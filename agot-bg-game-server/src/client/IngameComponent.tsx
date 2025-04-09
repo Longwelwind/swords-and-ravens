@@ -1,7 +1,24 @@
 import * as React from "react";
 import { Component, ReactNode } from "react";
-import GameClient from "./GameClient";
 import { observer } from "mobx-react";
+import { observable } from "mobx";
+import {
+  Button,
+  FormCheck,
+  Modal,
+  Popover,
+  Tooltip,
+  OverlayTrigger,
+  Card,
+  Col,
+  Row,
+} from "react-bootstrap";
+import { toast } from "react-toastify";
+import * as _ from "lodash";
+import classNames from "classnames";
+import { isMobile } from "react-device-detect";
+
+import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import MapComponent, { MAP_HEIGHT } from "./MapComponent";
 import MapControls, {
@@ -9,29 +26,17 @@ import MapControls, {
   RegionOnMapProperties,
   UnitOnMapProperties,
 } from "./MapControls";
-import ListGroup from "react-bootstrap/ListGroup";
-import ListGroupItem from "react-bootstrap/ListGroupItem";
-import Card from "react-bootstrap/Card";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
-import { toast } from "react-toastify";
-import renderChildGameState from "./utils/renderChildGameState";
-import WesterosGameState from "../common/ingame-game-state/westeros-game-state/WesterosGameState";
-import WesterosGameStateComponent from "./game-state-panel/WesterosGameStateComponent";
-import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
-import PlanningComponent from "./game-state-panel/PlanningComponent";
-import ActionGameState from "../common/ingame-game-state/action-game-state/ActionGameState";
-import ActionComponent from "./game-state-panel/ActionComponent";
-import * as _ from "lodash";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar } from "@fortawesome/free-solid-svg-icons/faStar";
-import { faEdit } from "@fortawesome/free-solid-svg-icons/faEdit";
-import { faHistory } from "@fortawesome/free-solid-svg-icons/faHistory";
-import { faCog } from "@fortawesome/free-solid-svg-icons/faCog";
-import { faComments } from "@fortawesome/free-solid-svg-icons/faComments";
-import { faComment } from "@fortawesome/free-solid-svg-icons/faComment";
-import Tooltip from "react-bootstrap/Tooltip";
+import GameStateColumn from "./game-state-panel/GameStateColumn";
+import HouseInfoColumn from "./game-state-panel/HouseInfoColumn";
+import GameTabsComponent from "./game-state-panel/GameTabsComponent";
+
+import { Channel } from "./chat-client/ChatClient";
+import House from "../common/ingame-game-state/game-data-structure/House";
+import Region from "../common/ingame-game-state/game-data-structure/Region";
+import Unit from "../common/ingame-game-state/game-data-structure/Unit";
+import BetterMap from "../utils/BetterMap";
+import PartialRecursive from "../utils/PartialRecursive";
+
 import cancelImage from "../../public/images/icons/cancel.svg";
 import truceImage from "../../public/images/icons/truce.svg";
 import stopwatchPlus15Image from "../../public/images/icons/stopwatch-plus-15.svg";
@@ -43,45 +48,13 @@ import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
-import hourglassImage from "../../public/images/icons/hourglass.svg";
-import mammothImage from "../../public/images/icons/mammoth.svg";
-import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
-import cardRandomImage from "../../public/images/icons/card-random.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 import contractImage from "../../public/images/icons/contract.svg";
-import expandImage from "../../public/images/icons/expand.svg";
-import House from "../common/ingame-game-state/game-data-structure/House";
-import GameLogListComponent from "./GameLogListComponent";
-import Game, {
-  MAX_WILDLING_STRENGTH,
-} from "../common/ingame-game-state/game-data-structure/Game";
-import GameEndedGameState from "../common/ingame-game-state/game-ended-game-state/GameEndedGameState";
-import GameEndedComponent from "./game-state-panel/GameEndedComponent";
-import Nav from "react-bootstrap/Nav";
-import Tab from "react-bootstrap/Tab";
-import ChatComponent from "./chat-client/ChatComponent";
-import InfluenceIconComponent from "./game-state-panel/utils/InfluenceIconComponent";
-import SupplyTrackComponent from "./game-state-panel/utils/SupplyTrackComponent";
-import Dropdown from "react-bootstrap/Dropdown";
-import User from "../server/User";
-import Player from "../common/ingame-game-state/Player";
-import { observable } from "mobx";
-import classNames from "classnames";
-import { Channel, Message } from "./chat-client/ChatClient";
-// @ts-expect-error Somehow this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
-import GameSettingsComponent from "./GameSettingsComponent";
-import IngameCancelledComponent from "./game-state-panel/IngameCancelledComponent";
+
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
-import NoteComponent from "./NoteComponent";
-import HouseRowComponent from "./HouseRowComponent";
-import UserSettingsComponent from "./UserSettingsComponent";
-import { GameSettings } from "../common/EntireGame";
-import { isMobile } from "react-device-detect";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
-import DraftGameState from "../common/ingame-game-state/draft-game-state/DraftGameState";
 import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
 import houseCardsBackImages from "./houseCardsBackImages";
 import houseInfluenceImages from "./houseInfluenceImages";
@@ -90,52 +63,26 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import {
-  faCheckToSlot,
-  faRightLeft,
-  faUniversity,
-} from "@fortawesome/free-solid-svg-icons";
 import joinNaturalLanguage from "./utils/joinNaturalLanguage";
-import PayDebtsGameState from "../common/ingame-game-state/pay-debts-game-state/PayDebtsGameState";
-import PayDebtsComponent from "./game-state-panel/PayDebtsComponent";
-import BetterMap from "../utils/BetterMap";
-import Region from "../common/ingame-game-state/game-data-structure/Region";
-import Unit from "../common/ingame-game-state/game-data-structure/Unit";
-import PartialRecursive from "../utils/PartialRecursive";
-import ChooseInitialObjectivesGameState from "../common/ingame-game-state/choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
-import ChooseInitialObjectivesComponent from "./game-state-panel/ChooseInitialObjectivesComponent";
-import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
-import { Button, FormCheck, Modal, Popover, Spinner } from "react-bootstrap";
+import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
-import ConditionalWrap from "./utils/ConditionalWrap";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
-import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
-import IronBankTabComponent from "./IronBankTabComponent";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import CombatInfoComponent from "./CombatInfoComponent";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 import houseIconImages from "./houseIconImages";
 import { preemptiveRaid } from "../common/ingame-game-state/game-data-structure/wildling-card/wildlingCardTypes";
-import VotesListComponent from "./VotesListComponent";
 import { houseColorFilters } from "./houseColorFilters";
 import LocalStorageService from "./utils/localStorageService";
 import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluenceIconComponent";
 import VolumeSliderComponent from "./utils/VolumeSliderComponent";
 import { houseThemes } from "./utils/SfxManager";
-import DraftComponent from "./game-state-panel/DraftComponent";
 
-interface ColumnOrders {
+export interface ColumnOrders {
   gameStateColumn: number;
   mapColumn: number;
   housesInfosColumn: number;
-}
-
-interface GameStatePhaseProps {
-  name: string;
-  gameState: any;
-  component: typeof Component;
 }
 
 interface IngameComponentProps {
@@ -143,7 +90,7 @@ interface IngameComponentProps {
   gameState: IngameGameState;
 }
 
-interface InfluenceTrackDetails {
+export interface InfluenceTrackDetails {
   name: string;
   trackToShow: (House | null)[];
   realTrack: House[];
@@ -153,7 +100,7 @@ interface InfluenceTrackDetails {
 @observer
 export default class IngameComponent extends Component<IngameComponentProps> {
   mapControls: MapControls = new MapControls();
-  @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
+
   @observable highlightedRegions = new BetterMap<
     Region,
     RegionOnMapProperties
@@ -161,51 +108,20 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   @observable showMapScrollbarInfo = false;
   @observable showBrowserZoomInfo = false;
   @observable columnSwapAnimationClassName = "";
-  @observable unseenNotes = false;
   @observable tracksPopoverVisible = false;
 
-  get logChatFullScreen(): boolean {
-    return this.props.gameClient.logChatFullScreen;
-  }
-
-  set logChatFullScreen(value: boolean) {
-    this.props.gameClient.logChatFullScreen = value;
-  }
+  private ingame = this.props.gameState;
+  private gameClient = this.props.gameClient;
+  private user = this.props.gameClient.authenticatedUser;
+  private authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
+  private game = this.ingame.game;
+  private gameSettings = this.ingame.entireGame.gameSettings;
+  private mapScrollbarEnabled =
+    !isMobile && (this.user?.settings.mapScrollbar ?? true);
 
   modifyRegionsOnMapCallback: any;
   modifyOrdersOnMapCallback: any;
   modifyUnitsOnMapCallback: any;
-  onVisibilityChangedCallback: (() => void) | null = null;
-
-  get game(): Game {
-    return this.ingame.game;
-  }
-
-  get gameSettings(): GameSettings {
-    return this.ingame.entireGame.gameSettings;
-  }
-
-  get user(): User | null {
-    return this.gameClient.authenticatedUser
-      ? this.gameClient.authenticatedUser
-      : null;
-  }
-
-  get ingame(): IngameGameState {
-    return this.props.gameState;
-  }
-
-  get authenticatedPlayer(): Player | null {
-    return this.gameClient.authenticatedPlayer;
-  }
-
-  get mapScrollbarEnabled(): boolean {
-    return !isMobile && (this.user?.settings.mapScrollbar ?? true);
-  }
-
-  get gameClient(): GameClient {
-    return this.props.gameClient;
-  }
 
   calcInfluenceTrackDetails(): InfluenceTrackDetails[] {
     const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(
@@ -290,7 +206,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   render(): ReactNode {
     const tracks = this.calcInfluenceTrackDetails();
-    if (this.logChatFullScreen) {
+    if (this.gameClient.logChatFullScreen) {
       const isOwnTurn = this.gameClient.isOwnTurn();
       const border = isOwnTurn
         ? "warning"
@@ -304,7 +220,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           xl="6"
           style={{ maxHeight: "95vh", height: "95vh" }}
         >
-          {this.renderGameStateCard(border)}
+          <GameTabsComponent
+            gameClient={this.gameClient}
+            ingame={this.ingame}
+            mapControls={this.mapControls}
+            border={border}
+            user={this.user}
+            authenticatedPlayer={this.authenticatedPlayer}
+            publicChatRoom={this.publicChatRoom}
+          />
           <button
             className="btn btn-secondary"
             style={{
@@ -314,7 +238,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               zIndex: 1000,
             }}
             onClick={() => {
-              this.logChatFullScreen = false;
+              this.gameClient.logChatFullScreen = false;
             }}
           >
             <img src={contractImage} width={24} />
@@ -340,7 +264,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 : "800px",
             }}
           >
-            {this.renderGameStateColumn()}
+            <GameStateColumn
+              ingame={this.ingame}
+              gameClient={this.gameClient}
+              mapControls={this.mapControls}
+              publicChatRoom={this.publicChatRoom}
+              authenticatedPlayer={this.authenticatedPlayer}
+              user={this.user}
+            />
           </Col>
           {!this.ingame.hasChildGameState(DraftHouseCardsGameState) ||
           this.user?.settings.showMapWhenDrafting ? (
@@ -381,7 +312,24 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 !isMobile && this.gameSettings.playerCount >= 8,
             })}
           >
-            {this.renderHousesColumn(isMobile, tracks)}
+            <HouseInfoColumn
+              ingame={this.ingame}
+              gameClient={this.gameClient}
+              mapControls={this.mapControls}
+              authenticatedPlayer={this.authenticatedPlayer}
+              user={this.user}
+              publicChatRoom={this.publicChatRoom}
+              gameControlsPopover={this.renderGameControlsPopover()}
+              tracks={tracks}
+              columnOrders={this.getColumnOrders()}
+              showGameControls={true}
+              colSwapAnimationClassChanged={(className) =>
+                (this.columnSwapAnimationClassName = className)
+              }
+              tracksPopoverVisibleChanged={(visible) =>
+                (this.tracksPopoverVisible = visible)
+              }
+            />
           </Col>
         </Row>
         {this.renderScrollbarModal()}
@@ -505,7 +453,23 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               >
                 <span>&times;</span>
               </button>
-              {this.renderHousesColumn(false, tracks)}
+              <HouseInfoColumn
+                ingame={this.ingame}
+                gameClient={this.gameClient}
+                mapControls={this.mapControls}
+                authenticatedPlayer={this.authenticatedPlayer}
+                user={this.user}
+                publicChatRoom={this.publicChatRoom}
+                gameControlsPopover={this.renderGameControlsPopover()}
+                tracks={tracks}
+                columnOrders={this.getColumnOrders()}
+                colSwapAnimationClassChanged={(className) =>
+                  (this.columnSwapAnimationClassName = className)
+                }
+                tracksPopoverVisibleChanged={(visible) =>
+                  (this.tracksPopoverVisible = visible)
+                }
+              />
             </Col>
           </Popover>
         }
@@ -659,242 +623,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   closeModal(): void {
     this.showMapScrollbarInfo = false;
     this.showBrowserZoomInfo = false;
-  }
-
-  renderHousesColumn(
-    renderGameControls: boolean,
-    tracks: InfluenceTrackDetails[]
-  ): ReactNode {
-    const bannedUsers = this.getBannedUsers();
-    const connectedSpectators = _.difference(
-      this.getConnectedSpectators(),
-      bannedUsers
-    );
-
-    return (
-      <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-        <Card
-          className={
-            this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : ""
-          }
-        >
-          <ListGroup variant="flush">
-            {this.renderInfluenceTracks(tracks)}
-            <ListGroupItem style={{ minHeight: "130px" }}>
-              <SupplyTrackComponent
-                supplyRestrictions={this.game.supplyRestrictions}
-                houses={this.game.houses.values}
-                ingame={this.ingame}
-                gameClient={this.gameClient}
-                mapControls={this.mapControls}
-              />
-            </ListGroupItem>
-          </ListGroup>
-          <button
-            type="button"
-            className="close"
-            onClick={(e: any) => {
-              if (this.user && this.columnSwapAnimationClassName == "") {
-                e.currentTarget.blur();
-                this.columnSwapAnimationClassName =
-                  "animate__animated animate__fadeIn";
-                this.user.settings.responsiveLayout =
-                  !this.user.settings.responsiveLayout;
-                this.tracksPopoverVisible = false;
-                window.setTimeout(
-                  () => (this.columnSwapAnimationClassName = ""),
-                  2050
-                );
-              }
-            }}
-            style={{ position: "absolute", left: "0px", padding: "4px" }}
-          >
-            <FontAwesomeIcon
-              icon={faRightLeft}
-              style={{ color: "white" }}
-              size="2xs"
-            />
-          </button>
-        </Card>
-        <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
-          <Card.Body id="houses-panel" className="no-space-around">
-            <ListGroup variant="flush">
-              <ListGroupItem className="d-flex justify-content-center p-2">
-                <OverlayTrigger
-                  overlay={
-                    <Tooltip
-                      id="cancel-game-vote-tooltip"
-                      className="tooltip-w-100"
-                    >
-                      The houses info list is always reordered by score and thus
-                      acts as the victory track.
-                      <br />
-                      If you hover the mouse pointer over the victory point
-                      counter, a tooltip appears
-                      <br />
-                      that shows you the total number of land areas, which is
-                      important for breaking ties.
-                    </Tooltip>
-                  }
-                  placement="top"
-                >
-                  <img src={podiumWinnerImage} width={40} />
-                </OverlayTrigger>
-              </ListGroupItem>
-              {this.game.getPotentialWinners().map((h) => (
-                <HouseRowComponent
-                  key={`house-row_${h.id}`}
-                  gameClient={this.gameClient}
-                  ingame={this.ingame}
-                  house={h}
-                  mapControls={this.mapControls}
-                />
-              ))}
-              <ListGroupItem className="font-italic">
-                {connectedSpectators.length > 0 ? (
-                  <>
-                    <Row className="justify-content-center">
-                      <Col xs="auto">Spectators:</Col>
-                    </Row>
-                    <Row
-                      className="justify-content-center"
-                      style={{ maxWidth: 500 }}
-                    >
-                      {connectedSpectators.map((u) => (
-                        <Col xs="auto" key={`specatator_${u.id}`}>
-                          <b>
-                            {getUserLinkOrLabel(
-                              this.ingame.entireGame,
-                              u,
-                              null
-                            )}
-                          </b>
-                          <button
-                            type="button"
-                            className={classNames(
-                              "close",
-                              !this.gameClient.canActAsOwner() ? "d-none" : ""
-                            )}
-                            onClick={() => this.banUser(u)}
-                          >
-                            <span>&times;</span>
-                          </button>
-                        </Col>
-                      ))}
-                    </Row>
-                  </>
-                ) : (
-                  <Row className="justify-content-center">
-                    <Col xs="auto">No spectators</Col>
-                  </Row>
-                )}
-              </ListGroupItem>
-              {bannedUsers.length > 0 && (
-                <ListGroupItem className="font-italic">
-                  <Row className="justify-content-center">
-                    <Col xs="auto">Banned users:</Col>
-                  </Row>
-                  <Row
-                    className="justify-content-center"
-                    style={{ maxWidth: 500 }}
-                  >
-                    {bannedUsers.map((u) => (
-                      <Col xs="auto" key={`banned_${u.id}`}>
-                        <b>
-                          {getUserLinkOrLabel(this.ingame.entireGame, u, null)}
-                        </b>
-                        <button
-                          type="button"
-                          className={classNames(
-                            "close",
-                            !this.gameClient.canActAsOwner() ? "d-none" : ""
-                          )}
-                          onClick={() => this.unbanUser(u)}
-                        >
-                          <span>&#x2713;</span>
-                        </button>
-                      </Col>
-                    ))}
-                  </Row>
-                </ListGroupItem>
-              )}
-            </ListGroup>
-          </Card.Body>
-        </Card>
-        {renderGameControls && this.renderGameControlsRow()}
-      </div>
-    );
-  }
-
-  private banUser(user: User): void {
-    if (this.gameClient.canActAsOwner()) {
-      if (
-        !window.confirm("Do you want to ban " + user.name + " from your game?")
-      ) {
-        return;
-      }
-
-      this.ingame.entireGame.sendMessageToServer({
-        type: "ban-user",
-        userId: user.id,
-      });
-    }
-  }
-
-  private unbanUser(user: User): void {
-    if (this.gameClient.canActAsOwner()) {
-      if (!window.confirm("Do you want to unban " + user.name + "?")) {
-        return;
-      }
-
-      this.ingame.entireGame.sendMessageToServer({
-        type: "unban-user",
-        userId: user.id,
-      });
-    }
-  }
-
-  private renderGameControlsRow(): React.ReactNode {
-    return (
-      <Row
-        className={this.mapScrollbarEnabled ? "flex-footer mt-2" : "mt-2"}
-        id="game-controls"
-      >
-        <Col xs="auto">
-          <div className="btn btn-outline-light btn-sm">
-            <OverlayTrigger
-              overlay={this.renderGameControlsPopover()}
-              placement="top"
-              trigger="click"
-              rootClose
-            >
-              <img src={settingsKnobsImage} width={32} />
-            </OverlayTrigger>
-          </div>
-        </Col>
-        <Col xs="auto">
-          <button
-            type="button"
-            className="btn btn-outline-light btn-sm"
-            onClick={() => (this.gameClient.muted = !this.gameClient.muted)}
-          >
-            <OverlayTrigger
-              placement="auto"
-              overlay={
-                <Tooltip id="mute-tooltip">
-                  {this.gameClient.muted ? "Unmute" : "Mute"}
-                </Tooltip>
-              }
-            >
-              <img
-                src={this.gameClient.muted ? speakerOffImage : speakerImage}
-                width={32}
-              />
-            </OverlayTrigger>
-          </button>
-        </Col>
-      </Row>
-    );
   }
 
   private renderGameControlsPopover(): OverlayChildren {
@@ -1150,821 +878,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     );
   }
 
-  private renderInfluenceTracks(
-    tracks: InfluenceTrackDetails[]
-  ): React.ReactNode {
-    return tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
-      <ListGroupItem
-        key={`influence-track-container_${i}`}
-        style={{ minHeight: "61px" }}
-      >
-        <Row className="align-items-center d-flex flex-nowrap">
-          <Col xs="auto" className="text-center" style={{ width: "46px" }}>
-            <OverlayTrigger
-              overlay={
-                <Tooltip id={`tooltip-tracker-${i}`}>
-                  {i == 0 ? (
-                    <>
-                      <b>Iron Throne Track</b>
-                      <br />
-                      All ties (except military ones) are decided by the holder
-                      of the Iron Throne.
-                      <br />
-                      Turn order is decided by this tracker.
-                    </>
-                  ) : i == 1 ? (
-                    <>
-                      <b>Fiefdoms Track</b>
-                      <br />
-                      Once per round, the holder of Valyrian Steel Blade can use
-                      the blade to increase by one the combat strength of his
-                      army in a combat.
-                      <br />
-                      In case of a tie in a combat, the winner is the house
-                      which is the highest in this tracker.
-                      <br />
-                      <br />
-                      {this.game.valyrianSteelBladeUsed ? (
-                        <>The Valyrian Steel Blade has been used this round.</>
-                      ) : (
-                        <>The Valyrian Steel Blade is available.</>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <b>Kings&apos;s Court Track</b>
-                      <br />
-                      At the end of the Planning Phase, the holder of the Raven
-                      may choose to either change one of his placed order, or to
-                      look at the top card of the Wildling deck and decide
-                      whether to leave it at the top or to place it at the
-                      bottom of the deck.
-                    </>
-                  )}
-                </Tooltip>
-              }
-              placement="right"
-            >
-              <img
-                src={
-                  i == 0
-                    ? stoneThroneImage
-                    : i == 1
-                      ? this.game.valyrianSteelBladeUsed
-                        ? diamondHiltUsedImage
-                        : diamondHiltImage
-                      : ravenImage
-                }
-                width={32}
-              />
-            </OverlayTrigger>
-          </Col>
-          {trackToShow.map((h, j) => (
-            <Col xs="auto" key={`influence-track_${i}_${h?.id ?? j}`}>
-              <InfluenceIconComponent
-                house={h}
-                ingame={this.ingame}
-                track={realTrack}
-                name={name}
-              />
-              <div className="tracker-star-container">
-                {stars &&
-                  _.range(0, this.game.starredOrderRestrictions[j]).map((k) => (
-                    <div key={`stars_${h?.id ?? j}_${k}`}>
-                      <FontAwesomeIcon
-                        style={{ color: "#ffc107", fontSize: "9px" }}
-                        icon={faStar}
-                      />
-                    </div>
-                  ))}
-              </div>
-            </Col>
-          ))}
-        </Row>
-      </ListGroupItem>
-    ));
-  }
-
-  renderGameStateColumn(): ReactNode {
-    const phases: GameStatePhaseProps[] = [
-      {
-        name: "Westeros",
-        gameState: WesterosGameState,
-        component: WesterosGameStateComponent,
-      },
-      {
-        name: "Planning",
-        gameState: PlanningGameState,
-        component: PlanningComponent,
-      },
-      {
-        name: "Action",
-        gameState: ActionGameState,
-        component: ActionComponent,
-      },
-    ];
-
-    const knowsWildlingCard =
-      this.authenticatedPlayer != null &&
-      this.authenticatedPlayer.house.knowsNextWildlingCard;
-    const nextWildlingCard = this.game.wildlingDeck.find(
-      (c) => c.id == this.game.clientNextWildlingCardId
-    );
-
-    const gameRunning = !this.ingame.isEndedOrCancelled;
-    const roundWarning =
-      gameRunning && this.game.maxTurns - this.game.turn == 1;
-    const roundCritical = gameRunning && this.game.turn == this.game.maxTurns;
-
-    const wildlingsWarning =
-      gameRunning && this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 4;
-    const wildlingsCritical =
-      gameRunning &&
-      (this.game.wildlingStrength == MAX_WILDLING_STRENGTH ||
-        this.game.wildlingStrength == MAX_WILDLING_STRENGTH - 2);
-
-    const isOwnTurn = this.gameClient.isOwnTurn();
-    const border = isOwnTurn
-      ? "warning"
-      : this.ingame.childGameState instanceof CancelledGameState
-        ? "danger"
-        : undefined;
-
-    const isPhaseActive = (phase: GameStatePhaseProps): boolean =>
-      this.ingame.childGameState instanceof phase.gameState;
-
-    return (
-      <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
-        <Card
-          id="game-state-panel"
-          className={
-            this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : "mb-2"
-          }
-          border={border}
-          style={{
-            maxHeight: this.mapScrollbarEnabled ? "65%" : "none",
-            paddingRight: "2px",
-            borderWidth: "3px",
-            overflowY: "scroll",
-          }}
-        >
-          <Row className="no-space-around">
-            <Col>
-              <ListGroup variant="flush">
-                {phases.some((phase) => isPhaseActive(phase)) && (
-                  <ListGroupItem>
-                    <Row className="justify-content-between align-items-center">
-                      <Col
-                        xs="auto"
-                        key={phases[0].name + "_phase"}
-                        className="px-1"
-                      >
-                        <OverlayTrigger
-                          overlay={this.renderRemainingWesterosCards()}
-                          trigger="click"
-                          placement="bottom-start"
-                          rootClose
-                        >
-                          <div
-                            className={classNames(
-                              "clickable btn btn-sm btn-secondary dropdown-toggle",
-                              {
-                                "weak-box-outline": isPhaseActive(phases[0]),
-                                "text-muted": !isPhaseActive(phases[0]),
-                              }
-                            )}
-                          >
-                            <ConditionalWrap
-                              condition={isPhaseActive(phases[0])}
-                              wrap={(child) => <b>{child}</b>}
-                            >
-                              <>{phases[0].name} phase</>
-                            </ConditionalWrap>
-                          </div>
-                        </OverlayTrigger>
-                      </Col>
-                      {_.drop(phases).map((phase) => (
-                        <Col
-                          xs="auto"
-                          key={`${phase.name}_phase`}
-                          className="px-1"
-                        >
-                          <div
-                            className={classNames({
-                              "p-1": true,
-                              "weak-box-outline": isPhaseActive(phase),
-                              "text-muted": !isPhaseActive(phase),
-                            })}
-                          >
-                            <ConditionalWrap
-                              condition={isPhaseActive(phase)}
-                              wrap={(child) => <b>{child}</b>}
-                            >
-                              <>{phase.name} phase</>
-                            </ConditionalWrap>
-                          </div>
-                        </Col>
-                      ))}
-                    </Row>
-                  </ListGroupItem>
-                )}
-                <ListGroupItem className="text-large">
-                  {renderChildGameState(
-                    { mapControls: this.mapControls, ...this.props },
-                    _.concat(
-                      phases.map(
-                        (phase) =>
-                          [phase.gameState, phase.component] as [
-                            any,
-                            typeof Component,
-                          ]
-                      ),
-                      [[DraftGameState, DraftComponent]],
-                      [[GameEndedGameState, GameEndedComponent]],
-                      [[CancelledGameState, IngameCancelledComponent]],
-                      [[PayDebtsGameState, PayDebtsComponent]],
-                      [
-                        [
-                          ChooseInitialObjectivesGameState,
-                          ChooseInitialObjectivesComponent,
-                        ],
-                      ]
-                    )
-                  )}
-                </ListGroupItem>
-              </ListGroup>
-            </Col>
-            <Col xs="auto" className="mx-1 px-0">
-              <Col
-                style={{ width: "28px", fontSize: "1.375rem" }}
-                className="px-0 text-center"
-              >
-                <Row
-                  className="mb-3 mx-0"
-                  onMouseEnter={() => this.highlightRegionsOfHouses()}
-                  onMouseLeave={() => this.highlightedRegions.clear()}
-                >
-                  <OverlayTrigger
-                    overlay={
-                      <Tooltip id="round-tooltip">
-                        <h5>
-                          Round {this.game.turn} / {this.game.maxTurns}
-                        </h5>
-                      </Tooltip>
-                    }
-                    placement="auto"
-                  >
-                    <div>
-                      <img
-                        className={classNames(
-                          { "dye-warning": roundWarning },
-                          { "dye-critical": roundCritical }
-                        )}
-                        src={hourglassImage}
-                        width={28}
-                      />
-                      <div
-                        style={{
-                          color: roundWarning
-                            ? "#F39C12"
-                            : roundCritical
-                              ? "#FF0000"
-                              : undefined,
-                        }}
-                      >
-                        {this.game.turn}
-                      </div>
-                    </div>
-                  </OverlayTrigger>
-                </Row>
-                <Row className="mr-0">
-                  <div>
-                    <OverlayTrigger
-                      overlay={this.renderWildlingDeckPopover(
-                        knowsWildlingCard,
-                        nextWildlingCard?.type
-                      )}
-                      trigger="click"
-                      placement="auto"
-                      rootClose
-                    >
-                      <div
-                        className={classNames(
-                          "clickable btn btn-sm btn-secondary p-1",
-                          { "weak-box-outline": knowsWildlingCard }
-                        )}
-                      >
-                        <img
-                          src={mammothImage}
-                          width={28}
-                          className={classNames(
-                            { "dye-warning": wildlingsWarning },
-                            { "dye-critical": wildlingsCritical }
-                          )}
-                        />
-                      </div>
-                    </OverlayTrigger>
-                    <div
-                      className={classNames({
-                        "txt-warning": wildlingsWarning,
-                        "txt-critical": wildlingsCritical,
-                      })}
-                    >
-                      {this.game.wildlingStrength}
-                    </div>
-                  </div>
-                </Row>
-                {this.ingame.rerender >= 0 &&
-                  this.game.dragonStrengthTokens.length > 0 && (
-                    <Row
-                      className="mx-0 mt-3"
-                      onMouseEnter={() => this.highlightRegionsWithDragons()}
-                      onMouseLeave={() => this.highlightedRegions.clear()}
-                    >
-                      <OverlayTrigger
-                        overlay={this.renderDragonStrengthTooltip()}
-                        placement="auto"
-                      >
-                        <div>
-                          <img src={spikedDragonHeadImage} width={28} />
-                          <div>{this.game.currentDragonStrength}</div>
-                        </div>
-                      </OverlayTrigger>
-                    </Row>
-                  )}
-              </Col>
-            </Col>
-          </Row>
-          <button
-            type="button"
-            className="close"
-            onClick={(e: any) => {
-              if (this.user && this.columnSwapAnimationClassName == "") {
-                e.currentTarget.blur();
-                this.columnSwapAnimationClassName =
-                  "animate__animated animate__fadeIn";
-                this.user.settings.responsiveLayout =
-                  !this.user.settings.responsiveLayout;
-                this.tracksPopoverVisible = false;
-                window.setTimeout(
-                  () => (this.columnSwapAnimationClassName = ""),
-                  2050
-                );
-              }
-            }}
-            style={{ position: "absolute", left: "0px", padding: "4px" }}
-          >
-            <FontAwesomeIcon
-              icon={faRightLeft}
-              style={{ color: "white" }}
-              size="2xs"
-            />
-          </button>
-          {isOwnTurn && (
-            <Spinner
-              animation="grow"
-              variant="warning"
-              size="sm"
-              style={{ position: "absolute", bottom: "4px", left: "4px" }}
-            />
-          )}
-        </Card>
-        {this.renderGameStateCard()}
-      </div>
-    );
-  }
-
-  private renderGameStateCard(
-    border: string | undefined = undefined
-  ): ReactNode {
-    const height = this.logChatFullScreen
-      ? "85%"
-      : this.mapScrollbarEnabled
-        ? "auto"
-        : "800px";
-
-    return (
-      <Card
-        border={border}
-        style={{
-          height: height,
-          maxHeight: height,
-          borderWidth: "3px",
-        }}
-        className={classNames(
-          { "flex-fill-remaining": this.mapScrollbarEnabled },
-          "text-large"
-        )}
-      >
-        <Tab.Container
-          activeKey={this.currentOpenedTab}
-          onSelect={(k) => {
-            if (k) {
-              this.currentOpenedTab = k;
-            }
-          }}
-        >
-          <Card.Header>
-            <Nav variant="tabs">
-              <Nav.Item>
-                <Nav.Link eventKey="game-logs">
-                  <OverlayTrigger
-                    overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
-                    placement="top"
-                  >
-                    <span>
-                      <FontAwesomeIcon
-                        style={{ color: "white" }}
-                        icon={faHistory}
-                      />
-                    </span>
-                  </OverlayTrigger>
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <div
-                  className={classNames({
-                    "new-event": this.publicChatRoom.areThereUnreadMessages,
-                    disconnected: !this.publicChatRoom.connected,
-                  })}
-                >
-                  <Nav.Link eventKey="chat">
-                    <OverlayTrigger
-                      overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
-                      placement="top"
-                    >
-                      <span>
-                        <FontAwesomeIcon
-                          style={{ color: "white" }}
-                          icon={faComments}
-                        />
-                      </span>
-                    </OverlayTrigger>
-                  </Nav.Link>
-                </div>
-              </Nav.Item>
-              {this.ingame.votes.size > 0 && (
-                <Nav.Item>
-                  <div
-                    className={classNames({
-                      "new-event":
-                        this.gameClient.authenticatedPlayer?.isNeededForVote,
-                    })}
-                  >
-                    <Nav.Link eventKey="votes">
-                      <OverlayTrigger
-                        overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
-                        placement="top"
-                      >
-                        <span>
-                          <FontAwesomeIcon
-                            style={{ color: "white" }}
-                            icon={faCheckToSlot}
-                          />
-                        </span>
-                      </OverlayTrigger>
-                    </Nav.Link>
-                  </div>
-                </Nav.Item>
-              )}
-              {this.ingame.entireGame.isFeastForCrows && (
-                <Nav.Item>
-                  <Nav.Link eventKey="objectives">
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip id="objectives-tooltip">Objectives</Tooltip>
-                      }
-                      placement="top"
-                    >
-                      <span>
-                        <img src={cardRandomImage} width={20} />
-                      </span>
-                    </OverlayTrigger>
-                  </Nav.Link>
-                </Nav.Item>
-              )}
-              {this.game.ironBank && this.gameSettings.playerCount < 8 && (
-                <Nav.Item>
-                  <Nav.Link eventKey="iron-bank">
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip id="iron-bank-tooltip">The Iron Bank</Tooltip>
-                      }
-                      placement="top"
-                    >
-                      <span>
-                        <FontAwesomeIcon
-                          style={{ color: "white" }}
-                          icon={faUniversity}
-                        />
-                      </span>
-                    </OverlayTrigger>
-                  </Nav.Link>
-                </Nav.Item>
-              )}
-              <Nav.Item>
-                <div className={classNames({ "new-event": this.unseenNotes })}>
-                  <Nav.Link eventKey="note">
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip id="note-tooltip">Personal note</Tooltip>
-                      }
-                      placement="top"
-                    >
-                      <span>
-                        <FontAwesomeIcon
-                          style={{ color: "white" }}
-                          icon={faEdit}
-                        />
-                        {/* &nbsp;Notes */}
-                      </span>
-                    </OverlayTrigger>
-                  </Nav.Link>
-                </div>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="settings">
-                  <OverlayTrigger
-                    overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
-                    placement="top"
-                  >
-                    <span>
-                      <FontAwesomeIcon
-                        style={{ color: "white" }}
-                        icon={faCog}
-                      />
-
-                      {/* &nbsp;Settings */}
-                    </span>
-                  </OverlayTrigger>
-                </Nav.Link>
-              </Nav.Item>
-              {this.authenticatedPlayer &&
-                !this.gameSettings.noPrivateChats && (
-                  <Nav.Item>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        id="private-chat-room-dropdown"
-                        variant="link"
-                      >
-                        <OverlayTrigger
-                          overlay={
-                            <Tooltip id="private-chat-tooltip">
-                              Private Chat
-                            </Tooltip>
-                          }
-                          placement="top"
-                        >
-                          <FontAwesomeIcon
-                            style={{ color: "white" }}
-                            icon={faComment}
-                          />
-                          {/* &nbsp;Private Chat */}
-                        </OverlayTrigger>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {this.getOtherPlayers().map((p) => (
-                          <Dropdown.Item
-                            onClick={() => this.onNewPrivateChatRoomClick(p)}
-                            key={`new-chat_${p.user.id}`}
-                          >
-                            {this.getUserDisplayNameLabel(p.user)}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </Nav.Item>
-                )}
-              {this.getPrivateChatRooms().map(({ user, roomId }) => (
-                <Nav.Item key={roomId}>
-                  <div
-                    className={classNames({
-                      "new-event":
-                        this.getPrivateChatRoomForPlayer(user)
-                          .areThereUnreadMessages,
-                      disconnected: !this.publicChatRoom.connected,
-                    })}
-                  >
-                    <Nav.Link eventKey={roomId}>
-                      {this.getUserDisplayNameLabel(user)}
-                    </Nav.Link>
-                  </div>
-                </Nav.Item>
-              ))}
-            </Nav>
-            {isMobile && !this.logChatFullScreen && (
-              <button
-                className="btn btn-secondary"
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  zIndex: 1000,
-                }}
-                onClick={() => {
-                  this.logChatFullScreen = true;
-                }}
-              >
-                <img src={expandImage} width={24} />
-              </button>
-            )}
-          </Card.Header>
-          <Card.Body id="game-log-panel">
-            {/* This is an invisible div to force the parent to stretch to its remaining width */}
-            <div style={{ visibility: "hidden", width: "850px" }} />
-            <Tab.Content className="h-100">
-              <Tab.Pane eventKey="chat" className="h-100">
-                <ChatComponent
-                  gameClient={this.gameClient}
-                  entireGame={this.ingame.entireGame}
-                  roomId={this.ingame.entireGame.publicChatRoomId}
-                  currentlyViewed={this.currentOpenedTab == "chat"}
-                  injectBetweenMessages={(p, n) =>
-                    this.injectBetweenMessages(p, n)
-                  }
-                  getUserDisplayName={(u) => (
-                    <b>
-                      {getUserLinkOrLabel(
-                        this.ingame.entireGame,
-                        u,
-                        this.ingame.players.tryGet(u, null),
-                        this.user?.settings.chatHouseNames
-                      )}
-                    </b>
-                  )}
-                />
-              </Tab.Pane>
-              {this.ingame.votes.size > 0 && (
-                <Tab.Pane eventKey="votes" className="h-100">
-                  <ScrollToBottom
-                    className="h-100"
-                    scrollViewClassName="overflow-x-hidden"
-                  >
-                    <VotesListComponent
-                      gameClient={this.gameClient}
-                      ingame={this.ingame}
-                    />
-                  </ScrollToBottom>
-                </Tab.Pane>
-              )}
-              <Tab.Pane eventKey="game-logs" className="h-100">
-                <div className="d-flex flex-column h-100">
-                  <div className="d-flex flex-column align-items-center">
-                    <Dropdown className="mb-2">
-                      <Dropdown.Toggle variant="secondary" size="sm">
-                        Jump to
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {this.renderGameLogRoundsDropDownItems()}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                  <ScrollToBottom
-                    className="flex-fill-remaining"
-                    scrollViewClassName="overflow-x-hidden"
-                  >
-                    <GameLogListComponent
-                      ingameGameState={this.ingame}
-                      gameClient={this.gameClient}
-                      currentlyViewed={this.currentOpenedTab == "game-logs"}
-                    />
-                  </ScrollToBottom>
-                </div>
-              </Tab.Pane>
-              <Tab.Pane eventKey="settings" className="h-100">
-                <GameSettingsComponent
-                  gameClient={this.gameClient}
-                  entireGame={this.ingame.entireGame}
-                />
-                <div style={{ marginTop: -20 }}>
-                  <UserSettingsComponent
-                    user={this.user}
-                    entireGame={this.ingame.entireGame}
-                  />
-                </div>
-              </Tab.Pane>
-              <Tab.Pane eventKey="objectives" className="h-100">
-                <div
-                  className="d-flex flex-column h-100"
-                  style={{ overflowY: "scroll" }}
-                >
-                  <ObjectivesInfoComponent
-                    ingame={this.ingame}
-                    gameClient={this.gameClient}
-                  />
-                </div>
-              </Tab.Pane>
-              {this.game.ironBank && (
-                <Tab.Pane eventKey="iron-bank" className="h-100">
-                  <div
-                    className="d-flex flex-column h-100"
-                    style={{ overflowY: "scroll" }}
-                  >
-                    <IronBankTabComponent
-                      ingame={this.ingame}
-                      ironBank={this.game.ironBank}
-                    />
-                  </div>
-                </Tab.Pane>
-              )}
-              <Tab.Pane eventKey="note" className="h-100">
-                <NoteComponent
-                  gameClient={this.gameClient}
-                  ingame={this.ingame}
-                />
-              </Tab.Pane>
-              {this.getPrivateChatRooms().map(({ roomId }) => (
-                <Tab.Pane
-                  eventKey={roomId}
-                  key={`chat_${roomId}`}
-                  className="h-100"
-                >
-                  <ChatComponent
-                    gameClient={this.gameClient}
-                    entireGame={this.ingame.entireGame}
-                    roomId={roomId}
-                    currentlyViewed={this.currentOpenedTab == roomId}
-                    getUserDisplayName={(u) => (
-                      <b>
-                        {getUserLinkOrLabel(
-                          this.ingame.entireGame,
-                          u,
-                          this.ingame.players.tryGet(u, null),
-                          this.user?.settings.chatHouseNames
-                        )}
-                      </b>
-                    )}
-                  />
-                </Tab.Pane>
-              ))}
-            </Tab.Content>
-          </Card.Body>
-        </Tab.Container>
-        {this.logChatFullScreen && border && (
-          <Spinner
-            animation="grow"
-            variant="warning"
-            size="sm"
-            style={{ position: "absolute", bottom: "4px", left: "4px" }}
-          />
-        )}
-      </Card>
-    );
-  }
-
-  renderGameLogRoundsDropDownItems(): JSX.Element[] {
-    const gameRoundElements = document.querySelectorAll(
-      '*[id^="gamelog-round-"]'
-    );
-    const ordersReveleadElements = Array.from(
-      document.querySelectorAll('*[id^="gamelog-orders-revealed-round-"]')
-    );
-    const result: JSX.Element[] = [];
-
-    gameRoundElements.forEach((gameRoundElem) => {
-      const round = gameRoundElem.id.replace("gamelog-round-", "");
-
-      result.push(
-        <Dropdown.Item
-          className="text-center"
-          key={`dropdownitem-for-${gameRoundElem.id}`}
-          onClick={() => {
-            // When game log is the active tab, items get rendered before this logic here can work
-            // Therefore we search the item during onClick again to make it work
-            const elemToScroll = document.getElementById(gameRoundElem.id);
-            elemToScroll?.scrollIntoView();
-          }}
-        >
-          Round {round}
-        </Dropdown.Item>
-      );
-
-      const ordersRevealedElem = ordersReveleadElements.find(
-        (elem) => elem.id == `gamelog-orders-revealed-round-${round}`
-      );
-      if (ordersRevealedElem) {
-        result.push(
-          <Dropdown.Item
-            className="text-center"
-            key={`dropdownitem-for-${ordersRevealedElem.id}`}
-            onClick={() => {
-              // When game log is the active tab, items get rendered before this logic here can work
-              // Therefore we search the item during onClick again to make it work
-              const elemToScroll = document.getElementById(
-                ordersRevealedElem.id
-              );
-              elemToScroll?.scrollIntoView();
-            }}
-          >
-            Orders were revealed
-          </Dropdown.Item>
-        );
-      }
-    });
-
-    return result;
-  }
-
   highlightRegionsOfHouses(): void {
     const regions = new BetterMap(
       this.ingame.world.getAllRegionsWithControllers()
@@ -2033,36 +946,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     return alignGameStateToTheRight
       ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
       : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };
-  }
-
-  getUserDisplayNameLabel(user: User): React.ReactNode {
-    const player = this.ingame.players.tryGet(user, null);
-    const displayName =
-      !this.user?.settings.chatHouseNames || !player
-        ? user.name
-        : player.house.name;
-
-    return (
-      <ConditionalWrap
-        condition={!player}
-        wrap={(children) => (
-          <OverlayTrigger
-            overlay={
-              <Tooltip id="user-is-spectator-tooltip">
-                This user does not participate in the game
-              </Tooltip>
-            }
-            placement="auto"
-            delay={{ show: 250, hide: 0 }}
-          >
-            {children}
-          </OverlayTrigger>
-        )}
-      >
-        {/* Spectators are shown in burlywood brown */}
-        <b style={{ color: player?.house.color ?? "#deb887" }}>{displayName}</b>
-      </ConditionalWrap>
-    );
   }
 
   get publicChatRoom(): Channel {
@@ -2225,80 +1108,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     );
   }
 
-  getConnectedSpectators(): User[] {
-    return _.difference(
-      this.ingame.entireGame.users.values.filter((u) => u.connected),
-      this.ingame.players.keys
-    );
-  }
-
-  getBannedUsers(): User[] {
-    return Array.from(this.ingame.bannedUsers.values())
-      .filter((uid) => this.ingame.entireGame.users.has(uid))
-      .map((uid) => this.ingame.entireGame.users.get(uid));
-  }
-
-  onNewPrivateChatRoomClick(p: Player): void {
-    const users = _.sortBy([this.user as User, p.user], (u) => u.id);
-
-    if (
-      !this.ingame.entireGame.privateChatRoomsIds.has(users[0]) ||
-      !this.ingame.entireGame.privateChatRoomsIds.get(users[0]).has(users[1])
-    ) {
-      // Create a new chat room for this player
-      this.ingame.entireGame.sendMessageToServer({
-        type: "create-private-chat-room",
-        otherUser: p.user.id,
-      });
-    } else {
-      // The room already exists
-      // Set the current tab to this user
-      this.currentOpenedTab = this.ingame.entireGame.privateChatRoomsIds
-        .get(users[0])
-        .get(users[1]);
-    }
-  }
-
-  getPrivateChatRooms(): { user: User; roomId: string }[] {
-    return this.ingame.entireGame.getPrivateChatRoomsOf(this.user as User);
-  }
-
-  getPrivateChatRoomForPlayer(u: User): Channel {
-    const users = _.sortBy([this.user as User, u], (u) => u.id);
-
-    return this.gameClient.chatClient.channels.get(
-      this.ingame.entireGame.privateChatRoomsIds.get(users[0]).get(users[1])
-    );
-  }
-
-  getOtherPlayers(): Player[] {
-    return _.sortBy(this.ingame.players.values, (p) =>
-      this.user?.settings.chatHouseNames ? p.house.name : p.user.name
-    ).filter((p) => p.user != this.user);
-  }
-
-  injectBetweenMessages(
-    _previous: Message | null,
-    _next: Message | null
-  ): ReactNode {
-    return null;
-  }
-
-  onNewPrivateChatRoomCreated(roomId: string): void {
-    this.currentOpenedTab = roomId;
-  }
-
-  onVisibilityChanged(): void {
-    if (document.visibilityState == "visible" || !this.user) {
-      return;
-    }
-
-    if (this.currentOpenedTab != this.user.settings.lastOpenedTab) {
-      this.user.settings.lastOpenedTab = this.currentOpenedTab;
-      this.user.syncSettings();
-    }
-  }
-
   getCombatFastTrackedComponent(stats: CombatStats[]): React.ReactNode {
     const winners = stats.filter((cs) => cs.isWinner);
     const winner =
@@ -2403,13 +1212,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
     );
 
-    this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) =>
-      this.onNewPrivateChatRoomCreated(roomId);
-
-    const visibilityChangedCallback = (): void => this.onVisibilityChanged();
-    document.addEventListener("visibilitychange", visibilityChangedCallback);
-    this.onVisibilityChangedCallback = visibilityChangedCallback;
-
     const dontShowAgainFromStorage = LocalStorageService.getWithExpiry<boolean>(
       "dontShowScrollbarHintsAgain"
     );
@@ -2504,10 +1306,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         }
       );
     };
-
-    if (this.gameClient.authenticatedUser?.note.length ?? 0 > 0) {
-      this.unseenNotes = true;
-    }
   }
 
   hasVerticalScrollbar(): boolean {
@@ -2526,28 +1324,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     _.pull(this.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     _.pull(this.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
 
-    const visibilityChangedCallback = this.onVisibilityChangedCallback;
-    if (visibilityChangedCallback) {
-      document.removeEventListener(
-        "visibilitychange",
-        visibilityChangedCallback
-      );
-    }
-
     this.ingame.entireGame.onWildingsAttackFastTracked = null;
     this.ingame.entireGame.onCombatFastTracked = null;
     this.ingame.onPreemptiveRaidNewAttack = null;
     this.ingame.onVoteStarted = null;
-  }
-
-  componentDidUpdate(
-    _prevProps: Readonly<IngameComponentProps>,
-    _prevState: Readonly<any>,
-    _snapshot?: any
-  ): void {
-    if (this.currentOpenedTab == "note") {
-      this.unseenNotes = false;
-    }
   }
 
   modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
