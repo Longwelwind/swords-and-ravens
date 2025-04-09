@@ -1,4 +1,7 @@
 import React, { Component, ReactNode } from "react";
+import { observer } from "mobx-react";
+import { observable } from "mobx";
+
 import {
   Col,
   Row,
@@ -45,6 +48,7 @@ import hourglassImage from "../../../public/images/icons/hourglass.svg";
 import mammothImage from "../../../public/images/icons/mammoth.svg";
 import ConditionalWrap from "../utils/ConditionalWrap";
 import renderChildGameState from "../utils/renderChildGameState";
+import ColumnSwapButton from "./utils/ColumnSwapButton";
 
 interface GameStateColumnProps {
   ingame: IngameGameState;
@@ -53,9 +57,14 @@ interface GameStateColumnProps {
   authenticatedPlayer: Player | null;
   publicChatRoom: Channel;
   user: User | null;
+  colSwapAnimationClassChanged: (classname: string) => void;
+  tracksPopoverVisibleChanged: (visible: boolean) => void;
 }
 
+@observer
 export default class GameStateColumn extends Component<GameStateColumnProps> {
+  @observable columnSwapAnimationClassName = "";
+
   private ingame = this.props.ingame;
   private gameClient = this.props.gameClient;
   private mapControls = this.props.mapControls;
@@ -245,6 +254,14 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
               </Col>
             </Col>
           </Row>
+          <ColumnSwapButton
+            user={this.props.user}
+            columnSwapAnimationClassName={this.columnSwapAnimationClassName}
+            colSwapAnimationClassChanged={
+              this.props.colSwapAnimationClassChanged
+            }
+            tracksPopoverVisibleChanged={this.props.tracksPopoverVisibleChanged}
+          />
           {isOwnTurn && (
             <Spinner
               animation="grow"

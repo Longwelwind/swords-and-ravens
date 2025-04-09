@@ -246,6 +246,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </Col>
       );
     }
+    const columnOrder = this.user?.settings.responsiveLayout
+      ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
+      : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };
 
     return (
       <>
@@ -254,7 +257,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           style={{ maxHeight: this.mapScrollbarEnabled ? "95vh" : "none" }}
         >
           <Col
-            xs={{ order: this.getColumnOrders().gameStateColumn }}
+            xs={{ order: columnOrder.gameStateColumn }}
             className={this.columnSwapAnimationClassName}
             style={{
               maxHeight: this.mapScrollbarEnabled ? "100%" : "none",
@@ -271,12 +274,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               publicChatRoom={this.publicChatRoom}
               authenticatedPlayer={this.authenticatedPlayer}
               user={this.user}
+              colSwapAnimationClassChanged={(className) =>
+                (this.columnSwapAnimationClassName = className)
+              }
+              tracksPopoverVisibleChanged={(visible) =>
+                (this.tracksPopoverVisible = visible)
+              }
             />
           </Col>
           {!this.ingame.hasChildGameState(DraftHouseCardsGameState) ||
           this.user?.settings.showMapWhenDrafting ? (
             <Col
-              xs={{ span: "auto", order: this.getColumnOrders().mapColumn }}
+              xs={{ span: "auto", order: columnOrder.mapColumn }}
               style={{ maxHeight: this.mapScrollbarEnabled ? "100%" : "none" }}
             >
               <div
@@ -299,7 +308,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <Col
             xs={{
               span: "auto",
-              order: this.getColumnOrders().housesInfosColumn,
+              order: columnOrder.housesInfosColumn,
             }}
             style={{
               maxHeight: this.mapScrollbarEnabled ? "100%" : "none",
@@ -321,7 +330,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               publicChatRoom={this.publicChatRoom}
               gameControlsPopover={this.renderGameControlsPopover()}
               tracks={tracks}
-              columnOrders={this.getColumnOrders()}
               showGameControls={true}
               colSwapAnimationClassChanged={(className) =>
                 (this.columnSwapAnimationClassName = className)
@@ -462,7 +470,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 publicChatRoom={this.publicChatRoom}
                 gameControlsPopover={this.renderGameControlsPopover()}
                 tracks={tracks}
-                columnOrders={this.getColumnOrders()}
                 colSwapAnimationClassChanged={(className) =>
                   (this.columnSwapAnimationClassName = className)
                 }
@@ -940,12 +947,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </div>
       </Tooltip>
     );
-  }
-
-  getColumnOrders(alignGameStateToTheRight?: boolean): ColumnOrders {
-    return alignGameStateToTheRight
-      ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
-      : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };
   }
 
   get publicChatRoom(): Channel {
