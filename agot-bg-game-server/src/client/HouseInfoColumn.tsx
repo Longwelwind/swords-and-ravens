@@ -1,6 +1,4 @@
 import React, { Component, ReactNode } from "react";
-import { observer } from "mobx-react";
-import { observable } from "mobx";
 import {
   Col,
   Row,
@@ -18,10 +16,7 @@ import _ from "lodash";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import GameClient from "./GameClient";
 import MapControls from "./MapControls";
-import Player from "../common/ingame-game-state/Player";
-import { Channel } from "./chat-client/ChatClient";
 import User from "../server/User";
-import { isMobile } from "react-device-detect";
 import { InfluenceTrackDetails } from "./IngameComponent";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
 
@@ -45,26 +40,17 @@ interface HouseInfoColumnProps {
   ingame: IngameGameState;
   gameClient: GameClient;
   mapControls: MapControls;
-  authenticatedPlayer: Player | null;
-  publicChatRoom: Channel;
-  user: User | null;
   tracks: InfluenceTrackDetails[];
   gameControlsPopover: OverlayChildren;
-  colSwapAnimationClassChanged: (classname: string) => void;
-  tracksPopoverVisibleChanged: (visible: boolean) => void;
+  onColumnSwapClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   showGameControls?: boolean;
 }
 
-@observer
 export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
-  @observable columnSwapAnimationClassName = "";
+  private gameClient = this.props.gameClient;
 
   private ingame = this.props.ingame;
   private game = this.props.ingame.game;
-  private mapScrollbarEnabled =
-    !isMobile && (this.props.user?.settings.mapScrollbar ?? true);
-  private gameClient = this.props.gameClient;
-  private user = this.props.user;
 
   render(): ReactNode {
     const bannedUsers = this.getBannedUsers();
@@ -74,10 +60,16 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
     );
 
     return (
-      <div className={this.mapScrollbarEnabled ? "flex-ratio-container" : ""}>
+      <div
+        className={
+          this.gameClient.isMapScrollbarSet ? "flex-ratio-container" : ""
+        }
+      >
         <Card
           className={
-            this.mapScrollbarEnabled ? "flex-sized-to-content mb-2" : ""
+            this.gameClient.isMapScrollbarSet
+              ? "flex-sized-to-content mb-2"
+              : ""
           }
         >
           <ListGroup variant="flush">
@@ -92,16 +84,13 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
               />
             </ListGroupItem>
           </ListGroup>
-          <ColumnSwapButton
-            user={this.user}
-            columnSwapAnimationClassName={this.columnSwapAnimationClassName}
-            colSwapAnimationClassChanged={
-              this.props.colSwapAnimationClassChanged
-            }
-            tracksPopoverVisibleChanged={this.props.tracksPopoverVisibleChanged}
-          />
+          <ColumnSwapButton onClick={this.props.onColumnSwapClick} />
         </Card>
-        <Card className={this.mapScrollbarEnabled ? "flex-fill-remaining" : ""}>
+        <Card
+          className={
+            this.gameClient.isMapScrollbarSet ? "flex-fill-remaining" : ""
+          }
+        >
           <Card.Body id="houses-panel" className="no-space-around">
             <ListGroup variant="flush">
               <ListGroupItem className="d-flex justify-content-center p-2">
@@ -350,7 +339,9 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
   private renderGameControlsRow(): React.ReactNode {
     return (
       <Row
-        className={this.mapScrollbarEnabled ? "flex-footer mt-2" : "mt-2"}
+        className={
+          this.gameClient.isMapScrollbarSet ? "flex-footer mt-2" : "mt-2"
+        }
         id="game-controls"
       >
         <Col xs="auto">

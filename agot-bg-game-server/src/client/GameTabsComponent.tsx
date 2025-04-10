@@ -35,7 +35,7 @@ import { Channel, Message } from "./chat-client/ChatClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckToSlot,
-  faCog,
+  faGear,
   faComment,
   faComments,
   faEdit,
@@ -52,9 +52,6 @@ interface GameTabsComponentProps {
   ingame: IngameGameState;
   gameClient: GameClient;
   mapControls: MapControls;
-  publicChatRoom: Channel;
-  authenticatedPlayer: Player | null;
-  user: User | null;
   border?: string; // used if it is the own turn in full sceen mode
 }
 
@@ -62,18 +59,15 @@ interface GameTabsComponentProps {
 export default class GameTabsComponent extends Component<GameTabsComponentProps> {
   onVisibilityChangedCallback: (() => void) | null = null;
 
-  @observable currentOpenedTab =
-    this.props.user?.settings.lastOpenedTab ?? "chat";
-  @observable unseenNotes = false;
+  private gameClient = this.props.gameClient;
+  private user = this.gameClient.authenticatedUser;
+  private player = this.gameClient.authenticatedPlayer;
 
   private ingame = this.props.ingame;
-  private gameClient = this.props.gameClient;
-  private user = this.props.user;
-  private publicChatRoom = this.props.publicChatRoom;
-  private authenticatedPlayer = this.props.authenticatedPlayer;
-  private mapScrollbarEnabled =
-    !isMobile && (this.props.user?.settings.mapScrollbar ?? true);
   private gameSettings = this.ingame.entireGame.gameSettings;
+
+  @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
+  @observable unseenNotes = false;
 
   get logChatFullScreen(): boolean {
     return this.gameClient.logChatFullScreen;
@@ -83,10 +77,16 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     this.gameClient.logChatFullScreen = value;
   }
 
+  private get publicChatRoom(): Channel {
+    return this.gameClient.chatClient.channels.get(
+      this.ingame.entireGame.publicChatRoomId
+    );
+  }
+
   render(): ReactNode {
     const height = this.logChatFullScreen
       ? "85%"
-      : this.mapScrollbarEnabled
+      : this.gameClient.isMapScrollbarSet
         ? "auto"
         : "800px";
 
@@ -99,7 +99,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
           borderWidth: "3px",
         }}
         className={classNames(
-          { "flex-fill-remaining": this.mapScrollbarEnabled },
+          { "flex-fill-remaining": this.gameClient.isMapScrollbarSet },
           "text-large"
         )}
       >
@@ -238,47 +238,46 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                     <span>
                       <FontAwesomeIcon
                         style={{ color: "white" }}
-                        icon={faCog}
+                        icon={faGear}
                       />
                     </span>
                   </OverlayTrigger>
                 </Nav.Link>
               </Nav.Item>
-              {this.authenticatedPlayer &&
-                !this.gameSettings.noPrivateChats && (
-                  <Nav.Item>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        id="private-chat-room-dropdown"
-                        variant="link"
+              {this.player && !this.gameSettings.noPrivateChats && (
+                <Nav.Item>
+                  <Dropdown>
+                    <Dropdown.Toggle
+                      id="private-chat-room-dropdown"
+                      variant="link"
+                    >
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="private-chat-tooltip">
+                            Private Chat
+                          </Tooltip>
+                        }
+                        placement="top"
                       >
-                        <OverlayTrigger
-                          overlay={
-                            <Tooltip id="private-chat-tooltip">
-                              Private Chat
-                            </Tooltip>
-                          }
-                          placement="top"
+                        <FontAwesomeIcon
+                          style={{ color: "white" }}
+                          icon={faComment}
+                        />
+                      </OverlayTrigger>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      {this.getOtherPlayers().map((p) => (
+                        <Dropdown.Item
+                          onClick={() => this.onNewPrivateChatRoomClick(p)}
+                          key={`new-chat_${p.user.id}`}
                         >
-                          <FontAwesomeIcon
-                            style={{ color: "white" }}
-                            icon={faComment}
-                          />
-                        </OverlayTrigger>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        {this.getOtherPlayers().map((p) => (
-                          <Dropdown.Item
-                            onClick={() => this.onNewPrivateChatRoomClick(p)}
-                            key={`new-chat_${p.user.id}`}
-                          >
-                            {this.getUserDisplayNameLabel(p.user)}
-                          </Dropdown.Item>
-                        ))}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </Nav.Item>
-                )}
+                          {this.getUserDisplayNameLabel(p.user)}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </Nav.Item>
+              )}
               {this.getPrivateChatRooms().map(({ user, roomId }) => (
                 <Nav.Item key={roomId}>
                   <div

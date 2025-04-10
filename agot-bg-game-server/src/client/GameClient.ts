@@ -10,6 +10,7 @@ import ChatClient from "./chat-client/ChatClient";
 import BetterMap from "../utils/BetterMap";
 import { compress, decompress } from "./utils/compression";
 import SfxManager from "./utils/SfxManager";
+import { isMobile } from "react-device-detect";
 
 export interface AuthData {
   userId: string;
@@ -189,6 +190,10 @@ export default class GameClient {
     } else {
       return null;
     }
+  }
+
+  get isMapScrollbarSet(): boolean {
+    return !isMobile && (this.authenticatedUser?.settings.mapScrollbar ?? true);
   }
 
   private setCurrentMutedStateAndSaveVolumeSettingsToLocalStorage(): void {
