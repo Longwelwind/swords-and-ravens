@@ -10,7 +10,6 @@ import {
   EntireGameSnapshot as EntireGameSnapshot,
   GameSnapshot,
 } from "../common/ingame-game-state/game-data-structure/Game";
-import Dropdown from "react-bootstrap/Dropdown";
 import User from "../server/User";
 import { observable } from "mobx";
 import { GameSettings } from "../common/EntireGame";
@@ -139,63 +138,10 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
     );
   }
 
-  onColumnSwap(): void {
+  private onColumnSwap(): void {
     if (!this.user || this.columnSwapAnimationClassName !== "") return;
     this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
     this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
     window.setTimeout(() => (this.columnSwapAnimationClassName = ""), 2050);
-  }
-
-  renderGameLogRoundsDropDownItems(): JSX.Element[] {
-    const gameRoundElements = document.querySelectorAll(
-      '*[id^="gamelog-round-"]'
-    );
-    const ordersReveleadElements = Array.from(
-      document.querySelectorAll('*[id^="gamelog-orders-revealed-round-"]')
-    );
-    const result: JSX.Element[] = [];
-
-    gameRoundElements.forEach((gameRoundElem) => {
-      const round = gameRoundElem.id.replace("gamelog-round-", "");
-
-      result.push(
-        <Dropdown.Item
-          className="text-center"
-          key={`dropdownitem-for-${gameRoundElem.id}`}
-          onClick={() => {
-            // When game log is the active tab, items get rendered before this logic here can work
-            // Therefore we search the item during onClick again to make it work
-            const elemToScroll = document.getElementById(gameRoundElem.id);
-            elemToScroll?.scrollIntoView();
-          }}
-        >
-          Round {round}
-        </Dropdown.Item>
-      );
-
-      const ordersRevealedElem = ordersReveleadElements.find(
-        (elem) => elem.id == `gamelog-orders-revealed-round-${round}`
-      );
-      if (ordersRevealedElem) {
-        result.push(
-          <Dropdown.Item
-            className="text-center"
-            key={`dropdownitem-for-${ordersRevealedElem.id}`}
-            onClick={() => {
-              // When game log is the active tab, items get rendered before this logic here can work
-              // Therefore we search the item during onClick again to make it work
-              const elemToScroll = document.getElementById(
-                ordersRevealedElem.id
-              );
-              elemToScroll?.scrollIntoView();
-            }}
-          >
-            Orders were revealed
-          </Dropdown.Item>
-        );
-      }
-    });
-
-    return result;
   }
 }
