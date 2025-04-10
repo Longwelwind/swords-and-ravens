@@ -23,18 +23,15 @@ import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import MapComponent, { MAP_HEIGHT } from "./MapComponent";
 import MapControls, {
   OrderOnMapProperties,
-  RegionOnMapProperties,
   UnitOnMapProperties,
 } from "./MapControls";
 import GameStateColumn from "./GameStateColumn";
 import HouseInfoColumn from "./HouseInfoColumn";
 import GameTabsComponent from "./GameTabsComponent";
 
-import { Channel } from "./chat-client/ChatClient";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
-import BetterMap from "../utils/BetterMap";
 import PartialRecursive from "../utils/PartialRecursive";
 
 import cancelImage from "../../public/images/icons/cancel.svg";
@@ -63,9 +60,7 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
-import joinNaturalLanguage from "./utils/joinNaturalLanguage";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import WesterosCardComponent from "./game-state-panel/utils/WesterosCardComponent";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
@@ -101,10 +96,6 @@ export interface InfluenceTrackDetails {
 export default class IngameComponent extends Component<IngameComponentProps> {
   mapControls: MapControls = new MapControls();
 
-  @observable highlightedRegions = new BetterMap<
-    Region,
-    RegionOnMapProperties
-  >();
   @observable showMapScrollbarInfo = false;
   @observable showBrowserZoomInfo = false;
   @observable columnSwapAnimationClassName = "";
@@ -116,10 +107,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   private authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
   private game = this.ingame.game;
   private gameSettings = this.ingame.entireGame.gameSettings;
-  private mapScrollbarEnabled =
-    !isMobile && (this.user?.settings.mapScrollbar ?? true);
 
-  modifyRegionsOnMapCallback: any;
   modifyOrdersOnMapCallback: any;
   modifyUnitsOnMapCallback: any;
 
@@ -225,9 +213,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             ingame={this.ingame}
             mapControls={this.mapControls}
             border={border}
-            user={this.user}
-            authenticatedPlayer={this.authenticatedPlayer}
-            publicChatRoom={this.publicChatRoom}
           />
           <button
             className="btn btn-secondary"
@@ -254,13 +239,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       <>
         <Row
           className="justify-content-center"
-          style={{ maxHeight: this.mapScrollbarEnabled ? "95vh" : "none" }}
+          style={{
+            maxHeight: this.gameClient.isMapScrollbarSet ? "95vh" : "none",
+          }}
         >
           <Col
             xs={{ order: columnOrder.gameStateColumn }}
             className={this.columnSwapAnimationClassName}
             style={{
-              maxHeight: this.mapScrollbarEnabled ? "100%" : "none",
+              maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
               minWidth: this.gameSettings.playerCount >= 8 ? "485px" : "470px",
               maxWidth: this.ingame.hasChildGameState(DraftHouseCardsGameState)
                 ? "1200px"
@@ -271,27 +258,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               ingame={this.ingame}
               gameClient={this.gameClient}
               mapControls={this.mapControls}
-              publicChatRoom={this.publicChatRoom}
-              authenticatedPlayer={this.authenticatedPlayer}
-              user={this.user}
-              colSwapAnimationClassChanged={(className) =>
-                (this.columnSwapAnimationClassName = className)
-              }
-              tracksPopoverVisibleChanged={(visible) =>
-                (this.tracksPopoverVisible = visible)
-              }
+              onColumnSwapClick={(e) => this.onColumnSwap(e)}
             />
           </Col>
           {!this.ingame.hasChildGameState(DraftHouseCardsGameState) ||
           this.user?.settings.showMapWhenDrafting ? (
             <Col
               xs={{ span: "auto", order: columnOrder.mapColumn }}
-              style={{ maxHeight: this.mapScrollbarEnabled ? "100%" : "none" }}
+              style={{
+                maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
+              }}
             >
               <div
                 id="map-component"
                 style={{
-                  height: this.mapScrollbarEnabled ? "100%" : "auto",
+                  height: this.gameClient.isMapScrollbarSet ? "100%" : "auto",
                   overflowY: "auto",
                   overflowX: "hidden",
                   maxHeight: MAP_HEIGHT,
@@ -311,7 +292,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               order: columnOrder.housesInfosColumn,
             }}
             style={{
-              maxHeight: this.mapScrollbarEnabled ? "100%" : "none",
+              maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
               maxWidth: "600px",
             }}
             className={classNames(this.columnSwapAnimationClassName, {
@@ -325,18 +306,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               ingame={this.ingame}
               gameClient={this.gameClient}
               mapControls={this.mapControls}
-              authenticatedPlayer={this.authenticatedPlayer}
-              user={this.user}
-              publicChatRoom={this.publicChatRoom}
               gameControlsPopover={this.renderGameControlsPopover()}
               tracks={tracks}
               showGameControls={true}
-              colSwapAnimationClassChanged={(className) =>
-                (this.columnSwapAnimationClassName = className)
-              }
-              tracksPopoverVisibleChanged={(visible) =>
-                (this.tracksPopoverVisible = visible)
-              }
+              onColumnSwapClick={(e) => this.onColumnSwap(e)}
             />
           </Col>
         </Row>
@@ -345,6 +318,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         {this.renderGameControlsButton()}
       </>
     );
+  }
+
+  onColumnSwap(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    if (this.user && this.columnSwapAnimationClassName === "") {
+      e.currentTarget.blur();
+      this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
+      this.user.settings.responsiveLayout =
+        !this.user.settings.responsiveLayout;
+      this.tracksPopoverVisible = false;
+      window.setTimeout(() => {
+        this.columnSwapAnimationClassName = "";
+      }, 2050);
+    }
   }
 
   renderGameControlsButton(): ReactNode {
@@ -465,17 +451,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 ingame={this.ingame}
                 gameClient={this.gameClient}
                 mapControls={this.mapControls}
-                authenticatedPlayer={this.authenticatedPlayer}
-                user={this.user}
-                publicChatRoom={this.publicChatRoom}
                 gameControlsPopover={this.renderGameControlsPopover()}
                 tracks={tracks}
-                colSwapAnimationClassChanged={(className) =>
-                  (this.columnSwapAnimationClassName = className)
-                }
-                tracksPopoverVisibleChanged={(visible) =>
-                  (this.tracksPopoverVisible = visible)
-                }
+                onColumnSwapClick={(e) => this.onColumnSwap(e)}
               />
             </Col>
           </Popover>
@@ -885,230 +863,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     );
   }
 
-  highlightRegionsOfHouses(): void {
-    const regions = new BetterMap(
-      this.ingame.world.getAllRegionsWithControllers()
-    );
-    this.highlightedRegions.clear();
-
-    regions.entries.forEach(([r, controller]) => {
-      this.highlightedRegions.set(r, {
-        highlight: {
-          active: controller != null ? true : false,
-          color:
-            controller?.id != "greyjoy"
-              ? (controller?.color ?? "#000000")
-              : "#000000",
-          light: r.type.id == "sea",
-          strong: r.type.id == "land",
-        },
-      });
-    });
-  }
-
-  highlightRegionsWithDragons(): void {
-    const regions = this.ingame.world.regions.values.filter(
-      (r) =>
-        r.units.size > 0 && r.units.values.some((u) => u.type.id == "dragon")
-    );
-    const map = new BetterMap(regions.map((r) => [r, r.getController()]));
-    this.highlightedRegions.clear();
-
-    map.entries.forEach(([r, controller]) => {
-      this.highlightedRegions.set(r, {
-        highlight: {
-          active: controller != null ? true : false,
-          color:
-            controller?.id != "greyjoy"
-              ? (controller?.color ?? "#000000")
-              : "#000000",
-          light: r.type.id == "sea",
-          strong: r.type.id == "land",
-        },
-      });
-    });
-  }
-
-  renderDragonStrengthTooltip(): OverlayChildren {
-    const roundsWhenIncreased = this.game.dragonStrengthTokens.filter(
-      (onRound) => onRound > this.game.turn
-    );
-    return (
-      <Tooltip id="dragon-strength-tooltip">
-        <div className="m-1 text-center">
-          <h5>Current Dragon Strength</h5>
-          {roundsWhenIncreased.length > 0 && (
-            <p>
-              Will increase in round
-              <br />
-              {joinNaturalLanguage(roundsWhenIncreased)}
-            </p>
-          )}
-        </div>
-      </Tooltip>
-    );
-  }
-
-  get publicChatRoom(): Channel {
-    return this.gameClient.chatClient.channels.get(
-      this.ingame.entireGame.publicChatRoomId
-    );
-  }
-
-  private renderRemainingWesterosCards(): OverlayChildren {
-    const remainingCards = this.game.remainingWesterosCardTypes.map((deck) =>
-      _.sortBy(
-        deck.entries,
-        (rwct) => -rwct[1],
-        (rwct) => rwct[0].name
-      )
-    );
-    const nextCards = this.game.nextWesterosCardTypes;
-
-    return (
-      <Popover id={"remaining-westeros-cards"} style={{ maxWidth: "100%" }}>
-        <Col xs={12}>
-          {this.gameSettings.cokWesterosPhase && (
-            <>
-              <Row className="mt-0">
-                <Col>
-                  <h5 className="text-center">Next Westeros Cards</h5>
-                </Col>
-              </Row>
-              <Row>
-                {nextCards.map((_, i) => (
-                  <Col
-                    key={"westeros-deck-" + i + "-header"}
-                    className="text-center"
-                  >
-                    <b>Deck {i + 1}</b>
-                  </Col>
-                ))}
-              </Row>
-              <Row>
-                {nextCards.map((wd, i) => (
-                  <Col key={"westeros-deck-" + i + "-data"}>
-                    {wd.map((wc, j) =>
-                      wc ? (
-                        <div
-                          key={"westeros-deck-" + i + "-" + j + "-data"}
-                          className="mb-1"
-                        >
-                          <WesterosCardComponent
-                            cardType={wc}
-                            westerosDeckI={i}
-                            size="small"
-                            tooltip
-                            showTitle
-                          />
-                        </div>
-                      ) : (
-                        <div />
-                      )
-                    )}
-                  </Col>
-                ))}
-              </Row>
-            </>
-          )}
-          <Row className={this.gameSettings.cokWesterosPhase ? "mt-4" : "mt-0"}>
-            <Col>
-              <h5 className="text-center">Remaining Westeros Cards</h5>
-            </Col>
-          </Row>
-          <Row>
-            {remainingCards.map((_, i) => (
-              <Col
-                key={"westeros-deck-" + i + "-header"}
-                className="text-center"
-              >
-                <b>Deck {i + 1}</b>
-              </Col>
-            ))}
-          </Row>
-          <Row className="mb-2">
-            {remainingCards.map((rc, i) => (
-              <Col key={"westeros-deck-" + i + "-data"}>
-                {rc.map(([wc, count], j) => (
-                  <Row
-                    key={"westeros-deck-" + i + "-" + j + "-data"}
-                    className="m1 align-items-center"
-                  >
-                    <Col xs="auto" style={{ marginRight: "-20px" }}>
-                      {count > 1 ? count : <>&nbsp;</>}
-                    </Col>
-                    <Col
-                      className="pl-0"
-                      style={{ width: "150px", maxWidth: "150px" }}
-                    >
-                      <WesterosCardComponent
-                        cardType={wc}
-                        westerosDeckI={i}
-                        size="small"
-                        tooltip
-                        showTitle
-                      />
-                    </Col>
-                  </Row>
-                ))}
-              </Col>
-            ))}
-          </Row>
-        </Col>
-      </Popover>
-    );
-  }
-
-  private renderWildlingDeckPopover(
-    knowsWildlingCard: boolean,
-    nextWildlingCard: WildlingCardType | undefined
-  ): OverlayChildren {
-    const wildlingDeck = _.sortBy(
-      this.game.wildlingDeck
-        .map((wc) => wc.type)
-        .filter((wc) => wc != nextWildlingCard),
-      (wc) => wc.name
-    );
-    return (
-      <Popover id="wildling-threat-tooltip">
-        <Col xs={12}>
-          {knowsWildlingCard && nextWildlingCard && (
-            <>
-              <Col xs={12} className="mt-0">
-                <h5 className="text-center">Top Wilding Card</h5>
-              </Col>
-              <Col xs={12} className="mb-2">
-                <Row className="justify-content-center">
-                  <WildlingCardComponent
-                    cardType={nextWildlingCard}
-                    size="smedium"
-                    tooltip
-                  />
-                </Row>
-              </Col>
-            </>
-          )}
-          <Col xs={12} className="mt-0">
-            <h5 className="text-center">The Wildling Deck</h5>
-          </Col>
-          <Col xs={12}>
-            <Row className="justify-content-center mr-0 ml-0">
-              {wildlingDeck.map((wc) => (
-                <Col
-                  xs="auto"
-                  key={`wild-deck-${wc.id}`}
-                  className="justify-content-center"
-                >
-                  <WildlingCardComponent cardType={wc} size="small" tooltip />
-                </Col>
-              ))}
-            </Row>
-          </Col>
-        </Col>
-      </Popover>
-    );
-  }
-
   getCombatFastTrackedComponent(stats: CombatStats[]): React.ReactNode {
     const winners = stats.filter((cs) => cs.isWinner);
     const winner =
@@ -1203,9 +957,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   }
 
   componentDidMount(): void {
-    this.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
     this.mapControls.modifyOrdersOnMap.push(
       (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
     );
@@ -1221,7 +972,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     if (
       screen.width < 1920 &&
       screen.height < 1080 &&
-      this.mapScrollbarEnabled &&
+      this.gameClient.isMapScrollbarSet &&
       !dontShowAgain
     ) {
       this.showMapScrollbarInfo = true;
@@ -1318,10 +1069,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   componentWillUnmount(): void {
     this.ingame.entireGame.onNewPrivateChatRoomCreated = null;
-    _.pull(
-      this.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
     _.pull(this.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
     _.pull(this.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
 
@@ -1333,10 +1080,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
     return this.ingame.ordersToBeAnimated.entries;
-  }
-
-  modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-    return this.highlightedRegions.entries;
   }
 
   modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
