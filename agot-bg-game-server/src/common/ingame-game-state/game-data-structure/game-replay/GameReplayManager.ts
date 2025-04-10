@@ -1,489 +1,1075 @@
-import { GameLogData } from "../GameLog";
-import IEntireGameSnapshot from "./IEntireGameSnapshot";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import _ from "lodash";
+import allKnownHouseCards from "../../../../client/utils/houseCardHelper";
+import { MAX_WILDLING_STRENGTH } from "../Game";
+import GameLog, { GameLogData } from "../GameLog";
+import orders from "../orders";
+import EntireGameSnapshot from "./EntireGameSnapshot";
+import GameLogManager from "../GameLogManager";
+import EntireGame from "../../../../common/EntireGame";
+import { computed, observable } from "mobx";
+import RegionSnapshot from "./RegionSnapshot";
+import GameSnapshot from "./GameSnapshot";
+import { modifyingGameLogIds } from "./replay-constants";
+import HouseSnapshot from "./HouseSnapshot";
+import { CombatStats } from "../../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
+import { UnitState } from "../Unit";
+import BetterMap from "../../../../utils/BetterMap";
 
 export default class GameReplayManager {
-  private modifyingGameLogIds = [
-    "turn-begin",
-    "march-resolved",
-    "westeros-cards-drawn",
-    "wildling-bidding",
-    "player-mustered",
-    "raven-holder-replace-order",
-    "raid-done",
-    "combat-valyrian-sword-used",
-    "clash-of-kings-bidding-done",
-    "clash-of-kings-final-ordering",
-    "consolidate-power-order-resolved",
-    "armies-reconciled",
-    "patchface-used",
-    "melisandre-dwd-used",
-    "jon-snow-used",
-    "doran-used",
-    "ser-gerris-drinkwater-used",
-    "reek-used",
-    "reek-returned-ramsay",
-    "lysa-arryn-mod-used",
-    "rodrik-the-reader-used",
-    "qyburn-used",
-    "aeron-damphair-used",
-    "retreat-region-chosen",
-    "retreat-failed",
-    "retreat-casualties-suffered",
-    "enemy-port-taken",
-    "ships-destroyed-by-empty-castle",
-    "preemptive-raid-units-killed",
-    "preemptive-raid-track-reduced",
-    "preemptive-raid-wildlings-attack",
-    "massing-on-the-milkwater-house-cards-removed",
-    "a-king-beyond-the-wall-lowest-reduce-tracks",
-    "a-king-beyond-the-wall-house-reduce-track",
-    "a-king-beyond-the-wall-highest-top-track",
-    "mammoth-riders-destroy-units",
-    "mammoth-riders-return-card",
-    "the-horde-descends-highest-muster",
-    "the-horde-descends-units-killed",
-    "crow-killers-knights-replaced",
-    "crow-killers-knights-killed",
-    "crow-killers-footman-upgraded",
-    "skinchanger-scout-nights-watch-victory",
-    "skinchanger-scout-wildling-victory",
-    "rattleshirts-raiders-nights-watch-victory",
-    "rattleshirts-raiders-wildling-victory",
-    "game-of-thrones-power-tokens-gained",
-    "immediatly-killed-after-combat",
-    "killed-after-combat",
-    "supply-adjusted",
-    "commander-power-token-gained",
-    "beric-dondarrion-used",
-    "varys-used",
-    "jon-connington-used",
-    "bronn-used",
-    "house-card-picked",
-    "littlefinger-power-tokens-gained",
-    "alayne-stone-used",
-    "lysa-arryn-ffc-power-tokens-gained",
-    "anya-waynwood-power-tokens-gained",
-    "robert-arryn-used",
-    "house-card-removed-from-game",
-    "viserys-targaryen-used",
-    "illyrio-mopatis-power-tokens-gained",
-    "daenerys-targaryen-b-power-tokens-discarded",
-    "missandei-used",
-    "power-tokens-gifted",
-    "influence-track-position-chosen",
-    "place-loyalty-choice",
-    "loyalty-token-placed",
-    "loyalty-token-gained",
-    "fire-made-flesh-choice",
-    "playing-with-fire-choice",
-    "the-long-plan-choice",
-    "move-loyalty-token-choice",
-    "loan-purchased",
-    "order-removed",
-    "interest-paid",
-    "debt-paid",
-    "customs-officer-power-tokens-gained",
-    "sellswords-placed",
-    "the-faceless-men-units-destroyed",
-    "pyromancer-executed",
-    "expert-artificer-executed",
-    "loyal-maester-executed",
-    "master-at-arms-executed",
-    "savvy-steward-executed",
-    "special-objective-scored",
-    "objective-scored",
-    "ironborn-raid",
-    "garrison-removed",
-    "garrison-returned",
-    "orders-revealed",
-    "house-cards-returned",
-    "leave-power-token-choice",
-    "balon-greyjoy-asos-power-tokens-gained",
-    "mace-tyrell-asos-order-placed",
-    "bran-stark-used",
-    "cersei-lannister-asos-power-tokens-discarded",
-    "doran-martell-asos-used",
-    "melisandre-of-asshai-power-tokens-gained",
-    "salladhar-saan-asos-power-tokens-changed",
-    "ser-ilyn-payne-asos-casualty-suffered",
-    "stannis-baratheon-asos-used",
-    "control-power-token-removed",
-    "last-land-unit-transformed-to-dragon",
-    "cersei-lannister-order-removed",
-    "loras-tyrell-attack-order-moved",
-    "mace-tyrell-footman-killed",
-    "massing-on-the-milkwater-house-cards-back",
-    "qarl-the-maid-tokens-gained",
-    "queen-of-thorns-order-removed",
-    "renly-baratheon-footman-upgraded-to-knight",
-    "roose-bolton-house-cards-returned",
-    "ser-ilyn-payne-footman-killed",
-    "tywin-lannister-power-tokens-gained",
-  ];
+  @observable selectedLogIndex = -1;
+  @observable selectedSnapshot: EntireGameSnapshot | null = null;
+  @observable regionsToHighlight: BetterMap<string, string> = new BetterMap();
+
+  private entireGame: EntireGame;
+
+  private currentCombatData: {
+    attackingRegion: RegionSnapshot;
+    defendingRegion: RegionSnapshot;
+    attacker: HouseSnapshot;
+    defender: HouseSnapshot;
+    retreatRegion: RegionSnapshot | null;
+    winner: HouseSnapshot | null;
+    loser: HouseSnapshot | null;
+    combatResult: CombatStats[] | null;
+  } | null = null;
+
+  get selectedWorldSnapshot(): RegionSnapshot[] {
+    if (!this.selectedSnapshot) return [];
+    return this.selectedSnapshot.worldSnapshot;
+  }
+
+  get selectedGameSnapshot(): GameSnapshot | undefined {
+    if (!this.selectedSnapshot?.gameSnapshot) return undefined;
+    return this.selectedSnapshot.gameSnapshot;
+  }
+
+  @computed
+  get isReplayMode(): boolean {
+    return this.selectedLogIndex > -1 && this.selectedSnapshot != null;
+  }
+
+  get logManager(): GameLogManager {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return this.entireGame.ingameGameState!.gameLogManager;
+  }
+
+  constructor(entireGame: EntireGame) {
+    this.entireGame = entireGame;
+  }
+
+  selectLog(index: number): void {
+    this.regionsToHighlight.clear();
+    const logs = this.logManager.logs.slice(0, index + 1).reverse();
+    const reversedIndex = logs.findIndex(
+      (log) => log.data.type === "orders-revealed"
+    );
+    const nearestSnapData = this.findNearestLogSnapshot(
+      index,
+      logs,
+      reversedIndex
+    );
+
+    if (!nearestSnapData) {
+      this.reset();
+      return;
+    }
+
+    const nearestSnap = nearestSnapData.nearestSnap;
+
+    if (!nearestSnap || nearestSnap?.type != "orders-revealed") return;
+
+    let snap = new EntireGameSnapshot(
+      _.cloneDeep({
+        worldSnapshot: nearestSnap.worldState,
+        gameSnapshot: nearestSnap.gameSnapshot,
+      })
+    );
+
+    const logsToApply = _.cloneDeep(
+      this.logManager.logs.slice(nearestSnapData.index + 1, index + 1)
+    );
+
+    while (logsToApply.length > 0) {
+      const log = logsToApply.shift();
+      if (!log) break;
+      if (log.data.type == "attack") {
+        if (log.data.attacked == null) {
+          snap = this.handleAttackAgainstNeutralForce(log.data, snap);
+        } else {
+          // Extract logs of this combat and apply them in a special way as they might relate to each other
+          // and we need to apply them in the right order.
+          snap = this.handleCombatLog(log, logsToApply, snap);
+        }
+      } else {
+        snap = this.applyLogEvent(log.data, snap);
+      }
+    }
+
+    this.selectedLogIndex = index;
+    this.selectedSnapshot = snap;
+
+    this.handleHighligting(this.logManager.logs[index].data);
+  }
+
+  private handleAttackAgainstNeutralForce(
+    log: GameLogData,
+    snap: EntireGameSnapshot
+  ): EntireGameSnapshot {
+    if (log.type !== "attack") return snap;
+    const region = snap.getRegion(log.attackingRegion);
+    const regionTo = snap.getRegion(log.attackedRegion);
+
+    log.units.forEach((unit) => {
+      region.moveTo(unit, log.attacker, regionTo);
+    });
+
+    region.removeOrder();
+    return snap;
+  }
+
+  private handleCombatLog(
+    log: GameLog,
+    logsToApply: GameLog[],
+    snap: EntireGameSnapshot
+  ): EntireGameSnapshot {
+    const combatLogs: GameLog[] = [log];
+    let isResolved = false;
+    let endIndex = logsToApply.findIndex(
+      (l) =>
+        l.data.type == "attack" ||
+        l.data.type == "march-resolved" ||
+        l.data.type == "action-phase-resolve-consolidate-power-began" ||
+        l.data.type == "winner-declared"
+    );
+
+    if (endIndex === -1) {
+      endIndex = logsToApply.length;
+      isResolved =
+        logsToApply.findIndex((l) => l.data.type == "retreat-region-chosen") !==
+        -1;
+    } else {
+      isResolved = true;
+    }
+
+    combatLogs.push(...logsToApply.splice(0, endIndex));
+
+    snap = this.applyCombatLogEvents(combatLogs, snap, isResolved);
+    return snap;
+  }
+
+  findNearestLogSnapshot(
+    index: number,
+    logs: GameLog[],
+    reversedIndex: number
+  ): {
+    nearestSnap: GameLogData;
+    index: number;
+  } | null {
+    const nearestSnap = reversedIndex >= 0 ? logs[reversedIndex].data : null;
+    const originalIndex = index - reversedIndex - 1;
+
+    if (!nearestSnap || nearestSnap?.type != "orders-revealed") {
+      // Fallback to return first
+      const i = this.logManager.logs.findIndex(
+        (log) => log.data.type === "orders-revealed"
+      );
+      if (i >= 0) {
+        return {
+          nearestSnap: this.logManager.logs[i].data,
+          index: i,
+        };
+      } else {
+        this.reset();
+        return null;
+      }
+    }
+    return {
+      nearestSnap: nearestSnap,
+      index: originalIndex,
+    };
+  }
+
+  nextLog(): void {
+    if (this.selectedLogIndex < 0) {
+      return;
+    }
+
+    let next = this.logManager.logs
+      .slice(this.selectedLogIndex + 1)
+      .findIndex((l) => this.isModifyingGameLogUI(l.data));
+
+    if (next < 0) return;
+
+    // restore original index
+    next += this.selectedLogIndex + 1;
+
+    this.selectLog(next);
+  }
+
+  nextRoundLog(): void {
+    if (this.selectedLogIndex < 0) {
+      return;
+    }
+
+    let next = this.logManager.logs
+      .slice(this.selectedLogIndex + 1)
+      .findIndex((l) => l.data.type == "turn-begin");
+
+    if (next < 0) {
+      this.selectLog(this.logManager.logs.length - 1);
+      return;
+    }
+
+    // restore original index
+    next += this.selectedLogIndex + 1;
+
+    this.selectLog(next);
+  }
+
+  previousLog(): void {
+    if (this.selectedLogIndex < 0) {
+      return;
+    }
+
+    const previous = this.logManager.logs
+      .slice(0, this.selectedLogIndex)
+      .reverse()
+      .findIndex((l) => this.isModifyingGameLogUI(l.data));
+
+    if (previous < 0) return;
+
+    // restore original index
+    this.selectLog(this.selectedLogIndex - previous - 1);
+  }
+
+  previousRoundLog(): void {
+    if (this.selectedLogIndex < 0) {
+      return;
+    }
+
+    const previous = this.logManager.logs
+      .slice(0, this.selectedLogIndex)
+      .reverse()
+      .findIndex((l) => l.data.type == "turn-begin");
+
+    if (previous < 0) return;
+
+    // restore original index
+    this.selectLog(this.selectedLogIndex - previous - 1);
+  }
+
+  reset(): void {
+    this.selectedSnapshot = null;
+    this.selectedLogIndex = -1;
+  }
 
   /*
     Replacing GameLogData by ModifiingGameLog allows to check in VS Code that all modifying logs are handled in the applyLogEvent function.
   */
-  applyLogEvent(
+  private applyLogEvent(
     log: GameLogData,
-    snap: IEntireGameSnapshot
-  ): IEntireGameSnapshot {
-    if (!this.modifyingGameLogIds.includes(log.type) || !snap.gameSnapshot) {
+    snap: EntireGameSnapshot
+  ): EntireGameSnapshot {
+    if (!this.isModifyingGameLog(log)) {
       return snap;
     }
 
     switch (log.type) {
-      case "turn-begin":
+      case "turn-begin": {
+        if (!snap.gameSnapshot) return snap;
         snap.gameSnapshot.round = log.turn;
+        snap.gameSnapshot.vsbUsed = false;
         return snap;
+      }
 
-      case "march-resolved":
+      case "march-resolved": {
+        const startingRegion = snap.getRegion(log.startingRegion);
+        // remove from starting region
+        log.moves.forEach(([rid, units]) => {
+          units.forEach((unit) => {
+            startingRegion.moveTo(unit, log.house, snap.getRegion(rid));
+          });
+        });
+        startingRegion.removeOrder();
         return snap;
-
+      }
       case "westeros-cards-drawn":
+        if (!snap.gameSnapshot) return snap;
+        snap.gameSnapshot.wildlingStrength += log.addedWildlingStrength;
+        snap.gameSnapshot.wildlingStrength = Math.min(
+          snap.gameSnapshot.wildlingStrength,
+          MAX_WILDLING_STRENGTH
+        );
         return snap;
 
       case "wildling-bidding":
-        return snap;
-
-      case "player-mustered":
-        return snap;
-
-      case "raven-holder-replace-order":
-        return snap;
-
-      case "raid-done":
-        return snap;
-
-      case "combat-valyrian-sword-used":
-        return snap;
-
-      case "clash-of-kings-bidding-done":
-        return snap;
-
-      case "clash-of-kings-final-ordering":
-        return snap;
-
-      case "consolidate-power-order-resolved":
-        return snap;
-
-      case "armies-reconciled":
-        return snap;
-
-      case "patchface-used":
-        return snap;
-
-      case "melisandre-dwd-used":
-        return snap;
-
-      case "jon-snow-used":
-        return snap;
-
-      case "doran-used":
-        return snap;
-
-      case "ser-gerris-drinkwater-used":
-        return snap;
-
-      case "reek-used":
-        return snap;
-
-      case "reek-returned-ramsay":
-        return snap;
-
-      case "lysa-arryn-mod-used":
-        return snap;
+        if (!snap.gameSnapshot) return snap;
+        if (log.nightsWatchVictory) snap.gameSnapshot.wildlingStrength = 0;
+        log.results.forEach(([bid, houses]) => {
+          houses.forEach((h) => {
+            const house = snap.getHouse(h);
+            house?.removePowerTokens(bid);
+          });
+        });
+        return snap;
+
+      case "player-mustered": {
+        log.musterings.forEach(([rid, units]) => {
+          units.forEach((unit) => {
+            const region = snap.getRegion(rid);
+            if (unit.from) {
+              region.removeUnit(unit.from, log.house);
+            }
+            const toRegion = snap.getRegion(unit.region);
+            toRegion.createUnit(unit.to, log.house);
+            region.removeOrder(); // in case triggered by CP* or vassal muster order
+          });
+        });
+        return snap;
+      }
+      case "raven-holder-replace-order": {
+        const region = snap.getRegion(log.region);
+        region.setOrder(this.getOrderTypeById(log.newOrder));
+        return snap;
+      }
+      case "raid-done": {
+        const raiderRegion = snap.getRegion(log.raiderRegion);
+        raiderRegion?.removeOrder();
+        if (log.raidedRegion) {
+          const raidedRegion = snap.getRegion(log.raidedRegion);
+          raidedRegion.removeOrder();
+        }
 
-      case "rodrik-the-reader-used":
-        return snap;
-
-      case "qyburn-used":
-        return snap;
-
-      case "aeron-damphair-used":
-        return snap;
-
-      case "retreat-region-chosen":
-        return snap;
-
-      case "retreat-failed":
-        return snap;
-
-      case "retreat-casualties-suffered":
-        return snap;
-
-      case "enemy-port-taken":
-        return snap;
-
-      case "ships-destroyed-by-empty-castle":
-        return snap;
-
-      case "preemptive-raid-units-killed":
-        return snap;
-
-      case "preemptive-raid-track-reduced":
-        return snap;
-
-      case "preemptive-raid-wildlings-attack":
-        return snap;
-
-      case "massing-on-the-milkwater-house-cards-removed":
-        return snap;
-
-      case "a-king-beyond-the-wall-lowest-reduce-tracks":
-        return snap;
-
-      case "a-king-beyond-the-wall-house-reduce-track":
-        return snap;
-
-      case "a-king-beyond-the-wall-highest-top-track":
-        return snap;
+        if (snap.gameSnapshot) {
+          if (log.raiderGainedPowerToken) {
+            const raider = snap.getHouse(log.raider);
+            raider?.addPowerTokens(1);
+          }
 
-      case "mammoth-riders-destroy-units":
-        return snap;
+          if (log.raidedHouseLostPowerToken) {
+            const raided = snap.getHouse(log.raidee);
+            raided?.removePowerTokens(1);
+          }
+        }
 
-      case "mammoth-riders-return-card":
         return snap;
-
-      case "the-horde-descends-highest-muster":
+      }
+      case "clash-of-kings-bidding-done": {
+        if (!snap.gameSnapshot) return snap;
+        log.results.forEach(([bid, houses]) => {
+          houses.forEach((h) => {
+            const house = snap.getHouse(h);
+            house?.removePowerTokens(bid);
+          });
+        });
         return snap;
+      }
 
-      case "the-horde-descends-units-killed":
+      case "clash-of-kings-final-ordering": {
+        if (!snap.gameSnapshot) return snap;
+        if (log.trackerI == 0) {
+          snap.gameSnapshot.ironThroneTrack = log.finalOrder;
+        } else if (log.trackerI == 1) {
+          snap.gameSnapshot.fiefdomsTrack = log.finalOrder;
+        } else if (log.trackerI == 2) {
+          snap.gameSnapshot.kingsCourtTrack = log.finalOrder;
+        }
         return snap;
-
-      case "crow-killers-knights-replaced":
+      }
+      case "consolidate-power-order-resolved": {
+        const region = snap.getRegion(log.region);
+        region.removeOrder();
         return snap;
+      }
 
-      case "crow-killers-knights-killed":
+      case "armies-reconciled": {
+        log.armies.forEach(([rid, units]) => {
+          const region = snap.getRegion(rid);
+          units.forEach((unit) => {
+            region.removeUnit(unit, log.house);
+          });
+        });
         return snap;
+      }
 
-      case "crow-killers-footman-upgraded":
-        return snap;
+      case "vassals-claimed": {
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse(log.house)!;
+        const vassals = log.vassals.map((v) => snap.getHouse(v)!);
 
-      case "skinchanger-scout-nights-watch-victory":
+        vassals.forEach((v) => {
+          v.isVassal = true;
+          v.suzerainHouseId = house.id;
+        });
         return snap;
+      }
 
-      case "skinchanger-scout-wildling-victory":
+      case "enemy-port-taken": {
         return snap;
+      }
 
-      case "rattleshirts-raiders-nights-watch-victory":
+      case "ships-destroyed-by-empty-castle": {
         return snap;
+      }
 
-      case "rattleshirts-raiders-wildling-victory":
+      case "preemptive-raid-units-killed": {
         return snap;
+      }
 
-      case "game-of-thrones-power-tokens-gained":
+      case "preemptive-raid-track-reduced": {
         return snap;
+      }
 
-      case "immediatly-killed-after-combat":
+      case "preemptive-raid-wildlings-attack": {
         return snap;
+      }
 
-      case "killed-after-combat":
+      case "massing-on-the-milkwater-house-cards-removed": {
         return snap;
+      }
 
-      case "supply-adjusted":
+      case "a-king-beyond-the-wall-lowest-reduce-tracks": {
         return snap;
+      }
 
-      case "commander-power-token-gained":
+      case "a-king-beyond-the-wall-house-reduce-track": {
         return snap;
+      }
 
-      case "beric-dondarrion-used":
+      case "a-king-beyond-the-wall-highest-top-track": {
         return snap;
+      }
 
-      case "varys-used":
+      case "mammoth-riders-destroy-units": {
         return snap;
+      }
 
-      case "jon-connington-used":
+      case "mammoth-riders-return-card": {
         return snap;
+      }
 
-      case "bronn-used":
+      case "the-horde-descends-highest-muster": {
         return snap;
+      }
 
-      case "house-card-picked":
+      case "the-horde-descends-units-killed": {
         return snap;
+      }
 
-      case "littlefinger-power-tokens-gained":
+      case "crow-killers-knights-replaced": {
         return snap;
+      }
 
-      case "alayne-stone-used":
+      case "crow-killers-knights-killed": {
         return snap;
+      }
 
-      case "lysa-arryn-ffc-power-tokens-gained":
+      case "crow-killers-footman-upgraded": {
         return snap;
+      }
 
-      case "anya-waynwood-power-tokens-gained":
+      case "skinchanger-scout-nights-watch-victory": {
         return snap;
+      }
 
-      case "robert-arryn-used":
+      case "skinchanger-scout-wildling-victory": {
         return snap;
+      }
 
-      case "house-card-removed-from-game":
+      case "rattleshirts-raiders-nights-watch-victory": {
         return snap;
+      }
 
-      case "viserys-targaryen-used":
+      case "rattleshirts-raiders-wildling-victory": {
         return snap;
+      }
 
-      case "illyrio-mopatis-power-tokens-gained":
+      case "game-of-thrones-power-tokens-gained": {
         return snap;
+      }
 
-      case "daenerys-targaryen-b-power-tokens-discarded":
+      case "supply-adjusted": {
         return snap;
+      }
 
-      case "missandei-used":
+      case "house-card-picked": {
         return snap;
+      }
 
-      case "power-tokens-gifted":
+      case "power-tokens-gifted": {
         return snap;
+      }
 
-      case "influence-track-position-chosen":
+      case "influence-track-position-chosen": {
         return snap;
+      }
 
-      case "place-loyalty-choice":
+      case "place-loyalty-choice": {
         return snap;
+      }
 
-      case "loyalty-token-placed":
+      case "loyalty-token-placed": {
         return snap;
+      }
 
-      case "loyalty-token-gained":
+      case "loyalty-token-gained": {
         return snap;
+      }
 
-      case "fire-made-flesh-choice":
+      case "fire-made-flesh-choice": {
         return snap;
+      }
 
-      case "playing-with-fire-choice":
+      case "playing-with-fire-choice": {
         return snap;
+      }
 
-      case "the-long-plan-choice":
+      case "the-long-plan-choice": {
         return snap;
+      }
 
-      case "move-loyalty-token-choice":
+      case "move-loyalty-token-choice": {
         return snap;
+      }
 
-      case "loan-purchased":
+      case "loan-purchased": {
         return snap;
+      }
 
-      case "order-removed":
+      case "order-removed": {
         return snap;
+      }
 
-      case "interest-paid":
+      case "interest-paid": {
         return snap;
+      }
 
-      case "debt-paid":
+      case "debt-paid": {
         return snap;
+      }
 
-      case "customs-officer-power-tokens-gained":
+      case "customs-officer-power-tokens-gained": {
         return snap;
+      }
 
-      case "sellswords-placed":
+      case "sellswords-placed": {
         return snap;
+      }
 
-      case "the-faceless-men-units-destroyed":
+      case "the-faceless-men-units-destroyed": {
         return snap;
+      }
 
-      case "pyromancer-executed":
+      case "pyromancer-executed": {
         return snap;
+      }
 
-      case "expert-artificer-executed":
+      case "expert-artificer-executed": {
         return snap;
+      }
 
-      case "loyal-maester-executed":
+      case "loyal-maester-executed": {
         return snap;
+      }
 
-      case "master-at-arms-executed":
+      case "master-at-arms-executed": {
         return snap;
+      }
 
-      case "savvy-steward-executed":
+      case "savvy-steward-executed": {
         return snap;
+      }
 
-      case "special-objective-scored":
+      case "special-objective-scored": {
         return snap;
+      }
 
-      case "objective-scored":
+      case "objective-scored": {
         return snap;
+      }
 
-      case "ironborn-raid":
+      case "ironborn-raid": {
         return snap;
+      }
 
-      case "garrison-removed":
+      case "garrison-removed": {
+        const region = snap.getRegion(log.region);
+        region.garrison = undefined;
         return snap;
+      }
 
-      case "garrison-returned":
+      case "garrison-returned": {
         return snap;
+      }
 
       case "orders-revealed":
-        return snap;
+        return new EntireGameSnapshot({
+          worldSnapshot: log.worldState,
+          gameSnapshot: log.gameSnapshot,
+        });
 
-      case "house-cards-returned":
+      case "house-cards-returned": {
         return snap;
+      }
 
-      case "leave-power-token-choice":
+      case "leave-power-token-choice": {
+        const region = snap.getRegion(log.region);
+        if (log.leftPowerToken) region.controlPowerToken = log.house;
         return snap;
+      }
 
-      case "balon-greyjoy-asos-power-tokens-gained":
+      case "control-power-token-removed": {
+        const region = snap.getRegion(log.regionId);
+        region.controlPowerToken = undefined;
         return snap;
+      }
 
-      case "mace-tyrell-asos-order-placed":
+      case "last-land-unit-transformed-to-dragon": {
         return snap;
+      }
 
-      case "bran-stark-used":
+      case "massing-on-the-milkwater-house-cards-back": {
         return snap;
+      }
 
-      case "cersei-lannister-asos-power-tokens-discarded":
+      /*
+            COMBAT LOGS
+      */
+      case "attack": {
         return snap;
+      }
+      case "combat-result": {
+        if (!snap.gameSnapshot) return snap;
+        const cd = this.currentCombatData!;
+        if (log.stats[0].houseCard)
+          cd.attacker.markHouseCardAsUsed(log.stats[0].houseCard);
 
-      case "doran-martell-asos-used":
+        if (log.stats[1].houseCard)
+          cd.defender.markHouseCardAsUsed(log.stats[1].houseCard);
         return snap;
+      }
+      case "immediatly-killed-after-combat": {
+        if (!snap.gameSnapshot) return snap;
+        const cd = this.currentCombatData!;
+        const house = snap.getHouse(log.house);
+        if (!house) return snap;
+        if (house != cd.loser)
+          throw new Error("Only the loser suffers this casualty type");
+        const region =
+          house == cd.defender ? cd.defendingRegion : cd.attackingRegion;
 
-      case "melisandre-of-asshai-power-tokens-gained":
+        log.killedBecauseWounded.forEach((unit) => {
+          region.removeUnit(unit, house.id, true);
+        });
+        log.killedBecauseCantRetreat.forEach((unit) => {
+          region.removeUnit(unit, house.id);
+        });
         return snap;
+      }
+      case "killed-after-combat": {
+        if (!snap.gameSnapshot) return snap;
+        const cd = this.currentCombatData!;
+        const house = snap.getHouse(log.house);
+        if (!house) return snap;
+        const region =
+          house == cd.defender ? cd.defendingRegion : cd.attackingRegion;
 
-      case "salladhar-saan-asos-power-tokens-changed":
+        log.killed.forEach((unit) => {
+          region.removeUnit(unit, house.id);
+        });
         return snap;
+      }
+      case "retreat-failed": {
+        return snap;
+      }
+      case "retreat-casualties-suffered": {
+        if (!snap.gameSnapshot) return snap;
+        const cd = this.currentCombatData!;
+        const house = snap.getHouse(log.house);
+        if (!house) return snap;
 
-      case "ser-ilyn-payne-asos-casualty-suffered":
-        return snap;
+        const region =
+          house == cd.defender ? cd.defendingRegion : cd.attackingRegion;
 
-      case "stannis-baratheon-asos-used":
-        return snap;
+        log.units.forEach((unit) => {
+          region.removeUnit(unit, house.id);
+        });
 
-      case "control-power-token-removed":
         return snap;
+      }
+      case "retreat-region-chosen": {
+        return snap;
+      }
 
-      case "last-land-unit-transformed-to-dragon":
+      case "combat-valyrian-sword-used": {
+        if (!snap.gameSnapshot) return snap;
+        snap.gameSnapshot.vsbUsed = true;
         return snap;
+      }
 
-      case "cersei-lannister-order-removed":
+      case "patchface-used": {
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse(log.affectedHouse);
+        house?.markHouseCardAsUsed(log.houseCard);
         return snap;
+      }
 
-      case "loras-tyrell-attack-order-moved":
+      case "melisandre-dwd-used": {
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse(log.house);
+        house?.markHouseCardAsAvailable(log.houseCard);
+        const card = allKnownHouseCards.get(log.houseCard);
+        house?.removePowerTokens(card.combatStrength);
         return snap;
+      }
 
-      case "mace-tyrell-footman-killed":
+      case "doran-used": {
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse(log.affectedHouse);
+        if (!house) return snap;
+        if (log.influenceTrack == 0) {
+          _.pull(snap.gameSnapshot.ironThroneTrack, house.id);
+          snap.gameSnapshot.ironThroneTrack.push(house.id);
+        } else if (log.influenceTrack == 1) {
+          _.pull(snap.gameSnapshot.fiefdomsTrack, house.id);
+          snap.gameSnapshot.fiefdomsTrack.push(house.id);
+        } else if (log.influenceTrack == 2) {
+          _.pull(snap.gameSnapshot.kingsCourtTrack, house.id);
+          snap.gameSnapshot.kingsCourtTrack.push(house.id);
+        }
         return snap;
+      }
 
-      case "massing-on-the-milkwater-house-cards-back":
+      case "reek-used": {
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse(log.house);
+        house?.markHouseCardAsAvailable("reek");
         return snap;
+      }
 
-      case "qarl-the-maid-tokens-gained":
+      case "reek-returned-ramsay": {
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse(log.house);
+        house?.markHouseCardAsAvailable(log.returnedCardId);
         return snap;
+      }
 
-      case "queen-of-thorns-order-removed":
+      case "lysa-arryn-mod-used": {
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse(log.house);
+        house?.markHouseCardAsAvailable("lysa-arryn-mod");
         return snap;
+      }
 
-      case "renly-baratheon-footman-upgraded-to-knight":
+      case "aeron-damphair-used": {
         return snap;
+      }
+      case "bronn-used": {
+        return snap;
+      }
+      case "qyburn-used": {
+        return snap;
+      }
+      case "stannis-baratheon-asos-used": {
+        return snap;
+      }
+      case "viserys-targaryen-used": {
+        return snap;
+      }
+      case "mace-tyrell-footman-killed": {
+        return snap;
+      }
+      case "queen-of-thorns-order-removed": {
+        return snap;
+      }
 
-      case "roose-bolton-house-cards-returned":
+      case "garrison-removed": {
         return snap;
+      }
+      case "commander-power-token-gained": {
+        return snap;
+      }
+      case "house-cards-returned": {
+        return snap;
+      }
+      case "bran-stark-used": {
+        return snap;
+      }
+      case "jon-connington-used": {
+        return snap;
+      }
+      case "mace-tyrell-asos-order-placed": {
+        return snap;
+      }
 
-      case "ser-ilyn-payne-footman-killed":
+      case "alayne-stone-used": {
         return snap;
-
-      case "tywin-lannister-power-tokens-gained":
+      }
+      case "cersei-lannister-order-removed": {
         return snap;
+      }
+      case "jon-snow-used": {
+        return snap;
+      }
+      case "missandei-used": {
+        return snap;
+      }
+      case "renly-baratheon-footman-upgraded-to-knight": {
+        return snap;
+      }
+      case "rodrik-the-reader-used": {
+        return snap;
+      }
+      case "ser-gerris-drinkwater-used": {
+        return snap;
+      }
+      case "ser-ilyn-payne-footman-killed": {
+        return snap;
+      }
+      case "anya-waynwood-power-tokens-gained": {
+        return snap;
+      }
+      case "arianne-martell-force-retreat": {
+        return snap;
+      }
+      case "balon-greyjoy-asos-power-tokens-gained": {
+        return snap;
+      }
+      case "cersei-lannister-asos-power-tokens-discarded": {
+        return snap;
+      }
+      case "daenerys-targaryen-b-power-tokens-discarded": {
+        return snap;
+      }
+      case "doran-martell-asos-used": {
+        return snap;
+      }
+      case "illyrio-mopatis-power-tokens-gained": {
+        return snap;
+      }
+      case "house-card-removed-from-game": {
+        return snap;
+      }
+      case "littlefinger-power-tokens-gained": {
+        return snap;
+      }
+      case "lysa-arryn-ffc-power-tokens-gained": {
+        return snap;
+      }
+      case "melisandre-of-asshai-power-tokens-gained": {
+        return snap;
+      }
+      case "qarl-the-maid-tokens-gained": {
+        return snap;
+      }
+      case "roose-bolton-house-cards-returned": {
+        return snap;
+      }
+      case "salladhar-saan-asos-power-tokens-changed": {
+        return snap;
+      }
+      case "loras-tyrell-attack-order-moved": {
+        return snap;
+      }
+      case "tywin-lannister-power-tokens-gained": {
+        return snap;
+      }
+      case "arianne-martell-prevent-movement": {
+        return snap;
+      }
+      case "beric-dondarrion-used": {
+        return snap;
+      }
+      case "robert-arryn-used": {
+        return snap;
+      }
+      case "ser-ilyn-payne-asos-casualty-suffered": {
+        return snap;
+      }
+      case "varys-used": {
+        return snap;
+      }
 
       default:
-        throw new Error(`Unhandled modifiing log type '${log.type}'`);
+        throw new Error(`Unhandled modifying log type '${log.type}'`);
+    }
+  }
+
+  private applyCombatLogEvents(
+    combatLogs: GameLog[],
+    snap: EntireGameSnapshot,
+    isResolved: boolean
+  ): EntireGameSnapshot {
+    const attackLog = combatLogs[0].data;
+    if (attackLog.type != "attack") {
+      throw new Error(`First log type must be 'attack'`);
+    }
+
+    const retreatRegionLog = combatLogs.find(
+      (log) => log.data.type == "retreat-region-chosen"
+    );
+
+    const combatResult = combatLogs.find(
+      (log) => log.data.type == "combat-result"
+    );
+
+    const winner =
+      combatResult && combatResult.data.type == "combat-result"
+        ? snap.getHouse(combatResult.data.winner)
+        : null;
+
+    let loser = null;
+
+    if (winner) {
+      loser =
+        winner == snap.getHouse(attackLog.attacker)
+          ? snap.getHouse(attackLog.attacked)
+          : snap.getHouse(attackLog.attacker);
+    }
+
+    const cd = {
+      attacker: snap.getHouse(attackLog.attacker)!,
+      defender: snap.getHouse(attackLog.attacked)!,
+      attackingRegion: snap.getRegion(attackLog.attackingRegion),
+      defendingRegion: snap.getRegion(attackLog.attackedRegion),
+      retreatRegion:
+        retreatRegionLog &&
+        retreatRegionLog.data.type == "retreat-region-chosen"
+          ? snap.getRegion(retreatRegionLog.data.regionTo)
+          : null,
+      isResolved: isResolved,
+      winner: winner,
+      loser: loser,
+      combatResult:
+        combatResult && combatResult.data.type == "combat-result"
+          ? combatResult.data.stats
+          : null,
+    };
+
+    this.currentCombatData = cd;
+
+    combatLogs.forEach((log) => {
+      snap = this.applyLogEvent(log.data, snap);
+    });
+
+    if (isResolved) {
+      this.handleResolvedCombat(combatLogs);
+    }
+
+    this.currentCombatData = null;
+    return snap;
+  }
+
+  private handleResolvedCombat(combatLogs: GameLog[]): void {
+    const cd = this.currentCombatData!;
+    if (!cd.winner || !cd.combatResult) {
+      throw new Error("combat-result not found in combat logs");
+    }
+    //const attackingArmy = cd.combatResult[0].armyUnits.map(unit => snap.get
+    const attackingArmy = cd.attackingRegion.getUnits(
+      cd.combatResult[0].armyUnits,
+      cd.attacker.id
+    );
+
+    const defendingArmy = cd.defendingRegion.getUnits(
+      cd.combatResult[1].armyUnits,
+      cd.defender.id
+    );
+
+    // Perform retreat:
+    if (cd.attacker == cd.winner) {
+      // defender retreats from the region
+      this.handleRetreat(
+        defendingArmy,
+        cd.defender.id,
+        cd.defendingRegion,
+        cd.retreatRegion,
+        combatLogs
+      );
+      // Attacker movement may be blocked
+      if (
+        !_.some(
+          combatLogs,
+          (l) => l.data.type == "arianne-martell-prevent-movement"
+        )
+      ) {
+        attackingArmy.forEach((unit) => {
+          cd.attackingRegion.moveTo(
+            unit.type,
+            cd.attacker.id,
+            cd.defendingRegion
+          );
+        });
+      }
+    } else {
+      // attacker retreat => stay in attacking region, but wound units
+      attackingArmy.forEach((unit) => {
+        unit.wounded = true;
+      });
+
+      if (
+        _.some(
+          combatLogs,
+          (l) => l.data.type == "arianne-martell-force-retreat"
+        )
+      ) {
+        // defending army must retreat though they won
+        this.handleRetreat(
+          defendingArmy,
+          cd.defender.id,
+          cd.defendingRegion,
+          cd.retreatRegion,
+          combatLogs
+        );
+      }
+    }
+
+    cd.attackingRegion.removeOrder();
+  }
+
+  isModifyingGameLog(log: GameLogData): boolean {
+    return modifyingGameLogIds.includes(log.type);
+  }
+
+  isModifyingGameLogUI(log: GameLogData): boolean {
+    if (log.type == "orders-revealed") {
+      return !log.onlySnapshot;
+    }
+    return modifyingGameLogIds.includes(log.type);
+  }
+
+  getOrderTypeById(id: number): string {
+    return orders.get(id).type.id;
+  }
+
+  private handleRetreat(
+    army: UnitState[],
+    house: string,
+    fromRegion: RegionSnapshot,
+    retreatRegion: RegionSnapshot | null,
+    combatLogs: GameLog[],
+    applyWound = true
+  ): void {
+    if (retreatRegion) {
+      army.forEach((unit) => {
+        fromRegion.moveTo(unit.type, house, retreatRegion);
+        unit.wounded = applyWound;
+      });
+    }
+    // Retreat region may miss due to several reasons:
+    // 1. No retreat region available (e.g. no ships in the sea)
+    // 2. No unit to retreat (e.g. all units are killed)
+    // 3. Retreat region is not available (e.g. blocked by Arianne Martell)
+  }
+
+  private handleHighligting(selectedLog: GameLogData): void {
+    if (selectedLog.type == "attack") {
+      this.regionsToHighlight.set(selectedLog.attackingRegion, "red");
+      this.regionsToHighlight.set(selectedLog.attackedRegion, "yellow");
+    } else if (selectedLog.type == "combat-result") {
+      this.regionsToHighlight.set(selectedLog.stats[0].region, "red");
+      this.regionsToHighlight.set(selectedLog.stats[1].region, "yellow");
     }
   }
 }

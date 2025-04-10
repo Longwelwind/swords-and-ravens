@@ -24,8 +24,8 @@ import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
 import IRegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IRegionSnapshot";
-import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
+import GameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/GameSnapshot";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -50,8 +50,6 @@ export function getClassNameForDragonStrength(
 
 interface WorldSnapshotComponentProps {
   ingameGameState: IngameGameState;
-  worldSnapshot: IRegionSnapshot[];
-  gameSnapshot?: IGameSnapshot;
 }
 
 export default class WorldSnapshotComponent extends Component<WorldSnapshotComponentProps> {
@@ -60,6 +58,14 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
 
   get ingame(): IngameGameState {
     return this.props.ingameGameState;
+  }
+
+  get worldSnapshot(): IRegionSnapshot[] {
+    return this.ingame.replayManager.selectedWorldSnapshot;
+  }
+
+  get gameSnapshot(): GameSnapshot | undefined {
+    return this.ingame.replayManager.selectedGameSnapshot;
   }
 
   constructor(props: WorldSnapshotComponentProps) {
@@ -84,7 +90,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     const regions = this.ingame.world.regions;
     const garrisons = new BetterMap<string, string | null>();
 
-    for (const region of this.props.worldSnapshot) {
+    for (const region of this.worldSnapshot) {
       if (region.garrison && region.garrison > 0 && region.garrison != 1000) {
         garrisons.set(region.id, getGarrisonToken(region.garrison));
       }
@@ -102,7 +108,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
         }}
       >
         <div style={{ position: "relative" }}>
-          {this.props.worldSnapshot.map((r) => (
+          {this.worldSnapshot.map((r) => (
             <div key={`world-state_${r.id}`}>
               {r.castleModifier !== undefined && (
                 <div
@@ -160,8 +166,8 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
   ): ReactNode {
     return (
       ironBankView &&
-      this.props.gameSnapshot?.ironBank &&
-      this.props.gameSnapshot?.ironBank.loanSlots.map((lc, i) => (
+      this.gameSnapshot?.ironBank &&
+      this.gameSnapshot?.ironBank.loanSlots.map((lc, i) => (
         <OverlayTrigger
           key={`loan-slot_${i}`}
           overlay={
@@ -228,7 +234,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
   ): ReactNode {
     return (
       ironBankView &&
-      this.props.gameSnapshot?.ironBank && (
+      this.gameSnapshot?.ironBank && (
         <div
           id="iron-bank-info"
           style={{
@@ -241,7 +247,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
         >
           <IronBankSnapshotComponent
             ingame={this.ingame}
-            ironBank={this.props.gameSnapshot?.ironBank}
+            ironBank={this.gameSnapshot?.ironBank}
           />
         </div>
       )
@@ -250,15 +256,25 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
 
   renderRegions(): ReactNode {
     const regions = this.ingame.world.regions;
-    return this.props.worldSnapshot.map((region) => {
+    return this.worldSnapshot.map((region) => {
       const blocked = region.garrison == 1000;
+      const highlightColor =
+        this.ingame.replayManager.regionsToHighlight.tryGet(
+          region.id,
+          undefined
+        );
       return (
         <polygon
           key={`world-state_region-polygon_${region.id}`}
           points={this.getRegionPath(regions.get(region.id))}
-          fill={blocked ? "black" : undefined}
+          fill={blocked ? "black" : highlightColor}
           fillRule="evenodd"
-          className={blocked ? "blocked-region" : "region-area-no-hover"}
+          className={classNames(
+            blocked ? "blocked-region" : "region-area-no-hover",
+            {
+              "highlighted-region-area": highlightColor !== undefined,
+            }
+          )}
         />
       );
     });
@@ -267,7 +283,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
   renderUnits(garrisons: BetterMap<string, string | null>): ReactNode {
     const regions = this.ingame.world.regions;
 
-    return this.props.worldSnapshot.map((r) => {
+    return this.worldSnapshot.map((r) => {
       return (
         <div
           key={`world-state_units-container_${r.id}`}
@@ -304,7 +320,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                     "unit-icon" +
                     getClassNameForDragonStrength(
                       u.type,
-                      this.props.gameSnapshot?.dragonStrength
+                      this.gameSnapshot?.dragonStrength
                     )
                   }
                   style={{
@@ -386,7 +402,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
   }
 
   renderOrders(): ReactNode {
-    return this.props.worldSnapshot.map((region) => {
+    return this.worldSnapshot.map((region) => {
       return region.order ? this.renderOrder(region) : null;
     });
   }

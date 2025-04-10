@@ -31,10 +31,15 @@ import {
   faHistory,
   faUniversity,
   faGear,
+  faForward,
+  faBackward,
+  faStepBackward,
+  faStepForward,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
+import { observer } from "mobx-react";
 
 interface ReplayGameStateColumnProps {
   gameClient: GameClient;
@@ -45,6 +50,7 @@ interface ReplayGameStateColumnProps {
   onColumnSwapClick: () => void;
 }
 
+@observer
 export default class ReplayGameStateColumn extends Component<ReplayGameStateColumnProps> {
   render(): ReactNode {
     const { gameClient, ingame, gameSnapshot, currentOpenedTab, onTabChange } =
@@ -227,6 +233,60 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                     </OverlayTrigger>
                   </Nav.Link>
                 </Nav.Item>
+                <div className="d-flex justify-content-center flex-grow-1">
+                  <button
+                    className="btn btn-secondary mx-1 mt-n1"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      ingame.replayManager.previousRoundLog();
+                      this.scrollToSelectedLog();
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      style={{ color: "white" }}
+                      icon={faStepBackward}
+                    />
+                  </button>
+                  <button
+                    className="btn btn-secondary mx-1 mt-n1"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      ingame.replayManager.previousLog();
+                      this.scrollToSelectedLog();
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      style={{ color: "white" }}
+                      icon={faBackward}
+                    />
+                  </button>
+                  <button
+                    className="btn btn-secondary mx-1 mt-n1"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      ingame.replayManager.nextLog();
+                      this.scrollToSelectedLog();
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      style={{ color: "white" }}
+                      icon={faForward}
+                    />
+                  </button>
+                  <button
+                    className="btn btn-secondary mx-1 mt-n1"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      ingame.replayManager.nextRoundLog();
+                      this.scrollToSelectedLog();
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      style={{ color: "white" }}
+                      icon={faStepForward}
+                    />
+                  </button>
+                </div>
               </Nav>
             </Card.Header>
             <Card.Body id="game-log-panel">
@@ -289,9 +349,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
     const gameRoundElements = document.querySelectorAll(
       '*[id^="gamelog-round-"]'
     );
-    const ordersReveleadElements = Array.from(
-      document.querySelectorAll('*[id^="gamelog-orders-revealed-round-"]')
-    );
+
     const result: JSX.Element[] = [];
 
     gameRoundElements.forEach((gameRoundElem) => {
@@ -311,30 +369,17 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
           Round {round}
         </Dropdown.Item>
       );
-
-      const ordersRevealedElem = ordersReveleadElements.find(
-        (elem) => elem.id == `gamelog-orders-revealed-round-${round}`
-      );
-      if (ordersRevealedElem) {
-        result.push(
-          <Dropdown.Item
-            className="text-center"
-            key={`dropdownitem-for-${ordersRevealedElem.id}`}
-            onClick={() => {
-              // When game log is the active tab, items get rendered before this logic here can work
-              // Therefore we search the item during onClick again to make it work
-              const elemToScroll = document.getElementById(
-                ordersRevealedElem.id
-              );
-              elemToScroll?.scrollIntoView();
-            }}
-          >
-            Orders were revealed
-          </Dropdown.Item>
-        );
-      }
     });
 
     return result;
+  }
+
+  private scrollToSelectedLog(): void {
+    const selectedLog = document.getElementById(
+      `game-log-content-${this.props.ingame.replayManager.selectedLogIndex}`
+    );
+    if (selectedLog) {
+      selectedLog.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
 }

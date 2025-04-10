@@ -23,18 +23,18 @@ import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
-import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
+import { observer } from "mobx-react";
 
 interface ReplayHouseInfoColumnProps {
   gameClient: GameClient;
   ingame: IngameGameState;
-  gameSnapshot: IGameSnapshot | undefined;
   onColumnSwapClick: () => void;
 }
 
+@observer
 export default class ReplayHouseInfoColumn extends Component<ReplayHouseInfoColumnProps> {
-  private gameSnapshot = this.props.gameSnapshot;
   private ingame = this.props.ingame;
+  private gameSnapshot = this.ingame.replayManager.selectedGameSnapshot;
   private gameClient = this.props.gameClient;
 
   get tracks(): { track: (House | null)[]; stars: boolean }[] {

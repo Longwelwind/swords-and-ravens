@@ -208,6 +208,7 @@ export type ModifyingGameLog =
   | ClashOfKingsFinalOrdering
   | ConsolidatePowerOrderResolved
   | ArmiesReconciled
+  | Attack
   | PatchfaceUsed
   | MelisandreDwDUsed
   | JonSnowUsed
@@ -228,8 +229,10 @@ export type ModifyingGameLog =
   | MaceTyrellFootmanKilled
   | SerIlynPayneFootmanKilled
   | CerseiLannisterOrderRemoved
-  | RetreatRegionChosen
+  | ArianneMartellPreventMovement
+  | ArianneMartellForceRetreat
   | RetreatFailed
+  | RetreatRegionChosen
   | RetreatCasualtiesSuffered
   | EnemyPortTaken
   | ShipsDestroyedByEmptyCastle
@@ -311,7 +314,9 @@ export type ModifyingGameLog =
   | SerIlynPayneASoSCasualtySuffered
   | StannisBaratheonASoSUsed
   | ControlPowerTokenRemoved
-  | LastLandUnitTransformedToDragon;
+  | LastLandUnitTransformedToDragon
+  | CombatResult
+  | VassalsClaimed;
 
 export enum PlayerActionType {
   ORDERS_PLACED,
@@ -665,6 +670,7 @@ interface LorasTyrellAttackOrderMoved {
   region: string;
 }
 
+// Todo: Replace this by ability not used, migrate existing logs
 interface QueenOfThornsNoOrderAvailable {
   type: "queen-of-thorns-no-order-available";
   house: string;
@@ -1302,6 +1308,7 @@ interface OrdersRevealed {
   type: "orders-revealed";
   worldState: IRegionSnapshot[];
   gameSnapshot?: IGameSnapshot;
+  onlySnapshot?: boolean;
 }
 
 interface HouseCardsReturned {

@@ -5,7 +5,7 @@ import { ServerMessage } from "../../messages/ServerMessage";
 import User from "../../server/User";
 import World from "./game-data-structure/World";
 import Player, { SerializedPlayer } from "./Player";
-import Region, { RegionSnapshot } from "./game-data-structure/Region";
+import Region from "./game-data-structure/Region";
 import PlanningGameState, {
   SerializedPlanningGameState,
 } from "./planning-game-state/PlanningGameState";
@@ -85,6 +85,8 @@ import {
 } from "./port-helper/PortHelper";
 import { dragon } from "./game-data-structure/unitTypes";
 import groupBy from "../../utils/groupBy";
+import IRegionSnapshot from "./game-data-structure/game-replay/IRegionSnapshot";
+import GameReplayManager from "./game-data-structure/game-replay/GameReplayManager";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -116,6 +118,7 @@ export default class IngameGameState extends GameState<
   @observable housesTimedOut: House[] = [];
   game: Game;
   gameLogManager: GameLogManager = new GameLogManager(this);
+  replayManager = new GameReplayManager(this.entireGame);
   @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
   @observable visibleRegionsPerPlayer: BetterMap<Player, Region[]> =
     new BetterMap();
@@ -249,6 +252,12 @@ export default class IngameGameState extends GameState<
       this.entireGame.gameSettings.draftHouseCards ||
       this.entireGame.gameSettings.draftMap
     ) {
+      this.log({
+        type: "orders-revealed",
+        worldState: this.getWorldSnapshotWithOrdersOnBoard(),
+        gameSnapshot: this.game.getSnapshot(),
+        onlySnapshot: true,
+      });
       this.setChildGameState(new DraftGameState(this)).firstStart();
     } else {
       this.onDraftGameStateEnd();
@@ -335,6 +344,18 @@ export default class IngameGameState extends GameState<
   ): void {
     this.game.vassalRelations = new BetterMap();
     this.broadcastVassalRelations();
+
+    if (this.game.turn == 1 && this.getVassalHouses().length > 0) {
+      // To support replaying first vassal picks
+      this.log({
+        type: "orders-revealed",
+        worldState:
+          this.getWorldSnapshotWithOrdersOnBoard(planningRestrictions),
+        gameSnapshot: this.game.getSnapshot(),
+        onlySnapshot: true,
+      });
+    }
+
     this.setChildGameState(new PlanningGameState(this)).firstStart(
       planningRestrictions,
       revealedWesterosCards
@@ -2765,7 +2786,7 @@ export default class IngameGameState extends GameState<
 
   getWorldSnapshotWithOrdersOnBoard(
     planningRestrictions: PlanningRestriction[] = []
-  ): RegionSnapshot[] {
+  ): IRegionSnapshot[] {
     const worldSnapshot = _.orderBy(this.world.getSnapshot(), [
       (r) => r.controller,
       (r) => r.id,

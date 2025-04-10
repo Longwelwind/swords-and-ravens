@@ -4,7 +4,6 @@ import { observer } from "mobx-react";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
-import IEntireGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IEntireGameSnapshot";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { MAP_HEIGHT } from "./MapComponent";
 import GameClient from "./GameClient";
@@ -22,24 +21,16 @@ import WorldSnapshotComponent from "./WorldSnapshotComponent";
 import { houseColorFilters } from "./houseColorFilters";
 import ReplayGameStateColumn from "./ReplayGameStateColumn";
 import ReplayHouseInfoColumn from "./ReplayHouseInfoColumn";
-import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
-import RegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/RegionSnapshot";
 
 interface ReplayComponentProps {
   gameClient: GameClient;
   ingame: IngameGameState;
-  entireGameSnapshot: IEntireGameSnapshot;
 }
 
 @observer
 export default class ReplayComponent extends Component<ReplayComponentProps> {
   private gameClient: GameClient = this.props.gameClient;
   private ingame: IngameGameState = this.props.ingame;
-  private entireGameSnapshot: IEntireGameSnapshot =
-    this.props.entireGameSnapshot;
-  private worldSnapshot: RegionSnapshot[] =
-    this.entireGameSnapshot.worldSnapshot;
-  private gameSnapshot?: IGameSnapshot = this.entireGameSnapshot.gameSnapshot;
   private gameSettings: GameSettings = this.ingame.entireGame.gameSettings;
   private user: User | null = this.gameClient.authenticatedUser;
 
@@ -89,7 +80,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
           <ReplayGameStateColumn
             gameClient={this.gameClient}
             ingame={this.ingame}
-            gameSnapshot={this.gameSnapshot}
+            gameSnapshot={this.ingame.replayManager.selectedGameSnapshot}
             currentOpenedTab={this.currentOpenedTab}
             onTabChange={(tab) => (this.currentOpenedTab = tab)}
             onColumnSwapClick={() => this.onColumnSwap()}
@@ -110,11 +101,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
               maxHeight: MAP_HEIGHT,
             }}
           >
-            <WorldSnapshotComponent
-              ingameGameState={this.ingame}
-              worldSnapshot={this.worldSnapshot}
-              gameSnapshot={this.gameSnapshot}
-            />
+            <WorldSnapshotComponent ingameGameState={this.ingame} />
           </div>
         </Col>
         {(!this.housesInfosCollapsed || isMobile) && (
@@ -128,7 +115,6 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
             <ReplayHouseInfoColumn
               gameClient={this.gameClient}
               ingame={this.ingame}
-              gameSnapshot={this.gameSnapshot}
               onColumnSwapClick={() => this.onColumnSwap()}
             />
           </Col>

@@ -122,7 +122,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
               "flex-nowrap": !isMobile && this.entireGame.name.length > 90,
             })}
           >
-            {this.props.entireGame.replaySnapshot != null ? (
+            {this.props.entireGame.ingameGameState?.replayManager
+              .isReplayMode ? (
               <>
                 {this.renderReplaySwitch()}
                 {this.renderGameName()}
@@ -150,11 +151,11 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             gameState={this.entireGame.childGameState}
           />
         ) : this.entireGame.childGameState instanceof IngameGameState &&
-          this.entireGame.replaySnapshot != null ? (
+          this.entireGame.ingameGameState &&
+          this.entireGame.ingameGameState.replayManager.isReplayMode ? (
           <ReplayComponent
             gameClient={this.props.gameClient}
             ingame={this.entireGame.childGameState}
-            entireGameSnapshot={this.entireGame.replaySnapshot}
           />
         ) : this.entireGame.childGameState instanceof IngameGameState ? (
           <IngameComponent
@@ -529,9 +530,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             </label>
           }
           style={{ marginTop: "-6px" }}
-          checked={this.entireGame.replaySnapshot != null}
+          checked={this.entireGame.ingameGameState?.replayManager.isReplayMode}
           onChange={() => {
-            this.entireGame.replaySnapshot = null;
+            if (this.entireGame.ingameGameState)
+              this.entireGame.ingameGameState.replayManager.reset();
           }}
         />
       </Col>

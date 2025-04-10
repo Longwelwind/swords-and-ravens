@@ -1,3 +1,5 @@
+import IIronBankSnapshot from "./IIronBankSnapshot";
+
 export default class IronBankSnapshot implements IIronBankSnapshot {
   loanSlots: (string | null)[];
   interestCosts?: [string, number][];

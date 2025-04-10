@@ -20,7 +20,9 @@ export default class GameSnapshot implements IGameSnapshot {
     this.ironThroneTrack = data.ironThroneTrack;
     this.fiefdomsTrack = data.fiefdomsTrack;
     this.kingsCourtTrack = data.kingsCourtTrack;
-    this.housesOnVictoryTrack = data.housesOnVictoryTrack;
+    this.housesOnVictoryTrack = data.housesOnVictoryTrack.map(
+      (hsnap) => new HouseSnapshot(hsnap)
+    );
     this.vsbUsed = data.vsbUsed;
     this.ironBank = data.ironBank;
   }

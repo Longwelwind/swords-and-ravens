@@ -447,6 +447,10 @@ $wildling-outline: rgba(yellow, 0.5);
   cursor: pointer;
 }
 
+.clickable-no-underline:hover {
+  text-decoration: none;
+}
+
 .link-color {
   color: #00bc8c;
 }
@@ -1324,4 +1328,25 @@ select {
             transform-origin: 0% 50%;
     opacity: 1;
   }
+}
+
+.mt-n1 {
+  margin-top: -1rem !important;
+}
+.mt-n2 {
+  margin-top: -2rem !important;
+} 
+
+.mb-n1 {
+  margin-bottom: -1rem !important;
+}
+.mb-n2 {
+  margin-bottom: -2rem !important;
+}
+
+.highlight-log {
+  background-color: #242735 !important;
+  border-radius: 10px;
+  border: 6px solid transparent; // Added thicker border
+  cursor: pointer;
 }
