@@ -17,10 +17,7 @@ import classNames from "classnames";
 
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import {
-  GameSnapshot,
-  MAX_WILDLING_STRENGTH,
-} from "../common/ingame-game-state/game-data-structure/Game";
+import { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
 import GameLogListComponent from "./GameLogListComponent";
 import GameSettingsComponent from "./GameSettingsComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
@@ -37,11 +34,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
+import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
 
 interface ReplayGameStateColumnProps {
   gameClient: GameClient;
   ingame: IngameGameState;
-  gameSnapshot: GameSnapshot | undefined;
+  gameSnapshot: IGameSnapshot | undefined;
   currentOpenedTab: string;
   onTabChange: (tab: string) => void;
   onColumnSwapClick: () => void;

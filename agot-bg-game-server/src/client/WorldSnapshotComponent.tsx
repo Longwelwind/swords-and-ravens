@@ -1,9 +1,6 @@
 import { Component, ReactNode } from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import * as React from "react";
-import Region, {
-  RegionSnapshot,
-} from "../common/ingame-game-state/game-data-structure/Region";
 import westerosImage from "../../public/images/westeros.jpg";
 import westeros7pImage from "../../public/images/westeros-7p.jpg";
 import westerosWithEssosImage from "../../public/images/westeros-with-essos.jpg";
@@ -26,7 +23,9 @@ import ImagePopover from "./utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
-import { GameSnapshot } from "../common/ingame-game-state/game-data-structure/Game";
+import IRegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IRegionSnapshot";
+import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
+import Region from "../common/ingame-game-state/game-data-structure/Region";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -51,8 +50,8 @@ export function getClassNameForDragonStrength(
 
 interface WorldSnapshotComponentProps {
   ingameGameState: IngameGameState;
-  worldSnapshot: RegionSnapshot[];
-  gameSnapshot?: GameSnapshot;
+  worldSnapshot: IRegionSnapshot[];
+  gameSnapshot?: IGameSnapshot;
 }
 
 export default class WorldSnapshotComponent extends Component<WorldSnapshotComponentProps> {
@@ -392,7 +391,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     });
   }
 
-  renderOrder(regionSnapshot: RegionSnapshot): ReactNode {
+  renderOrder(regionSnapshot: IRegionSnapshot): ReactNode {
     if (!regionSnapshot.order) {
       return null;
     }

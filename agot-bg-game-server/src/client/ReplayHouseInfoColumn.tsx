@@ -12,7 +12,6 @@ import HouseSnapshotComponent from "./HouseSnapshotComponent";
 import BetterMap from "../utils/BetterMap";
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import { GameSnapshot } from "../common/ingame-game-state/game-data-structure/Game";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
@@ -24,11 +23,12 @@ import stoneThroneImage from "../../public/images/icons/stone-throne.svg";
 import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
+import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
 
 interface ReplayHouseInfoColumnProps {
   gameClient: GameClient;
   ingame: IngameGameState;
-  gameSnapshot: GameSnapshot | undefined;
+  gameSnapshot: IGameSnapshot | undefined;
   onColumnSwapClick: () => void;
 }
 

@@ -1,7 +1,7 @@
 import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { ReplacementReason } from "../IngameGameState";
-import { GameSnapshot } from "./Game";
-import { RegionSnapshot } from "./Region";
+import IGameSnapshot from "./game-replay/IGameSnapshot";
+import IRegionSnapshot from "./game-replay/IRegionSnapshot";
 
 export default interface GameLog {
   time: Date;
@@ -194,6 +194,124 @@ export type GameLogData =
   | NoLoyaltyTokenAvailable
   | LastLandUnitTransformedToDragon
   | LivePbemSwitch;
+
+export type ModifyingGameLog =
+  | TurnBegin
+  | MarchResolved
+  | WesterosCardDrawn
+  | WildlingBidding
+  | PlayerMustered
+  | RavenHolderReplaceOrder
+  | RaidDone
+  | CombatValyrianSwordUsed
+  | ClashOfKingsBiddingDone
+  | ClashOfKingsFinalOrdering
+  | ConsolidatePowerOrderResolved
+  | ArmiesReconciled
+  | PatchfaceUsed
+  | MelisandreDwDUsed
+  | JonSnowUsed
+  | DoranUsed
+  | SerGerrisDrinkwaterUsed
+  | ReekUsed
+  | ReekReturnedRamsay
+  | LysaArrynModUsed
+  | RodrikTheReaderUsed
+  | QyburnUsed
+  | AeronDamhairUsed
+  | RooseBoltonHouseCardsReturned
+  | LorasTyrellAttackOrderMoved
+  | QueenOfThornsOrderRemoved
+  | TywinLannisterPowerTokensGained
+  | QarlTheMaidPowerTokensGained
+  | RenlyBaratheonFootmanUpgradedToKnight
+  | MaceTyrellFootmanKilled
+  | SerIlynPayneFootmanKilled
+  | CerseiLannisterOrderRemoved
+  | RetreatRegionChosen
+  | RetreatFailed
+  | RetreatCasualtiesSuffered
+  | EnemyPortTaken
+  | ShipsDestroyedByEmptyCastle
+  | PreemptiveRaidUnitsKilled
+  | PreemptiveRaidTrackReduced
+  | PreemptiveRaidWildlingsAttack
+  | MassingOnTheMilkwaterHouseCardsBack
+  | MassingOnTheMilkwaterHouseCardsRemoved
+  | AKingBeyondTheWallLowestReduceTracks
+  | AKingBeyondTheWallHouseReduceTrack
+  | AKingBeyondTheWallHighestTopTrack
+  | MammothRidersDestroyUnits
+  | MammothRidersReturnCard
+  | TheHordeDescendsHighestMuster
+  | TheHordeDescendsUnitsKilled
+  | CrowKillersKnightsReplaced
+  | CrowKillersKnightsKilled
+  | CrowKillersFootmanUpgraded
+  | SkinchangerScoutNightsWatchVictory
+  | SkinchangerScoutWildlingVictory
+  | RattleshirtsRaidersNightsWatchVictory
+  | RattleshirtsRaidersWildlingVictory
+  | GameOfThronesPowerTokensGained
+  | ImmediatelyBattleCasualtiesSuffered
+  | BattleCasualtiesSuffered
+  | SupplyAdjusted
+  | CommanderPowerTokenGained
+  | BericDondarrionUsed
+  | VarysUsed
+  | JonConningtonUsed
+  | BronnUsed
+  | HouseCardPicked
+  | LittlefingerPowerTokensGained
+  | AlayneStoneUsed
+  | LysaArrynFfcPowerTokensGained
+  | AnyaWaynwoodPowerTokensGained
+  | RobertArrynUsed
+  | HouseCardRemovedFromGame
+  | ViserysTargaryenUsed
+  | IllyrioMopatisPowerTokensGained
+  | DaenerysTargaryenPowerTokensDiscarded
+  | MissandeiUsed
+  | PowerTokensGifted
+  | InfluenceTrackPositionChosen
+  | PlaceLoyaltyChoice
+  | LoyaltyTokenPlaced
+  | LoyaltyTokenGained
+  | FireMadeFleshChoice
+  | PlayWithFireChoice
+  | TheLongPlanChoice
+  | MoveLoyaltyTokenChoice
+  | LoanPurchased
+  | OrderRemoved
+  | InterestPaid
+  | DebtPaid
+  | CustomsOfficerPowerTokensGained
+  | SellswordsPlaced
+  | TheFacelessMenUnitsDestroyed
+  | PyromancerExecuted
+  | ExpertArtificerExecuted
+  | LoyalMaesterExecuted
+  | MasterAtArmsExecuted
+  | SavvyStewardExecuted
+  | SpecialObjectiveScored
+  | ObjectiveScored
+  | IronbornRaid
+  | GarrisonRemoved
+  | GarrisonReturned
+  | OrdersRevealed
+  | HouseCardsReturned
+  | LeavePowerTokenChoice
+  | BalonGreyjoyASoSPowerTokensGained
+  | MaceTyrellASoSOrderPlaced
+  | BranStarkUsed
+  | CerseiLannisterASoSPowerTokensDiscarded
+  | DoranMartellASoSUsed
+  | MelisandreOfAsshaiPowerTokensGained
+  | SalladharSaanASoSPowerTokensChanged
+  | SerIlynPayneASoSCasualtySuffered
+  | StannisBaratheonASoSUsed
+  | ControlPowerTokenRemoved
+  | LastLandUnitTransformedToDragon;
 
 export enum PlayerActionType {
   ORDERS_PLACED,
@@ -1182,8 +1300,8 @@ interface ObjectiveDeckEmpty {
 
 interface OrdersRevealed {
   type: "orders-revealed";
-  worldState: RegionSnapshot[];
-  gameSnapshot?: GameSnapshot;
+  worldState: IRegionSnapshot[];
+  gameSnapshot?: IGameSnapshot;
 }
 
 interface HouseCardsReturned {

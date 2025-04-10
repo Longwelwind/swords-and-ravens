@@ -1,5 +1,5 @@
 import RegionType from "./RegionType";
-import Unit, { SerializedUnit, UnitState } from "./Unit";
+import Unit, { SerializedUnit } from "./Unit";
 import House from "./House";
 import { observable } from "mobx";
 import Game from "./Game";
@@ -12,6 +12,7 @@ import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { port } from "./regionTypes";
 import SnrError from "../../../utils/snrError";
 import Player from "../Player";
+import IRegionSnapshot from "./game-replay/IRegionSnapshot";
 
 export default class Region {
   game: Game;
@@ -160,8 +161,8 @@ export default class Region {
     }
   }
 
-  getSnapshot(): RegionSnapshot {
-    const result: RegionSnapshot = {
+  getSnapshot(): IRegionSnapshot {
+    const result: IRegionSnapshot = {
       id: this.id,
     };
 
@@ -273,18 +274,4 @@ export interface SerializedRegion {
   barrelModifier: number;
   crownModifier: number;
   overwrittenSuperControlPowerToken: string | null;
-}
-
-export interface RegionSnapshot {
-  id: string;
-  controller?: string;
-  units?: UnitState[];
-  garrison?: number;
-  controlPowerToken?: string;
-  loyaltyTokens?: number;
-  castleModifier?: number;
-  barrelModifier?: number;
-  crownModifier?: number;
-  overwrittenSuperControlPowerToken?: string;
-  order?: { type: string; restricted?: boolean };
 }

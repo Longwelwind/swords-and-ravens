@@ -1,15 +1,13 @@
 import * as React from "react";
 import { Component, ReactNode } from "react";
-import GameClient from "./GameClient";
 import { observer } from "mobx-react";
-import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import { MAP_HEIGHT } from "./MapComponent";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import {
-  EntireGameSnapshot as EntireGameSnapshot,
-  GameSnapshot,
-} from "../common/ingame-game-state/game-data-structure/Game";
+
+import IEntireGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IEntireGameSnapshot";
+import IngameGameState from "../common/ingame-game-state/IngameGameState";
+import { MAP_HEIGHT } from "./MapComponent";
+import GameClient from "./GameClient";
 import User from "../server/User";
 import { observable } from "mobx";
 import { GameSettings } from "../common/EntireGame";
@@ -22,25 +20,26 @@ import unitImages from "./unitImages";
 import houseIconImages from "./houseIconImages";
 import WorldSnapshotComponent from "./WorldSnapshotComponent";
 import { houseColorFilters } from "./houseColorFilters";
-import { RegionSnapshot } from "../common/ingame-game-state/game-data-structure/Region";
 import ReplayGameStateColumn from "./ReplayGameStateColumn";
 import ReplayHouseInfoColumn from "./ReplayHouseInfoColumn";
+import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
+import RegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/RegionSnapshot";
 
 interface ReplayComponentProps {
   gameClient: GameClient;
   ingame: IngameGameState;
-  entireGameSnapshot: EntireGameSnapshot;
+  entireGameSnapshot: IEntireGameSnapshot;
 }
 
 @observer
 export default class ReplayComponent extends Component<ReplayComponentProps> {
   private gameClient: GameClient = this.props.gameClient;
   private ingame: IngameGameState = this.props.ingame;
-  private entireGameSnapshot: EntireGameSnapshot =
+  private entireGameSnapshot: IEntireGameSnapshot =
     this.props.entireGameSnapshot;
   private worldSnapshot: RegionSnapshot[] =
     this.entireGameSnapshot.worldSnapshot;
-  private gameSnapshot?: GameSnapshot = this.entireGameSnapshot.gameSnapshot;
+  private gameSnapshot?: IGameSnapshot = this.entireGameSnapshot.gameSnapshot;
   private gameSettings: GameSettings = this.ingame.entireGame.gameSettings;
   private user: User | null = this.gameClient.authenticatedUser;
 

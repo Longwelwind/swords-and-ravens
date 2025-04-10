@@ -6,6 +6,7 @@ import Game from "./Game";
 import House from "./House";
 import LoanCard, { SerializedLoanCard } from "./loan-card/LoanCard";
 import LoanCardType from "./loan-card/LoanCardType";
+import IIronBankSnapshot from "./game-replay/IronBankSnapshot";
 
 export default class IronBank {
   game: Game;
@@ -164,7 +165,7 @@ export default class IronBank {
     return sortedByTurnOrder.entries;
   }
 
-  getSnapshot(): IronBankSnapshot {
+  getSnapshot(): IIronBankSnapshot {
     return {
       loanSlots: this.loanSlots.map((lc) => (lc != null ? lc.type.id : null)),
       interestCosts:
@@ -208,10 +209,4 @@ export interface SerializedIronBank {
   loanCardDeck: SerializedLoanCard[];
   purchasedLoans: SerializedLoanCard[];
   loanSlots: (SerializedLoanCard | null)[];
-}
-
-export interface IronBankSnapshot {
-  loanSlots: (string | null)[];
-  interestCosts?: [string, number][];
-  braavosController?: string;
 }
