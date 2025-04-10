@@ -1,3 +1,5 @@
+// @ts-expect-error Somehow this module cannot be found while it is
+import ScrollToBottom from "react-scroll-to-bottom";
 import React, { Component, ReactNode } from "react";
 
 import {
@@ -9,6 +11,7 @@ import {
   Spinner,
   Tab,
   Nav,
+  Dropdown,
 } from "react-bootstrap";
 import classNames from "classnames";
 
@@ -229,13 +232,32 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               </Nav>
             </Card.Header>
             <Card.Body id="game-log-panel">
+              {/* This is an invisible div to force the parent to stretch to its remaining width */}
+              <div style={{ visibility: "hidden", width: "850px" }} />
               <Tab.Content className="h-100">
                 <Tab.Pane eventKey="game-logs" className="h-100">
-                  <GameLogListComponent
-                    ingameGameState={ingame}
-                    gameClient={gameClient}
-                    currentlyViewed={true}
-                  />
+                  <div className="d-flex flex-column h-100">
+                    <div className="d-flex flex-column align-items-center">
+                      <Dropdown className="mb-2">
+                        <Dropdown.Toggle variant="secondary" size="sm">
+                          Jump to
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          {this.renderGameLogRoundsDropDownItems()}
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </div>
+                    <ScrollToBottom
+                      className="flex-fill-remaining"
+                      scrollViewClassName="overflow-x-hidden"
+                    >
+                      <GameLogListComponent
+                        ingameGameState={ingame}
+                        gameClient={gameClient}
+                        currentlyViewed={true}
+                      />
+                    </ScrollToBottom>
+                  </div>
                 </Tab.Pane>
                 {gameSnapshot?.ironBank && (
                   <Tab.Pane eventKey="iron-bank" className="h-100">
@@ -250,10 +272,12 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                     gameClient={gameClient}
                     entireGame={ingame.entireGame}
                   />
-                  <UserSettingsComponent
-                    user={gameClient.authenticatedUser}
-                    entireGame={ingame.entireGame}
-                  />
+                  <div style={{ marginTop: -20 }}>
+                    <UserSettingsComponent
+                      user={gameClient.authenticatedUser}
+                      entireGame={ingame.entireGame}
+                    />
+                  </div>
                 </Tab.Pane>
               </Tab.Content>
             </Card.Body>
@@ -261,5 +285,58 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
         </Card>
       </div>
     );
+  }
+
+  private renderGameLogRoundsDropDownItems(): JSX.Element[] {
+    const gameRoundElements = document.querySelectorAll(
+      '*[id^="gamelog-round-"]'
+    );
+    const ordersReveleadElements = Array.from(
+      document.querySelectorAll('*[id^="gamelog-orders-revealed-round-"]')
+    );
+    const result: JSX.Element[] = [];
+
+    gameRoundElements.forEach((gameRoundElem) => {
+      const round = gameRoundElem.id.replace("gamelog-round-", "");
+
+      result.push(
+        <Dropdown.Item
+          className="text-center"
+          key={`dropdownitem-for-${gameRoundElem.id}`}
+          onClick={() => {
+            // When game log is the active tab, items get rendered before this logic here can work
+            // Therefore we search the item during onClick again to make it work
+            const elemToScroll = document.getElementById(gameRoundElem.id);
+            elemToScroll?.scrollIntoView();
+          }}
+        >
+          Round {round}
+        </Dropdown.Item>
+      );
+
+      const ordersRevealedElem = ordersReveleadElements.find(
+        (elem) => elem.id == `gamelog-orders-revealed-round-${round}`
+      );
+      if (ordersRevealedElem) {
+        result.push(
+          <Dropdown.Item
+            className="text-center"
+            key={`dropdownitem-for-${ordersRevealedElem.id}`}
+            onClick={() => {
+              // When game log is the active tab, items get rendered before this logic here can work
+              // Therefore we search the item during onClick again to make it work
+              const elemToScroll = document.getElementById(
+                ordersRevealedElem.id
+              );
+              elemToScroll?.scrollIntoView();
+            }}
+          >
+            Orders were revealed
+          </Dropdown.Item>
+        );
+      }
+    });
+
+    return result;
   }
 }

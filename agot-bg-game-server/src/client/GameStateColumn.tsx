@@ -152,7 +152,36 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 {phases.some((phase) => isPhaseActive(phase)) && (
                   <ListGroupItem>
                     <Row className="justify-content-between align-items-center">
-                      {phases.map((phase) => (
+                      <Col
+                        xs="auto"
+                        key={phases[0].name + "_phase"}
+                        className="px-1"
+                      >
+                        <OverlayTrigger
+                          overlay={this.renderRemainingWesterosCards()}
+                          trigger="click"
+                          placement="bottom-start"
+                          rootClose
+                        >
+                          <div
+                            className={classNames(
+                              "clickable btn btn-sm btn-secondary dropdown-toggle",
+                              {
+                                "weak-box-outline": isPhaseActive(phases[0]),
+                                "text-muted": !isPhaseActive(phases[0]),
+                              }
+                            )}
+                          >
+                            <ConditionalWrap
+                              condition={isPhaseActive(phases[0])}
+                              wrap={(child) => <b>{child}</b>}
+                            >
+                              <>{phases[0].name} phase</>
+                            </ConditionalWrap>
+                          </div>
+                        </OverlayTrigger>
+                      </Col>
+                      {_.drop(phases).map((phase) => (
                         <Col
                           xs="auto"
                           key={`${phase.name}_phase`}
