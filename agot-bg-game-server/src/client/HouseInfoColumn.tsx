@@ -35,6 +35,7 @@ import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
+import { observer } from "mobx-react";
 
 interface HouseInfoColumnProps {
   ingame: IngameGameState;
@@ -46,6 +47,7 @@ interface HouseInfoColumnProps {
   showGameControls?: boolean;
 }
 
+@observer
 export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
   private gameClient = this.props.gameClient;
 

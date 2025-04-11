@@ -294,23 +294,19 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   </div>
                 </Nav.Item>
               ))}
+              {isMobile && !this.logChatFullScreen && (
+                <div className="d-flex justify-content-end flex-grow-1">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      this.logChatFullScreen = true;
+                    }}
+                  >
+                    <img src={expandImage} width={24} />
+                  </button>
+                </div>
+              )}
             </Nav>
-            {isMobile && !this.logChatFullScreen && (
-              <button
-                className="btn btn-secondary"
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  zIndex: 1000,
-                }}
-                onClick={() => {
-                  this.logChatFullScreen = true;
-                }}
-              >
-                <img src={expandImage} width={24} />
-              </button>
-            )}
           </Card.Header>
           <Card.Body id="game-log-panel">
             <div style={{ visibility: "hidden", width: "850px" }} />
@@ -530,9 +526,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     const gameRoundElements = document.querySelectorAll(
       '*[id^="gamelog-round-"]'
     );
-    const ordersReveleadElements = Array.from(
-      document.querySelectorAll('*[id^="gamelog-orders-revealed-round-"]')
-    );
+
     const result: JSX.Element[] = [];
 
     gameRoundElements.forEach((gameRoundElem) => {
@@ -550,26 +544,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
           Round {round}
         </Dropdown.Item>
       );
-
-      const ordersRevealedElem = ordersReveleadElements.find(
-        (elem) => elem.id == `gamelog-orders-revealed-round-${round}`
-      );
-      if (ordersRevealedElem) {
-        result.push(
-          <Dropdown.Item
-            className="text-center"
-            key={`dropdownitem-for-${ordersRevealedElem.id}`}
-            onClick={() => {
-              const elemToScroll = document.getElementById(
-                ordersRevealedElem.id
-              );
-              elemToScroll?.scrollIntoView();
-            }}
-          >
-            Orders were revealed
-          </Dropdown.Item>
-        );
-      }
     });
 
     return result;

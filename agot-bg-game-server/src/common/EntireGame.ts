@@ -41,7 +41,6 @@ import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/
 import getElapsedSeconds from "../utils/getElapsedSeconds";
 import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import House from "./ingame-game-state/game-data-structure/House";
-import { EntireGameSnapshot } from "./ingame-game-state/game-data-structure/Game";
 import SnrError from "../utils/snrError";
 
 export enum NotificationType {
@@ -156,9 +155,6 @@ export default class EntireGame extends GameState<
         lowestBidder: House | null
       ) => void)
     | null = null;
-
-  @observable
-  replaySnapshot: EntireGameSnapshot | null = null;
 
   @observable
   now = new Date();
