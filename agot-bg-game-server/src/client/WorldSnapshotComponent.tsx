@@ -26,6 +26,7 @@ import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
 import IRegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IRegionSnapshot";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import GameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/GameSnapshot";
+import { observer } from "mobx-react";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -52,6 +53,7 @@ interface WorldSnapshotComponentProps {
   ingameGameState: IngameGameState;
 }
 
+@observer
 export default class WorldSnapshotComponent extends Component<WorldSnapshotComponentProps> {
   backgroundImage: string = westerosImage;
   mapWidth: number = MAP_WIDTH;
@@ -61,11 +63,11 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
   }
 
   get worldSnapshot(): IRegionSnapshot[] {
-    return this.ingame.replayManager.selectedWorldSnapshot;
+    return this.ingame.replayManager.selectedSnapshot?.worldSnapshot ?? [];
   }
 
   get gameSnapshot(): GameSnapshot | undefined {
-    return this.ingame.replayManager.selectedGameSnapshot;
+    return this.ingame.replayManager.selectedSnapshot?.gameSnapshot;
   }
 
   constructor(props: WorldSnapshotComponentProps) {

@@ -80,7 +80,6 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
           <ReplayGameStateColumn
             gameClient={this.gameClient}
             ingame={this.ingame}
-            gameSnapshot={this.ingame.replayManager.selectedGameSnapshot}
             currentOpenedTab={this.currentOpenedTab}
             onTabChange={(tab) => (this.currentOpenedTab = tab)}
             onColumnSwapClick={() => this.onColumnSwap()}

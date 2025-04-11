@@ -38,13 +38,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
-import IGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IGameSnapshot";
 import { observer } from "mobx-react";
 
 interface ReplayGameStateColumnProps {
   gameClient: GameClient;
   ingame: IngameGameState;
-  gameSnapshot: IGameSnapshot | undefined;
   currentOpenedTab: string;
   onTabChange: (tab: string) => void;
   onColumnSwapClick: () => void;
@@ -53,8 +51,13 @@ interface ReplayGameStateColumnProps {
 @observer
 export default class ReplayGameStateColumn extends Component<ReplayGameStateColumnProps> {
   render(): ReactNode {
-    const { gameClient, ingame, gameSnapshot, currentOpenedTab, onTabChange } =
-      this.props;
+    const { gameClient, ingame, currentOpenedTab, onTabChange } = this.props;
+
+    const gameSnapshot = ingame.replayManager.selectedSnapshot?.gameSnapshot;
+
+    if (!gameSnapshot) {
+      return null;
+    }
 
     const roundWarning =
       gameSnapshot && ingame.game.maxTurns - gameSnapshot.round === 1;
@@ -287,6 +290,14 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                     />
                   </button>
                 </div>
+                <Dropdown className="ml-2">
+                  <Dropdown.Toggle variant="secondary" size="sm">
+                    Jump to
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    {this.renderGameLogRoundsDropDownItems()}
+                  </Dropdown.Menu>
+                </Dropdown>
               </Nav>
             </Card.Header>
             <Card.Body id="game-log-panel">
@@ -295,16 +306,6 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               <Tab.Content className="h-100">
                 <Tab.Pane eventKey="game-logs" className="h-100">
                   <div className="d-flex flex-column h-100">
-                    <div className="d-flex flex-column align-items-center">
-                      <Dropdown className="mb-2">
-                        <Dropdown.Toggle variant="secondary" size="sm">
-                          Jump to
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          {this.renderGameLogRoundsDropDownItems()}
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </div>
                     <ScrollToBottom
                       className="flex-fill-remaining"
                       scrollViewClassName="overflow-x-hidden"

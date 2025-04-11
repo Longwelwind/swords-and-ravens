@@ -9,7 +9,6 @@ import GameLogManager from "../GameLogManager";
 import EntireGame from "../../../../common/EntireGame";
 import { computed, observable } from "mobx";
 import RegionSnapshot from "./RegionSnapshot";
-import GameSnapshot from "./GameSnapshot";
 import { modifyingGameLogIds } from "./replay-constants";
 import HouseSnapshot from "./HouseSnapshot";
 import { CombatStats } from "../../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
@@ -20,6 +19,7 @@ export default class GameReplayManager {
   @observable selectedLogIndex = -1;
   @observable selectedSnapshot: EntireGameSnapshot | null = null;
   @observable regionsToHighlight: BetterMap<string, string> = new BetterMap();
+  @observable rerender = 0;
 
   private entireGame: EntireGame;
 
@@ -34,16 +34,6 @@ export default class GameReplayManager {
     combatResult: CombatStats[] | null;
   } | null = null;
 
-  get selectedWorldSnapshot(): RegionSnapshot[] {
-    if (!this.selectedSnapshot) return [];
-    return this.selectedSnapshot.worldSnapshot;
-  }
-
-  get selectedGameSnapshot(): GameSnapshot | undefined {
-    if (!this.selectedSnapshot?.gameSnapshot) return undefined;
-    return this.selectedSnapshot.gameSnapshot;
-  }
-
   @computed
   get isReplayMode(): boolean {
     return this.selectedLogIndex > -1 && this.selectedSnapshot != null;
@@ -56,6 +46,14 @@ export default class GameReplayManager {
 
   constructor(entireGame: EntireGame) {
     this.entireGame = entireGame;
+  }
+
+  render(): void {
+    if (this.rerender == 0) {
+      this.rerender = 1;
+    } else {
+      this.rerender = 0;
+    }
   }
 
   selectLog(index: number): void {
@@ -280,6 +278,12 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         snap.gameSnapshot.round = log.turn;
         snap.gameSnapshot.vsbUsed = false;
+        snap.worldSnapshot.forEach((region) => {
+          region.removeOrder();
+          region.units?.forEach((unit) => {
+            unit.wounded = false;
+          });
+        });
         return snap;
       }
 
@@ -310,6 +314,7 @@ export default class GameReplayManager {
           houses.forEach((h) => {
             const house = snap.getHouse(h);
             house?.removePowerTokens(bid);
+            this.render();
           });
         });
         return snap;
@@ -345,11 +350,13 @@ export default class GameReplayManager {
           if (log.raiderGainedPowerToken) {
             const raider = snap.getHouse(log.raider);
             raider?.addPowerTokens(1);
+            this.render();
           }
 
           if (log.raidedHouseLostPowerToken) {
             const raided = snap.getHouse(log.raidee);
             raided?.removePowerTokens(1);
+            this.render();
           }
         }
 
@@ -361,6 +368,7 @@ export default class GameReplayManager {
           houses.forEach((h) => {
             const house = snap.getHouse(h);
             house?.removePowerTokens(bid);
+            this.render();
           });
         });
         return snap;
@@ -401,6 +409,7 @@ export default class GameReplayManager {
         vassals.forEach((v) => {
           v.isVassal = true;
           v.suzerainHouseId = house.id;
+          this.render();
         });
         return snap;
       }
@@ -712,6 +721,7 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.affectedHouse);
         house?.markHouseCardAsUsed(log.houseCard);
+        this.render();
         return snap;
       }
 
@@ -721,6 +731,7 @@ export default class GameReplayManager {
         house?.markHouseCardAsAvailable(log.houseCard);
         const card = allKnownHouseCards.get(log.houseCard);
         house?.removePowerTokens(card.combatStrength);
+        this.render();
         return snap;
       }
 
@@ -745,6 +756,7 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.house);
         house?.markHouseCardAsAvailable("reek");
+        this.render();
         return snap;
       }
 
@@ -752,6 +764,7 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.house);
         house?.markHouseCardAsAvailable(log.returnedCardId);
+        this.render();
         return snap;
       }
 
@@ -759,6 +772,7 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.house);
         house?.markHouseCardAsAvailable("lysa-arryn-mod");
+        this.render();
         return snap;
       }
 

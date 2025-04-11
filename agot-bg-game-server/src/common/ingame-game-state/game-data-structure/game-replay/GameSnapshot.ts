@@ -1,17 +1,18 @@
+import { observable } from "mobx";
 import HouseSnapshot from "./HouseSnapshot";
 import IGameSnapshot from "./IGameSnapshot";
 import IronBankSnapshot from "./IronBankSnapshot";
 
 export default class GameSnapshot implements IGameSnapshot {
-  round: number;
-  wildlingStrength: number;
-  dragonStrength?: number;
-  ironThroneTrack: string[];
-  fiefdomsTrack: string[];
-  kingsCourtTrack: string[];
-  housesOnVictoryTrack: HouseSnapshot[];
-  vsbUsed?: boolean;
-  ironBank?: IronBankSnapshot;
+  @observable round: number;
+  @observable wildlingStrength: number;
+  @observable dragonStrength?: number;
+  @observable ironThroneTrack: string[];
+  @observable fiefdomsTrack: string[];
+  @observable kingsCourtTrack: string[];
+  @observable housesOnVictoryTrack: HouseSnapshot[];
+  @observable vsbUsed?: boolean;
+  @observable ironBank?: IronBankSnapshot;
 
   constructor(data: IGameSnapshot) {
     this.round = data.round;
