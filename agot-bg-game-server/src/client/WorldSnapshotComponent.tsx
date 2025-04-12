@@ -343,7 +343,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               }}
             />
           )}
-          {r.loyaltyTokens !== undefined && (
+          {(r.loyaltyTokens ?? -1) > 0 && (
             <div
               className="loyalty-icon"
               style={{
@@ -357,7 +357,10 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                 color: "white",
               }}
             >
-              {r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
+              {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                r.loyaltyTokens! > 1 ? r.loyaltyTokens : ""
+              }
             </div>
           )}
         </div>

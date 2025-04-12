@@ -33,6 +33,9 @@ export default class GameReplayManager {
   @observable selectedSnapshot: EntireGameSnapshot | null = null;
   @observable regionsToHighlight: BetterMap<string, string> = new BetterMap();
 
+  private previousFrom?: string;
+  private previousTo?: string;
+
   private entireGame: EntireGame;
 
   private currentCombatData: CombatLogData | null = null;
@@ -82,8 +85,9 @@ export default class GameReplayManager {
       })
     );
 
-    const logsToApply = _.cloneDeep(
-      this.logManager.logs.slice(nearestSnapData.index + 1, index + 1)
+    const logsToApply = this.logManager.logs.slice(
+      nearestSnapData.index + 1,
+      index + 1
     );
 
     while (logsToApply.length > 0) {
@@ -98,7 +102,7 @@ export default class GameReplayManager {
           snap = this.handleCombatLog(log, logsToApply, snap);
         }
       } else {
-        snap = this.applyLogEvent(snap, log.data, index);
+        snap = this.applyLogEvent(snap, log);
       }
     }
 
@@ -265,12 +269,13 @@ export default class GameReplayManager {
   */
   private applyLogEvent(
     snap: EntireGameSnapshot,
-    log: GameLogData,
-    logIndex: number
+    gameLog: GameLog
   ): EntireGameSnapshot {
-    if (!this.isModifyingGameLog(log)) {
+    if (!this.isModifyingGameLog(gameLog.data)) {
       return snap;
     }
+
+    const log = gameLog.data;
 
     switch (log.type) {
       case "turn-begin": {
@@ -660,31 +665,19 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.house)!;
         house.removePowerTokens(log.discardedPowerTokens);
-        // only power tokens are remved here
         return snap;
       }
 
       case "loyalty-token-placed": {
         const region = snap.getRegion(log.region);
-        const previousChoice = this.logManager.logs
-          .slice(0, logIndex)
-          .reverse()
-          .find((log) => log.data.type === "place-loyalty-choice");
-
-        if (
-          previousChoice &&
-          previousChoice.data.type === "place-loyalty-choice"
-        ) {
-          if (!region.loyaltyTokens) region.loyaltyTokens = 0;
-          region.loyaltyTokens += previousChoice.data.loyaltyTokenCount;
-        }
-
+        if (!region.loyaltyTokens) region.loyaltyTokens = 0;
+        region.loyaltyTokens++;
         return snap;
       }
 
       case "loyalty-token-gained": {
         const house = snap.getHouse("targaryen")!;
-        house.victoryPoints += log.count;
+        house.victoryPoints = log.count;
         const region = snap.getRegion(log.region);
         region.loyaltyTokens = 0;
         return snap;
@@ -724,23 +717,38 @@ export default class GameReplayManager {
       }
 
       case "move-loyalty-token-choice": {
-        const nextLog = this.logManager.logs[logIndex + 1];
+        if (log.regionFrom !== undefined && log.regionTo !== undefined) {
+          const from = snap.getRegion(log.regionFrom);
+          from.loyaltyTokens!--;
+          const to = snap.getRegion(log.regionTo);
+          if (!to.loyaltyTokens) to.loyaltyTokens = 0;
+          to.loyaltyTokens++;
+          this.previousFrom = log.regionFrom;
+          this.previousTo = log.regionTo;
+          return snap;
+        }
 
-        if (log.regionFrom && log.regionTo) {
+        if (
+          log.powerTokensDiscardedToCancelMovement !== undefined &&
+          log.powerTokensDiscardedToCancelMovement > 0
+        ) {
+          // Due to the clone deep nature we have to find the log by the time stamp
+
           if (
-            !nextLog ||
-            (nextLog.data.type === "move-loyalty-token-choice" &&
-              !nextLog.data.powerTokensDiscardedToCancelMovement)
+            this.previousFrom !== undefined &&
+            this.previousTo !== undefined
           ) {
-            const from = snap.getRegion(log.regionFrom);
+            const from = snap.getRegion(this.previousTo);
             from.loyaltyTokens!--;
-            const to = snap.getRegion(log.regionTo);
+            const to = snap.getRegion(this.previousFrom);
             to.loyaltyTokens!++;
+
+            this.previousFrom = undefined;
+            this.previousTo = undefined;
           }
         }
         return snap;
       }
-
       case "loan-purchased": {
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.house)!;
@@ -1325,8 +1333,7 @@ export default class GameReplayManager {
     this.currentCombatData = cd;
 
     combatLogs.forEach((log) => {
-      // original log index not relevant as we fetched related logs already in combat logs
-      snap = this.applyLogEvent(snap, log.data, -1);
+      snap = this.applyLogEvent(snap, log);
     });
 
     if (isResolved) {
