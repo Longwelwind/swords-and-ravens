@@ -56,7 +56,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
     const gameSnapshot = ingame.replayManager.selectedSnapshot?.gameSnapshot;
 
     if (!gameSnapshot) {
-      return this.renderTabs();
+      return this.renderTabsInContainer();
     }
 
     const roundWarning =
@@ -169,6 +169,17 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
             />
           )}
         </Card>
+        {this.renderTabs()}
+      </div>
+    );
+  }
+
+  private renderTabsInContainer(): ReactNode {
+    const { gameClient } = this.props;
+    return (
+      <div
+        className={gameClient.isMapScrollbarSet ? "flex-ratio-container" : ""}
+      >
         {this.renderTabs()}
       </div>
     );

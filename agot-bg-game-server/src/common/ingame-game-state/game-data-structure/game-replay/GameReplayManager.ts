@@ -400,9 +400,12 @@ export default class GameReplayManager {
       }
       case "consolidate-power-order-resolved": {
         const region = snap.getRegion(log.region);
+        region.removeOrder();
+
+        if (!snap.gameSnapshot) return snap;
+
         const house = snap.getHouse(log.house)!;
         house.addPowerTokens(log.powerTokenCount);
-        region.removeOrder();
         return snap;
       }
 
@@ -979,7 +982,7 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.affectedHouse)!;
         const track = snap.getInfluenceTrack(log.influenceTrack);
-        _.pull(track);
+        _.pull(track, house.id);
         track.push(house.id);
         return snap;
       }
