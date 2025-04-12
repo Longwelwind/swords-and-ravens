@@ -26,6 +26,7 @@ interface CombatLogData {
   winner: HouseSnapshot | null;
   loser: HouseSnapshot | null;
   combatResult: CombatStats[] | null;
+  isResolved: boolean;
 }
 
 export default class GameReplayManager {
@@ -1284,8 +1285,9 @@ export default class GameReplayManager {
     snap: EntireGameSnapshot,
     isResolved: boolean
   ): EntireGameSnapshot {
-    const attackLog = combatLogs[0].data;
-    if (attackLog.type != "attack") {
+    const attackLog = combatLogs[0];
+    const attack = attackLog.data;
+    if (attack.type != "attack") {
       throw new Error(`First log type must be 'attack'`);
     }
 
@@ -1293,42 +1295,52 @@ export default class GameReplayManager {
       (log) => log.data.type == "retreat-region-chosen"
     );
 
-    const combatResult = combatLogs.find(
-      (log) => log.data.type == "combat-result"
-    );
-
-    const winner =
-      combatResult && combatResult.data.type == "combat-result"
-        ? snap.getHouse(combatResult.data.winner)
-        : null;
-
-    let loser = null;
-
-    if (winner) {
-      loser =
-        winner == snap.getHouse(attackLog.attacker)
-          ? snap.getHouse(attackLog.attacked)
-          : snap.getHouse(attackLog.attacker);
-    }
-
-    const cd = {
-      attacker: snap.getHouse(attackLog.attacker)!,
-      defender: snap.getHouse(attackLog.attacked)!,
-      attackingRegion: snap.getRegion(attackLog.attackingRegion),
-      defendingRegion: snap.getRegion(attackLog.attackedRegion),
+    let cd: CombatLogData = {
+      attacker: snap.getHouse(attack.attacker)!,
+      defender: snap.getHouse(attack.attacked)!,
+      attackingRegion: snap.getRegion(attack.attackingRegion),
+      defendingRegion: snap.getRegion(attack.attackedRegion),
       retreatRegion:
         retreatRegionLog &&
         retreatRegionLog.data.type == "retreat-region-chosen"
           ? snap.getRegion(retreatRegionLog.data.regionTo)
           : null,
       isResolved: isResolved,
-      winner: winner,
-      loser: loser,
-      combatResult:
-        combatResult && combatResult.data.type == "combat-result"
-          ? combatResult.data.stats
-          : null,
+      winner: null,
+      loser: null,
+      combatResult: null,
     };
+
+    if (isResolved) {
+      const combatResult: any = combatLogs.find(
+        (log) => log.data.type == "combat-result"
+      );
+
+      if (!combatResult) {
+        throw new Error(
+          `Combat result not found in combat logs. Caused by: ` +
+            JSON.stringify(attackLog, null, 2)
+        );
+      }
+
+      const winner = (
+        combatResult && combatResult.data.type == "combat-result"
+          ? snap.getHouse(combatResult.data.winner)
+          : null
+      )!;
+
+      const loser =
+        winner == snap.getHouse(attack.attacker)
+          ? snap.getHouse(attack.attacked)
+          : snap.getHouse(attack.attacker);
+
+      cd = {
+        ...cd,
+        winner,
+        loser,
+        combatResult: _.cloneDeep(combatResult.data.stats),
+      };
+    }
 
     this.currentCombatData = cd;
 
@@ -1346,8 +1358,8 @@ export default class GameReplayManager {
 
   private handleResolvedCombat(combatLogs: GameLog[]): void {
     const cd = this.currentCombatData!;
-    if (!cd.winner || !cd.combatResult) {
-      throw new Error("combat-result not found in combat logs");
+    if (!cd.combatResult) {
+      throw new Error("combat result not set");
     }
     //const attackingArmy = cd.combatResult[0].armyUnits.map(unit => snap.get
     const attackingArmy = cd.attackingRegion.getUnits(
