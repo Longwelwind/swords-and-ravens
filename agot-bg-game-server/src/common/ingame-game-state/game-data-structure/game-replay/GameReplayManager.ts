@@ -86,9 +86,8 @@ export default class GameReplayManager {
       })
     );
 
-    const logsToApply = this.logManager.logs.slice(
-      nearestSnapData.index + 1,
-      index + 1
+    const logsToApply = _.cloneDeep(
+      this.logManager.logs.slice(nearestSnapData.index + 1, index + 1)
     );
 
     while (logsToApply.length > 0) {
