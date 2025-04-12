@@ -16,6 +16,7 @@ import { UnitState } from "../Unit";
 import BetterMap from "../../../../utils/BetterMap";
 import IngameGameState from "../../IngameGameState";
 import { HouseCardState } from "../house-card/HouseCard";
+import GameSnapshot from "./GameSnapshot";
 
 interface CombatLogData {
   attackerId: string;
@@ -35,6 +36,8 @@ export default class GameReplayManager {
   @observable selectedLogIndex = -1;
   @observable selectedSnapshot: EntireGameSnapshot | null = null;
   @observable regionsToHighlight: BetterMap<string, string> = new BetterMap();
+
+  seenSnapshots: BetterMap<number, EntireGameSnapshot> = new BetterMap();
 
   private previousFrom?: string;
   private previousTo?: string;
@@ -66,33 +69,29 @@ export default class GameReplayManager {
     const reversedIndex = logs.findIndex(
       (log) => log.data.type === "orders-revealed"
     );
-    const nearestSnapData = this.findNearestLogSnapshot(
+    const nearestLogSnapshot = this.findNearestLogSnapshot(
       index,
       logs,
       reversedIndex
     );
 
-    if (!nearestSnapData) {
+    if (!nearestLogSnapshot) {
       this.reset();
       return;
     }
 
-    const nearestSnap = nearestSnapData.nearestSnap;
-
-    if (!nearestSnap || nearestSnap?.type != "orders-revealed") return;
-
-    let snap = new EntireGameSnapshot(
-      _.cloneDeep({
-        worldSnapshot: nearestSnap.worldState,
-        gameSnapshot: nearestSnap.gameSnapshot,
-      })
-    );
+    let snap = nearestLogSnapshot.snap;
+    const originalIndex = nearestLogSnapshot.originalIndex;
 
     const logsToApply = _.cloneDeep(
-      this.logManager.logs.slice(nearestSnapData.index + 1, index + 1)
+      this.logManager.logs.slice(originalIndex + 1, index + 1)
     );
 
+    const thresholdForSavingSeenSnaps = 5;
+    let snapCount = 0;
+
     while (logsToApply.length > 0) {
+      snapCount++;
       const log = logsToApply.shift();
       if (!log) break;
       if (log.data.type == "attack") {
@@ -106,6 +105,13 @@ export default class GameReplayManager {
       } else {
         snap = this.applyLogEvent(snap, log);
       }
+    }
+
+    if (
+      snapCount > thresholdForSavingSeenSnaps &&
+      this.isModifyingGameLog(this.logManager.logs[index].data)
+    ) {
+      this.seenSnapshots.set(index, _.cloneDeep(snap));
     }
 
     this.selectedLogIndex = index;
@@ -164,31 +170,45 @@ export default class GameReplayManager {
     index: number,
     logs: GameLog[],
     reversedIndex: number
-  ): {
-    nearestSnap: GameLogData;
-    index: number;
-  } | null {
+  ): { snap: EntireGameSnapshot; originalIndex: number } | null {
     const nearestSnap = reversedIndex >= 0 ? logs[reversedIndex].data : null;
     const originalIndex = index - reversedIndex - 1;
 
-    if (!nearestSnap || nearestSnap?.type != "orders-revealed") {
-      // Fallback to return first
-      const i = this.logManager.logs.findIndex(
-        (log) => log.data.type === "orders-revealed"
+    // We want to search seenSnapshots keys if one index is nearer to index than original index
+    const nearestSeenSnapshotIndex = this.seenSnapshots.keys
+      .filter((key) => key <= index)
+      .reduce(
+        (prev, curr) =>
+          Math.abs(curr - index) < Math.abs(prev - index) ? curr : prev,
+        -1
       );
-      if (i >= 0) {
-        return {
-          nearestSnap: this.logManager.logs[i].data,
-          index: i,
-        };
-      } else {
-        this.reset();
-        return null;
-      }
+
+    if (
+      nearestSeenSnapshotIndex != -1 &&
+      nearestSeenSnapshotIndex > originalIndex
+    ) {
+      return {
+        snap: _.cloneDeep(this.seenSnapshots.get(nearestSeenSnapshotIndex)),
+        originalIndex: nearestSeenSnapshotIndex,
+      };
     }
+
+    if (!nearestSnap) {
+      return null;
+    }
+
     return {
-      nearestSnap: nearestSnap,
-      index: originalIndex,
+      snap: new EntireGameSnapshot(
+        _.cloneDeep({
+          worldSnapshot: (nearestSnap.type == "orders-revealed"
+            ? nearestSnap.worldState
+            : null) as RegionSnapshot[],
+          gameSnapshot: (nearestSnap.type == "orders-revealed"
+            ? nearestSnap.gameSnapshot
+            : null) as GameSnapshot,
+        })
+      ),
+      originalIndex: originalIndex,
     };
   }
 
