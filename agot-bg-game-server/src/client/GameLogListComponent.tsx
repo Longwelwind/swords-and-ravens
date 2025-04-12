@@ -26,17 +26,6 @@ import orders from "../common/ingame-game-state/game-data-structure/orders";
 import CombatInfoComponent from "./CombatInfoComponent";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import User from "../server/User";
-import {
-  baseHouseCardsData,
-  adwdHouseCardsData,
-  ffcHouseCardsData,
-  modBHouseCardsData,
-  HouseCardData,
-  asosHouseCardsData,
-  createHouseCard,
-} from "../common/ingame-game-state/game-data-structure/createGame";
-import HouseCard from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
-import houseCardAbilities from "../common/ingame-game-state/game-data-structure/house-card/houseCardAbilities";
 import BetterMap from "../utils/BetterMap";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
@@ -62,6 +51,9 @@ import SimpleInfluenceIconComponent from "./game-state-panel/utils/SimpleInfluen
 import orderImages from "./orderImages";
 import presentImage from "../../public/images/icons/present.svg";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
+import allKnownHouseCards from "./utils/houseCardHelper";
+import classNames from "classnames";
+import GameReplayManager from "../common/ingame-game-state/game-data-structure/game-replay/GameReplayManager";
 
 const fogOfWarPlaceholder = "a region";
 
@@ -69,11 +61,12 @@ interface GameLogListComponentProps {
   ingameGameState: IngameGameState;
   gameClient: GameClient;
   currentlyViewed: boolean;
+  scrollToLog?: number;
 }
 
 @observer
 export default class GameLogListComponent extends Component<GameLogListComponentProps> {
-  allHouseCards = new BetterMap(this.getAllHouseCards());
+  private allHouseCards = allKnownHouseCards;
   allHouseCardsByAbilityId = new BetterMap(
     this.allHouseCards.values
       .filter((hc) => hc.ability != null)
@@ -98,55 +91,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     return this.ingame.gameLogManager;
   }
 
+  get replayManager(): GameReplayManager {
+    return this.ingame.replayManager;
+  }
+
   get fogOfWar(): boolean {
     return !this.ingame.isEndedOrCancelled && this.ingame.fogOfWar;
-  }
-
-  createHouseCards(data: [string, HouseCardData][]): [string, HouseCard][] {
-    return data.map(([houseCardId, houseCardData]) => {
-      const houseCard = new HouseCard(
-        houseCardId,
-        houseCardData.name,
-        houseCardData.combatStrength ? houseCardData.combatStrength : 0,
-        houseCardData.swordIcons ? houseCardData.swordIcons : 0,
-        houseCardData.towerIcons ? houseCardData.towerIcons : 0,
-        houseCardData.ability
-          ? houseCardAbilities.get(houseCardData.ability)
-          : null
-      );
-
-      return [houseCardId, houseCard];
-    });
-  }
-
-  createNerfedHouseCards(): [string, HouseCard][] {
-    const balonNerfed = createHouseCard(
-      "balon-greyjoy-nerfed",
-      { name: "Balon Greyjoy", combatStrength: 2, ability: "jaqen-h-ghar" },
-      "greyjoy"
-    );
-    const aeronDwdNerfed = createHouseCard(
-      "aeron-damphair-dwd-nerfed",
-      { name: "Aeron Damphair", ability: "quentyn-martell" },
-      "greyjoy"
-    );
-
-    return [
-      [balonNerfed.id, balonNerfed],
-      [aeronDwdNerfed.id, aeronDwdNerfed],
-    ];
-  }
-
-  getAllHouseCards(): [string, HouseCard][] {
-    return _.concat(
-      this.createHouseCards(baseHouseCardsData),
-      this.createHouseCards(adwdHouseCardsData),
-      this.createHouseCards(ffcHouseCardsData),
-      this.createHouseCards(modBHouseCardsData),
-      this.createHouseCards(asosHouseCardsData),
-      this.game.vassalHouseCards.entries,
-      this.createNerfedHouseCards()
-    );
   }
 
   render(): ReactNode {
@@ -162,6 +112,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       : null;
 
     this.currentRound = 0;
+
+    const highlightLog = (i: number): boolean => {
+      return this.replayManager.isReplayMode
+        ? i == this.replayManager.selectedLogIndex
+        : this.replayManager.isModifyingGameLogUI(this.logManager.logs[i].data);
+    };
 
     return this.logManager.logs.map((l, i) => (
       <div key={`log_${i}`}>
@@ -216,7 +172,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             </Col>
           )}
           <Col>
-            <div className="game-log-content">
+            <div
+              id={`game-log-content-${i}`}
+              className={classNames("game-log-content", {
+                "highlight-log": highlightLog(i),
+                "clickable-no-underline": this.replayManager.isReplayMode,
+              })}
+              onClick={() => {
+                if (this.replayManager.isReplayMode) {
+                  this.onLogClick(i);
+                } else if (highlightLog(i)) {
+                  this.onLogClick(i);
+                }
+              }}
+            >
               {this.renderGameLogData(l.data, this.currentRound, i, l.time)}
             </div>
           </Col>
@@ -239,6 +208,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           )}
       </div>
     ));
+  }
+
+  onLogClick(i: number): void {
+    this.replayManager.selectLog(i);
   }
 
   renderGameLogData(
@@ -1126,7 +1099,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               Final order of{" "}
               <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
             </p>
-            <Row className="mb-2 mt-1">
+            <Row className="mb-2 mt-1 ml-2">
               {finalOrder.map((h) => (
                 <Col xs="auto" key={`cok_final_${data.trackerI}_${h.id}`}>
                   <SimpleInfluenceIconComponent house={h} />
@@ -1162,7 +1135,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               </p>
             )}
 
-            <Row className="mb-1 mt-2">
+            <Row className="mb-1 mt-2 ml-2">
               <HouseNumberResultsComponent
                 results={bids}
                 keyPrefix={`cok_${data.trackerI}`}
@@ -3158,18 +3131,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         );
       }
       case "orders-revealed": {
+        if (data.onlySnapshot) return null;
         return (
-          <p
-            id={`gamelog-orders-revealed-round-${currentRound}`}
-            className="clickable link-color"
-            onClick={() => {
-              this.props.gameClient.logChatFullScreen = false;
-              this.props.ingameGameState.entireGame.replaySnapshot = {
-                worldSnapshot: data.worldState,
-                gameSnapshot: data.gameSnapshot,
-              };
-            }}
-          >
+          <p id={`gamelog-orders-revealed-round-${currentRound}`}>
             Orders were revealed.
           </p>
         );

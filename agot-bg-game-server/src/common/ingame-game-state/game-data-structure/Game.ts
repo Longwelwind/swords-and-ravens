@@ -1,6 +1,6 @@
 import House, { SerializedHouse } from "./House";
 import World, { SerializedWorld } from "./World";
-import Region, { RegionSnapshot } from "./Region";
+import Region from "./Region";
 import UnitType from "./UnitType";
 import Unit from "./Unit";
 import Order from "./Order";
@@ -15,10 +15,7 @@ import WildlingCard, {
   SerializedWildlingCard,
 } from "./wildling-card/WildlingCard";
 import BetterMap from "../../../utils/BetterMap";
-import HouseCard, {
-  HouseCardState,
-  SerializedHouseCard,
-} from "./house-card/HouseCard";
+import HouseCard, { SerializedHouseCard } from "./house-card/HouseCard";
 import { land, port } from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
@@ -29,11 +26,12 @@ import {
   seaOrders,
   ironBankOrder,
 } from "./orders";
-import IronBank, { IronBankSnapshot, SerializedIronBank } from "./IronBank";
+import IronBank, { SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import { objectiveCards } from "./static-data-structure/objectiveCards";
 import SnrError from "../../../utils/snrError";
+import IGameSnapshot from "./game-replay/IGameSnapshot";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
@@ -624,7 +622,7 @@ export default class Game {
     });
   }
 
-  getSnapshot(): GameSnapshot {
+  getSnapshot(): IGameSnapshot {
     return {
       ironThroneTrack: this.ironThroneTrack.map((h) => h.id),
       fiefdomsTrack: this.fiefdomsTrack.map((h) => h.id),
@@ -872,35 +870,4 @@ export interface SerializedGame {
   ironBank: SerializedIronBank | null;
   objectiveDeck: string[];
   usurper: string | null;
-}
-
-export interface HouseSnapshot {
-  id: string;
-  victoryPoints: number;
-  landAreaCount: number;
-  supply: number;
-  houseCards: {
-    id: string;
-    state: HouseCardState;
-  }[];
-  powerTokens: number;
-  isVassal?: boolean;
-  suzerainHouseId?: string;
-}
-
-export interface GameSnapshot {
-  round: number;
-  wildlingStrength: number;
-  dragonStrength?: number;
-  ironThroneTrack: string[];
-  fiefdomsTrack: string[];
-  kingsCourtTrack: string[];
-  housesOnVictoryTrack: HouseSnapshot[];
-  vsbUsed?: boolean;
-  ironBank?: IronBankSnapshot;
-}
-
-export interface EntireGameSnapshot {
-  worldSnapshot: RegionSnapshot[];
-  gameSnapshot?: GameSnapshot;
 }
