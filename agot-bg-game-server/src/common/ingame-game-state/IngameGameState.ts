@@ -705,7 +705,7 @@ export default class IngameGameState extends GameState<
           type: "power-tokens-gifted",
           house: player.house.id,
           affectedHouse: toHouse.id,
-          powerTokens: message.powerTokens,
+          powerTokens: delta,
         });
       }
     } else if (message.type == "drop-power-tokens") {

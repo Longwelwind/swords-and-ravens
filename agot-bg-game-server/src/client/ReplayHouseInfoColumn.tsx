@@ -5,7 +5,6 @@ import ListGroup from "react-bootstrap/ListGroup";
 import ListGroupItem from "react-bootstrap/ListGroupItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
-import SupplyTrackComponent from "./game-state-panel/utils/SupplyTrackComponent";
 import HouseSnapshotComponent from "./HouseSnapshotComponent";
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
@@ -21,6 +20,7 @@ import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.sv
 import ravenImage from "../../public/images/icons/raven.svg";
 import { observer } from "mobx-react";
 import GameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/GameSnapshot";
+import ReplaySupplyTrackComponent from "./game-state-panel/utils/ReplaySupplyTrackComponent";
 
 interface ReplayHouseInfoColumnProps {
   gameClient: GameClient;
@@ -79,10 +79,9 @@ export default class ReplayHouseInfoColumn extends Component<ReplayHouseInfoColu
           <ListGroup variant="flush">
             {this.renderInfluenceTracks(gameSnapshot)}
             <ListGroupItem style={{ minHeight: "130px" }}>
-              <SupplyTrackComponent
-                gameClient={this.props.gameClient}
+              <ReplaySupplyTrackComponent
                 supplyRestrictions={this.ingame.game.supplyRestrictions}
-                houses={this.ingame.game.houses.values} // TODO: Create a ReplaySupplyTrackComponent
+                houses={gameSnapshot.housesOnVictoryTrack}
               />
             </ListGroupItem>
           </ListGroup>
