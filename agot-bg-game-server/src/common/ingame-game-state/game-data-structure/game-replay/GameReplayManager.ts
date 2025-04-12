@@ -87,7 +87,7 @@ export default class GameReplayManager {
       this.logManager.logs.slice(originalIndex + 1, index + 1)
     );
 
-    const thresholdForSavingSeenSnaps = 5;
+    const thresholdForSavingSeenSnaps = 10;
     let snapCount = 0;
 
     while (logsToApply.length > 0) {
@@ -112,12 +112,33 @@ export default class GameReplayManager {
       this.isModifyingGameLog(this.logManager.logs[index].data)
     ) {
       this.seenSnapshots.set(index, _.cloneDeep(snap));
+      const keysToKeep = this.seenSnapshots.keys;
+      filterArrayByThreshold(keysToKeep, thresholdForSavingSeenSnaps);
+      this.seenSnapshots.keys.forEach((key) => {
+        if (!keysToKeep.includes(key)) {
+          this.seenSnapshots.delete(key);
+        }
+      });
+      console.debug("seenSnapshots", this.seenSnapshots.keys);
     }
 
     this.selectedLogIndex = index;
     this.selectedSnapshot = snap;
 
     this.handleHighligting(this.logManager.logs[index].data);
+
+    function filterArrayByThreshold(arr: number[], threshold: number): void {
+      if (arr.length < 2) return;
+      arr.sort((a, b) => a - b); // Sort the array first
+      let i = 0;
+      while (i < arr.length - 1) {
+        if (Math.abs(arr[i + 1] - arr[i]) <= threshold) {
+          arr.splice(i + 1, 1); // Remove the element that breaks the condition
+        } else {
+          i++; // Move to the next element
+        }
+      }
+    }
   }
 
   private handleAttackAgainstNeutralForce(
@@ -194,22 +215,35 @@ export default class GameReplayManager {
     }
 
     if (!nearestSnap) {
+      const firstSnapIndex = this.logManager.logs.findIndex(
+        (l) => l.data.type == "orders-revealed"
+      );
+      if (firstSnapIndex > -1) {
+        return createSnapshotFromLog(this.logManager.logs[firstSnapIndex].data);
+      }
       return null;
     }
 
-    return {
-      snap: new EntireGameSnapshot(
-        _.cloneDeep({
-          worldSnapshot: (nearestSnap.type == "orders-revealed"
-            ? nearestSnap.worldState
-            : null) as RegionSnapshot[],
-          gameSnapshot: (nearestSnap.type == "orders-revealed"
-            ? nearestSnap.gameSnapshot
-            : null) as GameSnapshot,
-        })
-      ),
-      originalIndex: originalIndex,
-    };
+    return createSnapshotFromLog(nearestSnap);
+
+    function createSnapshotFromLog(
+      log: GameLogData
+    ): { snap: EntireGameSnapshot; originalIndex: number } | null {
+      if (log.type != "orders-revealed") return null;
+      return {
+        snap: new EntireGameSnapshot(
+          _.cloneDeep({
+            worldSnapshot: (log.type == "orders-revealed"
+              ? log.worldState
+              : null) as RegionSnapshot[],
+            gameSnapshot: (log.type == "orders-revealed"
+              ? log.gameSnapshot
+              : null) as GameSnapshot,
+          })
+        ),
+        originalIndex: originalIndex,
+      };
+    }
   }
 
   nextLog(): void {
