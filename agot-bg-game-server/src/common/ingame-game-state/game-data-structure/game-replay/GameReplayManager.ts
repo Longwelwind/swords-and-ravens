@@ -681,10 +681,11 @@ export default class GameReplayManager {
       }
 
       case "loyalty-token-gained": {
-        const house = snap.getHouse("targaryen")!;
-        house.victoryPoints = log.count;
         const region = snap.getRegion(log.region);
         region.loyaltyTokens = 0;
+        if (!snap.gameSnapshot) return snap;
+        const house = snap.getHouse("targaryen")!;
+        house.victoryPoints = log.count;
         return snap;
       }
 
