@@ -18,13 +18,15 @@ import IngameGameState from "../../IngameGameState";
 import { HouseCardState } from "../house-card/HouseCard";
 
 interface CombatLogData {
+  attackerId: string;
+  defenderId: string;
+  attacker?: HouseSnapshot;
+  defender?: HouseSnapshot;
   attackingRegion: RegionSnapshot;
   defendingRegion: RegionSnapshot;
-  attacker: HouseSnapshot;
-  defender: HouseSnapshot;
   retreatRegion: RegionSnapshot | null;
-  winner: HouseSnapshot | null;
-  loser: HouseSnapshot | null;
+  winner: string | null;
+  loser: string | null;
   combatResult: CombatStats[] | null;
   isResolved: boolean;
 }
@@ -121,7 +123,7 @@ export default class GameReplayManager {
     const regionTo = snap.getRegion(log.attackedRegion);
 
     log.units.forEach((unit) => {
-      region.moveTo(unit, log.attacker, regionTo);
+      region.moveTo(unit, regionTo);
     });
 
     region.removeOrder();
@@ -300,7 +302,7 @@ export default class GameReplayManager {
         // remove from starting region
         log.moves.forEach(([rid, units]) => {
           units.forEach((unit) => {
-            startingRegion.moveTo(unit, log.house, snap.getRegion(rid));
+            startingRegion.moveTo(unit, snap.getRegion(rid));
           });
         });
         startingRegion.removeOrder();
@@ -331,7 +333,7 @@ export default class GameReplayManager {
           units.forEach((unit) => {
             const region = snap.getRegion(rid);
             if (unit.from) {
-              region.removeUnit(unit.from, log.house);
+              region.removeUnit(unit.from);
             }
             const toRegion = snap.getRegion(unit.region);
             toRegion.createUnit(unit.to, log.house);
@@ -408,7 +410,7 @@ export default class GameReplayManager {
         log.armies.forEach(([rid, units]) => {
           const region = snap.getRegion(rid);
           units.forEach((unit) => {
-            region.removeUnit(unit, log.house);
+            region.removeUnit(unit);
           });
         });
         return snap;
@@ -472,7 +474,7 @@ export default class GameReplayManager {
 
         if (region) {
           while (region.units?.length ?? -1 > 0) {
-            region.removeUnit(region.units![0].type, log.oldController);
+            region.removeUnit(region.units![0].type);
           }
 
           for (let i = 0; i < log.shipCount; i++) {
@@ -485,14 +487,14 @@ export default class GameReplayManager {
       case "ships-destroyed-by-empty-castle": {
         const region = snap.getRegion(log.port);
         while (region.units?.length ?? -1 > 0) {
-          region.removeUnit(region.units![0].type, log.house);
+          region.removeUnit(region.units![0].type);
         }
 
         return snap;
       }
 
       case "preemptive-raid-units-killed": {
-        snap.removeUnits(log.units, log.house);
+        snap.removeUnits(log.units);
         return snap;
       }
 
@@ -501,7 +503,7 @@ export default class GameReplayManager {
         const track = snap.getInfluenceTrack(log.trackI);
         const currentI = track.indexOf(log.house);
         track.splice(currentI, 1);
-        track.splice(currentI + 2, 0, log.house);
+        track.splice(currentI + 2, 0);
 
         return snap;
       }
@@ -547,7 +549,7 @@ export default class GameReplayManager {
       }
 
       case "mammoth-riders-destroy-units": {
-        snap.removeUnits(log.units, log.house);
+        snap.removeUnits(log.units);
         return snap;
       }
 
@@ -558,7 +560,7 @@ export default class GameReplayManager {
       }
 
       case "the-horde-descends-units-killed": {
-        snap.removeUnits(log.units, log.house);
+        snap.removeUnits(log.units);
         return snap;
       }
 
@@ -566,7 +568,7 @@ export default class GameReplayManager {
         log.units.forEach(([rid, units]) => {
           const region = snap.getRegion(rid);
           units.forEach((_) => {
-            region.removeUnit("knight", log.house);
+            region.removeUnit("knight");
           });
           units.forEach((_) => {
             region.createUnit("footman", log.house);
@@ -577,7 +579,7 @@ export default class GameReplayManager {
       }
 
       case "crow-killers-knights-killed": {
-        snap.removeUnits(log.units, log.house);
+        snap.removeUnits(log.units);
         return snap;
       }
 
@@ -585,7 +587,7 @@ export default class GameReplayManager {
         log.units.forEach(([rid, units]) => {
           const region = snap.getRegion(rid);
           units.forEach((_) => {
-            region.removeUnit("footman", log.house);
+            region.removeUnit("footman");
           });
           units.forEach((_) => {
             region.createUnit("knight", log.house);
@@ -687,7 +689,7 @@ export default class GameReplayManager {
         if (log.dragonKilledInRegion) {
           const region = snap.getRegion(log.dragonKilledInRegion);
           if (region) {
-            region.removeUnit("dragon", log.house);
+            region.removeUnit("dragon");
           }
         }
 
@@ -771,7 +773,7 @@ export default class GameReplayManager {
 
       case "debt-paid": {
         if (!snap.gameSnapshot) return snap;
-        snap.removeUnits(log.units, log.house);
+        snap.removeUnits(log.units);
         return snap;
       }
 
@@ -799,9 +801,9 @@ export default class GameReplayManager {
           unitTypeId: string;
         }[];
         units.forEach((unit) => {
-          const { unitTypeId, regionId, houseId } = unit;
+          const { unitTypeId, regionId } = unit;
           const regionSnapshot = snap.getRegion(regionId);
-          regionSnapshot.removeUnit(unitTypeId, houseId!);
+          regionSnapshot.removeUnit(unitTypeId);
         });
         return snap;
       }
@@ -881,7 +883,7 @@ export default class GameReplayManager {
 
       case "last-land-unit-transformed-to-dragon": {
         const region = snap.getRegion(log.region);
-        region.removeUnit(log.transformedUnitType, log.house);
+        region.removeUnit(log.transformedUnitType);
         region.createUnit("dragon", log.house);
         return snap;
       }
@@ -904,54 +906,44 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot) return snap;
         const cd = this.currentCombatData!;
         if (log.stats[0].houseCard)
-          cd.attacker.markHouseCardAsUsed(log.stats[0].houseCard);
+          cd.attacker?.markHouseCardAsUsed(log.stats[0].houseCard);
 
         if (log.stats[1].houseCard)
-          cd.defender.markHouseCardAsUsed(log.stats[1].houseCard);
+          cd.defender?.markHouseCardAsUsed(log.stats[1].houseCard);
         return snap;
       }
       case "immediatly-killed-after-combat": {
-        if (!snap.gameSnapshot) return snap;
         const cd = this.currentCombatData!;
-        const house = snap.getHouse(log.house);
-        if (!house) return snap;
-        if (house != cd.loser)
-          throw new Error("Only the loser suffers this casualty type");
         const region =
-          house == cd.defender ? cd.defendingRegion : cd.attackingRegion;
+          log.house == cd.defenderId ? cd.defendingRegion : cd.attackingRegion;
 
         log.killedBecauseWounded.forEach((unit) => {
-          region.removeUnit(unit, house.id, true);
+          region.removeUnit(unit, true);
         });
         log.killedBecauseCantRetreat.forEach((unit) => {
-          region.removeUnit(unit, house.id);
+          region.removeUnit(unit);
         });
         return snap;
       }
       case "killed-after-combat": {
         if (!snap.gameSnapshot) return snap;
         const cd = this.currentCombatData!;
-        const house = snap.getHouse(log.house);
-        if (!house) return snap;
         const region =
-          house == cd.defender ? cd.defendingRegion : cd.attackingRegion;
+          log.house == cd.defenderId ? cd.defendingRegion : cd.attackingRegion;
 
         log.killed.forEach((unit) => {
-          region.removeUnit(unit, house.id);
+          region.removeUnit(unit);
         });
         return snap;
       }
       case "retreat-casualties-suffered": {
         if (!snap.gameSnapshot) return snap;
         const cd = this.currentCombatData!;
-        const house = snap.getHouse(log.house);
-        if (!house) return snap;
-
         const region =
-          house == cd.defender ? cd.defendingRegion : cd.attackingRegion;
+          log.house == cd.defenderId ? cd.defendingRegion : cd.attackingRegion;
 
         log.units.forEach((unit) => {
-          region.removeUnit(unit, house.id);
+          region.removeUnit(unit);
         });
 
         return snap;
@@ -985,10 +977,9 @@ export default class GameReplayManager {
 
       case "doran-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.affectedHouse);
-        if (!house) return snap;
+        const house = snap.getHouse(log.affectedHouse)!;
         const track = snap.getInfluenceTrack(log.influenceTrack);
-        _.pull(track, house.id);
+        _.pull(track);
         track.push(house.id);
         return snap;
       }
@@ -1047,7 +1038,7 @@ export default class GameReplayManager {
       }
       case "mace-tyrell-footman-killed": {
         const region = snap.getRegion(log.region);
-        region.removeUnit("footman", log.house);
+        region.removeUnit("footman");
         return snap;
       }
       case "queen-of-thorns-order-removed": {
@@ -1116,7 +1107,7 @@ export default class GameReplayManager {
       }
       case "renly-baratheon-footman-upgraded-to-knight": {
         const region = snap.getRegion(log.region);
-        region.removeUnit("footman", log.house);
+        region.removeUnit("footman");
         region.createUnit("knight", log.house);
         return snap;
       }
@@ -1129,7 +1120,7 @@ export default class GameReplayManager {
       }
       case "ser-ilyn-payne-footman-killed": {
         const region = snap.getRegion(log.region);
-        region.removeUnit("footman", log.house);
+        region.removeUnit("footman");
         return snap;
       }
       case "anya-waynwood-power-tokens-gained": {
@@ -1238,11 +1229,11 @@ export default class GameReplayManager {
       case "beric-dondarrion-used": {
         if (!snap.gameSnapshot) return snap;
         const houseIsAttacker =
-          this.currentCombatData?.attacker.id == log.house;
+          this.currentCombatData?.attacker?.id == log.house;
         const region = houseIsAttacker
           ? this.currentCombatData?.attackingRegion
           : this.currentCombatData?.defendingRegion;
-        region?.removeUnit(log.casualty, log.house);
+        region?.removeUnit(log.casualty);
         return snap;
       }
       case "robert-arryn-used": {
@@ -1259,17 +1250,17 @@ export default class GameReplayManager {
       case "ser-ilyn-payne-asos-casualty-suffered": {
         if (!snap.gameSnapshot) return snap;
         const houseIsAttacker =
-          this.currentCombatData?.attacker.id == log.house;
+          this.currentCombatData?.attacker?.id == log.house;
         const region = houseIsAttacker
           ? this.currentCombatData?.attackingRegion
           : this.currentCombatData?.defendingRegion;
-        region?.removeUnit(log.unit, log.house);
+        region?.removeUnit(log.unit);
         return snap;
       }
       case "varys-used": {
         if (!snap.gameSnapshot) return snap;
         const track = snap.getInfluenceTrack(1);
-        _.pull(track, log.house);
+        _.pull(track);
         track.unshift(log.house);
         return snap;
       }
@@ -1295,8 +1286,10 @@ export default class GameReplayManager {
     );
 
     let cd: CombatLogData = {
-      attacker: snap.getHouse(attack.attacker)!,
-      defender: snap.getHouse(attack.attacked)!,
+      attackerId: attack.attacker,
+      defenderId: attack.attacked!,
+      attacker: snap.getHouse(attack.attacker),
+      defender: snap.getHouse(attack.attacked),
       attackingRegion: snap.getRegion(attack.attackingRegion),
       defendingRegion: snap.getRegion(attack.attackedRegion),
       retreatRegion:
@@ -1305,13 +1298,13 @@ export default class GameReplayManager {
           ? snap.getRegion(retreatRegionLog.data.regionTo)
           : null,
       isResolved: isResolved,
-      winner: null,
-      loser: null,
       combatResult: null,
+      loser: null,
+      winner: null,
     };
 
     if (isResolved) {
-      const combatResult: any = combatLogs.find(
+      const combatResult = combatLogs.find(
         (log) => log.data.type == "combat-result"
       );
 
@@ -1322,22 +1315,29 @@ export default class GameReplayManager {
         );
       }
 
-      const winner = (
+      const winner =
         combatResult && combatResult.data.type == "combat-result"
-          ? snap.getHouse(combatResult.data.winner)
-          : null
-      )!;
+          ? combatResult.data.winner
+          : null;
+
+      if (!winner) {
+        throw new Error(
+          `Winner not found in combat logs. Caused by: ` +
+            JSON.stringify(attackLog, null, 2)
+        );
+      }
 
       const loser =
-        winner == snap.getHouse(attack.attacker)
-          ? snap.getHouse(attack.attacked)
-          : snap.getHouse(attack.attacker);
+        winner == attack.attacker ? attack.attacked : attack.attacker;
 
       cd = {
         ...cd,
         winner,
         loser,
-        combatResult: _.cloneDeep(combatResult.data.stats),
+        combatResult:
+          combatResult.data.type == "combat-result"
+            ? combatResult.data.stats
+            : null,
       };
     }
 
@@ -1362,25 +1362,17 @@ export default class GameReplayManager {
     }
     //const attackingArmy = cd.combatResult[0].armyUnits.map(unit => snap.get
     const attackingArmy = cd.attackingRegion.getUnits(
-      cd.combatResult[0].armyUnits,
-      cd.attacker.id
+      cd.combatResult[0].armyUnits
     );
 
     const defendingArmy = cd.defendingRegion.getUnits(
-      cd.combatResult[1].armyUnits,
-      cd.defender.id
+      cd.combatResult[1].armyUnits
     );
 
     // Perform retreat:
-    if (cd.attacker == cd.winner) {
+    if (cd.attackerId == cd.winner) {
       // defender retreats from the region
-      this.handleRetreat(
-        defendingArmy,
-        cd.defender.id,
-        cd.defendingRegion,
-        cd.retreatRegion,
-        combatLogs
-      );
+      this.handleRetreat(defendingArmy, cd.defendingRegion, cd.retreatRegion);
       // Attacker movement may be blocked
       if (
         !_.some(
@@ -1389,11 +1381,7 @@ export default class GameReplayManager {
         )
       ) {
         attackingArmy.forEach((unit) => {
-          cd.attackingRegion.moveTo(
-            unit.type,
-            cd.attacker.id,
-            cd.defendingRegion
-          );
+          cd.attackingRegion.moveTo(unit.type, cd.defendingRegion);
         });
       }
     } else {
@@ -1411,10 +1399,9 @@ export default class GameReplayManager {
         // defending army must retreat though they won
         this.handleRetreat(
           defendingArmy,
-          cd.defender.id,
           cd.defendingRegion,
           cd.retreatRegion,
-          combatLogs
+          true
         );
       }
     }
@@ -1439,15 +1426,13 @@ export default class GameReplayManager {
 
   private handleRetreat(
     army: UnitState[],
-    house: string,
     fromRegion: RegionSnapshot,
     retreatRegion: RegionSnapshot | null,
-    combatLogs: GameLog[],
     applyWound = true
   ): void {
     if (retreatRegion) {
       army.forEach((unit) => {
-        fromRegion.moveTo(unit.type, house, retreatRegion);
+        fromRegion.moveTo(unit.type, retreatRegion);
         unit.wounded = applyWound;
       });
     }
