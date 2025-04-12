@@ -51,12 +51,12 @@ interface ReplayGameStateColumnProps {
 @observer
 export default class ReplayGameStateColumn extends Component<ReplayGameStateColumnProps> {
   render(): ReactNode {
-    const { gameClient, ingame, currentOpenedTab, onTabChange } = this.props;
+    const { gameClient, ingame } = this.props;
 
     const gameSnapshot = ingame.replayManager.selectedSnapshot?.gameSnapshot;
 
     if (!gameSnapshot) {
-      return null;
+      return this.renderTabs();
     }
 
     const roundWarning =
@@ -169,181 +169,188 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
             />
           )}
         </Card>
-        <Card
-          style={{ height: gameClient.isMapScrollbarSet ? "auto" : "800px" }}
-          className={classNames(
-            { "flex-fill-remaining": gameClient.isMapScrollbarSet },
-            "text-large"
-          )}
+        {this.renderTabs()}
+      </div>
+    );
+  }
+
+  private renderTabs(): ReactNode {
+    const { gameClient, ingame, currentOpenedTab, onTabChange } = this.props;
+    const gameSnapshot = ingame.replayManager.selectedSnapshot?.gameSnapshot;
+
+    return (
+      <Card
+        style={{ height: gameClient.isMapScrollbarSet ? "auto" : "800px" }}
+        className={classNames(
+          { "flex-fill-remaining": gameClient.isMapScrollbarSet },
+          "text-large"
+        )}
+      >
+        <Tab.Container
+          activeKey={currentOpenedTab}
+          onSelect={(k) => k && onTabChange(k)}
         >
-          <Tab.Container
-            activeKey={currentOpenedTab}
-            onSelect={(k) => k && onTabChange(k)}
-          >
-            <Card.Header>
-              <Nav variant="tabs">
-                <Nav.Item>
-                  <Nav.Link eventKey="game-logs">
-                    <OverlayTrigger
-                      overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
-                      placement="top"
-                    >
-                      <span>
-                        <FontAwesomeIcon
-                          style={{ color: "white" }}
-                          icon={faHistory}
-                        />
-                      </span>
-                    </OverlayTrigger>
-                  </Nav.Link>
-                </Nav.Item>
-                {gameSnapshot?.ironBank &&
-                  ingame.entireGame.gameSettings.playerCount < 8 && (
-                    <Nav.Item>
-                      <Nav.Link eventKey="iron-bank">
-                        <OverlayTrigger
-                          overlay={
-                            <Tooltip id="iron-bank-tooltip">
-                              The Iron Bank
-                            </Tooltip>
-                          }
-                          placement="top"
-                        >
-                          <span>
-                            <FontAwesomeIcon
-                              style={{ color: "white" }}
-                              icon={faUniversity}
-                            />
-                          </span>
-                        </OverlayTrigger>
-                      </Nav.Link>
-                    </Nav.Item>
-                  )}
-                <Nav.Item>
-                  <Nav.Link eventKey="settings">
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip id="settings-tooltip">Settings</Tooltip>
-                      }
-                      placement="top"
-                    >
-                      <span>
-                        <FontAwesomeIcon
-                          style={{ color: "white" }}
-                          icon={faGear}
-                        />
-                      </span>
-                    </OverlayTrigger>
-                  </Nav.Link>
-                </Nav.Item>
-                <div className="d-flex justify-content-center flex-grow-1">
-                  <button
-                    className="btn btn-secondary mx-1 mt-n1"
-                    onClick={(e) => {
-                      e.currentTarget.blur();
-                      ingame.replayManager.previousRoundLog();
-                      this.scrollToSelectedLog();
-                    }}
+          <Card.Header>
+            <Nav variant="tabs">
+              <Nav.Item>
+                <Nav.Link eventKey="game-logs">
+                  <OverlayTrigger
+                    overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                    placement="top"
                   >
-                    <FontAwesomeIcon
-                      style={{ color: "white" }}
-                      icon={faStepBackward}
-                    />
-                  </button>
-                  <button
-                    className="btn btn-secondary mx-1 mt-n1"
-                    onClick={(e) => {
-                      e.currentTarget.blur();
-                      ingame.replayManager.previousLog();
-                      this.scrollToSelectedLog();
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      style={{ color: "white" }}
-                      icon={faBackward}
-                    />
-                  </button>
-                  <button
-                    className="btn btn-secondary mx-1 mt-n1"
-                    onClick={(e) => {
-                      e.currentTarget.blur();
-                      ingame.replayManager.nextLog();
-                      this.scrollToSelectedLog();
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      style={{ color: "white" }}
-                      icon={faForward}
-                    />
-                  </button>
-                  <button
-                    className="btn btn-secondary mx-1 mt-n1"
-                    onClick={(e) => {
-                      e.currentTarget.blur();
-                      ingame.replayManager.nextRoundLog();
-                      this.scrollToSelectedLog();
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      style={{ color: "white" }}
-                      icon={faStepForward}
-                    />
-                  </button>
-                </div>
-                <Dropdown className="ml-2">
-                  <Dropdown.Toggle variant="secondary" size="sm">
-                    Jump to
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    {this.renderGameLogRoundsDropDownItems()}
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Nav>
-            </Card.Header>
-            <Card.Body id="game-log-panel">
-              {/* This is an invisible div to force the parent to stretch to its remaining width */}
-              <div style={{ visibility: "hidden", width: "850px" }} />
-              <Tab.Content className="h-100">
-                <Tab.Pane eventKey="game-logs" className="h-100">
-                  <div className="d-flex flex-column h-100">
-                    <ScrollToBottom
-                      className="flex-fill-remaining"
-                      scrollViewClassName="overflow-x-hidden"
-                      initialScrollBehavior="auto"
-                    >
-                      <GameLogListComponent
-                        ingameGameState={ingame}
-                        gameClient={gameClient}
-                        currentlyViewed={true}
+                    <span>
+                      <FontAwesomeIcon
+                        style={{ color: "white" }}
+                        icon={faHistory}
                       />
-                    </ScrollToBottom>
-                  </div>
-                </Tab.Pane>
-                {gameSnapshot?.ironBank && (
-                  <Tab.Pane eventKey="iron-bank" className="h-100">
-                    <IronBankSnapshotTabComponent
-                      ingame={ingame}
-                      ironBank={gameSnapshot.ironBank}
-                    />
-                  </Tab.Pane>
+                    </span>
+                  </OverlayTrigger>
+                </Nav.Link>
+              </Nav.Item>
+              {gameSnapshot?.ironBank &&
+                ingame.entireGame.gameSettings.playerCount < 8 && (
+                  <Nav.Item>
+                    <Nav.Link eventKey="iron-bank">
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="iron-bank-tooltip">
+                            The Iron Bank
+                          </Tooltip>
+                        }
+                        placement="top"
+                      >
+                        <span>
+                          <FontAwesomeIcon
+                            style={{ color: "white" }}
+                            icon={faUniversity}
+                          />
+                        </span>
+                      </OverlayTrigger>
+                    </Nav.Link>
+                  </Nav.Item>
                 )}
-                <Tab.Pane eventKey="settings" className="h-100">
-                  <GameSettingsComponent
-                    gameClient={gameClient}
+              <Nav.Item>
+                <Nav.Link eventKey="settings">
+                  <OverlayTrigger
+                    overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                    placement="top"
+                  >
+                    <span>
+                      <FontAwesomeIcon
+                        style={{ color: "white" }}
+                        icon={faGear}
+                      />
+                    </span>
+                  </OverlayTrigger>
+                </Nav.Link>
+              </Nav.Item>
+              <div className="d-flex justify-content-center flex-grow-1">
+                <button
+                  className="btn btn-secondary mx-1 mt-n1"
+                  onClick={(e) => {
+                    e.currentTarget.blur();
+                    ingame.replayManager.previousRoundLog();
+                    this.scrollToSelectedLog();
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ color: "white" }}
+                    icon={faStepBackward}
+                  />
+                </button>
+                <button
+                  className="btn btn-secondary mx-1 mt-n1"
+                  onClick={(e) => {
+                    e.currentTarget.blur();
+                    ingame.replayManager.previousLog();
+                    this.scrollToSelectedLog();
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ color: "white" }}
+                    icon={faBackward}
+                  />
+                </button>
+                <button
+                  className="btn btn-secondary mx-1 mt-n1"
+                  onClick={(e) => {
+                    e.currentTarget.blur();
+                    ingame.replayManager.nextLog();
+                    this.scrollToSelectedLog();
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ color: "white" }}
+                    icon={faForward}
+                  />
+                </button>
+                <button
+                  className="btn btn-secondary mx-1 mt-n1"
+                  onClick={(e) => {
+                    e.currentTarget.blur();
+                    ingame.replayManager.nextRoundLog();
+                    this.scrollToSelectedLog();
+                  }}
+                >
+                  <FontAwesomeIcon
+                    style={{ color: "white" }}
+                    icon={faStepForward}
+                  />
+                </button>
+              </div>
+              <Dropdown className="ml-2">
+                <Dropdown.Toggle variant="secondary" size="sm">
+                  Jump to
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {this.renderGameLogRoundsDropDownItems()}
+                </Dropdown.Menu>
+              </Dropdown>
+            </Nav>
+          </Card.Header>
+          <Card.Body id="game-log-panel">
+            {/* This is an invisible div to force the parent to stretch to its remaining width */}
+            <div style={{ visibility: "hidden", width: "850px" }} />
+            <Tab.Content className="h-100">
+              <Tab.Pane eventKey="game-logs" className="h-100">
+                <div className="d-flex flex-column h-100">
+                  <ScrollToBottom
+                    className="flex-fill-remaining"
+                    scrollViewClassName="overflow-x-hidden"
+                    initialScrollBehavior="auto"
+                  >
+                    <GameLogListComponent
+                      ingameGameState={ingame}
+                      gameClient={gameClient}
+                      currentlyViewed={true}
+                    />
+                  </ScrollToBottom>
+                </div>
+              </Tab.Pane>
+              {gameSnapshot?.ironBank && (
+                <Tab.Pane eventKey="iron-bank" className="h-100">
+                  <IronBankSnapshotTabComponent
+                    ingame={ingame}
+                    ironBank={gameSnapshot.ironBank}
+                  />
+                </Tab.Pane>
+              )}
+              <Tab.Pane eventKey="settings" className="h-100">
+                <GameSettingsComponent
+                  gameClient={gameClient}
+                  entireGame={ingame.entireGame}
+                />
+                <div style={{ marginTop: -20 }}>
+                  <UserSettingsComponent
+                    user={gameClient.authenticatedUser}
                     entireGame={ingame.entireGame}
                   />
-                  <div style={{ marginTop: -20 }}>
-                    <UserSettingsComponent
-                      user={gameClient.authenticatedUser}
-                      entireGame={ingame.entireGame}
-                    />
-                  </div>
-                </Tab.Pane>
-              </Tab.Content>
-            </Card.Body>
-          </Tab.Container>
-        </Card>
-      </div>
+                </div>
+              </Tab.Pane>
+            </Tab.Content>
+          </Card.Body>
+        </Tab.Container>
+      </Card>
     );
   }
 

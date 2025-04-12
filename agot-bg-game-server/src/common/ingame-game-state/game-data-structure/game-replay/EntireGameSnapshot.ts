@@ -17,11 +17,11 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
       : undefined;
   }
 
-  getHouse(id: string | null): HouseSnapshot | null {
-    if (id == null || !this.gameSnapshot) return null;
+  getHouse(id: string | null): HouseSnapshot | undefined {
+    if (id == null || !this.gameSnapshot) return undefined;
     return (
       this.gameSnapshot.housesOnVictoryTrack.find((house) => house.id === id) ??
-      null
+      undefined
     );
   }
 
@@ -51,11 +51,11 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
     return [];
   }
 
-  removeUnits(units: [string, string[]][], house: string): void {
+  removeUnits(units: [string, string[]][]): void {
     units.forEach(([rid, _units]) => {
       const region = this.getRegion(rid);
       _units.forEach((u) => {
-        region.removeUnit(u, house);
+        region.removeUnit(u);
       });
     });
   }

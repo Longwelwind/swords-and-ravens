@@ -37,8 +37,8 @@ export default class RegionSnapshot implements IRegionSnapshot {
     this.units.push({ type, house, wounded: false });
   }
 
-  moveTo(unitType: string, house: string, to: RegionSnapshot): void {
-    const unit = this.removeUnit(unitType, house);
+  moveTo(unitType: string, to: RegionSnapshot): void {
+    const unit = this.removeUnit(unitType);
     if (unit) to.addUnit(unit);
   }
 
@@ -49,7 +49,10 @@ export default class RegionSnapshot implements IRegionSnapshot {
     this.units.push(unit);
   }
 
-  getUnits(unitTypes: string[], house: string): UnitState[] {
+  getUnits(
+    unitTypes: string[],
+    wounded: boolean | undefined = undefined
+  ): UnitState[] {
     if (!this.units) {
       return [];
     }
@@ -57,7 +60,7 @@ export default class RegionSnapshot implements IRegionSnapshot {
     const result: UnitState[] = [];
     for (const ut of unitTypes) {
       const foundUnit = this.units.find(
-        (u) => u.type === ut && u.house === house && !result.includes(u)
+        (u) => u.type === ut && u.wounded === wounded && !result.includes(u)
       );
       if (foundUnit) {
         result.push(foundUnit);
@@ -68,7 +71,6 @@ export default class RegionSnapshot implements IRegionSnapshot {
 
   removeUnit(
     unitType: string,
-    house: string,
     wounded: boolean | undefined = undefined
   ): UnitState | null {
     if (!this.units) {
@@ -76,14 +78,12 @@ export default class RegionSnapshot implements IRegionSnapshot {
     }
 
     let index = this.units.findIndex(
-      (u) => u.type === unitType && u.house === house && u.wounded === wounded
+      (u) => u.type === unitType && u.wounded === wounded
     );
 
     // Todo: fallback to find a possible wounded unit
     if (index === -1) {
-      index = this.units.findIndex(
-        (u) => u.type === unitType && u.house === house
-      );
+      index = this.units.findIndex((u) => u.type === unitType);
     }
 
     if (index !== -1) {
