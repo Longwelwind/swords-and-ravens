@@ -10,7 +10,6 @@ import EntireGame from "../../../../common/EntireGame";
 import { computed, observable } from "mobx";
 import RegionSnapshot from "./RegionSnapshot";
 import { modifyingGameLogIds } from "./replay-constants";
-import HouseSnapshot from "./HouseSnapshot";
 import { CombatStats } from "../../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { UnitState } from "../Unit";
 import BetterMap from "../../../../utils/BetterMap";
@@ -19,13 +18,11 @@ import { HouseCardState } from "../house-card/HouseCard";
 import GameSnapshot from "./GameSnapshot";
 
 interface CombatLogData {
-  attackerId: string;
-  defenderId: string;
-  attacker?: HouseSnapshot;
-  defender?: HouseSnapshot;
-  attackingRegion: RegionSnapshot;
-  defendingRegion: RegionSnapshot;
-  retreatRegion: RegionSnapshot | null;
+  attacker: string;
+  defender: string;
+  attackingRegion: string;
+  defendingRegion: string;
+  retreatRegion: string | null;
   winner: string | null;
   loser: string | null;
   combatResult: CombatStats[] | null;
@@ -962,18 +959,29 @@ export default class GameReplayManager {
       }
       case "combat-result": {
         if (!snap.gameSnapshot) return snap;
-        const cd = this.currentCombatData!;
-        if (log.stats[0].houseCard)
-          cd.attacker?.markHouseCardAsUsed(log.stats[0].houseCard);
+        const attStats = log.stats[0];
+        const defStats = log.stats[1];
 
-        if (log.stats[1].houseCard)
-          cd.defender?.markHouseCardAsUsed(log.stats[1].houseCard);
+        if (attStats.house && attStats.houseCard) {
+          const attacker = snap.getHouse(attStats.house)!;
+          attacker.markHouseCardAsUsed(attStats.houseCard);
+        }
+
+        if (defStats.house && defStats.houseCard) {
+          const defender = snap.getHouse(defStats.house)!;
+          defender.markHouseCardAsUsed(defStats.houseCard);
+        }
         return snap;
       }
       case "immediatly-killed-after-combat": {
-        const cd = this.currentCombatData!;
-        const region =
-          log.house == cd.defenderId ? cd.defendingRegion : cd.attackingRegion;
+        const cd = this.currentCombatData;
+        if (!cd) {
+          throw new Error("combat result not set");
+        }
+
+        const region = snap.getRegion(
+          log.house == cd.defender ? cd.defendingRegion : cd.attackingRegion
+        );
 
         log.killedBecauseWounded.forEach((unit) => {
           region.removeUnit(unit, true);
@@ -985,9 +993,14 @@ export default class GameReplayManager {
       }
       case "killed-after-combat": {
         if (!snap.gameSnapshot) return snap;
-        const cd = this.currentCombatData!;
-        const region =
-          log.house == cd.defenderId ? cd.defendingRegion : cd.attackingRegion;
+        const cd = this.currentCombatData;
+        if (!cd) {
+          throw new Error("combat result not set");
+        }
+
+        const region = snap.getRegion(
+          log.house == cd.defender ? cd.defendingRegion : cd.attackingRegion
+        );
 
         log.killed.forEach((unit) => {
           region.removeUnit(unit);
@@ -996,9 +1009,14 @@ export default class GameReplayManager {
       }
       case "retreat-casualties-suffered": {
         if (!snap.gameSnapshot) return snap;
-        const cd = this.currentCombatData!;
-        const region =
-          log.house == cd.defenderId ? cd.defendingRegion : cd.attackingRegion;
+        const cd = this.currentCombatData;
+        if (!cd) {
+          throw new Error("combat result not set");
+        }
+
+        const region = snap.getRegion(
+          log.house == cd.defender ? cd.defendingRegion : cd.attackingRegion
+        );
 
         log.units.forEach((unit) => {
           region.removeUnit(unit);
@@ -1269,9 +1287,11 @@ export default class GameReplayManager {
         return snap;
       }
       case "loras-tyrell-attack-order-moved": {
-        const region = snap.getRegion(
-          this.currentCombatData!.attackingRegion.id
-        );
+        if (!this.currentCombatData) {
+          throw new Error("combat result not set");
+        }
+
+        const region = snap.getRegion(this.currentCombatData.attackingRegion);
         const order = region.order;
         region.removeOrder();
         const toRegion = snap.getRegion(log.region);
@@ -1286,12 +1306,16 @@ export default class GameReplayManager {
       }
       case "beric-dondarrion-used": {
         if (!snap.gameSnapshot) return snap;
-        const houseIsAttacker =
-          this.currentCombatData?.attacker?.id == log.house;
-        const region = houseIsAttacker
-          ? this.currentCombatData?.attackingRegion
-          : this.currentCombatData?.defendingRegion;
-        region?.removeUnit(log.casualty);
+        if (!this.currentCombatData) {
+          throw new Error("combat result not set");
+        }
+        const houseIsAttacker = this.currentCombatData.attacker == log.house;
+        const region = snap.getRegion(
+          houseIsAttacker
+            ? this.currentCombatData.attackingRegion
+            : this.currentCombatData.defendingRegion
+        );
+        region.removeUnit(log.casualty);
         return snap;
       }
       case "robert-arryn-used": {
@@ -1307,12 +1331,16 @@ export default class GameReplayManager {
       }
       case "ser-ilyn-payne-asos-casualty-suffered": {
         if (!snap.gameSnapshot) return snap;
-        const houseIsAttacker =
-          this.currentCombatData?.attacker?.id == log.house;
-        const region = houseIsAttacker
-          ? this.currentCombatData?.attackingRegion
-          : this.currentCombatData?.defendingRegion;
-        region?.removeUnit(log.unit);
+        if (!this.currentCombatData) {
+          throw new Error("combat result not set");
+        }
+        const houseIsAttacker = this.currentCombatData.attacker == log.house;
+        const region = snap.getRegion(
+          houseIsAttacker
+            ? this.currentCombatData.attackingRegion
+            : this.currentCombatData.defendingRegion
+        );
+        region.removeUnit(log.unit);
         return snap;
       }
       case "varys-used": {
@@ -1344,16 +1372,14 @@ export default class GameReplayManager {
     );
 
     let cd: CombatLogData = {
-      attackerId: attack.attacker,
-      defenderId: attack.attacked!,
-      attacker: snap.getHouse(attack.attacker),
-      defender: snap.getHouse(attack.attacked),
-      attackingRegion: snap.getRegion(attack.attackingRegion),
-      defendingRegion: snap.getRegion(attack.attackedRegion),
+      attacker: attack.attacker,
+      defender: attack.attacked!,
+      attackingRegion: attack.attackingRegion,
+      defendingRegion: attack.attackedRegion,
       retreatRegion:
         retreatRegionLog &&
         retreatRegionLog.data.type == "retreat-region-chosen"
-          ? snap.getRegion(retreatRegionLog.data.regionTo)
+          ? retreatRegionLog.data.regionTo
           : null,
       isResolved: isResolved,
       combatResult: null,
@@ -1406,31 +1432,44 @@ export default class GameReplayManager {
     });
 
     if (isResolved) {
-      this.handleResolvedCombat(combatLogs);
+      this.handleResolvedCombat(combatLogs, snap);
     }
 
     this.currentCombatData = null;
     return snap;
   }
 
-  private handleResolvedCombat(combatLogs: GameLog[]): void {
+  private handleResolvedCombat(
+    combatLogs: GameLog[],
+    snap: EntireGameSnapshot
+  ): void {
     const cd = this.currentCombatData!;
     if (!cd.combatResult) {
       throw new Error("combat result not set");
     }
-    //const attackingArmy = cd.combatResult[0].armyUnits.map(unit => snap.get
-    const attackingArmy = cd.attackingRegion.getUnits(
+
+    const attackingRegion = snap.getRegion(cd.attackingRegion);
+    const attackingArmy = attackingRegion.getUnits(
       cd.combatResult[0].armyUnits
     );
 
-    const defendingArmy = cd.defendingRegion.getUnits(
+    const defendingRegion = snap.getRegion(cd.defendingRegion);
+    const defendingArmy = defendingRegion.getUnits(
       cd.combatResult[1].armyUnits
     );
 
+    const retreatRegion = cd.retreatRegion
+      ? snap.getRegion(cd.retreatRegion)
+      : null;
+
+    if (!retreatRegion) {
+      throw new Error("retreat region not set");
+    }
+
     // Perform retreat:
-    if (cd.attackerId == cd.winner) {
+    if (cd.attacker == cd.winner) {
       // defender retreats from the region
-      this.handleRetreat(defendingArmy, cd.defendingRegion, cd.retreatRegion);
+      this.handleRetreat(defendingArmy, defendingRegion, retreatRegion);
       // Attacker movement may be blocked
       if (
         !_.some(
@@ -1439,7 +1478,7 @@ export default class GameReplayManager {
         )
       ) {
         attackingArmy.forEach((unit) => {
-          cd.attackingRegion.moveTo(unit.type, cd.defendingRegion);
+          attackingRegion.moveTo(unit.type, defendingRegion);
         });
       }
     } else {
@@ -1455,16 +1494,11 @@ export default class GameReplayManager {
         )
       ) {
         // defending army must retreat though they won
-        this.handleRetreat(
-          defendingArmy,
-          cd.defendingRegion,
-          cd.retreatRegion,
-          true
-        );
+        this.handleRetreat(defendingArmy, defendingRegion, retreatRegion, true);
       }
     }
 
-    cd.attackingRegion.removeOrder();
+    attackingRegion.removeOrder();
   }
 
   isModifyingGameLog(log: GameLogData): boolean {
