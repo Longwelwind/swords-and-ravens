@@ -80,11 +80,11 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
     return [];
   }
 
-  removeUnits(units: [string, string[]][]): void {
+  removeUnits(units: [string, string[]][], house: string): void {
     units.forEach(([rid, _units]) => {
       const region = this.getRegion(rid);
       _units.forEach((u) => {
-        region.removeUnit(u);
+        region.removeUnit(u, house);
       });
     });
   }

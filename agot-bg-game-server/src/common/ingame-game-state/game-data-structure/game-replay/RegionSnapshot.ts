@@ -37,9 +37,20 @@ export default class RegionSnapshot implements IRegionSnapshot {
     this.units.push({ type, house, wounded: false });
   }
 
-  moveTo(unitType: string, to: RegionSnapshot): void {
-    const unit = this.removeUnit(unitType);
-    if (unit) to.addUnit(unit);
+  moveTo(
+    to: RegionSnapshot,
+    unitType: string,
+    house: string,
+    wounded: boolean | undefined = undefined,
+    applyWound = false
+  ): void {
+    const unit = this.removeUnit(unitType, house, wounded);
+    if (unit) {
+      to.addUnit(unit);
+      if (applyWound) {
+        unit.wounded = true;
+      }
+    }
   }
 
   addUnit(unit: UnitState): void {
@@ -49,48 +60,56 @@ export default class RegionSnapshot implements IRegionSnapshot {
     this.units.push(unit);
   }
 
-  getUnits(
-    unitTypes: string[],
-    wounded: boolean | undefined = undefined
-  ): UnitState[] {
+  markAllUnitsAsWounded(): void {
     if (!this.units) {
-      return [];
+      // The attacking army may already be destroyed so we expect this to be empty
+      return;
     }
 
-    const result: UnitState[] = [];
-    for (const ut of unitTypes) {
-      const foundUnit = this.units.find(
-        (u) => u.type === ut && u.wounded === wounded && !result.includes(u)
-      );
-      if (foundUnit) {
-        result.push(foundUnit);
-      }
+    for (const unit of this.units) {
+      unit.wounded = true;
     }
-    return result;
+  }
+
+  getUnit(
+    unitType: string,
+    house: string,
+    wounded: boolean | undefined = undefined
+  ): UnitState {
+    if (!this.units) {
+      throw new Error(`No units in region snapshot: ${this.id}`);
+    }
+    const unit = this.units.find(
+      (u) => u.type === unitType && u.house === house && !u.wounded === !wounded
+    );
+    if (!unit) {
+      throw new Error(
+        `${unitType} of house ${house} not found in region snapshot: ${this.id}`
+      );
+    }
+    return unit;
   }
 
   removeUnit(
     unitType: string,
+    house: string,
     wounded: boolean | undefined = undefined
-  ): UnitState | null {
+  ): UnitState {
     if (!this.units) {
-      return null;
+      throw new Error(`No units in region snapshot: ${this.id}`);
     }
+    const unit = this.getUnit(unitType, house, wounded);
+    this.units = this.units.filter((u) => u !== unit);
+    return unit;
+  }
 
-    let index = this.units.findIndex(
-      (u) => u.type === unitType && u.wounded === wounded
-    );
-
-    // Todo: fallback to find a possible wounded unit
-    if (index === -1) {
-      index = this.units.findIndex((u) => u.type === unitType);
+  removeAllUnits(): UnitState[] {
+    if (!this.units) {
+      return [];
     }
-
-    if (index !== -1) {
-      return this.units.splice(index, 1)[0];
-    }
-
-    return null;
+    const units = this.units;
+    this.units = [];
+    return units;
   }
 
   removeOrder(): void {
