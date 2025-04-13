@@ -3,10 +3,14 @@ import GameSnapshot from "./GameSnapshot";
 import HouseSnapshot from "./HouseSnapshot";
 import IEntireGameSnapshot from "./IEntireGameSnapshot";
 import RegionSnapshot from "./RegionSnapshot";
+import BetterMap from "../../../../utils/BetterMap";
 
 export default class EntireGameSnapshot implements IEntireGameSnapshot {
   @observable worldSnapshot: RegionSnapshot[];
   @observable gameSnapshot?: GameSnapshot;
+
+  private _regionMap = new BetterMap<string, RegionSnapshot>();
+  private _houseMap = new BetterMap<string, HouseSnapshot>();
 
   constructor(data: IEntireGameSnapshot) {
     this.worldSnapshot = data.worldSnapshot.map(
@@ -15,19 +19,44 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
     this.gameSnapshot = data.gameSnapshot
       ? new GameSnapshot(data.gameSnapshot)
       : undefined;
+
+    this.worldSnapshot.forEach((region) => {
+      this._regionMap.set(region.id, region);
+    });
+
+    this.gameSnapshot?.housesOnVictoryTrack.forEach((house) => {
+      this._houseMap.set(house.id, house);
+    });
   }
 
-  getHouse(id: string | null): HouseSnapshot | undefined {
-    if (id == null || !this.gameSnapshot) return undefined;
-    return (
-      this.gameSnapshot.housesOnVictoryTrack.find((house) => house.id === id) ??
-      undefined
-    );
+  getHouse(id: string): HouseSnapshot {
+    if (!this._houseMap.has(id)) {
+      const house = new HouseSnapshot({
+        id,
+        houseCards: [],
+        supply: 0,
+        powerTokens: 0,
+        landAreaCount: 0,
+        victoryPoints: 0,
+      });
+      this._houseMap.set(id, house);
+      if (
+        this.gameSnapshot &&
+        !this.gameSnapshot.housesOnVictoryTrack.includes(house)
+      ) {
+        this.gameSnapshot.housesOnVictoryTrack.push(house);
+      }
+    }
+
+    return this._houseMap.get(id);
   }
 
   getRegion(id: string): RegionSnapshot {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.worldSnapshot.find((region) => region.id === id)!;
+    if (!this._regionMap.has(id)) {
+      this._regionMap.set(id, new RegionSnapshot({ id }));
+      this.worldSnapshot.push(this._regionMap.get(id));
+    }
+    return this._regionMap.get(id);
   }
 
   setOrderToRegion(regionId: string, orderType: string): void {

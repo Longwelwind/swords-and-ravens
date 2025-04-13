@@ -373,7 +373,7 @@ export default class GameReplayManager {
         if (log.nightsWatchVictory) snap.gameSnapshot.wildlingStrength = 0;
         log.results.forEach(([bid, houses]) => {
           houses.forEach((h) => {
-            const house = snap.getHouse(h)!;
+            const house = snap.getHouse(h);
             house.removePowerTokens(bid);
           });
         });
@@ -412,7 +412,7 @@ export default class GameReplayManager {
             raider?.addPowerTokens(1);
           }
 
-          if (log.raidedHouseLostPowerToken) {
+          if (log.raidee && log.raidedHouseLostPowerToken) {
             const raided = snap.getHouse(log.raidee);
             raided?.removePowerTokens(1);
           }
@@ -424,7 +424,7 @@ export default class GameReplayManager {
         if (!snap.gameSnapshot || log.distributor != null) return snap;
         log.results.forEach(([bid, houses]) => {
           houses.forEach((h) => {
-            const house = snap.getHouse(h)!;
+            const house = snap.getHouse(h);
             house.removePowerTokens(bid);
           });
         });
@@ -455,7 +455,7 @@ export default class GameReplayManager {
 
         if (!snap.gameSnapshot) return snap;
 
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokenCount);
         return snap;
       }
@@ -472,8 +472,8 @@ export default class GameReplayManager {
 
       case "vassals-claimed": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
-        const vassals = log.vassals.map((v) => snap.getHouse(v)!);
+        const house = snap.getHouse(log.house);
+        const vassals = log.vassals.map((v) => snap.getHouse(v));
 
         vassals.forEach((v) => {
           v.isVassal = true;
@@ -569,7 +569,7 @@ export default class GameReplayManager {
       }
 
       case "massing-on-the-milkwater-house-cards-removed": {
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         log.houseCardsUsed.forEach((hc) => {
           house.markHouseCardAsUsed(hc);
         });
@@ -608,7 +608,7 @@ export default class GameReplayManager {
       }
 
       case "mammoth-riders-return-card": {
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable(log.houseCard);
         return snap;
       }
@@ -652,7 +652,7 @@ export default class GameReplayManager {
 
       case "skinchanger-scout-nights-watch-victory": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerToken);
         return snap;
       }
@@ -660,7 +660,7 @@ export default class GameReplayManager {
       case "skinchanger-scout-wildling-victory": {
         if (!snap.gameSnapshot) return snap;
         log.powerTokensLost.forEach(([hid, amount]) => {
-          const h = snap.getHouse(hid)!;
+          const h = snap.getHouse(hid);
           h.removePowerTokens(-amount); // as amount should be stored negative we remove a negative amount
         });
       }
@@ -674,7 +674,7 @@ export default class GameReplayManager {
       case "rattleshirts-raiders-wildling-victory": {
         if (!snap.gameSnapshot) return snap;
         log.newSupply.forEach(([hid, supply]) => {
-          const h = snap.getHouse(hid)!;
+          const h = snap.getHouse(hid);
           h.supply = supply;
         });
         return snap;
@@ -683,7 +683,7 @@ export default class GameReplayManager {
       case "supply-adjusted": {
         if (!snap.gameSnapshot) return snap;
         log.supplies.forEach(([hid, supply]) => {
-          const h = snap.getHouse(hid)!;
+          const h = snap.getHouse(hid);
           h.supply = supply;
         });
         return snap;
@@ -691,7 +691,7 @@ export default class GameReplayManager {
 
       case "house-card-picked": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.houseCards.push({
           id: log.houseCard,
           state: HouseCardState.AVAILABLE,
@@ -701,8 +701,8 @@ export default class GameReplayManager {
 
       case "power-tokens-gifted": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
-        const affectedHouse = snap.getHouse(log.affectedHouse)!;
+        const house = snap.getHouse(log.house);
+        const affectedHouse = snap.getHouse(log.affectedHouse);
 
         house.removePowerTokens(log.powerTokens);
         affectedHouse.addPowerTokens(log.powerTokens);
@@ -719,7 +719,7 @@ export default class GameReplayManager {
 
       case "place-loyalty-choice": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.removePowerTokens(log.discardedPowerTokens);
         return snap;
       }
@@ -735,7 +735,7 @@ export default class GameReplayManager {
         const region = snap.getRegion(log.region);
         region.loyaltyTokens = 0;
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse("targaryen")!;
+        const house = snap.getHouse("targaryen");
         house.victoryPoints = log.count;
         return snap;
       }
@@ -768,7 +768,7 @@ export default class GameReplayManager {
 
       case "the-long-plan-choice": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.removePowerTokens(1);
         return snap;
       }
@@ -808,7 +808,7 @@ export default class GameReplayManager {
       }
       case "loan-purchased": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.removePowerTokens(log.paid);
         return snap;
       }
@@ -821,7 +821,7 @@ export default class GameReplayManager {
 
       case "interest-paid": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.paid); // paid is negative
         return snap;
       }
@@ -834,7 +834,7 @@ export default class GameReplayManager {
 
       case "customs-officer-power-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.gained);
         return snap;
       }
@@ -874,7 +874,7 @@ export default class GameReplayManager {
         if (!region.crownModifier) region.crownModifier = 0;
         region.crownModifier++;
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.gainedPowerTokens);
         return snap;
       }
@@ -908,28 +908,28 @@ export default class GameReplayManager {
 
       case "special-objective-scored": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.victoryPoints = log.newTotal;
         return snap;
       }
 
       case "objective-scored": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.victoryPoints = log.newTotal;
         return snap;
       }
 
       case "ironborn-raid": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.victoryPoints = log.newTotal;
         return snap;
       }
 
       case "house-cards-returned": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         log.houseCards.forEach((hc) => {
           house.markHouseCardAsAvailable(hc);
         });
@@ -944,7 +944,7 @@ export default class GameReplayManager {
       }
 
       case "massing-on-the-milkwater-house-cards-back": {
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         log.houseCardsReturned.forEach((hc) => {
           house.markHouseCardAsAvailable(hc);
         });
@@ -963,12 +963,12 @@ export default class GameReplayManager {
         const defStats = log.stats[1];
 
         if (attStats.house && attStats.houseCard) {
-          const attacker = snap.getHouse(attStats.house)!;
+          const attacker = snap.getHouse(attStats.house);
           attacker.markHouseCardAsUsed(attStats.houseCard);
         }
 
         if (defStats.house && defStats.houseCard) {
-          const defender = snap.getHouse(defStats.house)!;
+          const defender = snap.getHouse(defStats.house);
           defender.markHouseCardAsUsed(defStats.houseCard);
         }
         return snap;
@@ -1033,7 +1033,7 @@ export default class GameReplayManager {
 
       case "patchface-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.affectedHouse)!;
+        const house = snap.getHouse(log.affectedHouse);
         house.markHouseCardAsUsed(log.houseCard);
 
         return snap;
@@ -1043,7 +1043,7 @@ export default class GameReplayManager {
 
       case "melisandre-dwd-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable(log.houseCard);
         const card = allKnownHouseCards.get(log.houseCard);
         house.removePowerTokens(card.combatStrength);
@@ -1053,7 +1053,7 @@ export default class GameReplayManager {
 
       case "doran-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.affectedHouse)!;
+        const house = snap.getHouse(log.affectedHouse);
         const track = snap.getInfluenceTrack(log.influenceTrack);
         _.pull(track, house.id);
         track.push(house.id);
@@ -1062,7 +1062,7 @@ export default class GameReplayManager {
 
       case "reek-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable("reek");
 
         return snap;
@@ -1070,7 +1070,7 @@ export default class GameReplayManager {
 
       case "reek-returned-ramsay": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable(log.returnedCardId);
 
         return snap;
@@ -1078,26 +1078,26 @@ export default class GameReplayManager {
 
       case "lysa-arryn-mod-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable("lysa-arryn-mod");
         return snap;
       }
 
       case "aeron-damphair-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.removePowerTokens(log.tokens);
         return snap;
       }
       case "bronn-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.removePowerTokens(2);
         return snap;
       }
       case "qyburn-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.removePowerTokens(2);
         return snap;
       }
@@ -1108,7 +1108,7 @@ export default class GameReplayManager {
       }
       case "viserys-targaryen-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsUsed(log.houseCard);
         return snap;
       }
@@ -1129,13 +1129,13 @@ export default class GameReplayManager {
       }
       case "commander-power-token-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(1);
         return snap;
       }
       case "house-cards-returned": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         log.houseCards.forEach((hc) => {
           house.markHouseCardAsAvailable(hc);
         });
@@ -1143,7 +1143,7 @@ export default class GameReplayManager {
       }
       case "bran-stark-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable(log.houseCard);
         return snap;
       }
@@ -1159,8 +1159,8 @@ export default class GameReplayManager {
       }
       case "alayne-stone-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
-        const affectedHouse = snap.getHouse(log.affectedHouse)!;
+        const house = snap.getHouse(log.house);
+        const affectedHouse = snap.getHouse(log.affectedHouse);
         house.removePowerTokens(2);
         affectedHouse.powerTokens = 0;
         return snap;
@@ -1177,7 +1177,7 @@ export default class GameReplayManager {
       }
       case "missandei-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable(log.houseCard);
         return snap;
       }
@@ -1209,26 +1209,26 @@ export default class GameReplayManager {
       }
       case "balon-greyjoy-asos-power-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokensGained);
         return snap;
       }
       case "cersei-lannister-asos-power-tokens-discarded": {
         if (!snap.gameSnapshot) return snap;
-        const affected = snap.getHouse(log.affectedHouse)!;
+        const affected = snap.getHouse(log.affectedHouse);
         affected.removePowerTokens(log.powerTokensDiscarded);
 
         return snap;
       }
       case "daenerys-targaryen-b-power-tokens-discarded": {
         if (!snap.gameSnapshot) return snap;
-        const affected = snap.getHouse(log.affectedHouse)!;
+        const affected = snap.getHouse(log.affectedHouse);
         affected.removePowerTokens(log.powerTokensDiscarded);
         return snap;
       }
       case "doran-martell-asos-used": {
         if (!snap.gameSnapshot) return snap;
-        const affectedHouse = snap.getHouse(log.affectedHouse)!;
+        const affectedHouse = snap.getHouse(log.affectedHouse);
         const track = snap.getInfluenceTrack(1);
         _.pull(track, affectedHouse.id);
         track.push(affectedHouse.id);
@@ -1236,43 +1236,43 @@ export default class GameReplayManager {
       }
       case "illyrio-mopatis-power-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokensGained);
         return snap;
       }
       case "house-card-removed-from-game": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         _.remove(house.houseCards, (hc) => hc.id === log.houseCard);
         return snap;
       }
       case "littlefinger-power-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokens);
         return snap;
       }
       case "lysa-arryn-ffc-power-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokens);
         return snap;
       }
       case "melisandre-of-asshai-power-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokens);
         return snap;
       }
       case "qarl-the-maid-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokensGained);
         return snap;
       }
       case "roose-bolton-house-cards-returned": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         log.houseCards.forEach((hc) => {
           house.markHouseCardAsAvailable(hc);
         });
@@ -1280,8 +1280,8 @@ export default class GameReplayManager {
       }
       case "salladhar-saan-asos-power-tokens-changed": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
-        const affectedHouse = snap.getHouse(log.affectedHouse)!;
+        const house = snap.getHouse(log.house);
+        const affectedHouse = snap.getHouse(log.affectedHouse);
         house.addPowerTokens(log.powerTokensGained);
         affectedHouse.removePowerTokens(log.powerTokensLost);
         return snap;
@@ -1300,7 +1300,7 @@ export default class GameReplayManager {
       }
       case "tywin-lannister-power-tokens-gained": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
+        const house = snap.getHouse(log.house);
         house.addPowerTokens(log.powerTokensGained);
         return snap;
       }
@@ -1320,8 +1320,8 @@ export default class GameReplayManager {
       }
       case "robert-arryn-used": {
         if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house)!;
-        const affectedHouse = snap.getHouse(log.affectedHouse)!;
+        const house = snap.getHouse(log.house);
+        const affectedHouse = snap.getHouse(log.affectedHouse);
         _.remove(house.houseCards, (card) => card.id === "robert-arryn");
         _.remove(
           affectedHouse.houseCards,
@@ -1443,8 +1443,8 @@ export default class GameReplayManager {
     combatLogs: GameLog[],
     snap: EntireGameSnapshot
   ): void {
-    const cd = this.currentCombatData!;
-    if (!cd.combatResult) {
+    const cd = this.currentCombatData;
+    if (!cd || !cd.combatResult) {
       throw new Error("combat result not set");
     }
 
