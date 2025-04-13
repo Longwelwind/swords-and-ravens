@@ -424,7 +424,7 @@ export default class GameReplayManager {
         return snap;
       }
       case "clash-of-kings-bidding-done": {
-        if (!snap.gameSnapshot) return snap;
+        if (!snap.gameSnapshot || log.distributor != null) return snap;
         log.results.forEach(([bid, houses]) => {
           houses.forEach((h) => {
             const house = snap.getHouse(h)!;
