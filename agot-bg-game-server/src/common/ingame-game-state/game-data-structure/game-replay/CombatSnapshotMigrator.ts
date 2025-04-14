@@ -4,6 +4,7 @@ import EntireGameSnapshot from "./EntireGameSnapshot";
 import IngameGameState from "../../IngameGameState";
 import ReplayConstants from "./replay-constants";
 import _ from "lodash";
+import { removeFirst, pullFirst } from "../../../../utils/arrayExt";
 
 export interface CombatLogData {
   attacker: string;
@@ -20,14 +21,6 @@ export interface CombatLogData {
   movePrevented: boolean;
   retreatForced: boolean;
   postCombatLogs: GameLogData[];
-}
-
-function removeFirst(arr: string[], item: string): string | null {
-  const index = arr.indexOf(item);
-  if (index > -1) {
-    return arr.splice(index, 1)[0];
-  }
-  return null;
 }
 
 export default class CombatSnapshotMigrator {
@@ -158,24 +151,14 @@ export default class CombatSnapshotMigrator {
       (log) => log.data.type == "retreat-region-chosen"
     );
 
-    const arianneMartellMovementPrevented = relatedCombatResultLogs.some(
-      (log, index) => {
-        if (log.data.type === "arianne-martell-prevent-movement") {
-          relatedCombatResultLogs.splice(index, 1);
-          return true;
-        }
-        return false;
-      }
+    const arianneMartellMovementPrevented = removeFirst(
+      relatedCombatResultLogs,
+      (log) => log.data.type == "arianne-martell-prevent-movement"
     );
 
-    const arianneMartellForcedRetreat = relatedCombatResultLogs.some(
-      (log, index) => {
-        if (log.data.type === "arianne-martell-force-retreat") {
-          relatedCombatResultLogs.splice(index, 1);
-          return true;
-        }
-        return false;
-      }
+    const arianneMartellForcedRetreat = removeFirst(
+      relatedCombatResultLogs,
+      (log) => log.data.type === "arianne-martell-force-retreat"
     );
 
     if (retreatRegionChosen.length > 1) {
@@ -203,8 +186,8 @@ export default class CombatSnapshotMigrator {
       loserArmy,
       loserRegion,
       retreatRegion,
-      movePrevented: arianneMartellMovementPrevented,
-      retreatForced: arianneMartellForcedRetreat,
+      movePrevented: arianneMartellMovementPrevented != null,
+      retreatForced: arianneMartellForcedRetreat != null,
       postCombatLogs: relatedCombatResultLogs.map((l) => l.data),
     };
   }
@@ -230,7 +213,7 @@ export default class CombatSnapshotMigrator {
         for (let i = 0; i < log.killedBecauseCantRetreat.length; i++) {
           const unit = log.killedBecauseCantRetreat[i];
           region.removeUnit(unit, ccd.loser);
-          removeFirst(ccd.loserArmy, unit);
+          pullFirst(ccd.loserArmy, unit);
         }
         return snap;
       }
@@ -239,7 +222,7 @@ export default class CombatSnapshotMigrator {
         for (let i = 0; i < log.killed.length; i++) {
           const unit = log.killed[i];
           region.removeUnit(unit, ccd.loser);
-          removeFirst(ccd.loserArmy, unit);
+          pullFirst(ccd.loserArmy, unit);
         }
         return snap;
       }
@@ -248,14 +231,8 @@ export default class CombatSnapshotMigrator {
         for (let i = 0; i < log.units.length; i++) {
           const unit = log.units[i];
           region.removeUnit(unit, ccd.defender);
-          removeFirst(ccd.loserArmy, unit);
+          pullFirst(ccd.loserArmy, unit);
         }
-        return snap;
-      }
-      case "retreat-failed": {
-        const region = snap.getRegion(ccd.defenderRegion);
-        region.removeAllUnits();
-        ccd.defenderArmy = [];
         return snap;
       }
       default:
