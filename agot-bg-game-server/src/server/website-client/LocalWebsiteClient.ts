@@ -1,78 +1,125 @@
-import WebsiteClient, {StoredGameData, StoredUserData} from "./WebsiteClient";
+import WebsiteClient, { StoredGameData, StoredUserData } from "./WebsiteClient";
 import User from "../User";
+import fs from "fs";
+import path from "path";
+import { SerializedEntireGame } from "../../common/EntireGame";
+import serializedGameMigrations from "../serializedGameMigrations";
 
 export default class LocalWebsiteClient implements WebsiteClient {
-    async getGame(gameId: string): Promise<StoredGameData> {
-        if (gameId != "1") {
-            throw new Error();
-        }
-
-        return {
-            id: gameId,
-            name: "Local Test Game",
-            ownerId: "1",
-            serializedGame: null,
-            version: null
-        };
+  async getGame(gameId: string): Promise<StoredGameData> {
+    if (gameId != "1") {
+      throw new Error();
     }
 
-    async getUser(userId: string): Promise<StoredUserData> {
-        return {
-            id: userId,
-            name: `Super Long Player Name #${userId}`,
-            token: userId,
-            groups: [{"name": "Member"}],
-            profileSettings: {
-                muted: true,
-                houseNamesForChat: true,
-                mapScrollbar: true,
-                responsiveLayout: false
-            }
-        };
-    }
+    const serializedGame = await this.loadGameFromFile();
+    const version = Math.max(
+      ...serializedGameMigrations.map((mig) => Number(mig.version))
+    );
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/ban-types
-    async saveGame(_gameId: string, _serializedGame: any, _viewOfGame: any, _players: {userId: string; data: object}[], _state: string, _version: string, updateLastActive: boolean): Promise<void> {
-        console.log("Game saved. updateLastActive: " + updateLastActive);
-    }
+    return {
+      id: gameId,
+      name: "Local Test Game",
+      ownerId: "1",
+      serializedGame: serializedGame,
+      version: version.toString(),
+    };
+  }
 
-    async notifyReadyToStart(_gameId: string, userIds: string[]): Promise<void> {
-        console.log(`notifyReadyToStart: ${userIds.join(", ")}`);
+  private async loadGameFromFile(): Promise<object | null> {
+    const filePath = path.resolve(__dirname, "local-entire-game.json");
+    try {
+      const fileContent = await fs.promises.readFile(filePath, "utf-8");
+      return JSON.parse(fileContent);
+    } catch (error) {
+      console.error(`Failed to load game from file: ${error.message}`);
+      return null;
     }
+  }
 
-    async notifyYourTurn(_gameId: string, userIds: string[]): Promise<void> {
-        console.log(`notifyYourTurn: ${userIds.join(", ")}`);
-    }
+  async getUser(userId: string): Promise<StoredUserData> {
+    return {
+      id: userId,
+      name: `Super Long Player Name #${userId}`,
+      token: userId,
+      groups: [{ name: "Member" }],
+      profileSettings: {
+        muted: true,
+        houseNamesForChat: true,
+        mapScrollbar: true,
+        responsiveLayout: false,
+      },
+    };
+  }
 
-    async notifyBribeForSupport(gameId: string, userIds: string[]): Promise<void> {
-        console.log(`notifyBribeForSupport: ${userIds.join(", ")}`);
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/ban-types
+  async saveGame(
+    _gameId: string,
+    serializedGame: SerializedEntireGame,
+    _viewOfGame: any,
+    _players: { userId: string; data: object }[],
+    _state: string,
+    _version: string,
+    updateLastActive: boolean
+  ): Promise<void> {
+    console.log("updateLastActive", updateLastActive);
+    if (serializedGame.childGameState.type != "ingame") {
+      return;
     }
+    const filePath = path.resolve(__dirname, "local-entire-game.json");
+    try {
+      const dataToSave = JSON.stringify(serializedGame);
+      await fs.promises.writeFile(filePath, dataToSave, "utf-8");
+      console.log("Game successfully saved to file.");
+    } catch (error) {
+      console.error(`Failed to save game to file: ${error.message}`);
+    }
+  }
 
-    async notifyBattleResults(_gameId: string, userIds: string[]): Promise<void> {
-        console.log(`notifyBattleResults: ${userIds.join(", ")}`);
-    }
+  async notifyReadyToStart(_gameId: string, userIds: string[]): Promise<void> {
+    console.log(`notifyReadyToStart: ${userIds.join(", ")}`);
+  }
 
-    async notifyNewVote(_gameId: string, userIds: string[]): Promise<void> {
-        console.log(`notifyNewVoteStarted: ${userIds.join(", ")}`);
-    }
+  async notifyYourTurn(_gameId: string, userIds: string[]): Promise<void> {
+    console.log(`notifyYourTurn: ${userIds.join(", ")}`);
+  }
 
-    async notifyGameEnded(_gameId: string, userIds: string[]): Promise<void> {
-        console.log(`notifyGameEnded: ${userIds.join(", ")}`);
-    }
+  async notifyBribeForSupport(
+    gameId: string,
+    userIds: string[]
+  ): Promise<void> {
+    console.log(`notifyBribeForSupport: ${userIds.join(", ")}`);
+  }
 
-    async addPbemResponseTime(user: User, responseTimeInSeconds: number): Promise<void> {
-        console.log(`ADD-PBEM-RESPONSE-TIME: ${user.name}: ${responseTimeInSeconds}`);
-    }
+  async notifyBattleResults(_gameId: string, userIds: string[]): Promise<void> {
+    console.log(`notifyBattleResults: ${userIds.join(", ")}`);
+  }
 
-    async createPublicChatRoom(name: string): Promise<string> {
-        return `chat-${name}`;
-    }
+  async notifyNewVote(_gameId: string, userIds: string[]): Promise<void> {
+    console.log(`notifyNewVoteStarted: ${userIds.join(", ")}`);
+  }
 
-    async createPrivateChatRoom(users: User[], _name: string): Promise<string> {
-        return `private-chat-between-${users.map(u => u.name).join("-")}`;
-    }
+  async notifyGameEnded(_gameId: string, userIds: string[]): Promise<void> {
+    console.log(`notifyGameEnded: ${userIds.join(", ")}`);
+  }
 
-    async clearChatRoom(roomId: string): Promise<void> {
-        console.log("room " + roomId + " cleared.");
-    }
+  async addPbemResponseTime(
+    user: User,
+    responseTimeInSeconds: number
+  ): Promise<void> {
+    console.log(
+      `ADD-PBEM-RESPONSE-TIME: ${user.name}: ${responseTimeInSeconds}`
+    );
+  }
+
+  async createPublicChatRoom(name: string): Promise<string> {
+    return `chat-${name}`;
+  }
+
+  async createPrivateChatRoom(users: User[], _name: string): Promise<string> {
+    return `private-chat-between-${users.map((u) => u.name).join("-")}`;
+  }
+
+  async clearChatRoom(roomId: string): Promise<void> {
+    console.log("room " + roomId + " cleared.");
+  }
 }
