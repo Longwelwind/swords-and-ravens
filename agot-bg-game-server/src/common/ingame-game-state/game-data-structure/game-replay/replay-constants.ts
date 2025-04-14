@@ -1,4 +1,4 @@
-const modifyingGameLogIds = [
+const modifyingGameLogIds = new Set([
   "combat-result",
   "turn-begin",
   "march-resolved",
@@ -22,7 +22,6 @@ const modifyingGameLogIds = [
   "lysa-arryn-mod-used",
   "qyburn-used",
   "aeron-damphair-used",
-  "retreat-casualties-suffered",
   "enemy-port-taken",
   "ships-destroyed-by-empty-castle",
   "preemptive-raid-units-killed",
@@ -43,8 +42,6 @@ const modifyingGameLogIds = [
   "rattleshirts-raiders-nights-watch-victory",
   "rattleshirts-raiders-wildling-victory",
   "game-of-thrones-power-tokens-gained",
-  "immediatly-killed-after-combat",
-  "killed-after-combat",
   "supply-adjusted",
   "commander-power-token-gained",
   "beric-dondarrion-used",
@@ -114,72 +111,35 @@ const modifyingGameLogIds = [
   "tywin-lannister-power-tokens-gained",
   "attack",
   "vassals-claimed",
-];
+]);
 
-const combatLogIds = [
-  "attack",
-  "combat-valyrian-sword-used",
-  "aeron-damphair-used",
-  "bronn-used",
-  "qyburn-used",
-  "stannis-baratheon-asos-used",
-  "viserys-targaryen-used",
-  "doran-used",
-  "mace-tyrell-footman-killed",
-  "queen-of-thorns-order-removed",
-];
-
-const postCombatLogIds = [
-  "combat-result",
-  "garrison-removed",
+const relatedCombatResultTypes = new Set([
+  "killed-after-combat",
   "immediatly-killed-after-combat",
-  "commander-power-token-gained",
-  "house-cards-returned",
-  "bran-stark-used",
-  "jon-connington-used",
-  "mace-tyrell-asos-order-placed",
-  "melisandre-dwd-used",
-  "patchface-used",
-  "alayne-stone-used",
-  "cersei-lannister-order-removed",
-  "jon-snow-used",
-  "lysa-arryn-mod-used",
-  "missandei-used",
-  "reek-used",
-  "renly-baratheon-footman-upgraded-to-knight",
-  "rodrik-the-reader-used",
-  "ser-gerris-drinkwater-used",
-  "ser-ilyn-payne-footman-killed",
-  "retreat-casualties-suffered",
-  "retreat-failed",
   "retreat-region-chosen",
   "arianne-martell-prevent-movement",
   "arianne-martell-force-retreat",
-  "anya-waynwood-power-tokens-gained",
-  "balon-greyjoy-asos-power-tokens-gained",
-  "cersei-lannister-asos-power-tokens-discarded",
-  "daenerys-targaryen-b-power-tokens-discarded",
-  "doran-martell-asos-used",
-  "illyrio-mopatis-power-tokens-gained",
-  "house-card-removed-from-game",
-  "jaqen-h-ghar-house-card-replaced",
-  "littlefinger-power-tokens-gained",
-  "lysa-arryn-ffc-power-tokens-gained",
-  "melisandre-of-asshai-power-tokens-gained",
-  "qarl-the-maid-tokens-gained",
-  "reek-returned-ramsay",
-  "robb-stark-retreat-location-overriden",
-  "roose-bolton-house-cards-returned",
-  "salladhar-saan-asos-power-tokens-changed",
-  "loras-tyrell-attack-order-moved",
-  "tywin-lannister-power-tokens-gained",
-  "varys-used",
-];
+  "retreat-casualties-suffered",
+  "retreat-failed",
+]);
 
-const allCombatLogIds = Array.from(
-  new Set(...combatLogIds, ...postCombatLogIds)
-);
+const combatTerminationTypes = new Set([
+  "attack",
+  "march-resolved",
+  "combat-result", // not really possible as "attack" must "preceed", but for safety...
+  "action-phase-resolve-consolidate-power-began",
+  "winner-declared",
+  "turn-begin",
+  "westeros-phase-began",
+]);
 
-const combatResult = postCombatLogIds[0];
-
-export { modifyingGameLogIds, allCombatLogIds, combatResult };
+export {
+  modifyingGameLogIds,
+  relatedCombatResultTypes,
+  combatTerminationTypes,
+};
+export default class ReplayConstants {
+  static modifyingGameLogIds = modifyingGameLogIds;
+  static relatedCombatResultTypes = relatedCombatResultTypes;
+  static combatTerminationTypes = combatTerminationTypes;
+}

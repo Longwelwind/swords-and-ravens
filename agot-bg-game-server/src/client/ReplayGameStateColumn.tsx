@@ -1,5 +1,3 @@
-// @ts-expect-error Somehow this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
 import React, { Component, ReactNode } from "react";
 
 import {
@@ -323,19 +321,18 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
             {/* This is an invisible div to force the parent to stretch to its remaining width */}
             <div style={{ visibility: "hidden", width: "850px" }} />
             <Tab.Content className="h-100">
-              <Tab.Pane eventKey="game-logs" className="h-100">
-                <div className="d-flex flex-column h-100">
-                  <ScrollToBottom
-                    className="flex-fill-remaining"
-                    scrollViewClassName="overflow-x-hidden"
-                    initialScrollBehavior="auto"
-                  >
-                    <GameLogListComponent
-                      ingameGameState={ingame}
-                      gameClient={gameClient}
-                      currentlyViewed={true}
-                    />
-                  </ScrollToBottom>
+              <Tab.Pane
+                eventKey="game-logs"
+                className="d-flex flex-column h-100"
+              >
+                <div
+                  style={{ overflowY: "auto", flex: 1, overflowX: "hidden" }}
+                >
+                  <GameLogListComponent
+                    ingameGameState={ingame}
+                    gameClient={gameClient}
+                    currentlyViewed={true}
+                  />
                 </div>
               </Tab.Pane>
               {gameSnapshot?.ironBank && (
