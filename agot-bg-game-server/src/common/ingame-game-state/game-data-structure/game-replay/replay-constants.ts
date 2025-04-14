@@ -120,7 +120,6 @@ const relatedCombatResultTypes = new Set([
   "arianne-martell-prevent-movement",
   "arianne-martell-force-retreat",
   "retreat-casualties-suffered",
-  "retreat-failed",
 ]);
 
 const combatTerminationTypes = new Set([

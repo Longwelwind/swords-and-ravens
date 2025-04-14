@@ -16,6 +16,7 @@ export default class GameReplayManager {
   @observable selectedLogIndex = -1;
   @observable selectedSnapshot: EntireGameSnapshot | null = null;
   @observable regionsToHighlight: BetterMap<string, string> = new BetterMap();
+  @observable marchMarkers: BetterMap<string, string> = new BetterMap();
 
   private seenSnapshots: BetterMap<number, EntireGameSnapshot> =
     new BetterMap();
@@ -189,6 +190,7 @@ export default class GameReplayManager {
     this.selectedSnapshot = null;
     this.selectedLogIndex = -1;
     this.regionsToHighlight.clear();
+    this.marchMarkers.clear();
   }
 
   private findNearestLogSnapshot(
@@ -254,13 +256,25 @@ export default class GameReplayManager {
     return modifyingGameLogIds.has(log.type);
   }
 
-  private handleHighligting(selectedLog: GameLogData): void {
-    if (selectedLog.type == "attack") {
-      this.regionsToHighlight.set(selectedLog.attackingRegion, "red");
-      this.regionsToHighlight.set(selectedLog.attackedRegion, "yellow");
-    } else if (selectedLog.type == "combat-result") {
-      this.regionsToHighlight.set(selectedLog.stats[0].region, "red");
-      this.regionsToHighlight.set(selectedLog.stats[1].region, "yellow");
+  private handleHighligting(log: GameLogData): void {
+    if (log.type == "attack") {
+      this.regionsToHighlight.set(log.attackingRegion, "red");
+      this.regionsToHighlight.set(log.attackedRegion, "yellow");
+    } else if (log.type == "combat-result") {
+      this.regionsToHighlight.set(log.stats[0].region, "red");
+      this.regionsToHighlight.set(log.stats[1].region, "yellow");
+    } else if (log.type == "player-mustered") {
+      const regions = _.uniq(
+        log.musterings.map(([_, m]) => m.map((r) => r.region)).flat()
+      );
+      regions.forEach((region) => {
+        this.regionsToHighlight.set(region, "green");
+      });
+    } else if (log.type == "march-resolved") {
+      const toRegions = log.moves.map(([r, _]) => r);
+      toRegions.forEach((region) => {
+        this.marchMarkers.set(log.startingRegion, region);
+      });
     }
   }
 }

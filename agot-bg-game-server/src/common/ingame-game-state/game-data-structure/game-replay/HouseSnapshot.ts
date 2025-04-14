@@ -15,6 +15,7 @@ export default class HouseSnapshot implements IHouseSnapshot {
   @observable powerTokens: number;
   @observable isVassal?: boolean;
   @observable suzerainHouseId?: string;
+  name: string;
 
   constructor(data: IHouseSnapshot) {
     this.id = data.id;
@@ -25,6 +26,7 @@ export default class HouseSnapshot implements IHouseSnapshot {
     this.powerTokens = data.powerTokens;
     this.isVassal = data.isVassal;
     this.suzerainHouseId = data.suzerainHouseId;
+    this.name = data.id.charAt(0).toUpperCase() + data.id.slice(1);
   }
 
   addPowerTokens(count: number): void {

@@ -27,6 +27,7 @@ import IRegionSnapshot from "../common/ingame-game-state/game-data-structure/gam
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import GameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/GameSnapshot";
 import { observer } from "mobx-react";
+import Xarrow from "react-xarrows";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -155,6 +156,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
           {this.renderIronBankInfos(ironBankView)}
           {this.renderLoanCardDeck(ironBankView)}
           {this.renderLoanCardSlots(ironBankView)}
+          {this.renderMarchMarkers()}
         </div>
         <svg style={{ width: `${this.mapWidth}px`, height: `${MAP_HEIGHT}px` }}>
           {this.renderRegions()}
@@ -363,6 +365,10 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               }
             </div>
           )}
+          <div
+            id={`replay-march-markers-${r.id}`}
+            className="center-relative-to-parent disable-pointer-events v-hidden"
+          />
         </div>
       );
     });
@@ -454,5 +460,21 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     const points = this.ingame.world.getContinuousBorder(region);
 
     return points.map((p) => p.x + "," + p.y).join(" ");
+  }
+
+  renderMarchMarkers(): ReactNode[] {
+    return this.ingame.replayManager.marchMarkers.entries.map(([from, to]) => (
+      <Xarrow
+        key={`snaphot-arrow-${from}-${to}`}
+        start={`replay-march-markers-${from}`}
+        end={`replay-march-markers-${to}`}
+        color={"black"}
+        curveness={0.5}
+        dashness={{ animation: 2 }}
+        path="smooth"
+        headShape="circle"
+        headSize={3}
+      />
+    ));
   }
 }
