@@ -48,22 +48,22 @@ export default class CombatSnapshotMigrator {
 
     const cld = this.combatLogData;
     this.combatLogDataFetched(cld);
-    console.log("Combat result log data", cld);
 
     for (let i = 0; i < cld.postCombatLogs.length; i++) {
       const l = cld.postCombatLogs[i];
-      console.debug(`Executing post-combat event: ${l.type}`, l);
       snap = this.applyCombatResultEvent(snap, l);
     }
 
     const attackingRegion = snap.getRegion(cld.attackerRegion);
     const defendingRegion = snap.getRegion(cld.defenderRegion);
+    const retreatRegion = cld.retreatRegion
+      ? snap.getRegion(cld.retreatRegion)
+      : null;
 
     // Perform move and retreat:
     if (cld.attacker == cld.winner) {
-      if (cld.retreatRegion) {
+      if (retreatRegion) {
         // Retreat defending units
-        const retreatRegion = snap.getRegion(cld.retreatRegion);
         while (cld.defenderArmy.length > 0) {
           const unit = cld.defenderArmy.pop();
           if (!unit) break;
@@ -85,19 +85,35 @@ export default class CombatSnapshotMigrator {
         }
       }
     } else {
-      // attacker retreat => stay in attacking region, but wound units
-      attackingRegion.markAllUnitsAsWounded();
-
-      if (cld.retreatForced) {
-        // Retreat defending units
-        if (cld.retreatRegion) {
-          // Retreat defending units
-          const retreatRegion = snap.getRegion(cld.retreatRegion);
-          for (let i = 0; i < cld.defenderArmy.length; i++) {
-            const unit = cld.defenderArmy[i];
-            defendingRegion.moveTo(retreatRegion, unit, cld.defender);
-          }
+      // Attacking units usually retreat to where they came from
+      // Except Arianne Martell forces retreat of a victorious defender
+      if (cld.retreatForced && retreatRegion) {
+        for (let i = 0; i < cld.defenderArmy.length; i++) {
+          const unit = cld.defenderArmy[i];
+          defendingRegion.moveTo(
+            retreatRegion,
+            unit,
+            cld.defender,
+            undefined,
+            true
+          );
         }
+      }
+      // or Robb Stark forces the attacker to retreat to a specific region
+      else if (retreatRegion) {
+        for (let i = 0; i < cld.attackerArmy.length; i++) {
+          const unit = cld.attackerArmy[i];
+          attackingRegion.moveTo(
+            retreatRegion,
+            unit,
+            cld.attacker,
+            undefined,
+            true
+          );
+        }
+      } else {
+        // just mark all units as wounded
+        attackingRegion.markAllUnitsAsWounded();
       }
     }
 
@@ -205,10 +221,6 @@ export default class CombatSnapshotMigrator {
         for (let i = 0; i < log.killedBecauseWounded.length; i++) {
           const unit = log.killedBecauseWounded[i];
           region.removeUnit(unit, ccd.loser, true);
-          const index = ccd.loserArmy.indexOf(unit);
-          if (index > -1) {
-            ccd.loserArmy.splice(index, 1);
-          }
         }
         for (let i = 0; i < log.killedBecauseCantRetreat.length; i++) {
           const unit = log.killedBecauseCantRetreat[i];
