@@ -232,9 +232,7 @@ export interface UserSettings {
   mapScrollbar: boolean;
   lastOpenedTab: string | null;
   chatHouseNames: boolean;
-  responsiveLayout: boolean;
-  tracksColumnCollapsed: boolean;
-  showMapWhenDrafting: boolean;
+  gameStateColumnRight: boolean;
   muted: boolean;
   notificationsVolume: number;
   musicVolume: number;

@@ -231,7 +231,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </Col>
       );
     }
-    const columnOrder = this.user?.settings.responsiveLayout
+    const columnOrder = this.user?.settings.gameStateColumnRight
       ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
       : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };
 
@@ -262,7 +262,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             />
           </Col>
           {!this.ingame.hasChildGameState(DraftHouseCardsGameState) ||
-          this.user?.settings.showMapWhenDrafting ? (
+          this.gameClient.showMapWhileDrafting ? (
             <Col
               xs={{ span: "auto", order: columnOrder.mapColumn }}
               style={{
@@ -324,8 +324,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     if (this.user && this.columnSwapAnimationClassName === "") {
       e.currentTarget.blur();
       this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
-      this.user.settings.responsiveLayout =
-        !this.user.settings.responsiveLayout;
+      this.user.settings.gameStateColumnRight =
+        !this.user.settings.gameStateColumnRight;
       this.tracksPopoverVisible = false;
       window.setTimeout(() => {
         this.columnSwapAnimationClassName = "";
@@ -350,8 +350,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             className="clickable btn btn-sm btn-secondary"
             style={{
               position: "fixed",
-              right: this.user?.settings.responsiveLayout ? "auto" : "4px",
-              left: this.user?.settings.responsiveLayout ? "4px" : "auto",
+              right: this.user?.settings.gameStateColumnRight ? "auto" : "4px",
+              left: this.user?.settings.gameStateColumnRight ? "4px" : "auto",
               top: "45px",
               padding: "4px",
               borderStyle: "none",
@@ -366,8 +366,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           onClick={() => (this.gameClient.muted = !this.gameClient.muted)}
           style={{
             position: "fixed",
-            right: this.user?.settings.responsiveLayout ? "auto" : "4px",
-            left: this.user?.settings.responsiveLayout ? "4px" : "auto",
+            right: this.user?.settings.gameStateColumnRight ? "auto" : "4px",
+            left: this.user?.settings.gameStateColumnRight ? "4px" : "auto",
             top: "85px",
             paddingBottom: "4px",
             paddingTop: "4px",
@@ -472,8 +472,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           }}
           style={{
             position: "fixed",
-            right: this.user?.settings.responsiveLayout ? "auto" : "4px",
-            left: this.user?.settings.responsiveLayout ? "4px" : "auto",
+            right: this.user?.settings.gameStateColumnRight ? "auto" : "4px",
+            left: this.user?.settings.gameStateColumnRight ? "4px" : "auto",
             top: "6px",
             padding: "4px",
             borderStyle: "none",

@@ -39,7 +39,7 @@ export default class GameClient {
   @observable authenticatedUser: User | null = null;
 
   @observable isReconnecting = false;
-
+  @observable showMapWhileDrafting = false;
   @observable logChatFullScreen = false;
 
   chatClient: ChatClient = new ChatClient(this);

@@ -18,7 +18,7 @@ interface UserSettingsComponentProps {
 export default class UserSettingsComponent extends Component<UserSettingsComponentProps> {
   @observable mapScrollbar = false;
   @observable chatHouseNames = false;
-  @observable responsiveLayout = false;
+  @observable gameStateColumnRight = false;
 
   render(): ReactNode {
     return (
@@ -102,9 +102,9 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                         </label>
                       </OverlayTrigger>
                     }
-                    checked={this.responsiveLayout}
+                    checked={this.gameStateColumnRight}
                     onChange={() => {
-                      this.responsiveLayout = !this.responsiveLayout;
+                      this.gameStateColumnRight = !this.gameStateColumnRight;
                       this.changeUserSettings();
                     }}
                   />
@@ -129,7 +129,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
     if (this.props.user) {
       this.mapScrollbar = this.props.user.settings.mapScrollbar;
       this.chatHouseNames = this.props.user.settings.chatHouseNames;
-      this.responsiveLayout = this.props.user.settings.responsiveLayout;
+      this.gameStateColumnRight = this.props.user.settings.gameStateColumnRight;
     }
   }
 
@@ -137,7 +137,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
     if (this.props.user) {
       this.props.user.settings.mapScrollbar = this.mapScrollbar;
       this.props.user.settings.chatHouseNames = this.chatHouseNames;
-      this.props.user.settings.responsiveLayout = this.responsiveLayout;
+      this.props.user.settings.gameStateColumnRight = this.gameStateColumnRight;
       this.props.user.syncSettings();
     }
   }

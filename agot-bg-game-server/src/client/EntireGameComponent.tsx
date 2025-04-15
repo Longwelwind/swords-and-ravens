@@ -26,7 +26,6 @@ import {
 } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
-import { observable } from "mobx";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -55,7 +54,6 @@ interface EntireGameComponentProps {
 
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
-  @observable showMapWhenDrafting = false;
   setIntervalId = -1;
 
   get entireGame(): EntireGame {
@@ -68,6 +66,14 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
   get lobby(): LobbyGameState | null {
     return this.entireGame.lobbyGameState;
+  }
+
+  get showMapWhileDrafting(): boolean {
+    return this.props.gameClient.showMapWhileDrafting;
+  }
+
+  set showMapWhileDrafting(value: boolean) {
+    this.props.gameClient.showMapWhileDrafting = value;
   }
 
   get isGameEnded(): boolean {
@@ -507,10 +513,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             type="switch"
             label="Show map"
             style={{ marginTop: "-6px" }}
-            checked={this.showMapWhenDrafting}
+            checked={this.showMapWhileDrafting}
             onChange={() => {
-              this.showMapWhenDrafting = !this.showMapWhenDrafting;
-              this.changeUserSettings();
+              this.showMapWhileDrafting = !this.showMapWhileDrafting;
             }}
           />
         </Col>
@@ -545,7 +550,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
       return;
     }
     const user = this.props.gameClient.authenticatedUser;
-    user.settings.showMapWhenDrafting = this.showMapWhenDrafting;
     user.syncSettings();
   }
 
@@ -602,11 +606,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     this.entireGame.onClientGameStateChange = () =>
       this.onClientGameStateChange();
     this.entireGame.onGameStarted = () => this.onGameStarted();
-
-    if (this.props.gameClient.authenticatedUser) {
-      this.showMapWhenDrafting =
-        this.props.gameClient.authenticatedUser.settings.showMapWhenDrafting;
-    }
 
     this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
   }
