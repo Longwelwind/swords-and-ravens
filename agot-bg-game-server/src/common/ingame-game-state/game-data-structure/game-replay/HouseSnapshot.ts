@@ -5,7 +5,7 @@ import IHouseSnapshot from "./IHouseSnapshot";
 
 export default class HouseSnapshot implements IHouseSnapshot {
   id: string;
-  @observable victoryPoints: number;
+  @observable victoryPointsUI: number;
   @observable landAreaCount: number;
   @observable supply: number;
   @observable houseCards: {
@@ -15,18 +15,24 @@ export default class HouseSnapshot implements IHouseSnapshot {
   @observable powerTokens: number;
   @observable isVassal?: boolean;
   @observable suzerainHouseId?: string;
+  victoryPoints: number;
   name: string;
+  color: string;
 
   constructor(data: IHouseSnapshot) {
     this.id = data.id;
     this.victoryPoints = data.victoryPoints;
+    this.victoryPointsUI = data.victoryPoints;
     this.landAreaCount = data.landAreaCount;
     this.supply = data.supply;
-    this.houseCards = data.houseCards;
+    this.houseCards = data.houseCards.map((card) => ({ ...card }));
     this.powerTokens = data.powerTokens;
     this.isVassal = data.isVassal;
     this.suzerainHouseId = data.suzerainHouseId;
-    this.name = data.id.charAt(0).toUpperCase() + data.id.slice(1);
+  }
+
+  getCopy(): HouseSnapshot {
+    return new HouseSnapshot(this);
   }
 
   addPowerTokens(count: number): void {

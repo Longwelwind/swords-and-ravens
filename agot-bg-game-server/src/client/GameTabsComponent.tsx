@@ -296,28 +296,23 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   </div>
                 </Nav.Item>
               ))}
-              {isMobile && !this.logChatFullScreen && (
-                <div className="d-flex justify-content-end flex-grow-1">
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      this.logChatFullScreen = true;
-                    }}
-                  >
-                    <img src={expandImage} width={24} />
-                  </button>
-                </div>
-              )}
               {this.currentOpenedTab == "game-logs" && (
-                <div className="d-flex flex-grow-1" />
-              )}
-              {this.currentOpenedTab == "game-logs" && (
-                <Dropdown className="ml-2">
+                <Dropdown className="ml-auto mt-1">
                   <Dropdown.Toggle variant="secondary" size="sm">
                     Jump to
                   </Dropdown.Toggle>
                   <Dropdown.Menu>{this.gameRoundElems}</Dropdown.Menu>
                 </Dropdown>
+              )}
+              {isMobile && !this.logChatFullScreen && (
+                <button
+                  className="btn btn-secondary ml-auto"
+                  onClick={() => {
+                    this.logChatFullScreen = true;
+                  }}
+                >
+                  <img src={expandImage} width={24} />
+                </button>
               )}
             </Nav>
           </Card.Header>

@@ -91,6 +91,10 @@ export default class Region {
     return this.staticRegion.improvementSlot;
   }
 
+  get nameSlot(): Point {
+    return this.staticRegion.nameSlot;
+  }
+
   get superLoyaltyToken(): boolean {
     return this.staticRegion.superLoyaltyToken;
   }
@@ -165,11 +169,6 @@ export default class Region {
     const result: IRegionSnapshot = {
       id: this.id,
     };
-
-    const controller = this.getController();
-    if (controller) {
-      result.controller = controller.id;
-    }
 
     if (this.units.size != 0) {
       result.units = this.units.values.map((u) => u.getUnitState());

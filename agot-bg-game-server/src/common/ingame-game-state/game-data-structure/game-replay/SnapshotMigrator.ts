@@ -8,7 +8,7 @@ import { HouseCardState } from "../house-card/HouseCard";
 import IngameGameState from "../../IngameGameState";
 import allKnownHouseCards from "../../../../client/utils/houseCardHelper";
 import CombatSnapshotMigrator, {
-  CombatLogData,
+  CombatResultData,
 } from "./CombatSnapshotMigrator";
 
 export default class SnapshotMigrator {
@@ -17,7 +17,14 @@ export default class SnapshotMigrator {
   // For handling loyalty token movement
   private previousFrom?: string;
   private previousTo?: string;
-  private combatLogData: CombatLogData | null = null;
+  private attackData: {
+    attacker: string;
+    defender: string;
+    attackerRegion: string;
+    defenderRegion: string;
+    attackerArmy: string[];
+  } | null = null;
+  private combatResultData: CombatResultData | null = null;
 
   private get supplyRestrictions(): number[][] {
     return this.ingame.game.supplyRestrictions;
@@ -192,23 +199,14 @@ export default class SnapshotMigrator {
         return snap;
       }
 
-      case "garrison-removed": {
-        const region = snap.getRegion(log.region);
-        region.garrison = undefined;
-        return snap;
-      }
-
-      case "garrison-returned": {
-        const region = snap.getRegion(log.region);
-        region.garrison = log.strength;
-        return snap;
-      }
-
       case "orders-revealed":
-        return new EntireGameSnapshot({
-          worldSnapshot: log.worldState,
-          gameSnapshot: log.gameSnapshot,
-        });
+        return new EntireGameSnapshot(
+          {
+            worldSnapshot: log.worldState,
+            gameSnapshot: log.gameSnapshot,
+          },
+          this.ingame
+        );
 
       case "leave-power-token-choice": {
         const region = snap.getRegion(log.region);
@@ -305,6 +303,7 @@ export default class SnapshotMigrator {
       }
 
       case "mammoth-riders-return-card": {
+        if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.house);
         house.markHouseCardAsAvailable(log.houseCard);
         return snap;
@@ -504,6 +503,8 @@ export default class SnapshotMigrator {
         return snap;
       }
       case "loan-purchased": {
+        const region = snap.getRegion(log.region);
+        region.removeOrder();
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse(log.house);
         house.removePowerTokens(log.paid);
@@ -653,22 +654,29 @@ export default class SnapshotMigrator {
               COMBAT LOGS
         */
       case "attack": {
+        const attackerRegion = snap.getRegion(log.attackingRegion);
+        const attackedRegion = snap.getRegion(log.attackedRegion);
         if (log.attacked == null) {
           // Only handle attack against neutral force here.
-          const region = snap.getRegion(log.attackingRegion);
-          const regionTo = snap.getRegion(log.attackedRegion);
-
           log.units.forEach((unit) => {
-            region.moveTo(regionTo, unit, log.attacker);
+            attackerRegion.moveTo(attackedRegion, unit, log.attacker);
           });
 
-          region.removeOrder();
+          attackerRegion.removeOrder();
+        } else {
+          this.attackData = {
+            attacker: log.attacker,
+            defender: log.attacked,
+            attackerRegion: log.attackingRegion,
+            defenderRegion: log.attackedRegion,
+            attackerArmy: log.units,
+          };
         }
         return snap;
       }
       case "combat-result": {
-        const migrator = new CombatSnapshotMigrator(this.ingame, (cld) => {
-          this.combatLogData = cld;
+        const migrator = new CombatSnapshotMigrator(this.ingame, (crd) => {
+          this.combatResultData = crd;
         });
         const migrated = migrator.migrateCombatResultLog(
           log,
@@ -691,8 +699,6 @@ export default class SnapshotMigrator {
 
         return snap;
       }
-
-      // UNREVIEWED LOGS:
 
       case "melisandre-dwd-used": {
         if (!snap.gameSnapshot) return snap;
@@ -767,7 +773,13 @@ export default class SnapshotMigrator {
       }
       case "mace-tyrell-footman-killed": {
         const region = snap.getRegion(log.region);
-        region.removeUnit("footman", log.house);
+        if (!this.attackData) throw new Error("attack data not set");
+        const enemy =
+          log.house == this.attackData.attacker
+            ? this.attackData.defender
+            : this.attackData.attacker;
+
+        region.removeUnit("footman", enemy);
         return snap;
       }
       case "queen-of-thorns-order-removed": {
@@ -778,6 +790,11 @@ export default class SnapshotMigrator {
       case "garrison-removed": {
         const region = snap.getRegion(log.region);
         region.garrison = undefined;
+        return snap;
+      }
+      case "garrison-returned": {
+        const region = snap.getRegion(log.region);
+        region.garrison = log.strength;
         return snap;
       }
       case "commander-power-token-gained": {
@@ -848,8 +865,13 @@ export default class SnapshotMigrator {
         return snap;
       }
       case "ser-ilyn-payne-footman-killed": {
+        if (!this.combatResultData) throw new Error("combat result not set");
+        const enemy =
+          log.house == this.combatResultData.attacker
+            ? this.combatResultData.defender
+            : this.combatResultData.attacker;
         const region = snap.getRegion(log.region);
-        region.removeUnit("footman", log.house);
+        region.removeUnit("footman", enemy);
         return snap;
       }
       case "anya-waynwood-power-tokens-gained": {
@@ -940,9 +962,9 @@ export default class SnapshotMigrator {
         return snap;
       }
       case "loras-tyrell-attack-order-moved": {
-        if (!this.combatLogData) throw new Error("combat result not set");
+        if (!this.combatResultData) throw new Error("combat result not set");
 
-        const region = snap.getRegion(this.combatLogData.attackerRegion);
+        const region = snap.getRegion(this.combatResultData.attackerRegion);
         const order = region.order;
         region.removeOrder();
         const toRegion = snap.getRegion(log.region);
@@ -956,13 +978,12 @@ export default class SnapshotMigrator {
         return snap;
       }
       case "beric-dondarrion-used": {
-        if (!snap.gameSnapshot) return snap;
-        if (!this.combatLogData) throw new Error("combat result not set");
+        if (!this.combatResultData) throw new Error("combat result not set");
 
-        const cld = this.combatLogData;
-        const houseIsAttacker = cld.attacker == log.house;
+        const crd = this.combatResultData;
+        const houseIsAttacker = crd.attacker == log.house;
         const region = snap.getRegion(
-          houseIsAttacker ? cld.attacker : cld.defenderRegion
+          houseIsAttacker ? crd.attacker : crd.defenderRegion
         );
         region.removeUnit(log.casualty, log.house);
         return snap;
@@ -980,13 +1001,10 @@ export default class SnapshotMigrator {
       }
       case "ser-ilyn-payne-asos-casualty-suffered": {
         if (!snap.gameSnapshot) return snap;
-        if (!this.combatLogData) throw new Error("combat result not set");
-        const cld = this.combatLogData;
-        const houseIsAttacker = cld.attacker == log.house;
-        const region = snap.getRegion(
-          houseIsAttacker ? cld.attackerRegion : cld.defenderRegion
-        );
-        region.removeUnit(log.unit, log.house);
+        if (!this.combatResultData) throw new Error("combat result not set");
+        const crd = this.combatResultData;
+        const region = snap.getRegion(crd.loserRegion);
+        region.removeUnit(log.unit, log.affectedHouse);
         return snap;
       }
       case "varys-used": {
@@ -1003,7 +1021,8 @@ export default class SnapshotMigrator {
   }
 
   public resetCombatLogData(): void {
-    this.combatLogData = null;
+    this.combatResultData = null;
+    this.attackData = null;
   }
 
   private getOrderTypeById(id: number): string {

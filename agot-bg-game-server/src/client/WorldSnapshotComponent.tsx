@@ -23,11 +23,12 @@ import ImagePopover from "./utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
-import IRegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IRegionSnapshot";
+import RegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/RegionSnapshot";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import GameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/GameSnapshot";
 import { observer } from "mobx-react";
 import Xarrow from "react-xarrows";
+import EntireGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/EntireGameSnapshot";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;
@@ -63,12 +64,18 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     return this.props.ingameGameState;
   }
 
-  get worldSnapshot(): IRegionSnapshot[] {
-    return this.ingame.replayManager.selectedSnapshot?.worldSnapshot ?? [];
+  get entireGameSnapshot(): EntireGameSnapshot {
+    if (!this.ingame.replayManager.selectedSnapshot)
+      throw new Error("Replay mode called without a snapshot");
+    return this.ingame.replayManager.selectedSnapshot;
+  }
+
+  get worldSnapshot(): RegionSnapshot[] {
+    return this.entireGameSnapshot.worldSnapshot;
   }
 
   get gameSnapshot(): GameSnapshot | undefined {
-    return this.ingame.replayManager.selectedSnapshot?.gameSnapshot;
+    return this.entireGameSnapshot.gameSnapshot;
   }
 
   constructor(props: WorldSnapshotComponentProps) {
@@ -149,6 +156,14 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                   }}
                 />
               )}
+              <div
+                id={`replay-march-markers-${r.id}`}
+                className="units-container disable-pointer-events v-hidden"
+                style={{
+                  left: regions.get(r.id).nameSlot.x,
+                  top: regions.get(r.id).nameSlot.y,
+                }}
+              />
             </div>
           ))}
           {this.renderUnits(garrisons)}
@@ -263,7 +278,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     return this.worldSnapshot.map((region) => {
       const blocked = region.garrison == 1000;
       const highlightColor =
-        this.ingame.replayManager.regionsToHighlight.tryGet(
+        this.ingame.replayManager.highlighter.regionsToHighlight.tryGet(
           region.id,
           undefined
         );
@@ -276,7 +291,12 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
           className={classNames(
             blocked ? "blocked-region" : "region-area-no-hover",
             {
-              "highlighted-region-area": highlightColor !== undefined,
+              "highlighted-region-area-light":
+                highlightColor !== undefined &&
+                regions.get(region.id).type.id != "land",
+              "highlighted-region-area-strong":
+                highlightColor !== undefined &&
+                regions.get(region.id).type.id == "land",
             }
           )}
         />
@@ -365,10 +385,6 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               }
             </div>
           )}
-          <div
-            id={`replay-march-markers-${r.id}`}
-            className="center-relative-to-parent disable-pointer-events v-hidden"
-          />
         </div>
       );
     });
@@ -418,29 +434,23 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     });
   }
 
-  renderOrder(regionSnapshot: IRegionSnapshot): ReactNode {
-    if (!regionSnapshot.order) {
+  renderOrder(r: RegionSnapshot): ReactNode {
+    if (!r.order) {
       return null;
     }
 
-    const region = this.ingame.world.regions.get(regionSnapshot.id);
-    const backgroundUrl = orderImages.get(regionSnapshot.order.type);
+    const region = this.ingame.world.regions.get(r.id);
+    const backgroundUrl = orderImages.get(r.order.type);
 
-    const drawBorder = regionSnapshot.order.type.includes("sea-");
-    const controller = regionSnapshot.controller
-      ? this.ingame.game.houses.get(regionSnapshot.controller)
-      : null;
-    const color =
-      drawBorder && controller
-        ? controller.id != "greyjoy"
-          ? controller.color
-          : "black"
-        : undefined;
+    const drawBorder = r.order.type.includes("sea-");
+    const controller = this.entireGameSnapshot.getController(r.id);
+
+    const color = drawBorder && controller ? controller.color : undefined;
 
     return (
       <div
         className={classNames("order-container", {
-          "restricted-order": regionSnapshot.order.restricted,
+          "restricted-order": r.order.restricted,
         })}
         style={{ left: region.orderSlot.x, top: region.orderSlot.y }}
         key={"world-state_order-in-region-" + region.id}
@@ -463,18 +473,25 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
   }
 
   renderMarchMarkers(): ReactNode[] {
-    return this.ingame.replayManager.marchMarkers.entries.map(([from, to]) => (
-      <Xarrow
-        key={`snaphot-arrow-${from}-${to}`}
-        start={`replay-march-markers-${from}`}
-        end={`replay-march-markers-${to}`}
-        color={"black"}
-        curveness={0.5}
-        dashness={{ animation: 2 }}
-        path="smooth"
-        headShape="circle"
-        headSize={3}
-      />
-    ));
+    return this.ingame.replayManager.highlighter.marchMarkers.map(
+      ([from, to]) => (
+        <Xarrow
+          key={`snaphot-arrow-${from}-${to.to}`}
+          start={`replay-march-markers-${from}`}
+          end={`replay-march-markers-${to.to}`}
+          color={to.color}
+          strokeWidth={5}
+          curveness={0.3}
+          dashness={{ animation: 2 }}
+          path="smooth"
+          showHead={true}
+          showTail={true}
+          headShape="arrow1"
+          tailShape={"circle"}
+          headSize={5}
+          tailSize={3}
+        />
+      )
+    );
   }
 }

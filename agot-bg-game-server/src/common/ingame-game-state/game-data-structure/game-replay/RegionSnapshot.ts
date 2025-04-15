@@ -4,7 +4,6 @@ import IRegionSnapshot from "./IRegionSnapshot";
 
 export default class RegionSnapshot implements IRegionSnapshot {
   id: string;
-  @observable controller?: string;
   @observable units?: UnitState[];
   @observable garrison?: number;
   @observable controlPowerToken?: string;
@@ -17,8 +16,9 @@ export default class RegionSnapshot implements IRegionSnapshot {
 
   constructor(data: IRegionSnapshot) {
     this.id = data.id;
-    this.controller = data.controller;
-    this.units = data.units;
+    this.units = data.units
+      ? data.units.map((unit) => ({ ...unit }))
+      : undefined;
     this.garrison = data.garrison;
     this.controlPowerToken = data.controlPowerToken;
     this.loyaltyTokens = data.loyaltyTokens;
@@ -28,6 +28,21 @@ export default class RegionSnapshot implements IRegionSnapshot {
     this.overwrittenSuperControlPowerToken =
       data.overwrittenSuperControlPowerToken;
     this.order = data.order;
+  }
+
+  getCopy(): RegionSnapshot {
+    return new RegionSnapshot({
+      id: this.id,
+      units: this.units,
+      garrison: this.garrison,
+      controlPowerToken: this.controlPowerToken,
+      loyaltyTokens: this.loyaltyTokens,
+      castleModifier: this.castleModifier,
+      barrelModifier: this.barrelModifier,
+      crownModifier: this.crownModifier,
+      order: this.order,
+      overwrittenSuperControlPowerToken: this.overwrittenSuperControlPowerToken,
+    });
   }
 
   createUnit(type: string, house: string): void {

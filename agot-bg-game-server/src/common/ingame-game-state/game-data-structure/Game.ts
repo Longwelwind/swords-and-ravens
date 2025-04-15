@@ -333,30 +333,27 @@ export default class Game {
   }
 
   getPotentialWinners(lastRound = false): House[] {
-    let victoryConditions: ((h: House) => number)[] = [];
-
-    if (!this.ingame.entireGame.isFeastForCrows) {
-      victoryConditions = [
-        (h: House) => (this.ingame.isVassalHouse(h) ? 1 : -1),
-        (h: House) => -this.getVictoryPoints(h),
-        (h: House) => -this.getTotalControlledLandRegions(h),
-        (h: House) => -h.supplyLevel,
-        (h: House) => this.ironThroneTrack.indexOf(h),
-      ];
-    } else if (!lastRound) {
-      victoryConditions = [
-        (h: House) => (this.ingame.isVassalHouse(h) ? 1 : -1),
-        (h: House) => -this.getVictoryPoints(h),
-        (h: House) => -this.getTotalControlledLandRegions(h),
-        (h: House) => this.ironThroneTrack.indexOf(h),
-      ];
-    } else {
-      victoryConditions = [
-        (h: House) => (this.ingame.isVassalHouse(h) ? 1 : -1),
-        (h: House) => -this.getVictoryPoints(h),
-        (h: House) => this.ironThroneTrack.indexOf(h),
-      ];
-    }
+    const victoryConditions: ((h: House) => number)[] = !this.ingame.entireGame
+      .isFeastForCrows
+      ? [
+          (h: House) => (this.ingame.isVassalHouse(h) ? 1 : -1),
+          (h: House) => -this.getVictoryPoints(h),
+          (h: House) => -this.getTotalControlledLandRegions(h),
+          (h: House) => -h.supplyLevel,
+          (h: House) => this.ironThroneTrack.indexOf(h),
+        ]
+      : !lastRound
+        ? [
+            (h: House) => (this.ingame.isVassalHouse(h) ? 1 : -1),
+            (h: House) => -this.getVictoryPoints(h),
+            (h: House) => -this.getTotalControlledLandRegions(h),
+            (h: House) => this.ironThroneTrack.indexOf(h),
+          ]
+        : [
+            (h: House) => (this.ingame.isVassalHouse(h) ? 1 : -1),
+            (h: House) => -this.getVictoryPoints(h),
+            (h: House) => this.ironThroneTrack.indexOf(h),
+          ];
 
     return _.sortBy(this.houses.values, victoryConditions);
   }

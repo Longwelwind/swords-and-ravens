@@ -6,7 +6,7 @@ import ReplayConstants from "./replay-constants";
 import _ from "lodash";
 import { removeFirst, pullFirst } from "../../../../utils/arrayExt";
 
-export interface CombatLogData {
+export interface CombatResultData {
   attacker: string;
   defender: string;
   attackerArmy: string[];
@@ -25,15 +25,15 @@ export interface CombatLogData {
 
 export default class CombatSnapshotMigrator {
   private ingame: IngameGameState;
-  private combatLogData: CombatLogData;
-  private combatLogDataFetched: (data: CombatLogData) => void;
+  private combatResultData: CombatResultData;
+  private onCombatResultDataRetrieved: (data: CombatResultData) => void;
 
   constructor(
     ingame: IngameGameState,
-    combatLogData: (data: CombatLogData) => void
+    combatResultDataRetrieved: (data: CombatResultData) => void
   ) {
     this.ingame = ingame;
-    this.combatLogDataFetched = combatLogData;
+    this.onCombatResultDataRetrieved = combatResultDataRetrieved;
   }
 
   migrateCombatResultLog(
@@ -44,73 +44,81 @@ export default class CombatSnapshotMigrator {
     if (log.type != "combat-result") {
       throw new Error(`Log type must be 'combat-result'`);
     }
-    this.combatLogData = this.getCombatLogData(log, logIndex);
+    this.combatResultData = this.getCombatResultData(log, logIndex);
 
-    const cld = this.combatLogData;
-    this.combatLogDataFetched(cld);
+    const crd = this.combatResultData;
+    this.onCombatResultDataRetrieved(crd);
 
-    for (let i = 0; i < cld.postCombatLogs.length; i++) {
-      const l = cld.postCombatLogs[i];
+    for (let i = 0; i < crd.postCombatLogs.length; i++) {
+      const l = crd.postCombatLogs[i];
       snap = this.applyCombatResultEvent(snap, l);
     }
 
-    const attackingRegion = snap.getRegion(cld.attackerRegion);
-    const defendingRegion = snap.getRegion(cld.defenderRegion);
-    const retreatRegion = cld.retreatRegion
-      ? snap.getRegion(cld.retreatRegion)
+    const attackingRegion = snap.getRegion(crd.attackerRegion);
+    const defendingRegion = snap.getRegion(crd.defenderRegion);
+    const retreatRegion = crd.retreatRegion
+      ? snap.getRegion(crd.retreatRegion)
       : null;
 
     // Perform move and retreat:
-    if (cld.attacker == cld.winner) {
+    if (crd.attacker == crd.winner) {
       if (retreatRegion) {
         // Retreat defending units
-        while (cld.defenderArmy.length > 0) {
-          const unit = cld.defenderArmy.pop();
+        while (crd.defenderArmy.length > 0) {
+          const unit = crd.defenderArmy.pop();
           if (!unit) break;
           defendingRegion.moveTo(
             retreatRegion,
             unit,
-            cld.defender,
+            crd.defender,
             undefined,
             true
           );
         }
+
+        crd.loserRegion = retreatRegion.id;
       }
       // Attacker movement may be blocked
-      if (!cld.movePrevented) {
-        const to = snap.getRegion(cld.defenderRegion);
-        for (let i = 0; i < cld.attackerArmy.length; i++) {
-          const unit = cld.attackerArmy[i];
-          attackingRegion.moveTo(to, unit, cld.attacker);
+      if (!crd.movePrevented) {
+        const to = snap.getRegion(crd.defenderRegion);
+        for (let i = 0; i < crd.attackerArmy.length; i++) {
+          const unit = crd.attackerArmy[i];
+          attackingRegion.moveTo(to, unit, crd.attacker);
         }
+
+        crd.attackerRegion = crd.defenderRegion;
       }
     } else {
       // Attacking units usually retreat to where they came from
       // Except Arianne Martell forces retreat of a victorious defender
-      if (cld.retreatForced && retreatRegion) {
-        for (let i = 0; i < cld.defenderArmy.length; i++) {
-          const unit = cld.defenderArmy[i];
+      if (crd.retreatForced && retreatRegion) {
+        for (let i = 0; i < crd.defenderArmy.length; i++) {
+          const unit = crd.defenderArmy[i];
           defendingRegion.moveTo(
             retreatRegion,
             unit,
-            cld.defender,
+            crd.defender,
             undefined,
             true
           );
         }
+
+        crd.defenderRegion = retreatRegion.id;
       }
       // or Robb Stark forces the attacker to retreat to a specific region
       else if (retreatRegion) {
-        for (let i = 0; i < cld.attackerArmy.length; i++) {
-          const unit = cld.attackerArmy[i];
+        for (let i = 0; i < crd.attackerArmy.length; i++) {
+          const unit = crd.attackerArmy[i];
           attackingRegion.moveTo(
             retreatRegion,
             unit,
-            cld.attacker,
+            crd.attacker,
             undefined,
             true
           );
         }
+
+        crd.attackerRegion = retreatRegion.id;
       } else {
         // just mark all units as wounded
         attackingRegion.markAllUnitsAsWounded();
@@ -138,7 +146,10 @@ export default class CombatSnapshotMigrator {
     return snap;
   }
 
-  private getCombatLogData(log: GameLogData, logIndex: number): CombatLogData {
+  private getCombatResultData(
+    log: GameLogData,
+    logIndex: number
+  ): CombatResultData {
     if (log.type != "combat-result") {
       throw new Error(`Log type must be 'combat-result'`);
     }
@@ -150,8 +161,8 @@ export default class CombatSnapshotMigrator {
     const defender = def.house;
     const attackerRegion = att.region;
     const defenderRegion = def.region;
-    const attackerArmy = _.cloneDeep(att.armyUnits);
-    const defenderArmy = _.cloneDeep(def.armyUnits);
+    const attackerArmy = [...att.armyUnits];
+    const defenderArmy = [...def.armyUnits];
     const loser = winner === attacker ? defender : attacker;
     const loserArmy = winner === attacker ? defenderArmy : attackerArmy;
     const loserRegion = winner === attacker ? defenderRegion : attackerRegion;
@@ -212,7 +223,7 @@ export default class CombatSnapshotMigrator {
     snap: EntireGameSnapshot,
     log: GameLogData
   ): EntireGameSnapshot {
-    const ccd = this.combatLogData;
+    const ccd = this.combatResultData;
 
     switch (log.type) {
       case "immediatly-killed-after-combat": {

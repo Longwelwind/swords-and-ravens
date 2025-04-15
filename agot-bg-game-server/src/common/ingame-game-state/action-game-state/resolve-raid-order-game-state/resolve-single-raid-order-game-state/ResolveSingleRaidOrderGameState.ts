@@ -145,7 +145,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         false,
         this.house,
         false,
-        !resolvedAutomatically ? "red" : undefined
+        !resolvedAutomatically ? "yellow" : undefined
       );
 
       this.ingameGameState.log(
@@ -184,7 +184,7 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
         false,
         this.house,
         false,
-        !resolvedAutomatically ? "yellow" : undefined
+        !resolvedAutomatically ? "red" : undefined
       );
     } else if (
       orderType instanceof RaidSupportOrderType &&

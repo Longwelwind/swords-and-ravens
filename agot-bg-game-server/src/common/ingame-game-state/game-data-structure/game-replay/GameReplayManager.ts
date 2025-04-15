@@ -5,18 +5,36 @@ import EntireGameSnapshot from "./EntireGameSnapshot";
 import GameLogManager from "../GameLogManager";
 import EntireGame from "../../../../common/EntireGame";
 import { computed, observable } from "mobx";
-import RegionSnapshot from "./RegionSnapshot";
 import ReplayConstants, { modifyingGameLogIds } from "./replay-constants";
 import BetterMap from "../../../../utils/BetterMap";
 import IngameGameState from "../../IngameGameState";
-import GameSnapshot from "./GameSnapshot";
 import SnapshotMigrator from "./SnapshotMigrator";
+import StaticRegion from "../static-data-structure/StaticRegion";
+import Game from "../Game";
+import SnapshotHighlighter from "./SnapshotHighlighter";
+
+function filterArrayByThreshold(arr: number[], threshold: number): void {
+  if (arr.length < 2) return;
+  arr.sort((a, b) => a - b);
+  let i = 0;
+  while (i < arr.length - 1) {
+    if (Math.abs(arr[i + 1] - arr[i]) <= threshold) {
+      arr.splice(i + 1, 1);
+    } else {
+      i++;
+    }
+  }
+}
 
 export default class GameReplayManager {
   @observable selectedLogIndex = -1;
   @observable selectedSnapshot: EntireGameSnapshot | null = null;
-  @observable regionsToHighlight: BetterMap<string, string> = new BetterMap();
-  @observable marchMarkers: BetterMap<string, string> = new BetterMap();
+  @observable highlightHouseAreas: boolean;
+
+  castleRegions: BetterMap<string, StaticRegion> = new BetterMap();
+  landRegions: BetterMap<string, StaticRegion> = new BetterMap();
+
+  highlighter = new SnapshotHighlighter(this);
 
   private seenSnapshots: BetterMap<number, EntireGameSnapshot> =
     new BetterMap();
@@ -36,8 +54,19 @@ export default class GameReplayManager {
     return this.ingame.gameLogManager;
   }
 
-  constructor(entireGame: EntireGame) {
-    this.entireGame = entireGame;
+  constructor(game: Game) {
+    this.entireGame = game.ingame.entireGame;
+    this.landRegions = new BetterMap<string, StaticRegion>();
+    this.castleRegions = new BetterMap<string, StaticRegion>();
+    for (const region of game.world.regions.values) {
+      const staticRegion = region.staticRegion;
+      if (staticRegion.type.id == "land") {
+        this.landRegions.set(staticRegion.id, staticRegion);
+        if (staticRegion.castleLevel > 0) {
+          this.castleRegions.set(staticRegion.id, staticRegion);
+        }
+      }
+    }
   }
 
   selectLog(index: number): void {
@@ -57,7 +86,7 @@ export default class GameReplayManager {
       return;
     }
 
-    let snap = nearestLogSnapshot.snap;
+    let snap = nearestLogSnapshot.snap.getCopy();
     const originalIndex = nearestLogSnapshot.originalIndex;
 
     const thresholdForSavingSeenSnaps = 10;
@@ -76,11 +105,15 @@ export default class GameReplayManager {
       snapCount++;
     }
 
+    snap.calculateControllersPerRegion();
+
+    const selectedLog = this.logManager.logs[index].data;
+
     if (
       snapCount > thresholdForSavingSeenSnaps &&
-      this.isModifyingGameLog(this.logManager.logs[index].data)
+      this.isModifyingGameLog(selectedLog)
     ) {
-      this.seenSnapshots.set(index, _.cloneDeep(snap));
+      this.seenSnapshots.set(index, snap);
       const keysToKeep = this.seenSnapshots.keys;
       filterArrayByThreshold(keysToKeep, thresholdForSavingSeenSnaps);
       this.seenSnapshots.keys.forEach((key) => {
@@ -88,26 +121,16 @@ export default class GameReplayManager {
           this.seenSnapshots.delete(key);
         }
       });
-      console.debug("seenSnapshots", this.seenSnapshots.keys);
+    }
+
+    if (snap.gameSnapshot && selectedLog.type != "orders-revealed") {
+      snap.gameSnapshot.housesOnVictoryTrack = snap.getVictoryTrack();
     }
 
     this.selectedLogIndex = index;
     this.selectedSnapshot = snap;
 
-    this.handleHighligting(this.logManager.logs[index].data);
-
-    function filterArrayByThreshold(arr: number[], threshold: number): void {
-      if (arr.length < 2) return;
-      arr.sort((a, b) => a - b); // Sort the array first
-      let i = 0;
-      while (i < arr.length - 1) {
-        if (Math.abs(arr[i + 1] - arr[i]) <= threshold) {
-          arr.splice(i + 1, 1); // Remove the element that breaks the condition
-        } else {
-          i++; // Move to the next element
-        }
-      }
-    }
+    this.highlighter.hightlightRelevantAreas();
   }
 
   isModifyingGameLogUI(log: GameLogData): boolean {
@@ -189,8 +212,12 @@ export default class GameReplayManager {
   reset(): void {
     this.selectedSnapshot = null;
     this.selectedLogIndex = -1;
-    this.regionsToHighlight.clear();
-    this.marchMarkers.clear();
+    this.highlighter.clear();
+  }
+
+  toggleControlledAreasHighlighting(): void {
+    this.highlightHouseAreas = !this.highlightHouseAreas;
+    this.highlighter.hightlightRelevantAreas();
   }
 
   private findNearestLogSnapshot(
@@ -215,7 +242,7 @@ export default class GameReplayManager {
       nearestSeenSnapshotIndex > originalIndex
     ) {
       return {
-        snap: _.cloneDeep(this.seenSnapshots.get(nearestSeenSnapshotIndex)),
+        snap: this.seenSnapshots.get(nearestSeenSnapshotIndex),
         originalIndex: nearestSeenSnapshotIndex,
       };
     }
@@ -225,27 +252,29 @@ export default class GameReplayManager {
         (l) => l.data.type == "orders-revealed"
       );
       if (firstSnapIndex > -1) {
-        return createSnapshotFromLog(this.logManager.logs[firstSnapIndex].data);
+        return createSnapshotFromLog(
+          this.logManager.logs[firstSnapIndex].data,
+          this.ingame
+        );
       }
       return null;
     }
 
-    return createSnapshotFromLog(nearestSnap);
+    return createSnapshotFromLog(nearestSnap, this.ingame);
 
     function createSnapshotFromLog(
-      log: GameLogData
+      log: GameLogData,
+      ingame: IngameGameState
     ): { snap: EntireGameSnapshot; originalIndex: number } | null {
       if (log.type != "orders-revealed") return null;
+      const l: any = log;
       return {
         snap: new EntireGameSnapshot(
-          _.cloneDeep({
-            worldSnapshot: (log.type == "orders-revealed"
-              ? log.worldState
-              : null) as RegionSnapshot[],
-            gameSnapshot: (log.type == "orders-revealed"
-              ? log.gameSnapshot
-              : null) as GameSnapshot,
-          })
+          {
+            worldSnapshot: l.worldState,
+            gameSnapshot: l.gameSnapshot,
+          },
+          ingame
         ),
         originalIndex: originalIndex,
       };
@@ -254,27 +283,5 @@ export default class GameReplayManager {
 
   private isModifyingGameLog(log: GameLogData): boolean {
     return modifyingGameLogIds.has(log.type);
-  }
-
-  private handleHighligting(log: GameLogData): void {
-    if (log.type == "attack") {
-      this.regionsToHighlight.set(log.attackingRegion, "red");
-      this.regionsToHighlight.set(log.attackedRegion, "yellow");
-    } else if (log.type == "combat-result") {
-      this.regionsToHighlight.set(log.stats[0].region, "red");
-      this.regionsToHighlight.set(log.stats[1].region, "yellow");
-    } else if (log.type == "player-mustered") {
-      const regions = _.uniq(
-        log.musterings.map(([_, m]) => m.map((r) => r.region)).flat()
-      );
-      regions.forEach((region) => {
-        this.regionsToHighlight.set(region, "green");
-      });
-    } else if (log.type == "march-resolved") {
-      const toRegions = log.moves.map(([r, _]) => r);
-      toRegions.forEach((region) => {
-        this.marchMarkers.set(log.startingRegion, region);
-      });
-    }
   }
 }

@@ -33,10 +33,12 @@ import {
   faBackward,
   faStepBackward,
   faStepForward,
+  faMap,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 import { observer } from "mobx-react";
+import { observable } from "mobx";
 
 interface ReplayGameStateColumnProps {
   gameClient: GameClient;
@@ -48,6 +50,7 @@ interface ReplayGameStateColumnProps {
 
 @observer
 export default class ReplayGameStateColumn extends Component<ReplayGameStateColumnProps> {
+  @observable roundDropDownItems: ReactNode[] = [];
   render(): ReactNode {
     const { gameClient, ingame } = this.props;
 
@@ -253,67 +256,83 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                   </OverlayTrigger>
                 </Nav.Link>
               </Nav.Item>
-              <div className="d-flex justify-content-center flex-grow-1">
-                <button
-                  className="btn btn-secondary mx-1 mt-n1"
-                  onClick={(e) => {
-                    e.currentTarget.blur();
-                    ingame.replayManager.previousRoundLog();
-                    this.scrollToSelectedLog();
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{ color: "white" }}
-                    icon={faStepBackward}
-                  />
-                </button>
-                <button
-                  className="btn btn-secondary mx-1 mt-n1"
-                  onClick={(e) => {
-                    e.currentTarget.blur();
-                    ingame.replayManager.previousLog();
-                    this.scrollToSelectedLog();
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{ color: "white" }}
-                    icon={faBackward}
-                  />
-                </button>
-                <button
-                  className="btn btn-secondary mx-1 mt-n1"
-                  onClick={(e) => {
-                    e.currentTarget.blur();
-                    ingame.replayManager.nextLog();
-                    this.scrollToSelectedLog();
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{ color: "white" }}
-                    icon={faForward}
-                  />
-                </button>
-                <button
-                  className="btn btn-secondary mx-1 mt-n1"
-                  onClick={(e) => {
-                    e.currentTarget.blur();
-                    ingame.replayManager.nextRoundLog();
-                    this.scrollToSelectedLog();
-                  }}
-                >
-                  <FontAwesomeIcon
-                    style={{ color: "white" }}
-                    icon={faStepForward}
-                  />
-                </button>
-              </div>
-              <Dropdown className="ml-2">
+              <Nav.Item>
+                <div className="dropdown-divider"></div>
+              </Nav.Item>
+              <button
+                className="btn btn-secondary"
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  ingame.replayManager.previousRoundLog();
+                  this.scrollToSelectedLog();
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ color: "white" }}
+                  icon={faStepBackward}
+                />
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  ingame.replayManager.previousLog();
+                  this.scrollToSelectedLog();
+                }}
+              >
+                <FontAwesomeIcon style={{ color: "white" }} icon={faBackward} />
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  ingame.replayManager.nextLog();
+                  this.scrollToSelectedLog();
+                }}
+              >
+                <FontAwesomeIcon style={{ color: "white" }} icon={faForward} />
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  ingame.replayManager.nextRoundLog();
+                  this.scrollToSelectedLog();
+                }}
+              >
+                <FontAwesomeIcon
+                  style={{ color: "white" }}
+                  icon={faStepForward}
+                />
+              </button>
+              <Nav.Item>
+                <div className="dropdown-divider"></div>
+              </Nav.Item>
+              <button
+                className="btn btn-secondary"
+                onClick={(e) => {
+                  e.currentTarget.blur();
+                  ingame.replayManager.toggleControlledAreasHighlighting();
+                }}
+              >
+                <FontAwesomeIcon
+                  className={
+                    this.props.ingame.replayManager.highlightHouseAreas
+                      ? "wildling-highlight"
+                      : ""
+                  }
+                  icon={faMap}
+                  style={{ color: "white" }}
+                />
+              </button>
+              <Nav.Item>
+                <div className="dropdown-divider"></div>
+              </Nav.Item>
+              <Dropdown className="ml-auto mt-1">
                 <Dropdown.Toggle variant="secondary" size="sm">
                   Jump to
                 </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {this.renderGameLogRoundsDropDownItems()}
-                </Dropdown.Menu>
+                <Dropdown.Menu>{this.roundDropDownItems}</Dropdown.Menu>
               </Dropdown>
             </Nav>
           </Card.Header>
@@ -362,12 +381,12 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
     );
   }
 
-  private renderGameLogRoundsDropDownItems(): JSX.Element[] {
+  private getGameLogRoundsDropDownItems(): ReactNode[] {
     const gameRoundElements = document.querySelectorAll(
       '*[id^="gamelog-round-"]'
     );
 
-    const result: JSX.Element[] = [];
+    const result: ReactNode[] = [];
 
     gameRoundElements.forEach((gameRoundElem) => {
       const round = gameRoundElem.id.replace("gamelog-round-", "");
@@ -406,6 +425,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
   }
 
   componentDidMount(): void {
+    this.roundDropDownItems = this.getGameLogRoundsDropDownItems();
     this.scrollToSelectedLog();
   }
 }
