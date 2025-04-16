@@ -118,7 +118,7 @@ export default class IngameGameState extends GameState<
   @observable housesTimedOut: House[] = [];
   game: Game;
   gameLogManager: GameLogManager = new GameLogManager(this);
-  replayManager = new GameReplayManager(this.entireGame);
+  replayManager: GameReplayManager;
   @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
   @observable visibleRegionsPerPlayer: BetterMap<Player, Region[]> =
     new BetterMap();
@@ -2787,10 +2787,7 @@ export default class IngameGameState extends GameState<
   getWorldSnapshotWithOrdersOnBoard(
     planningRestrictions: PlanningRestriction[] = []
   ): IRegionSnapshot[] {
-    const worldSnapshot = _.orderBy(this.world.getSnapshot(), [
-      (r) => r.controller,
-      (r) => r.id,
-    ]);
+    const worldSnapshot = this.world.getSnapshot();
     worldSnapshot.forEach((r) => {
       const region = this.world.regions.get(r.id);
       if (region && this.ordersOnBoard.has(region)) {
@@ -2871,6 +2868,7 @@ export default class IngameGameState extends GameState<
       ingameGameState,
       data.game
     );
+    ingameGameState.replayManager = new GameReplayManager(ingameGameState.game);
     ingameGameState.players = new BetterMap(
       data.players.map((p) => [
         entireGame.users.get(p.userId),

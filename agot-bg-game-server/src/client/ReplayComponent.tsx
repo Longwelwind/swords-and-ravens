@@ -10,7 +10,6 @@ import GameClient from "./GameClient";
 import User from "../server/User";
 import { observable } from "mobx";
 import { GameSettings } from "../common/EntireGame";
-import { isMobile } from "react-device-detect";
 import houseCardsBackImages from "./houseCardsBackImages";
 import houseInfluenceImages from "./houseInfluenceImages";
 import houseOrderImages from "./houseOrderImages";
@@ -36,8 +35,6 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
 
   @observable currentOpenedTab = "game-logs";
   @observable columnSwapAnimationClassName = "";
-  @observable housesInfosCollapsed =
-    this.user?.settings.tracksColumnCollapsed ?? false;
 
   constructor(props: ReplayComponentProps) {
     super(props);
@@ -55,7 +52,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
   }
 
   render(): ReactNode {
-    const columnOrders = this.user?.settings.responsiveLayout
+    const columnOrders = this.user?.settings.gameStateColumnRight
       ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
       : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };
 
@@ -103,21 +100,19 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
             <WorldSnapshotComponent ingameGameState={this.ingame} />
           </div>
         </Col>
-        {(!this.housesInfosCollapsed || isMobile) && (
-          <Col
-            xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
-            className={this.columnSwapAnimationClassName}
-            style={{
-              maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
-            }}
-          >
-            <ReplayHouseInfoColumn
-              gameClient={this.gameClient}
-              ingame={this.ingame}
-              onColumnSwapClick={() => this.onColumnSwap()}
-            />
-          </Col>
-        )}
+        <Col
+          xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
+          className={this.columnSwapAnimationClassName}
+          style={{
+            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
+          }}
+        >
+          <ReplayHouseInfoColumn
+            gameClient={this.gameClient}
+            ingame={this.ingame}
+            onColumnSwapClick={() => this.onColumnSwap()}
+          />
+        </Col>
       </Row>
     );
   }
@@ -125,7 +120,8 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
   private onColumnSwap(): void {
     if (!this.user || this.columnSwapAnimationClassName !== "") return;
     this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
-    this.user.settings.responsiveLayout = !this.user.settings.responsiveLayout;
+    this.user.settings.gameStateColumnRight =
+      !this.user.settings.gameStateColumnRight;
     window.setTimeout(() => (this.columnSwapAnimationClassName = ""), 2050);
   }
 }

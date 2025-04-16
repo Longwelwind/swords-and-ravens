@@ -92,11 +92,10 @@ export default class User {
     const emptySettings: UserSettings = {
       chatHouseNames: false,
       lastOpenedTab: "",
+      // Todo: Get rid of this as well and define two layouts for mobile and desktop
       mapScrollbar: false,
       muted: false,
-      responsiveLayout: false,
-      showMapWhenDrafting: false,
-      tracksColumnCollapsed: false,
+      gameStateColumnRight: false,
       musicVolume: 0,
       notificationsVolume: 0,
       sfxVolume: 0,

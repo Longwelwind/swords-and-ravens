@@ -662,27 +662,19 @@ export default class GlobalServer {
       }
     }
 
+    if (
+      entireGame.users.values.map((u) => u.connectedClients).flat().length > 0
+    ) {
+      // Don't unload games that are still connected to clients
+      return;
+    }
+
     console.log("Unloading game " + entireGame.id);
 
     // Save the game before unloading:
     if (entireGame.onSaveGame) {
       entireGame.onSaveGame(false);
     }
-
-    // As we keep the game active as long as we receive "ping" this is only kept for safety
-    entireGame.users.values.forEach((u) => {
-      u.connectedClients.forEach((ws) => {
-        ws.close();
-        setTimeout(() => {
-          if (
-            ws.readyState == WebSocket.OPEN ||
-            ws.readyState == WebSocket.CLOSING
-          ) {
-            ws.terminate();
-          }
-        }, 10000);
-      });
-    });
 
     entireGame.onSendClientMessage = undefined;
     entireGame.onSendServerMessage = undefined;

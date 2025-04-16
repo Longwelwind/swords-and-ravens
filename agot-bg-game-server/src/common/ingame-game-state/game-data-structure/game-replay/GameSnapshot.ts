@@ -18,13 +18,19 @@ export default class GameSnapshot implements IGameSnapshot {
     this.round = data.round;
     this.wildlingStrength = data.wildlingStrength;
     this.dragonStrength = data.dragonStrength;
-    this.ironThroneTrack = data.ironThroneTrack;
-    this.fiefdomsTrack = data.fiefdomsTrack;
-    this.kingsCourtTrack = data.kingsCourtTrack;
+    this.ironThroneTrack = [...data.ironThroneTrack];
+    this.fiefdomsTrack = [...data.fiefdomsTrack];
+    this.kingsCourtTrack = [...data.kingsCourtTrack];
     this.housesOnVictoryTrack = data.housesOnVictoryTrack.map(
-      (hsnap) => new HouseSnapshot(hsnap)
+      (snap) => new HouseSnapshot(snap)
     );
     this.vsbUsed = data.vsbUsed;
-    this.ironBank = data.ironBank;
+    this.ironBank = data.ironBank
+      ? new IronBankSnapshot(data.ironBank)
+      : undefined;
+  }
+
+  getCopy(): GameSnapshot {
+    return new GameSnapshot(this);
   }
 }

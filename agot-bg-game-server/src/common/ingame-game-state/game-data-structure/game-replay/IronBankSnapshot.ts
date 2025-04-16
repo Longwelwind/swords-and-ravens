@@ -6,8 +6,14 @@ export default class IronBankSnapshot implements IIronBankSnapshot {
   braavosController?: string;
 
   constructor(data: IIronBankSnapshot) {
-    this.loanSlots = data.loanSlots;
-    this.interestCosts = data.interestCosts;
+    this.loanSlots = [...data.loanSlots];
+    this.interestCosts = data.interestCosts
+      ? [...data.interestCosts]
+      : undefined;
     this.braavosController = data.braavosController;
+  }
+
+  getCopy(): IronBankSnapshot {
+    return new IronBankSnapshot(this);
   }
 }

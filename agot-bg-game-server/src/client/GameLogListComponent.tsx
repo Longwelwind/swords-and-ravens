@@ -186,7 +186,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 }
               }}
             >
-              {this.renderGameLogData(l.data, this.currentRound, i, l.time)}
+              {this.renderGameLogData(l.data, this.currentRound)}
             </div>
           </Col>
         </Row>
@@ -214,12 +214,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     this.replayManager.selectLog(i);
   }
 
-  renderGameLogData(
-    data: GameLogData,
-    currentRound: number,
-    currentLogIndex: number,
-    logTime: Date
-  ): ReactNode {
+  renderGameLogData(data: GameLogData, currentRound: number): ReactNode {
     switch (data.type) {
       case "player-action": {
         const house = this.game.houses.get(data.house);
@@ -360,27 +355,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           ? orderImages.get(data.orderType)
           : null;
 
-        const previousLog = this.logManager.logs[currentLogIndex - 1];
-        let showDottedLine = true;
-
-        if (previousLog.data.type == "action-phase-resolve-march-began") {
-          showDottedLine = false;
-        } else if (previousLog.data.type == "march-resolved") {
-          if (
-            previousLog.data.house == data.attacker &&
-            logTime.getTime() - previousLog.time.getTime() <= 100
-          ) {
-            showDottedLine = false;
-          }
-        }
-
         return (
           <Row className="align-items-center">
-            {showDottedLine && (
-              <Col xs="12">
-                <hr style={{ borderTop: "dotted 1px", color: "grey" }} />
-              </Col>
-            )}
             {orderImgUrl && (
               <Col xs="auto">
                 <img src={orderImgUrl} width="42px" />
@@ -417,20 +393,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
       case "march-resolved": {
         const house = this.game.houses.get(data.house);
-        const showDottedLine =
-          this.logManager.logs[currentLogIndex - 1]?.data.type !=
-          "action-phase-resolve-march-began";
 
         if (this.fogOfWar) {
           return (
             <Row className="align-items-center">
-              {showDottedLine && (
-                <Col xs="12">
-                  <hr
-                    style={{ borderTop: "dotted 1px", borderColor: "grey" }}
-                  />
-                </Col>
-              )}
               <Col>
                 <p>
                   House <b>{house.name}</b> resolved a <b>March</b> order.
@@ -451,11 +417,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <Row className="align-items-center">
-            {showDottedLine && (
-              <Col xs="12">
-                <hr style={{ borderTop: "dotted 1px", borderColor: "grey" }} />
-              </Col>
-            )}
             {orderImgUrl && (
               <Col xs="auto">
                 <img src={orderImgUrl} width="42px" />
@@ -642,11 +603,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               ></HouseNumberResultsComponent>
             </div>
             {data.nightsWatchVictory ? (
-              <p>
+              <p className="text-center">
                 The <b>Night&apos;s Watch</b> won!
               </p>
             ) : (
-              <p>
+              <p className="text-center">
                 The <b>Wildlings</b> won!
               </p>
             )}
@@ -995,22 +956,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
-          <>
-            <p>
-              House <b>{house.name}</b> picked <b>{houseCard.name}</b>.
-            </p>
-          </>
+          <p>
+            House <b>{house.name}</b> picked <b>{houseCard.name}</b>.
+          </p>
         );
       }
 
       case "house-cards-chosen": {
         const house = this.game.houses.get(data.house);
         return (
-          <>
-            <p>
-              House <b>{house.name}</b> has chosen their House cards.
-            </p>
-          </>
+          <p>
+            House <b>{house.name}</b> has chosen their House cards.
+          </p>
         );
       }
 
@@ -1655,20 +1612,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const newController = this.game.houses.get(data.newController);
         const oldController = this.game.houses.get(data.oldController);
         const port = this.world.regions.get(data.port);
-        return (
+        return data.shipCount > 0 ? (
           <p>
-            {data.shipCount > 0 ? (
-              <>
-                House <b>{newController.name}</b> converted {data.shipCount}{" "}
-                ship{data.shipCount == 1 ? "" : "s"} from House{" "}
-                <b>{oldController.name}</b> in <b>{port.name}</b>.
-              </>
-            ) : (
-              <>
-                House <b>{newController.name}</b> destroyed all{" "}
-                <b>{oldController.name}</b> ships in <b>{port.name}</b>.
-              </>
-            )}
+            House <b>{newController.name}</b> converted {data.shipCount} ship
+            {data.shipCount == 1 ? "" : "s"} from House{" "}
+            <b>{oldController.name}</b> in <b>{port.name}</b>.
+          </p>
+        ) : (
+          <p>
+            House <b>{newController.name}</b> destroyed all{" "}
+            <b>{oldController.name}</b> ships in <b>{port.name}</b>.
           </p>
         );
       }
@@ -1678,11 +1631,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const castle = this.game.world.regions.get(data.castle);
         return (
           <p>
-            <>
-              House <b>{house.name}</b> lost {data.shipCount} Ship
-              {data.shipCount > 1 ? "s" : ""} in <b>{port.name}</b> because{" "}
-              <b>{castle.name}</b> is empty now.
-            </>
+            House <b>{house.name}</b> lost {data.shipCount} Ship
+            {data.shipCount > 1 ? "s" : ""} in <b>{port.name}</b> because{" "}
+            <b>{castle.name}</b> is empty now.
           </p>
         );
       }
@@ -1831,26 +1782,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           this.allHouseCards.get(hcid)
         );
 
-        return (
+        return houseCardsUsed.length > 0 ? (
           <p>
-            {houseCardsUsed.length > 0 ? (
-              <>
-                House <b>{house.name}</b> discarded{" "}
-                {joinReactNodes(
-                  houseCardsUsed.map((hc) => (
-                    <b key={`massing-on-the-milkwater-cards-removed_${hc.id}`}>
-                      {hc.name}
-                    </b>
-                  )),
-                  ", "
-                )}
-                .
-              </>
-            ) : (
-              <>
-                House <b>{house.name}</b> did not discard a House card.
-              </>
+            House <b>{house.name}</b> discarded{" "}
+            {joinReactNodes(
+              houseCardsUsed.map((hc) => (
+                <b key={`massing-on-the-milkwater-cards-removed_${hc.id}`}>
+                  {hc.name}
+                </b>
+              )),
+              ", "
             )}
+            .
+          </p>
+        ) : (
+          <p>
+            House <b>{house.name}</b> did not discard a House card.
           </p>
         );
       }
@@ -2048,29 +1995,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           utids.map((utid) => unitTypes.get(utid)),
         ]) as [Region, UnitType[]][];
 
-        return (
+        return units.length > 0 ? (
           <p>
-            {units.length > 0 ? (
-              <>
-                <b>Crow Killers</b>: House <b>{house.name}</b> replaced{" "}
-                {joinReactNodes(
-                  units.map(([region, unitTypes], i) => (
-                    <span key={`crow-killers-upgrade_${i}`}>
-                      <b>{unitTypes.length}</b> Footm
-                      {unitTypes.length == 1 ? "a" : "e"}n in{" "}
-                      <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
-                    </span>
-                  )),
-                  ", "
-                )}{" "}
-                with Knights.
-              </>
-            ) : (
-              <>
-                <b>Crow Killers</b>: House <b>{house.name}</b> was not able to
-                replace any Footman with Knights.
-              </>
-            )}
+            <b>Crow Killers</b>: House <b>{house.name}</b> replaced{" "}
+            {joinReactNodes(
+              units.map(([region, unitTypes], i) => (
+                <span key={`crow-killers-upgrade_${i}`}>
+                  <b>{unitTypes.length}</b> Footm
+                  {unitTypes.length == 1 ? "a" : "e"}n in{" "}
+                  <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
+                </span>
+              )),
+              ", "
+            )}{" "}
+            with Knights.
+          </p>
+        ) : (
+          <p>
+            <b>Crow Killers</b>: House <b>{house.name}</b> was not able to
+            replace any Footman with Knights.
           </p>
         );
       }
@@ -2147,16 +2090,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         );
 
         return (
-          <>
-            <ul>
-              {gains.map(([house, gain]) => (
-                <li key={`got_${house.id}_${gain}`}>
-                  House <b>{house.name}</b> gained <b>{gain}</b>{" "}
-                  Power&nbsp;token{gain != 1 ? "s" : ""}.
-                </li>
-              ))}
-            </ul>
-          </>
+          <ul>
+            {gains.map(([house, gain]) => (
+              <li key={`got_${house.id}_${gain}`}>
+                House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token
+                {gain != 1 ? "s" : ""}.
+              </li>
+            ))}
+          </ul>
         );
       case "immediatly-killed-after-combat": {
         const house = this.game.houses.get(data.house);
@@ -2430,7 +2371,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         );
 
         return (
-          <p>
+          <>
             <p>
               <b>Anya Waynwood</b>:
             </p>
@@ -2442,7 +2383,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 </li>
               ))}
             </ul>
-          </p>
+          </>
         );
       }
       case "robert-arryn-used": {

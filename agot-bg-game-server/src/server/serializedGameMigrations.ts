@@ -17,7 +17,7 @@ import { v4 } from "uuid";
 import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//import { SerializedEntireGame } from "../common/EntireGame";
+import { SerializedEntireGame } from "../common/EntireGame";
 
 function replaceHouseCard(
   deck: [string, any][],
@@ -2890,6 +2890,31 @@ const serializedGameMigrations: {
     version: "123",
     migrate: (serializedGame: any) => {
       serializedGame.multiAccountProtectionMap = [];
+      return serializedGame;
+    },
+  },
+  {
+    version: "124",
+    migrate: (serializedGame: any) => {
+      serializedGame.users.forEach((u: any) => {
+        if (!u.settings) {
+          u.settings = {
+            chatHouseNames: false,
+            gameStateColumnRight: false,
+            lastOpenedTab: "chat",
+            mapScrollbar: true,
+            musicVolume: 1,
+            notificationsVolume: 1,
+            sfxVolume: 1,
+            muted: false,
+          };
+        }
+        u.settings.gameStateColumnRight = u.settings.responsiveLayout;
+        delete u.settings.responsiveLayout;
+        delete u.settings.showMapWhenDrafting;
+        delete u.settings.tracksColumnCollapsed;
+      });
+
       return serializedGame;
     },
   },

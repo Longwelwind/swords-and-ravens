@@ -423,11 +423,9 @@ export default class EntireGame extends GameState<
       {
         chatHouseNames: profileSettings.houseNamesForChat,
         mapScrollbar: profileSettings.mapScrollbar,
-        responsiveLayout: profileSettings.responsiveLayout,
+        gameStateColumnRight: profileSettings.responsiveLayout,
         muted: profileSettings.muted,
         lastOpenedTab: null,
-        tracksColumnCollapsed: false,
-        showMapWhenDrafting: false,
         musicVolume: profileSettings.muted ? 0 : 1,
         notificationsVolume: profileSettings.muted ? 0 : 1,
         sfxVolume: profileSettings.muted ? 0 : 1,

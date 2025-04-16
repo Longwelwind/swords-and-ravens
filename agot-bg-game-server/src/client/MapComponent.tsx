@@ -295,11 +295,16 @@ export default class MapComponent extends Component<MapComponentProps> {
         color={
           unit.allegiance.id != "greyjoy" ? unit.allegiance.color : "black"
         }
-        curveness={0.5}
+        strokeWidth={5}
+        curveness={0.3}
         dashness={{ animation: 2 }}
         path="smooth"
-        headShape="circle"
-        headSize={3}
+        showHead={true}
+        showTail={true}
+        headShape="arrow1"
+        tailShape={"circle"}
+        headSize={5}
+        tailSize={3}
       />
     ));
   }

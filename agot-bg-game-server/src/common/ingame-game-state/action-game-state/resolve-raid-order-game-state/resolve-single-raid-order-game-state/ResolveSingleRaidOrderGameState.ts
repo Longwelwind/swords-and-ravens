@@ -1,9 +1,9 @@
 import GameState from "../../../../GameState";
 import ResolveRaidOrderGameState from "../ResolveRaidOrderGameState";
 import House from "../../../game-data-structure/House";
-import {ClientMessage} from "../../../../../messages/ClientMessage";
+import { ClientMessage } from "../../../../../messages/ClientMessage";
 import Player from "../../../Player";
-import {ServerMessage} from "../../../../../messages/ServerMessage";
+import { ServerMessage } from "../../../../../messages/ServerMessage";
 import Region from "../../../game-data-structure/Region";
 import EntireGame from "../../../../EntireGame";
 import Game from "../../../game-data-structure/Game";
@@ -17,179 +17,252 @@ import RaidSupportOrderType from "../../../../../common/ingame-game-state/game-d
 import IronBankOrderType from "../../../../../common/ingame-game-state/game-data-structure/order-types/IronBankOrderType";
 
 export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRaidOrderGameState> {
-    house: House;
+  house: House;
 
-    get resolveRaidOrderGameState(): ResolveRaidOrderGameState {
-        return this.parentGameState;
+  get resolveRaidOrderGameState(): ResolveRaidOrderGameState {
+    return this.parentGameState;
+  }
+
+  get entireGame(): EntireGame {
+    return this.resolveRaidOrderGameState.entireGame;
+  }
+
+  get actionGameState(): ActionGameState {
+    return this.resolveRaidOrderGameState.actionGameState;
+  }
+
+  get ingameGameState(): IngameGameState {
+    return this.resolveRaidOrderGameState.ingameGameState;
+  }
+
+  get game(): Game {
+    return this.ingameGameState.game;
+  }
+
+  get world(): World {
+    return this.game.world;
+  }
+
+  firstStart(house: House): void {
+    this.house = house;
+
+    // Check if all raid orders can not be trivially resolved
+    const regionsWithRaidOrders =
+      this.parentGameState.getRegionsWithRaidOrderOfHouse(this.house);
+
+    if (
+      !regionsWithRaidOrders.some(
+        ([r, ot]) => this.getRaidableRegions(r, ot).length > 0
+      )
+    ) {
+      // If yes, fast-track the game by resolving one
+      const regionToResolve = regionsWithRaidOrders[0];
+
+      this.resolveRaidOrder(regionToResolve[0], null, true);
     }
+  }
 
-    get entireGame(): EntireGame {
-        return this.resolveRaidOrderGameState.entireGame;
+  onPlayerMessage(player: Player, message: ClientMessage): void {
+    if (message.type == "resolve-raid") {
+      if (this.ingameGameState.getControllerOfHouse(this.house) != player) {
+        return;
+      }
+
+      const orderRegion = this.world.regions.get(message.orderRegionId);
+      const targetRegion = message.targetRegionId
+        ? this.world.regions.get(message.targetRegionId)
+        : null;
+
+      // We can safely cast as a region with an order must be controlled by a house
+      if (
+        this.ingameGameState.getControllerOfHouse(
+          orderRegion.getController() as House
+        ) != player
+      ) {
+        return;
+      }
+
+      const regionsWithRaidOrders = this.parentGameState
+        .getRegionsWithRaidOrderOfHouse(this.house)
+        .map(([r, _ot]) => r);
+      if (!regionsWithRaidOrders.includes(orderRegion)) {
+        return;
+      }
+
+      this.resolveRaidOrder(orderRegion, targetRegion);
     }
+  }
 
-    get actionGameState(): ActionGameState {
-        return this.resolveRaidOrderGameState.actionGameState;
-    }
+  resolveRaidOrder(
+    orderRegion: Region,
+    targetRegion: Region | null,
+    resolvedAutomatically = false
+  ): void {
+    const order = this.actionGameState.ordersOnBoard.get(orderRegion);
+    const orderType =
+      order.type instanceof RaidOrderType
+        ? (order.type as RaidOrderType)
+        : order.type instanceof RaidSupportOrderType
+          ? (order.type as RaidSupportOrderType)
+          : null;
 
-    get ingameGameState(): IngameGameState {
-        return this.resolveRaidOrderGameState.ingameGameState;
-    }
+    if (targetRegion && orderType) {
+      const orderTarget = this.actionGameState.ordersOnBoard.get(targetRegion);
 
-    get game(): Game {
-        return this.ingameGameState.game;
-    }
+      if (
+        !this.getRaidableRegions(orderRegion, orderType).includes(targetRegion)
+      ) {
+        return;
+      }
 
-    get world(): World {
-        return this.game.world;
-    }
+      // If the raided order is a consolidate power, transfer some power tokens
+      const raidedHouse = targetRegion.getController();
+      if (raidedHouse == null) {
+        // This should normally never happens as a region that has an order always have a controller
+        throw new Error();
+      }
 
-    firstStart(house: House): void {
-        this.house = house;
+      let raiderGainedPowerToken: boolean | null = null;
+      let raidedHouseLostPowerToken: boolean | null = null;
 
-        // Check if all raid orders can not be trivially resolved
-        const regionsWithRaidOrders = this.parentGameState.getRegionsWithRaidOrderOfHouse(this.house);
-
-        if (!regionsWithRaidOrders.some(([r, ot]) => this.getRaidableRegions(r, ot).length > 0)) {
-            // If yes, fast-track the game by resolving one
-            const regionToResolve = regionsWithRaidOrders[0];
-
-            this.resolveRaidOrder(regionToResolve[0], null, true);
-        }
-    }
-
-    onPlayerMessage(player: Player, message: ClientMessage): void {
-        if (message.type == "resolve-raid") {
-            if (this.ingameGameState.getControllerOfHouse(this.house) != player) {
-                return;
-            }
-
-            const orderRegion = this.world.regions.get(message.orderRegionId);
-            const targetRegion = message.targetRegionId ? this.world.regions.get(message.targetRegionId) : null;
-
-            // We can safely cast as a region with an order must be controlled by a house
-            if (this.ingameGameState.getControllerOfHouse(orderRegion.getController() as House) != player) {
-                return;
-            }
-
-            const regionsWithRaidOrders = this.parentGameState.getRegionsWithRaidOrderOfHouse(this.house).map(([r, _ot]) => r);
-            if (!regionsWithRaidOrders.includes(orderRegion)) {
-                return;
-            }
-
-            this.resolveRaidOrder(orderRegion, targetRegion);
-        }
-    }
-
-    resolveRaidOrder(orderRegion: Region, targetRegion: Region | null, resolvedAutomatically = false): void {
-        const order = this.actionGameState.ordersOnBoard.get(orderRegion);
-        const orderType = order.type instanceof RaidOrderType
-            ? order.type as RaidOrderType
-            : order.type instanceof RaidSupportOrderType
-                ? order.type as RaidSupportOrderType : null;
-
-        if (targetRegion && orderType) {
-            const orderTarget = this.actionGameState.ordersOnBoard.get(targetRegion);
-
-            if (!this.getRaidableRegions(orderRegion, orderType).includes(targetRegion)) {
-                return;
-            }
-
-            // If the raided order is a consolidate power, transfer some power tokens
-            const raidedHouse = targetRegion.getController();
-            if (raidedHouse == null) {
-                // This should normally never happens as a region that has an order always have a controller
-                throw new Error();
-            }
-
-            let raiderGainedPowerToken: boolean | null = null;
-            let raidedHouseLostPowerToken: boolean | null = null;
-
-            if (orderTarget.type instanceof ConsolidatePowerOrderType && !(orderTarget.type instanceof IronBankOrderType)) {
-                if (!this.ingameGameState.isVassalHouse(this.house)) {
-                    raiderGainedPowerToken = this.ingameGameState.changePowerTokens(this.house, 1) != 0;
-                }
-
-                if (!this.ingameGameState.isVassalHouse(raidedHouse)) {
-                    raidedHouseLostPowerToken = this.ingameGameState.changePowerTokens(raidedHouse, -1) != 0;
-                }
-            }
-
-            this.actionGameState.removeOrderFromRegion(targetRegion, false, this.house, false, !resolvedAutomatically ? "red" : undefined);
-
-            this.ingameGameState.log({
-                type: "raid-done",
-                raider: this.house.id,
-                raidee: raidedHouse.id,
-                raiderRegion: orderRegion.id,
-                raidedRegion: targetRegion.id,
-                orderRaided: orderTarget.id,
-                raiderGainedPowerToken: raiderGainedPowerToken,
-                raidedHouseLostPowerToken: raidedHouseLostPowerToken
-            }, resolvedAutomatically);
-        } else {
-            this.ingameGameState.log({
-                type: "raid-done",
-                raider: this.house.id,
-                raiderRegion: orderRegion.id,
-                raidedRegion: null,
-                raidee: null,
-                orderRaided: null,
-                raiderGainedPowerToken: null,
-                raidedHouseLostPowerToken: null
-            }, resolvedAutomatically);
+      if (
+        orderTarget.type instanceof ConsolidatePowerOrderType &&
+        !(orderTarget.type instanceof IronBankOrderType)
+      ) {
+        if (!this.ingameGameState.isVassalHouse(this.house)) {
+          raiderGainedPowerToken =
+            this.ingameGameState.changePowerTokens(this.house, 1) != 0;
         }
 
-        // Keep an unresolved RaidSupportOrder to use it as support later
-        if (orderType instanceof RaidOrderType || targetRegion != null) {
-            this.actionGameState.removeOrderFromRegion(orderRegion, false, this.house, false, !resolvedAutomatically ? "yellow" : undefined);
-        } else if (orderType instanceof RaidSupportOrderType && targetRegion == null) {
-            this.parentGameState.resolvedRaidSupportOrderRegions.push(orderRegion);
+        if (!this.ingameGameState.isVassalHouse(raidedHouse)) {
+          raidedHouseLostPowerToken =
+            this.ingameGameState.changePowerTokens(raidedHouse, -1) != 0;
         }
+      }
 
-        this.resolveRaidOrderGameState.onResolveSingleRaidOrderGameStateEnd(this.house);
+      this.actionGameState.removeOrderFromRegion(
+        targetRegion,
+        false,
+        this.house,
+        false,
+        !resolvedAutomatically ? "yellow" : undefined
+      );
+
+      this.ingameGameState.log(
+        {
+          type: "raid-done",
+          raider: this.house.id,
+          raidee: raidedHouse.id,
+          raiderRegion: orderRegion.id,
+          raidedRegion: targetRegion.id,
+          orderRaided: orderTarget.id,
+          raiderGainedPowerToken: raiderGainedPowerToken,
+          raidedHouseLostPowerToken: raidedHouseLostPowerToken,
+        },
+        resolvedAutomatically
+      );
+    } else {
+      this.ingameGameState.log(
+        {
+          type: "raid-done",
+          raider: this.house.id,
+          raiderRegion: orderRegion.id,
+          raidedRegion: null,
+          raidee: null,
+          orderRaided: null,
+          raiderGainedPowerToken: null,
+          raidedHouseLostPowerToken: null,
+        },
+        resolvedAutomatically
+      );
     }
 
-    getWaitedUsers(): User[] {
-        return [this.ingameGameState.getControllerOfHouse(this.house).user];
+    // Keep an unresolved RaidSupportOrder to use it as support later
+    if (orderType instanceof RaidOrderType || targetRegion != null) {
+      this.actionGameState.removeOrderFromRegion(
+        orderRegion,
+        false,
+        this.house,
+        false,
+        !resolvedAutomatically ? "red" : undefined
+      );
+    } else if (
+      orderType instanceof RaidSupportOrderType &&
+      targetRegion == null
+    ) {
+      this.parentGameState.resolvedRaidSupportOrderRegions.push(orderRegion);
     }
 
-    onServerMessage(_message: ServerMessage): void {
+    this.resolveRaidOrderGameState.onResolveSingleRaidOrderGameStateEnd(
+      this.house
+    );
+  }
 
-    }
+  getWaitedUsers(): User[] {
+    return [this.ingameGameState.getControllerOfHouse(this.house).user];
+  }
 
-    getRaidableRegions(orderRegion: Region, raid: RaidOrderType | RaidSupportOrderType): Region[] {
-        return this.world.getNeighbouringRegions(orderRegion)
-            .filter(r => r.getController() != this.house)
-            .filter(r => this.actionGameState.ordersOnBoard.has(r))
-            .filter(r => raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r)))
-            .filter(r => r.type.kind == orderRegion.type.kind || orderRegion.type.canAdditionalyRaid == r.type.kind)
-            // Vassal family members can't raid each other
-            .filter(r => !this.ingameGameState.getOtherVassalFamilyHouses(this.house).includes(r.getController()));
-    }
+  onServerMessage(_message: ServerMessage): void {}
 
-    resolveRaid(orderRegion: Region, targetRegion: Region | null): void {
-        this.entireGame.sendMessageToServer({
-            type: "resolve-raid",
-            orderRegionId: orderRegion.id,
-            targetRegionId: targetRegion ? targetRegion.id : null
-        });
-    }
+  getRaidableRegions(
+    orderRegion: Region,
+    raid: RaidOrderType | RaidSupportOrderType
+  ): Region[] {
+    return (
+      this.world
+        .getNeighbouringRegions(orderRegion)
+        .filter((r) => r.getController() != this.house)
+        .filter((r) => this.actionGameState.ordersOnBoard.has(r))
+        .filter((r) =>
+          raid.isValidRaidableOrder(this.actionGameState.ordersOnBoard.get(r))
+        )
+        .filter(
+          (r) =>
+            r.type.kind == orderRegion.type.kind ||
+            orderRegion.type.canAdditionalyRaid == r.type.kind
+        )
+        // Vassal family members can't raid each other
+        .filter(
+          (r) =>
+            !this.ingameGameState
+              .getOtherVassalFamilyHouses(this.house)
+              .includes(r.getController())
+        )
+    );
+  }
 
-    serializeToClient(_admin: boolean, _player: Player | null): SerializedResolveSingleRaidOrderGameState {
-        return {
-            houseId: this.house.id
-        };
-    }
+  resolveRaid(orderRegion: Region, targetRegion: Region | null): void {
+    this.entireGame.sendMessageToServer({
+      type: "resolve-raid",
+      orderRegionId: orderRegion.id,
+      targetRegionId: targetRegion ? targetRegion.id : null,
+    });
+  }
 
-    static deserializeFromServer(resolveRaidOrderGameState: ResolveRaidOrderGameState, data: SerializedResolveSingleRaidOrderGameState): ResolveSingleRaidOrderGameState {
-        const resolveSingleRaidOrderGameState = new ResolveSingleRaidOrderGameState(resolveRaidOrderGameState);
+  serializeToClient(
+    _admin: boolean,
+    _player: Player | null
+  ): SerializedResolveSingleRaidOrderGameState {
+    return {
+      houseId: this.house.id,
+    };
+  }
 
-        resolveSingleRaidOrderGameState.house = resolveRaidOrderGameState.game.houses.get(data.houseId);
+  static deserializeFromServer(
+    resolveRaidOrderGameState: ResolveRaidOrderGameState,
+    data: SerializedResolveSingleRaidOrderGameState
+  ): ResolveSingleRaidOrderGameState {
+    const resolveSingleRaidOrderGameState = new ResolveSingleRaidOrderGameState(
+      resolveRaidOrderGameState
+    );
 
-        return resolveSingleRaidOrderGameState;
-    }
+    resolveSingleRaidOrderGameState.house =
+      resolveRaidOrderGameState.game.houses.get(data.houseId);
+
+    return resolveSingleRaidOrderGameState;
+  }
 }
 
 export interface SerializedResolveSingleRaidOrderGameState {
-    houseId: string;
+  houseId: string;
 }

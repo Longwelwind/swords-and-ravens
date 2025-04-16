@@ -1,5 +1,5 @@
 import IHouseSnapshot from "./IHouseSnapshot";
-import IIronBankSnapshot from "./IronBankSnapshot";
+import IIronBankSnapshot from "./IIronBankSnapshot";
 
 export default interface IGameSnapshot {
   round: number;
@@ -11,5 +11,4 @@ export default interface IGameSnapshot {
   housesOnVictoryTrack: IHouseSnapshot[];
   vsbUsed?: boolean;
   ironBank?: IIronBankSnapshot;
-  dragonStrengthTokens?: number[];
 }

@@ -1,25 +1,26 @@
 $grid-gutter-width: 1rem;
 $grid-breakpoints: (
-        xs: 0,
-        sm: 576px,
-        md: 768px,
-        lg: 992px,
-        xl: 1800px,
-        xxl: 2290px
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1800px,
+  xxl: 2290px,
 );
 
 $container-max-widths: (
-        sm: 540px,
-        md: 720px,
-        lg: 960px,
-        xl: 1800px,
-        xxl: 2290px
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1800px,
+  xxl: 2290px,
 );
 
-@import './theme/_variables';
-@import '../../../node_modules/bootstrap/scss/bootstrap';
+@import "./theme/_variables";
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+@import "./animations.scss";
 
-:root{
+:root {
   scrollbar-color: #28282a #7c7c7d !important;
   scrollbar-width: thin !important;
 }
@@ -44,8 +45,7 @@ $container-max-widths: (
   background: #555;
 }
 
-strong
-{
+strong {
   font-weight: bold;
 }
 
@@ -54,7 +54,9 @@ strong
   margin-bottom: -0.5rem;
 }
 
-.col, .col-auto, .col-12 {
+.col,
+.col-auto,
+.col-12 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
@@ -95,12 +97,12 @@ strong
 }
 
 .map .power-token {
-   position: absolute;
-   width: 23px;
-   height: 32px;
-   background-size: contain;
-   background-position: center;
-   background-repeat: no-repeat;
+  position: absolute;
+  width: 23px;
+  height: 32px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
   // This allows the power token to be center on the position-absolute reference points
   transform: translate(-50%, -50%);
 }
@@ -112,9 +114,9 @@ strong
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
- // This allows the loyalty token to be center on the position-absolute reference points
- transform: translate(-50%, -50%);
- opacity: 0.8;
+  // This allows the loyalty token to be center on the position-absolute reference points
+  transform: translate(-50%, -50%);
+  opacity: 0.8;
 }
 
 .house-power-token {
@@ -352,87 +354,138 @@ $medium-outline: rgba($outline-color, 0.6);
 
 .weak-box-outline {
   border-radius: 0.5rem;
-  box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
-  -moz-box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
-  -webkit-box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
-  -o-box-shadow: 2px 2px 2px $medium-outline, -2px -2px 2px $medium-outline, 2px -2px 2px $medium-outline, -2px 2px 2px $medium-outline;
+  box-shadow:
+    2px 2px 2px $medium-outline,
+    -2px -2px 2px $medium-outline,
+    2px -2px 2px $medium-outline,
+    -2px 2px 2px $medium-outline;
+  -moz-box-shadow:
+    2px 2px 2px $medium-outline,
+    -2px -2px 2px $medium-outline,
+    2px -2px 2px $medium-outline,
+    -2px 2px 2px $medium-outline;
+  -webkit-box-shadow:
+    2px 2px 2px $medium-outline,
+    -2px -2px 2px $medium-outline,
+    2px -2px 2px $medium-outline,
+    -2px 2px 2px $medium-outline;
+  -o-box-shadow:
+    2px 2px 2px $medium-outline,
+    -2px -2px 2px $medium-outline,
+    2px -2px 2px $medium-outline,
+    -2px 2px 2px $medium-outline;
 }
 
 .weak-text-outline {
-  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline);
+  filter: drop-shadow(1px 1px 2px $medium-outline)
+    drop-shadow(-1px -1px 2px $medium-outline);
 }
 
 .hover-weak-text-outline:hover {
-  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline);
+  filter: drop-shadow(1px 1px 2px $medium-outline)
+    drop-shadow(-1px -1px 2px $medium-outline);
   transition: all 0.12s linear;
 }
 
 .weak-outline {
-  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline) drop-shadow(1px -1px 2px $medium-outline) drop-shadow(-1px 1px 2px $medium-outline);
+  filter: drop-shadow(1px 1px 2px $medium-outline)
+    drop-shadow(-1px -1px 2px $medium-outline)
+    drop-shadow(1px -1px 2px $medium-outline)
+    drop-shadow(-1px 1px 2px $medium-outline);
 }
 
 .hover-weak-outline:hover {
-  filter: drop-shadow(1px 1px 2px $medium-outline) drop-shadow(-1px -1px 2px $medium-outline) drop-shadow(1px -1px 2px $medium-outline) drop-shadow(-1px 1px 2px $medium-outline);
+  filter: drop-shadow(1px 1px 2px $medium-outline)
+    drop-shadow(-1px -1px 2px $medium-outline)
+    drop-shadow(1px -1px 2px $medium-outline)
+    drop-shadow(-1px 1px 2px $medium-outline);
   transition: all 0.12s linear;
 }
 
 .smedium-outline {
-	filter: drop-shadow(3px 3px 3px $medium-outline) drop-shadow(-3px -3px 3px $medium-outline) drop-shadow(3px -3px 3px $medium-outline) drop-shadow(-3px 3px 3px $medium-outline);
+  filter: drop-shadow(3px 3px 3px $medium-outline)
+    drop-shadow(-3px -3px 3px $medium-outline)
+    drop-shadow(3px -3px 3px $medium-outline)
+    drop-shadow(-3px 3px 3px $medium-outline);
 }
 
 .hover-smedium-outline:hover {
-	filter: drop-shadow(3px 3px 3px $medium-outline) drop-shadow(-3px -3px 3px $medium-outline) drop-shadow(3px -3px 3px $medium-outline) drop-shadow(-3px 3px 3px $medium-outline);
+  filter: drop-shadow(3px 3px 3px $medium-outline)
+    drop-shadow(-3px -3px 3px $medium-outline)
+    drop-shadow(3px -3px 3px $medium-outline)
+    drop-shadow(-3px 3px 3px $medium-outline);
   transition: all 0.12s linear;
 }
 
 .medium-outline {
-	filter: drop-shadow(3px 3px 3px $outline-color) drop-shadow(-3px -3px 3px $outline-color) drop-shadow(3px -3px 3px $outline-color) drop-shadow(-3px 3px 3px $outline-color);
+  filter: drop-shadow(3px 3px 3px $outline-color)
+    drop-shadow(-3px -3px 3px $outline-color)
+    drop-shadow(3px -3px 3px $outline-color)
+    drop-shadow(-3px 3px 3px $outline-color);
 }
 
 .hover-medium-outline:hover {
-  filter: drop-shadow(3px 3px 3px $outline-color) drop-shadow(-3px -3px 3px $outline-color) drop-shadow(4px -4px 4px $outline-color) drop-shadow(-3px 3px 3px $outline-color);
+  filter: drop-shadow(3px 3px 3px $outline-color)
+    drop-shadow(-3px -3px 3px $outline-color)
+    drop-shadow(4px -4px 4px $outline-color)
+    drop-shadow(-3px 3px 3px $outline-color);
   transition: all 0.12s linear;
 }
 
 .strong-outline {
-  filter: drop-shadow(5px 5px 6px $outline-color) drop-shadow(-5px -5px 6px $outline-color) drop-shadow(5px -5px 6px $outline-color) drop-shadow(-5px 5px 6px $outline-color);
+  filter: drop-shadow(5px 5px 6px $outline-color)
+    drop-shadow(-5px -5px 6px $outline-color)
+    drop-shadow(5px -5px 6px $outline-color)
+    drop-shadow(-5px 5px 6px $outline-color);
 }
 
 .hover-strong-outline:hover {
-  filter: drop-shadow(5px 5px 6px $outline-color) drop-shadow(-5px -5px 6px $outline-color) drop-shadow(5px -5px 6px $outline-color) drop-shadow(-5px 5px 6px $outline-color);
+  filter: drop-shadow(5px 5px 6px $outline-color)
+    drop-shadow(-5px -5px 6px $outline-color)
+    drop-shadow(5px -5px 6px $outline-color)
+    drop-shadow(-5px 5px 6px $outline-color);
   transition: all 0.12s linear;
 }
 
 .highlight-red {
-  filter: drop-shadow(3px 3px 3px red) drop-shadow(-3px -3px 3px red) drop-shadow(3px -3px 3px red) drop-shadow(-3px 3px 3px red);
+  filter: drop-shadow(3px 3px 3px red) drop-shadow(-3px -3px 3px red)
+    drop-shadow(3px -3px 3px red) drop-shadow(-3px 3px 3px red);
 }
 
 .hover-strong-outline-red:hover {
-  filter: drop-shadow(5px 5px 6px red) drop-shadow(-5px -5px 6px red) drop-shadow(5px -5px 6px red) drop-shadow(-5px 5px 6px red);
+  filter: drop-shadow(5px 5px 6px red) drop-shadow(-5px -5px 6px red)
+    drop-shadow(5px -5px 6px red) drop-shadow(-5px 5px 6px red);
   transition: all 0.12s linear;
 }
 
 .highlight-yellow {
-  filter: drop-shadow(3px 3px 3px yellow) drop-shadow(-3px -3px 3px yellow) drop-shadow(3px -3px 3px yellow) drop-shadow(-3px 3px 3px yellow);
+  filter: drop-shadow(3px 3px 3px yellow) drop-shadow(-3px -3px 3px yellow)
+    drop-shadow(3px -3px 3px yellow) drop-shadow(-3px 3px 3px yellow);
 }
 
 .hover-strong-outline-yellow:hover {
-  filter: drop-shadow(5px 5px 6px yellow) drop-shadow(-5px -5px 6px yellow) drop-shadow(5px -5px 6px yellow) drop-shadow(-5px 5px 6px yellow);
+  filter: drop-shadow(5px 5px 6px yellow) drop-shadow(-5px -5px 6px yellow)
+    drop-shadow(5px -5px 6px yellow) drop-shadow(-5px 5px 6px yellow);
   transition: all 0.12s linear;
 }
 
 .highlight-green {
-  filter: drop-shadow(3px 3px 3px green) drop-shadow(-3px -3px 3px green) drop-shadow(3px -3px 3px green) drop-shadow(-3px 3px 3px green);
+  filter: drop-shadow(3px 3px 3px green) drop-shadow(-3px -3px 3px green)
+    drop-shadow(3px -3px 3px green) drop-shadow(-3px 3px 3px green);
 }
 
 .hover-strong-outline-green:hover {
-  filter: drop-shadow(5px 5px 6px green) drop-shadow(-5px -5px 6px green) drop-shadow(5px -5px 6px green) drop-shadow(-5px 5px 6px green);
+  filter: drop-shadow(5px 5px 6px green) drop-shadow(-5px -5px 6px green)
+    drop-shadow(5px -5px 6px green) drop-shadow(-5px 5px 6px green);
   transition: all 0.12s linear;
 }
 
 $wildling-outline: rgba(yellow, 0.5);
 .wildling-highlight {
-  filter: drop-shadow(2px 2px 2px $wildling-outline) drop-shadow(-2px -2px 2px $wildling-outline) drop-shadow(2px -2px 2px $wildling-outline) drop-shadow(-2px 2px 2px $wildling-outline);
+  filter: drop-shadow(2px 2px 2px $wildling-outline)
+    drop-shadow(-2px -2px 2px $wildling-outline)
+    drop-shadow(2px -2px 2px $wildling-outline)
+    drop-shadow(-2px 2px 2px $wildling-outline);
 }
 
 .clickable {
@@ -465,7 +518,7 @@ $wildling-outline: rgba(yellow, 0.5);
 }
 
 .region-area-fogged {
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .region-area-no-hover {
@@ -490,7 +543,7 @@ $wildling-outline: rgba(yellow, 0.5);
 }
 
 .highlighted-region-area-strong {
-  opacity: 0.7 !important;
+  opacity: 0.6 !important;
 }
 
 .highlighted-region-area-light {
@@ -510,11 +563,14 @@ $wildling-outline: rgba(yellow, 0.5);
   animation: 1s ease-out 3s infinite normal both running background_fade;
 }
 
-.game-log-content, .game-log-content p, .game-log-content ul {
+.game-log-content,
+.game-log-content p,
+.game-log-content ul {
   margin-bottom: 0.5em;
 }
 
-.btn-xs, .btn-group-xs > .btn {
+.btn-xs,
+.btn-group-xs > .btn {
   padding: 0.1rem 0.25rem;
 }
 
@@ -532,7 +588,7 @@ hr {
 
 div.new-event {
   border: solid;
-  border-color: #F39C12;
+  border-color: #f39c12;
   border-radius: 5px;
   border-width: 3px;
 }
@@ -583,43 +639,59 @@ div.disconnected {
  and then we apply the specified filters to get the color F39C12 (orange) for warning and FF0000 (red) for critical
 */
 .dye-warning {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%)
+    hue-rotate(353deg) brightness(98%) contrast(94%);
 }
 
 .dye-warning:hover {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%)
+    hue-rotate(353deg) brightness(98%) contrast(94%);
 }
 
 .dye-warning-highlight {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%) drop-shadow(2px 2px 4px $wildling-outline) drop-shadow(-2px -2px 4px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%)
+    hue-rotate(353deg) brightness(98%) contrast(94%)
+    drop-shadow(2px 2px 4px $wildling-outline)
+    drop-shadow(-2px -2px 4px $wildling-outline);
 }
 
 .dye-warning-highlight:hover {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%) hue-rotate(353deg) brightness(98%) contrast(94%) drop-shadow(2px 2px 4px $wildling-outline) drop-shadow(-2px -2px 4px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(565%)
+    hue-rotate(353deg) brightness(98%) contrast(94%)
+    drop-shadow(2px 2px 4px $wildling-outline)
+    drop-shadow(-2px -2px 4px $wildling-outline);
 }
 
 .dye-critical {
-  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%);
+  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%)
+    hue-rotate(4deg) brightness(109%) contrast(114%);
 }
 
 .dye-critical:hover {
-  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%);
+  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%)
+    hue-rotate(4deg) brightness(109%) contrast(114%);
 }
 
 .dye-critical-highlight {
-  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%) drop-shadow(2px 2px 3px $wildling-outline) drop-shadow(-2px -2px 3px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%)
+    hue-rotate(4deg) brightness(109%) contrast(114%)
+    drop-shadow(2px 2px 3px $wildling-outline)
+    drop-shadow(-2px -2px 3px $wildling-outline);
 }
 
 .dye-critical-highlight:hover {
-  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%) hue-rotate(4deg) brightness(109%) contrast(114%) drop-shadow(2px 2px 3px $wildling-outline) drop-shadow(-2px -2px 3px $wildling-outline);
+  filter: brightness(0) saturate(100%) invert(11%) sepia(82%) saturate(7445%)
+    hue-rotate(4deg) brightness(109%) contrast(114%)
+    drop-shadow(2px 2px 3px $wildling-outline)
+    drop-shadow(-2px -2px 3px $wildling-outline);
 }
 
 .txt-warning {
-  color: #F39C12;
+  color: #f39c12;
 }
 
 .txt-critical {
-  color: #FF0000;
+  color: #ff0000;
 }
 
 .unavailable-monotone {
@@ -643,7 +715,11 @@ div.disconnected {
   margin: 0 !important;
 }
 
-.no-gutters, .no-gutters .col, .no-gutters .col-auto, .no-gutters .col-12, .no-gutters .nav-link {
+.no-gutters,
+.no-gutters .col,
+.no-gutters .col-auto,
+.no-gutters .col-12,
+.no-gutters .nav-link {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   margin-top: 0 !important;
@@ -733,256 +809,8 @@ hr.red {
   visibility: hidden;
 }
 
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-.animate__fadeIn {
-  -webkit-animation-name: fadeIn;
-  animation-name: fadeIn;
-}
-.animate__animated {
-  -webkit-animation-duration: 2s;
-  animation-duration: 2s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
-
-:root {
-  --toastify-z-index: 9998;
-  --toastify-color-progress-dark: #F39C12;
-  --toastify-color-progress-light: #F39C12;
-}
-
-.slide-in-elliptic-top-fwd {
-	-webkit-animation: slide-in-elliptic-top-fwd 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: slide-in-elliptic-top-fwd 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-/* ----------------------------------------------
- * Generated by Animista
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation slide-in-elliptic-top-fwd
- * ----------------------------------------
- */
- @-webkit-keyframes slide-in-elliptic-top-fwd {
-  0% {
-    -webkit-transform: translateY(-600px) rotateX(-30deg) scale(0);
-            transform: translateY(-600px) rotateX(-30deg) scale(0);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateY(0) rotateX(0) scale(1);
-            transform: translateY(0) rotateX(0) scale(1);
-    -webkit-transform-origin: 50% 1400px;
-            transform-origin: 50% 1400px;
-    opacity: 1;
-  }
-}
-@keyframes slide-in-elliptic-top-fwd {
-  0% {
-    -webkit-transform: translateY(-600px) rotateX(-30deg) scale(0);
-            transform: translateY(-600px) rotateX(-30deg) scale(0);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 0;
-  }
-  100% {
-    -webkit-transform: translateY(0) rotateX(0) scale(1);
-            transform: translateY(0) rotateX(0) scale(1);
-    -webkit-transform-origin: 50% 1400px;
-            transform-origin: 50% 1400px;
-    opacity: 1;
-  }
-}
-
-.slide-out-elliptic-top-bck {
-	-webkit-animation: slide-out-elliptic-top-bck 0.7s ease-in both;
-	        animation: slide-out-elliptic-top-bck 0.7s ease-in both;
-}
-
-/* ----------------------------------------------
- * Generated by Animista
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation slide-out-elliptic-top-bck
- * ----------------------------------------
- */
- @-webkit-keyframes slide-out-elliptic-top-bck {
-  0% {
-    -webkit-transform: translateY(0) rotateX(0) scale(1);
-            transform: translateY(0) rotateX(0) scale(1);
-    -webkit-transform-origin: 50% 1400px;
-            transform-origin: 50% 1400px;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: translateY(-600px) rotateX(-30deg) scale(0);
-            transform: translateY(-600px) rotateX(-30deg) scale(0);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 1;
-  }
-}
-@keyframes slide-out-elliptic-top-bck {
-  0% {
-    -webkit-transform: translateY(0) rotateX(0) scale(1);
-            transform: translateY(0) rotateX(0) scale(1);
-    -webkit-transform-origin: 50% 1400px;
-            transform-origin: 50% 1400px;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: translateY(-600px) rotateX(-30deg) scale(0);
-            transform: translateY(-600px) rotateX(-30deg) scale(0);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 1;
-  }
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2022-10-5 7:50:7
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation pulsate-bck
- * ----------------------------------------
- */
- @-webkit-keyframes pulsate-bck {
-  0% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-  50% {
-    -webkit-transform: scale(0.9);
-            transform: scale(0.9);
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-}
-@keyframes pulsate-bck {
-  0% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-  50% {
-    -webkit-transform: scale(0.9);
-            transform: scale(0.9);
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2022-10-5 7:53:18
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation fade-out
- * ----------------------------------------
- */
- @-webkit-keyframes fade-out {
-  25% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-@keyframes fade-out {
-  25% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2022-10-5 8:16:58
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation fade-in
- * ----------------------------------------
- */
- @-webkit-keyframes fade-in {
-  0% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes fade-in {
-  0% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.pulsate-bck {
-	-webkit-animation: pulsate-bck 0.5s ease-in-out infinite both;
-	        animation: pulsate-bck 0.5s ease-in-out infinite both;
-}
-
-.pulsate-bck_fade-in {
-	-webkit-animation: fade-in 4.5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both, pulsate-bck 0.5s ease-in-out infinite both;
-	        animation: fade-in 4.5s cubic-bezier(0.390, 0.575, 0.565, 1.000) both, pulsate-bck 0.5s ease-in-out infinite both;
-}
-
-.pulsate-bck_fade-out {
-  -webkit-animation: fade-out 4.5s ease-out both, pulsate-bck 0.5s ease-in-out infinite both;
-	        animation: fade-out 4.5s ease-out both, pulsate-bck 0.5s ease-in-out infinite both;
-}
-
-.btn-secondary:focus, .btn-secondary.focus {
+.btn-secondary:focus,
+.btn-secondary.focus {
   box-shadow: none !important;
 }
 
@@ -1002,340 +830,12 @@ hr.red {
   font-size: 1rem;
 }
 
-
-.flip-vertical-right {
-	-webkit-animation: flip-vertical-right 2s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
-	        animation: flip-vertical-right 2s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2022-10-5 17:55:17
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation flip-vertical-right
- * ----------------------------------------
- */
- @-webkit-keyframes flip-vertical-right {
-  0% {
-    -webkit-transform: rotateY(0);
-            transform: rotateY(0);
-  }
-  100% {
-    -webkit-transform: rotateY(180deg);
-            transform: rotateY(180deg);
-  }
-}
-@keyframes flip-vertical-right {
-  0% {
-    -webkit-transform: rotateY(0);
-            transform: rotateY(0);
-  }
-  100% {
-    -webkit-transform: rotateY(180deg);
-            transform: rotateY(180deg);
-  }
-}
-
-.loader {
-  display: inline-block;
-  position: relative;
-  box-sizing: border-box;
-}
-.loader::after {
-  content: '';
-  width: 5px;
-  height: 5px;
-  background: currentColor;
-  position: absolute;
-  bottom: 4px;
-  right: -10px;
-  box-sizing: border-box;
-  border-radius: 50%;
-  animation: animloader 1s linear infinite;
-}
-
-@keyframes animloader {
-  0% {
-    box-shadow: 10px 0 rgba(255, 255, 255, 0), 20px 0 rgba(255, 255, 255, 0);
-  }
-  50% {
-    box-shadow: 10px 0, 20px 0 rgba(255, 255, 255, 0);
-  }
-  100% {
-    box-shadow: 10px 0, 20px 0;
-  }
-}
-
-select {
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
-}
-
-.d-inline {
-  display: inline;
-}
-
-.circle-border {
-  border-radius: 50%;
-  border: 2px solid;
-}
-
-.btn-sm {
-  border-radius: 0.5rem;
-}
-
-.btn-secondary:hover {
-  color: #fff !important;
-  background-color: #999;
-  border-color: #999;
-}
-
-.might-overflow {
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-.ingame-userlabel {
-  float: left;
-  max-width: 210px;
-}
-
-.enabled {
-  color: white !important;
-  pointer-events: auto !important;
-  cursor: default !important;
-}
-
-.own-message {
-  background-color: #242735;
-  border-radius: 10px;
-}
-
-.foreign-message {
-  background-color: #1c1c1c;
-  border-radius: 10px;
-}
-
-.float-right {
-  float: right;
-}
-
-
-.scale-in-top {
-	-webkit-animation: scale-in-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: scale-in-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2024-3-12 10:44:35
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation scale-in-top
- * ----------------------------------------
- */
- @-webkit-keyframes scale-in-top {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 50% 0%;
-            transform-origin: 50% 0%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 50% 0%;
-            transform-origin: 50% 0%;
-    opacity: 1;
-  }
-}
-@keyframes scale-in-top {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 50% 0%;
-            transform-origin: 50% 0%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 50% 0%;
-            transform-origin: 50% 0%;
-    opacity: 1;
-  }
-}
-
-
-.scale-in-right {
-	-webkit-animation: scale-in-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: scale-in-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2024-3-12 10:44:58
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation scale-in-right
- * ----------------------------------------
- */
- @-webkit-keyframes scale-in-right {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 100% 50%;
-            transform-origin: 100% 50%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 100% 50%;
-            transform-origin: 100% 50%;
-    opacity: 1;
-  }
-}
-@keyframes scale-in-right {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 100% 50%;
-            transform-origin: 100% 50%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 100% 50%;
-            transform-origin: 100% 50%;
-    opacity: 1;
-  }
-}
-
-
-.scale-in-bottom {
-	-webkit-animation: scale-in-bottom 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: scale-in-bottom 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2024-3-12 10:45:14
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation scale-in-bottom
- * ----------------------------------------
- */
- @-webkit-keyframes scale-in-bottom {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 1;
-  }
-}
-@keyframes scale-in-bottom {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 50% 100%;
-            transform-origin: 50% 100%;
-    opacity: 1;
-  }
-}
-
-
-.scale-in-left {
-	-webkit-animation: scale-in-left 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: scale-in-left 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
-/* ----------------------------------------------
- * Generated by Animista on 2024-3-12 10:45:31
- * Licensed under FreeBSD License.
- * See http://animista.net/license for more info.
- * w: http://animista.net, t: @cssanimista
- * ---------------------------------------------- */
-
-/**
- * ----------------------------------------
- * animation scale-in-left
- * ----------------------------------------
- */
- @-webkit-keyframes scale-in-left {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    opacity: 1;
-  }
-}
-@keyframes scale-in-left {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0);
-    -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    opacity: 1;
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    opacity: 1;
-  }
-}
-
 .mt-n1 {
   margin-top: -1rem !important;
 }
 .mt-n2 {
   margin-top: -2rem !important;
-} 
+}
 
 .mb-n1 {
   margin-bottom: -1rem !important;
@@ -1349,4 +849,13 @@ select {
   border-radius: 10px;
   border: 6px solid transparent; // Added thicker border
   cursor: pointer;
+}
+
+.dropdown-divider {
+  width: 2px;
+  height: 95%;
+  background-color: $gray-800; // Subtle gray color
+  margin: 0 1rem; // Spacing on both sides
+  opacity: 0.9; // Slight transparency
+  border-radius: 2px; // Rounded corners
 }
