@@ -4,6 +4,26 @@ import fs from "fs";
 import path from "path";
 import { SerializedEntireGame } from "../../common/EntireGame";
 import serializedGameMigrations from "../serializedGameMigrations";
+import _ from "lodash";
+
+const user = {
+  id: "",
+  name: "",
+  facelessName: "",
+  settings: {
+    chatHouseNames: false,
+    mapScrollbar: true,
+    gameStateColumnRight: false,
+    muted: true,
+    lastOpenedTab: "game-logs",
+    musicVolume: 1,
+    notificationsVolume: 1,
+    sfxVolume: 1,
+  },
+  connected: false,
+  otherUsersFromSameNetwork: [],
+  note: "",
+};
 
 export default class LocalWebsiteClient implements WebsiteClient {
   async getGame(gameId: string): Promise<StoredGameData> {
@@ -11,10 +31,14 @@ export default class LocalWebsiteClient implements WebsiteClient {
       throw new Error();
     }
 
-    const serializedGame = await this.loadGameFromFile();
+    let serializedGame: any = await this.loadGameFromFile();
     const version = Math.max(
       ...serializedGameMigrations.map((mig) => Number(mig.version))
     );
+
+    if (serializedGame.migrate) {
+      serializedGame = this.migrateRealGameToLocalDebugGame(serializedGame);
+    }
 
     return {
       id: gameId,
@@ -23,6 +47,54 @@ export default class LocalWebsiteClient implements WebsiteClient {
       serializedGame: serializedGame,
       version: version.toString(),
     };
+  }
+
+  private migrateRealGameToLocalDebugGame(
+    serializedGame: SerializedEntireGame
+  ): SerializedEntireGame {
+    serializedGame.id = "1";
+    serializedGame.ownerUserId = "1";
+
+    serializedGame.users = [];
+    serializedGame.privateChatRoomIds = [];
+
+    for (let i = 0; i < 8; i++) {
+      const u = {
+        ...user,
+        id: `${i + 1}`,
+        name: `Player ${i + 1}`,
+        facelessName: `Nobody ${i + 1}`,
+      };
+      serializedGame.users.push(u);
+    }
+
+    if (serializedGame.childGameState.type != "ingame") {
+      return serializedGame;
+    }
+
+    const ingame = serializedGame.childGameState;
+    ingame.votes = [];
+    ingame.gameLogManager.lastSeenLogTimes = [];
+    const houses = ingame.players.map((p) => p.houseId);
+    ingame.players = [];
+    for (let i = 0; i < houses.length; i++) {
+      const player = {
+        houseId: houses[i],
+        userId: `${i + 1}`,
+        liveClockData: null,
+        waitedForData: null,
+      };
+      ingame.players.push(player);
+    }
+
+    _.remove(
+      ingame.gameLogManager.logs,
+      (log) =>
+        log.data.type == "user-house-assignments" ||
+        log.data.type == "player-replaced"
+    );
+
+    return serializedGame;
   }
 
   private async loadGameFromFile(): Promise<object | null> {

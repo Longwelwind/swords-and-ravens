@@ -15,6 +15,8 @@ export interface CombatResultData {
   defenderRegion: string;
   retreatRegion: string | null;
   winner: string;
+  winnerArmy: string[];
+  winnerRegion: string;
   loser: string;
   loserArmy: string[];
   loserRegion: string;
@@ -163,9 +165,15 @@ export default class CombatSnapshotMigrator {
     const defenderRegion = def.region;
     const attackerArmy = [...att.armyUnits];
     const defenderArmy = [...def.armyUnits];
+    const winnerArmy = winner === attacker ? attackerArmy : defenderArmy;
+    const winnerRegion = winner === attacker ? attackerRegion : defenderRegion;
     const loser = winner === attacker ? defender : attacker;
     const loserArmy = winner === attacker ? defenderArmy : attackerArmy;
     const loserRegion = winner === attacker ? defenderRegion : attackerRegion;
+
+    // const winnerFacedSkullIcon =
+    //   (winner === attacker && defenderTob === "skull") ||
+    //   (winner === defender && attackerTob === "skull");
 
     const logsSlice = this.ingame.gameLogManager.logs.slice(logIndex + 1);
     const relatedCombatResultLogs = _.takeWhile(
@@ -209,6 +217,8 @@ export default class CombatSnapshotMigrator {
       attackerRegion,
       defenderRegion,
       winner,
+      winnerArmy,
+      winnerRegion,
       loser,
       loserArmy,
       loserRegion,
@@ -241,22 +251,46 @@ export default class CombatSnapshotMigrator {
         return snap;
       }
       case "killed-after-combat": {
-        const region = snap.getRegion(ccd.loserRegion);
-        for (let i = 0; i < log.killed.length; i++) {
-          const unit = log.killed[i];
-          region.removeUnit(unit, ccd.loser);
-          pullFirst(ccd.loserArmy, unit);
+        if (log.house == ccd.loser) {
+          const region = snap.getRegion(ccd.loserRegion);
+          for (let i = 0; i < log.killed.length; i++) {
+            const unit = log.killed[i];
+            region.removeUnit(unit, ccd.loser);
+            pullFirst(ccd.loserArmy, unit);
+          }
+        } else if (log.house == ccd.winner) {
+          const region = snap.getRegion(ccd.winnerRegion);
+          for (let i = 0; i < log.killed.length; i++) {
+            const unit = log.killed[i];
+            region.removeUnit(unit, ccd.winner);
+            pullFirst(ccd.winnerArmy, unit);
+          }
+        } else {
+          throw new Error(`Unable to apply log ${JSON.stringify(log)}`);
         }
+
         return snap;
       }
       case "retreat-casualties-suffered": {
-        const region = snap.getRegion(ccd.loserRegion);
-        for (let i = 0; i < log.units.length; i++) {
-          const unit = log.units[i];
-          region.removeUnit(unit, ccd.defender);
-          pullFirst(ccd.loserArmy, unit);
+        if (log.house == ccd.loser) {
+          const region = snap.getRegion(ccd.loserRegion);
+          for (let i = 0; i < log.units.length; i++) {
+            const unit = log.units[i];
+            region.removeUnit(unit, ccd.defender);
+            pullFirst(ccd.loserArmy, unit);
+          }
+          return snap;
+        } else if (log.house == ccd.winner) {
+          const region = snap.getRegion(ccd.winnerRegion);
+          for (let i = 0; i < log.units.length; i++) {
+            const unit = log.units[i];
+            region.removeUnit(unit, ccd.winner);
+            pullFirst(ccd.winnerArmy, unit);
+          }
+          return snap;
+        } else {
+          throw new Error(`Unable to apply log ${JSON.stringify(log)}`);
         }
-        return snap;
       }
       default:
         throw new Error(`Unhandled combat result log type '${log.type}'`);

@@ -818,8 +818,18 @@ export default class SnapshotMigrator {
         return snap;
       }
       case "jon-connington-used": {
+        if (!snap.gameSnapshot)
+          throw new Error(
+            "Jon Connington cannot be applied in games with world snapshot only"
+          );
+        // If Jon was used the region must be controlled by the vassal house
+        snap.calculateControllersPerRegion();
         const region = snap.getRegion(log.region);
-        region.createUnit("knight", log.house);
+        const vassal = snap.getController(log.region);
+        if (!vassal) {
+          throw new Error(`Vassal of house ${log.house} not found`);
+        }
+        region.createUnit("knight", vassal.id);
         return snap;
       }
       case "mace-tyrell-asos-order-placed": {
@@ -1020,7 +1030,27 @@ export default class SnapshotMigrator {
     }
   }
 
-  public resetCombatLogData(): void {
+  handleVassalReplacement(
+    snap: EntireGameSnapshot,
+    log: GameLogData
+  ): EntireGameSnapshot {
+    if (!snap.gameSnapshot) return snap;
+    if (log.type == "player-replaced" && log.newCommanderHouse) {
+      const house = snap.getHouse(log.house);
+      house.isVassal = true;
+      house.suzerainHouseId = log.newCommanderHouse;
+    }
+
+    if (log.type == "vassal-replaced") {
+      const house = snap.getHouse(log.house);
+      house.isVassal = undefined;
+      house.suzerainHouseId = undefined;
+    }
+
+    return snap;
+  }
+
+  resetCombatLogData(): void {
     this.combatResultData = null;
     this.attackData = null;
   }

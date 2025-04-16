@@ -31,8 +31,8 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
     this.worldSnapshot.forEach((region) => {
       this._regionMap.set(region.id, region);
     });
-    this.gameSnapshot?.housesOnVictoryTrack.forEach((HouseSnapshot) => {
-      this._houseMap.set(HouseSnapshot.id, HouseSnapshot);
+    this.gameSnapshot?.housesOnVictoryTrack.forEach((house) => {
+      this._houseMap.set(house.id, house);
     });
 
     this.loadHouseDataFromGame();
@@ -86,22 +86,22 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
     return [];
   }
 
-  removeUnits(units: [string, string[]][], HouseSnapshot: string): void {
+  removeUnits(units: [string, string[]][], house: string): void {
     units.forEach(([rid, _units]) => {
       const region = this.getRegion(rid);
       _units.forEach((u) => {
-        region.removeUnit(u, HouseSnapshot);
+        region.removeUnit(u, house);
       });
     });
   }
 
   changeSupply(
-    HouseSnapshot: string,
+    house: string,
     delta: number,
     supplyRestrictions: number[][]
   ): number {
     if (!this.gameSnapshot) return 0;
-    const h = this.getHouse(HouseSnapshot);
+    const h = this.getHouse(house);
     if (!h) return 0;
     const oldValue = h.supply;
     h.supply = Math.max(
@@ -109,6 +109,19 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
       Math.min(h.supply + delta, supplyRestrictions.length - 1)
     );
     return h.supply - oldValue;
+  }
+
+  getVassalControlledByHouse(house: string): string {
+    if (!this.gameSnapshot)
+      throw new Error("Vassals cannot be determined without game snapshot");
+
+    for (const h of this._houseMap.values) {
+      if (h.suzerainHouseId === house) {
+        return h.id;
+      }
+    }
+
+    throw new Error("Vassal not found for house: " + house);
   }
 
   getVictoryTrack(): HouseSnapshot[] {

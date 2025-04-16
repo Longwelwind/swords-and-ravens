@@ -105,6 +105,7 @@ export default class GameReplayManager {
       if (!this.isModifyingGameLog(log)) continue;
       const clone = _.cloneDeep(this.logManager.logs[i]).data;
       snap = this.migrator.applyLogEvent(snap, clone, i);
+      snap = this.migrator.handleVassalReplacement(snap, clone);
       snapCount++;
     }
 
