@@ -316,8 +316,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               )}
             </Nav>
           </Card.Header>
-          <Card.Body id="game-log-panel">
-            <div style={{ visibility: "hidden", width: "850px" }} />
+          <Card.Body id="game-log-panel" className="px-1">
             <Tab.Content className="h-100">
               <Tab.Pane eventKey="chat" className="h-100">
                 <ChatComponent

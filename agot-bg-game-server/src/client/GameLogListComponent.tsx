@@ -135,7 +135,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           </Row>
         )}
         <Row>
-          <Col xs="auto" className="text-muted">
+          <Col xs="auto" className="text-muted px-0 ml-2">
             <OverlayTrigger
               placement="auto"
               overlay={
@@ -146,8 +146,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               popperConfig={{ modifiers: [preventOverflow] }}
             >
               <small>
-                {l.time.getHours().toString().padStart(2, "0")}:
-                {l.time.getMinutes().toString().padStart(2, "0")}
+                {l.time.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
               </small>
             </OverlayTrigger>
           </Col>
@@ -171,7 +174,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               </OverlayTrigger>
             </Col>
           )}
-          <Col>
+          <Col className="mr-2">
             <div
               id={`game-log-content-${i}`}
               className={classNames("game-log-content", {

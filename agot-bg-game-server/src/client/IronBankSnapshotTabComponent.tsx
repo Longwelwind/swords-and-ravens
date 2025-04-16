@@ -89,7 +89,9 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
           <Col xs="auto">
             <div
               className="vertical-game-card smedium"
-              style={{ backgroundImage: `url(${loanCardImages.get("back")})` }}
+              style={{
+                backgroundImage: `url(${loanCardImages.get("back")})`,
+              }}
             />
           </Col>
         </Row>
