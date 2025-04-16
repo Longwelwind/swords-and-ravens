@@ -1,5 +1,5 @@
 import { observable } from "mobx";
-import { UnitState } from "../Unit";
+import { UnitState } from "../../common/ingame-game-state/game-data-structure/Unit";
 import IRegionSnapshot from "./IRegionSnapshot";
 
 export default class RegionSnapshot implements IRegionSnapshot {

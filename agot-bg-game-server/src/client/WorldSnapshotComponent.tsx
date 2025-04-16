@@ -23,12 +23,12 @@ import ImagePopover from "./utils/ImagePopover";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
-import RegionSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/RegionSnapshot";
+import RegionSnapshot from "./game-replay/RegionSnapshot";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
-import GameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/GameSnapshot";
+import GameSnapshot from "./game-replay/GameSnapshot";
 import { observer } from "mobx-react";
 import Xarrow from "react-xarrows";
-import EntireGameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/EntireGameSnapshot";
+import EntireGameSnapshot from "./game-replay/EntireGameSnapshot";
 
 export const MAP_HEIGHT = 1378;
 export const MAP_WIDTH = 741;

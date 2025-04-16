@@ -3,8 +3,8 @@ import GameSnapshot from "./GameSnapshot";
 import HouseSnapshot from "./HouseSnapshot";
 import IEntireGameSnapshot from "./IEntireGameSnapshot";
 import RegionSnapshot from "./RegionSnapshot";
-import BetterMap from "../../../../utils/BetterMap";
-import IngameGameState from "../../IngameGameState";
+import BetterMap from "../../utils/BetterMap";
+import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import _ from "lodash";
 
 export default class EntireGameSnapshot implements IEntireGameSnapshot {
@@ -43,6 +43,7 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
   }
 
   calculateControllersPerRegion(): void {
+    if (!this.gameSnapshot) return;
     this.worldSnapshot.forEach((region) => {
       const hid = this.determineController(region.id);
       const controller = hid ? this._houseMap.get(hid) : null;

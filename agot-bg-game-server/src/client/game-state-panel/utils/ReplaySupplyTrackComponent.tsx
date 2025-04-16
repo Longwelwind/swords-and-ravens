@@ -5,7 +5,7 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import houseInfluenceImages from "../../houseInfluenceImages";
 import barrelImage from "../../../../public/images/icons/barrel.svg";
-import HouseSnapshot from "../../../common/ingame-game-state/game-data-structure/game-replay/HouseSnapshot";
+import HouseSnapshot from "../../game-replay/HouseSnapshot";
 
 interface ReplaySupplyTrackComponentProps {
   supplyRestrictions: number[][];

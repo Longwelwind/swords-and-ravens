@@ -9,7 +9,7 @@ import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretLeft } from "@fortawesome/free-solid-svg-icons";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
-import IIronBankSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IronBankSnapshot";
+import IIronBankSnapshot from "./game-replay/IronBankSnapshot";
 
 interface IronBankSnapshotTabComponentProps {
   ingame: IngameGameState;

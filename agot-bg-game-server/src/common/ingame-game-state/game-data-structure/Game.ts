@@ -31,7 +31,7 @@ import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import { objectiveCards } from "./static-data-structure/objectiveCards";
 import SnrError from "../../../utils/snrError";
-import IGameSnapshot from "./game-replay/IGameSnapshot";
+import IGameSnapshot from "../../../client/game-replay/IGameSnapshot";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;

@@ -85,8 +85,8 @@ import {
 } from "./port-helper/PortHelper";
 import { dragon } from "./game-data-structure/unitTypes";
 import groupBy from "../../utils/groupBy";
-import IRegionSnapshot from "./game-data-structure/game-replay/IRegionSnapshot";
-import GameReplayManager from "./game-data-structure/game-replay/GameReplayManager";
+import IRegionSnapshot from "../../client/game-replay/IRegionSnapshot";
+import GameReplayManager from "../../client/game-replay/GameReplayManager";
 
 export const NOTE_MAX_LENGTH = 5000;
 

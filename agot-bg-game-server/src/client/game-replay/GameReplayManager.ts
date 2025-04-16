@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import _ from "lodash";
-import GameLog, { GameLogData } from "../GameLog";
+import GameLog, {
+  GameLogData,
+} from "../../common/ingame-game-state/game-data-structure/GameLog";
 import EntireGameSnapshot from "./EntireGameSnapshot";
-import GameLogManager from "../GameLogManager";
-import EntireGame from "../../../../common/EntireGame";
+import GameLogManager from "../../common/ingame-game-state/game-data-structure/GameLogManager";
+import EntireGame from "../../common/EntireGame";
 import { computed, observable } from "mobx";
 import ReplayConstants, { modifyingGameLogIds } from "./replay-constants";
-import BetterMap from "../../../../utils/BetterMap";
-import IngameGameState from "../../IngameGameState";
+import BetterMap from "../../utils/BetterMap";
+import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import SnapshotMigrator from "./SnapshotMigrator";
-import StaticRegion from "../static-data-structure/StaticRegion";
-import Game from "../Game";
+import StaticRegion from "../../common/ingame-game-state/game-data-structure/static-data-structure/StaticRegion";
+import Game from "../../common/ingame-game-state/game-data-structure/Game";
 import SnapshotHighlighter from "./SnapshotHighlighter";
 
 function filterArrayByThreshold(arr: number[], threshold: number): void {
@@ -95,13 +97,14 @@ export default class GameReplayManager {
     this.migrator = new SnapshotMigrator(this.ingame);
 
     for (let i = originalIndex + 1; i <= index; i++) {
-      const log = _.cloneDeep(this.logManager.logs[i]);
-      if (ReplayConstants.combatTerminationTypes.has(log.data.type)) {
+      const log = this.logManager.logs[i].data;
+      if (ReplayConstants.combatTerminationTypes.has(log.type)) {
         this.migrator.resetCombatLogData();
       }
 
-      if (!this.isModifyingGameLog(log.data)) continue;
-      snap = this.migrator.applyLogEvent(snap, log.data, i);
+      if (!this.isModifyingGameLog(log)) continue;
+      const clone = _.cloneDeep(this.logManager.logs[i]).data;
+      snap = this.migrator.applyLogEvent(snap, clone, i);
       snapCount++;
     }
 
@@ -109,19 +112,13 @@ export default class GameReplayManager {
 
     const selectedLog = this.logManager.logs[index].data;
 
-    if (
-      snapCount > thresholdForSavingSeenSnaps &&
-      this.isModifyingGameLog(selectedLog)
-    ) {
-      this.seenSnapshots.set(index, snap);
-      const keysToKeep = this.seenSnapshots.keys;
-      filterArrayByThreshold(keysToKeep, thresholdForSavingSeenSnaps);
-      this.seenSnapshots.keys.forEach((key) => {
-        if (!keysToKeep.includes(key)) {
-          this.seenSnapshots.delete(key);
-        }
-      });
-    }
+    this.saveCurrentSnapshot(
+      snapCount,
+      thresholdForSavingSeenSnaps,
+      selectedLog,
+      index,
+      snap
+    );
 
     if (snap.gameSnapshot && selectedLog.type != "orders-revealed") {
       snap.gameSnapshot.housesOnVictoryTrack = snap.getVictoryTrack();
@@ -278,6 +275,28 @@ export default class GameReplayManager {
         ),
         originalIndex: originalIndex,
       };
+    }
+  }
+
+  private saveCurrentSnapshot(
+    snapCount: number,
+    thresholdForSavingSeenSnaps: number,
+    selectedLog: GameLogData,
+    index: number,
+    snap: EntireGameSnapshot
+  ): void {
+    if (
+      snapCount > thresholdForSavingSeenSnaps &&
+      this.isModifyingGameLog(selectedLog)
+    ) {
+      this.seenSnapshots.set(index, snap);
+      const keysToKeep = this.seenSnapshots.keys;
+      filterArrayByThreshold(keysToKeep, thresholdForSavingSeenSnaps);
+      this.seenSnapshots.keys.forEach((key) => {
+        if (!keysToKeep.includes(key)) {
+          this.seenSnapshots.delete(key);
+        }
+      });
     }
   }
 

@@ -8,7 +8,7 @@ import HouseCard from "../../../common/ingame-game-state/game-data-structure/hou
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { preventOverflow } from "@popperjs/core";
 import ImagePopover from "../../utils/ImagePopover";
-import HouseSnapshot from "../../../common/ingame-game-state/game-data-structure/game-replay/HouseSnapshot";
+import HouseSnapshot from "../../game-replay/HouseSnapshot";
 
 interface HouseCardBackComponentProps {
   house: House | HouseSnapshot | null;

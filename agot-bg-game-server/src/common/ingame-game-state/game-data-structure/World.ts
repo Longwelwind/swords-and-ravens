@@ -15,7 +15,7 @@ import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
 import StaticIronBankView from "./static-data-structure/StaticIronBankView";
 import { GameSettings } from "../../../common/EntireGame";
 import Player from "../Player";
-import IRegionSnapshot from "./game-replay/IRegionSnapshot";
+import IRegionSnapshot from "../../../client/game-replay/IRegionSnapshot";
 
 export default class World {
   settings: GameSettings;
