@@ -1,6 +1,6 @@
 import { observable } from "mobx";
-import allKnownHouseCards from "../../../../client/utils/houseCardHelper";
-import { HouseCardState } from "../house-card/HouseCard";
+import allKnownHouseCards from "../utils/houseCardHelper";
+import { HouseCardState } from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import IHouseSnapshot from "./IHouseSnapshot";
 
 export default class HouseSnapshot implements IHouseSnapshot {

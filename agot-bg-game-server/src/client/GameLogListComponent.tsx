@@ -53,7 +53,7 @@ import presentImage from "../../public/images/icons/present.svg";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import allKnownHouseCards from "./utils/houseCardHelper";
 import classNames from "classnames";
-import GameReplayManager from "../common/ingame-game-state/game-data-structure/game-replay/GameReplayManager";
+import GameReplayManager from "./game-replay/GameReplayManager";
 
 const fogOfWarPlaceholder = "a region";
 

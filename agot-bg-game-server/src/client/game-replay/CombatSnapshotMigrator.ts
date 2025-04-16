@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { GameLogData } from "../GameLog";
+import { GameLogData } from "../../common/ingame-game-state/game-data-structure/GameLog";
 import EntireGameSnapshot from "./EntireGameSnapshot";
-import IngameGameState from "../../IngameGameState";
+import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import ReplayConstants from "./replay-constants";
 import _ from "lodash";
-import { removeFirst, pullFirst } from "../../../../utils/arrayExt";
+import { removeFirst, pullFirst } from "../../utils/arrayExt";
 
 export interface CombatResultData {
   attacker: string;

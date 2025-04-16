@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import _ from "lodash";
-import GameLog, { GameLogData } from "../GameLog";
+import GameLog, {
+  GameLogData,
+} from "../../common/ingame-game-state/game-data-structure/GameLog";
 import EntireGameSnapshot from "./EntireGameSnapshot";
-import GameLogManager from "../GameLogManager";
-import EntireGame from "../../../../common/EntireGame";
+import GameLogManager from "../../common/ingame-game-state/game-data-structure/GameLogManager";
+import EntireGame from "../../common/EntireGame";
 import { computed, observable } from "mobx";
 import ReplayConstants, { modifyingGameLogIds } from "./replay-constants";
-import BetterMap from "../../../../utils/BetterMap";
-import IngameGameState from "../../IngameGameState";
+import BetterMap from "../../utils/BetterMap";
+import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import SnapshotMigrator from "./SnapshotMigrator";
-import StaticRegion from "../static-data-structure/StaticRegion";
-import Game from "../Game";
+import StaticRegion from "../../common/ingame-game-state/game-data-structure/static-data-structure/StaticRegion";
+import Game from "../../common/ingame-game-state/game-data-structure/Game";
 import SnapshotHighlighter from "./SnapshotHighlighter";
 
 function filterArrayByThreshold(arr: number[], threshold: number): void {

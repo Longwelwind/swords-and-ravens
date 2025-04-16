@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { observable } from "mobx";
-import { GameLogData } from "../GameLog";
+import { GameLogData } from "../../common/ingame-game-state/game-data-structure/GameLog";
 import GameReplayManager from "./GameReplayManager";
-import BetterMap from "../../../../utils/BetterMap";
+import BetterMap from "../../utils/BetterMap";
 import EntireGameSnapshot from "./EntireGameSnapshot";
 import _ from "lodash";
 

@@ -21,7 +21,7 @@ import worldImage from "../../public/images/icons/world.svg";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
 import { OverlayChildren } from "react-bootstrap/esm/Overlay";
-import HouseSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/HouseSnapshot";
+import HouseSnapshot from "./game-replay/HouseSnapshot";
 import allKnownHouseCards from "./utils/houseCardHelper";
 
 interface HouseSnapshotComponentProps {

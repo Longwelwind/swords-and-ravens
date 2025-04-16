@@ -1,4 +1,4 @@
-import { HouseCardState } from "../house-card/HouseCard";
+import { HouseCardState } from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 
 export default interface IHouseSnapshot {
   id: string;

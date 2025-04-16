@@ -3,8 +3,8 @@ import GameSnapshot from "./GameSnapshot";
 import HouseSnapshot from "./HouseSnapshot";
 import IEntireGameSnapshot from "./IEntireGameSnapshot";
 import RegionSnapshot from "./RegionSnapshot";
-import BetterMap from "../../../../utils/BetterMap";
-import IngameGameState from "../../IngameGameState";
+import BetterMap from "../../utils/BetterMap";
+import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import _ from "lodash";
 
 export default class EntireGameSnapshot implements IEntireGameSnapshot {

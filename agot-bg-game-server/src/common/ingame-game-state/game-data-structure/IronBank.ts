@@ -6,7 +6,7 @@ import Game from "./Game";
 import House from "./House";
 import LoanCard, { SerializedLoanCard } from "./loan-card/LoanCard";
 import LoanCardType from "./loan-card/LoanCardType";
-import IIronBankSnapshot from "./game-replay/IIronBankSnapshot";
+import IIronBankSnapshot from "../../../client/game-replay/IIronBankSnapshot";
 
 export default class IronBank {
   game: Game;

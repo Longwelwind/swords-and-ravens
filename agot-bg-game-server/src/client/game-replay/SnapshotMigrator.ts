@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import _ from "lodash";
-import { MAX_WILDLING_STRENGTH } from "../Game";
-import { GameLogData } from "../GameLog";
-import orders from "../orders";
+import { MAX_WILDLING_STRENGTH } from "../../common/ingame-game-state/game-data-structure/Game";
+import { GameLogData } from "../../common/ingame-game-state/game-data-structure/GameLog";
+import orders from "../../common/ingame-game-state/game-data-structure/orders";
 import EntireGameSnapshot from "./EntireGameSnapshot";
-import { HouseCardState } from "../house-card/HouseCard";
-import IngameGameState from "../../IngameGameState";
-import allKnownHouseCards from "../../../../client/utils/houseCardHelper";
+import { HouseCardState } from "../../common/ingame-game-state/game-data-structure/house-card/HouseCard";
+import IngameGameState from "../../common/ingame-game-state/IngameGameState";
+import allKnownHouseCards from "../utils/houseCardHelper";
 import CombatSnapshotMigrator, {
   CombatResultData,
 } from "./CombatSnapshotMigrator";

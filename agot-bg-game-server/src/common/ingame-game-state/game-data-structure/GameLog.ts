@@ -1,7 +1,7 @@
 import { CombatStats } from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 import { ReplacementReason } from "../IngameGameState";
-import IGameSnapshot from "./game-replay/IGameSnapshot";
-import IRegionSnapshot from "./game-replay/IRegionSnapshot";
+import IGameSnapshot from "../../../client/game-replay/IGameSnapshot";
+import IRegionSnapshot from "../../../client/game-replay/IRegionSnapshot";
 
 export default interface GameLog {
   time: Date;

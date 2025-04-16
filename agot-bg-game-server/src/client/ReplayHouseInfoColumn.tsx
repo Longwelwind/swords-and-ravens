@@ -19,7 +19,7 @@ import diamondHiltImage from "../../public/images/icons/diamond-hilt.svg";
 import diamondHiltUsedImage from "../../public/images/icons/diamond-hilt-used.svg";
 import ravenImage from "../../public/images/icons/raven.svg";
 import { observer } from "mobx-react";
-import GameSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/GameSnapshot";
+import GameSnapshot from "./game-replay/GameSnapshot";
 import ReplaySupplyTrackComponent from "./game-state-panel/utils/ReplaySupplyTrackComponent";
 
 interface ReplayHouseInfoColumnProps {

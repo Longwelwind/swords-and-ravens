@@ -8,7 +8,7 @@ import House from "../common/ingame-game-state/game-data-structure/House";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import braavosInitialLoanCostReduceImage from "../../public/images/garrisons/braavos-initial-loan-cost-reduce.png";
 import ironBankImage from "../../public/images/ironBank.jpg";
-import IIronBankSnapshot from "../common/ingame-game-state/game-data-structure/game-replay/IronBankSnapshot";
+import IIronBankSnapshot from "./game-replay/IronBankSnapshot";
 
 interface IronBankSnapshotComponentProps {
   ingame: IngameGameState;

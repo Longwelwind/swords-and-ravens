@@ -12,7 +12,7 @@ import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { port } from "./regionTypes";
 import SnrError from "../../../utils/snrError";
 import Player from "../Player";
-import IRegionSnapshot from "./game-replay/IRegionSnapshot";
+import IRegionSnapshot from "../../../client/game-replay/IRegionSnapshot";
 
 export default class Region {
   game: Game;
