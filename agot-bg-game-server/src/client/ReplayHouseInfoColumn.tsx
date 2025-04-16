@@ -8,7 +8,6 @@ import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 import HouseSnapshotComponent from "./HouseSnapshotComponent";
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import House from "../common/ingame-game-state/game-data-structure/House";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
@@ -21,6 +20,7 @@ import ravenImage from "../../public/images/icons/raven.svg";
 import { observer } from "mobx-react";
 import GameSnapshot from "./game-replay/GameSnapshot";
 import ReplaySupplyTrackComponent from "./game-state-panel/utils/ReplaySupplyTrackComponent";
+import HouseSnapshot from "./game-replay/HouseSnapshot";
 
 interface ReplayHouseInfoColumnProps {
   gameClient: GameClient;
@@ -33,22 +33,17 @@ export default class ReplayHouseInfoColumn extends Component<ReplayHouseInfoColu
   private ingame = this.props.ingame;
   private gameClient = this.props.gameClient;
 
-  getTracks(snap: GameSnapshot): { track: (House | null)[]; stars: boolean }[] {
+  getTracks(): { track: HouseSnapshot[]; stars: boolean }[] {
+    const entireSnap = this.ingame.replayManager.selectedSnapshot;
+    const snap = entireSnap?.gameSnapshot;
     if (!snap) {
       return [];
     }
-    const ironThrone = snap.ironThroneTrack.map((h) =>
-      this.ingame.game.houses.get(h)
-    );
-    const fiefdoms = snap.fiefdomsTrack.map((h) =>
-      this.ingame.game.houses.get(h)
-    );
-    const kingsCourt = snap.kingsCourtTrack.map((h) =>
-      this.ingame.game.houses.get(h)
-    );
+    const ironThrone = snap.ironThroneTrack.map((h) => entireSnap.getHouse(h));
+    const fiefdoms = snap.fiefdomsTrack.map((h) => entireSnap.getHouse(h));
+    const kingsCourt = snap.kingsCourtTrack.map((h) => entireSnap.getHouse(h));
 
     // Todo: enable temporary tracks for replaying Draft and CoK states
-
     return [
       { track: ironThrone, stars: false },
       { track: fiefdoms, stars: false },
@@ -113,7 +108,7 @@ export default class ReplayHouseInfoColumn extends Component<ReplayHouseInfoColu
   }
 
   private renderInfluenceTracks(snap: GameSnapshot): React.ReactNode {
-    return this.getTracks(snap).map(({ track, stars }, i) => (
+    return this.getTracks().map(({ track, stars }, i) => (
       <ListGroupItem
         key={`influence-track-container_${i}`}
         style={{ minHeight: "61px" }}
@@ -133,26 +128,54 @@ export default class ReplayHouseInfoColumn extends Component<ReplayHouseInfoColu
               width={32}
             />
           </Col>
-          {track.map((h, j) => (
-            <Col xs="auto" key={`influence-track_${i}_${h?.id ?? j}`}>
-              <SimpleInfluenceIconComponent house={h} />
-              <div className="tracker-star-container">
-                {stars &&
-                  _.range(0, this.ingame.game.starredOrderRestrictions[j]).map(
-                    (k) => (
-                      <div key={`stars_${h?.id ?? j}_${k}`}>
-                        <FontAwesomeIcon
-                          style={{ color: "#ffc107", fontSize: "9px" }}
-                          icon={faStar}
-                        />
-                      </div>
-                    )
-                  )}
-              </div>
-            </Col>
-          ))}
+          {this.renderTrack(track, i, stars)}
         </Row>
       </ListGroupItem>
+    ));
+  }
+
+  private renderTrack(
+    track: HouseSnapshot[],
+    i: number,
+    stars: boolean
+  ): React.ReactNode {
+    const totalHouses = this.ingame.game.houses.size;
+    const filledTrack: (HouseSnapshot | null)[] = [...track];
+
+    // Fill the track with null placeholders if it's shorter than total houses
+    while (filledTrack.length < totalHouses) {
+      filledTrack.push(null);
+    }
+
+    return filledTrack.map((h, j) => (
+      <Col
+        xs="auto"
+        key={`influence-track_${i}_${h?.id ?? `placeholder_${j}`}`}
+      >
+        {h ? (
+          <>
+            <SimpleInfluenceIconComponent house={h} />
+            <div className="tracker-star-container">
+              {stars &&
+                _.range(0, this.ingame.game.starredOrderRestrictions[j]).map(
+                  (k) => (
+                    <div key={`stars_${h?.id ?? j}_${k}`}>
+                      <FontAwesomeIcon
+                        style={{ color: "#ffc107", fontSize: "9px" }}
+                        icon={faStar}
+                      />
+                    </div>
+                  )
+                )}
+            </div>
+          </>
+        ) : (
+          // Invisible placeholder
+          <div
+            style={{ visibility: "hidden", width: "36px", height: "36px" }}
+          />
+        )}
+      </Col>
     ));
   }
 }
