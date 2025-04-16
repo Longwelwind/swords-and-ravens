@@ -43,6 +43,7 @@ export default class EntireGameSnapshot implements IEntireGameSnapshot {
   }
 
   calculateControllersPerRegion(): void {
+    if (!this.gameSnapshot) return;
     this.worldSnapshot.forEach((region) => {
       const hid = this.determineController(region.id);
       const controller = hid ? this._houseMap.get(hid) : null;
