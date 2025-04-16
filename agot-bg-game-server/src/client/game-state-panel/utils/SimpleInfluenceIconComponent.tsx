@@ -5,6 +5,7 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { LobbyHouse } from "../../../common/lobby-game-state/LobbyGameState";
 import { preventOverflow } from "@popperjs/core";
 import classNames from "classnames";
+import HouseSnapshot from "../../../client/game-replay/HouseSnapshot";
 
 interface SimpleInfluenceIconComponentProps {
   house: LobbyHouse | null;
@@ -14,7 +15,7 @@ interface SimpleInfluenceIconComponentProps {
 }
 
 export default class SimpleInfluenceIconComponent extends Component<SimpleInfluenceIconComponentProps> {
-  get house(): LobbyHouse | null {
+  get house(): LobbyHouse | HouseSnapshot | null {
     return this.props.house;
   }
 

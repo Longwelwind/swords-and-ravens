@@ -36,7 +36,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
       ...serializedGameMigrations.map((mig) => Number(mig.version))
     );
 
-    if (serializedGame.migrate) {
+    if (serializedGame && serializedGame.migrate !== undefined) {
       serializedGame = this.migrateRealGameToLocalDebugGame(serializedGame);
     }
 
@@ -75,7 +75,14 @@ export default class LocalWebsiteClient implements WebsiteClient {
     const ingame = serializedGame.childGameState;
     ingame.votes = [];
     ingame.gameLogManager.lastSeenLogTimes = [];
-    const houses = ingame.players.map((p) => p.houseId);
+    const log = ingame.gameLogManager.logs.find(
+      (log) => log.data.type === "user-house-assignments"
+    );
+    if (!log || log.data.type != "user-house-assignments") {
+      throw new Error("user-houser-assignment log not found");
+    }
+    const houses = log.data.assignments.map(([houseId, _]) => houseId);
+
     ingame.players = [];
     for (let i = 0; i < houses.length; i++) {
       const player = {
@@ -90,9 +97,23 @@ export default class LocalWebsiteClient implements WebsiteClient {
     _.remove(
       ingame.gameLogManager.logs,
       (log) =>
-        log.data.type == "user-house-assignments" ||
-        log.data.type == "player-replaced"
+        log.data.type === "user-house-assignments" ||
+        (log.data.type === "player-replaced" && log.data.newUser)
     );
+
+    ingame.gameLogManager.logs
+      .filter((log) => log.data.type === "player-replaced")
+      .forEach((log) => {
+        if (log.data.type !== "player-replaced") {
+          return;
+        }
+        const house = log.data.house;
+        const player = ingame.players.find((p) => p.houseId === house);
+        if (!player) {
+          throw new Error(`Player not found for house ${house}`);
+        }
+        log.data.oldUser = player.userId;
+      });
 
     return serializedGame;
   }
