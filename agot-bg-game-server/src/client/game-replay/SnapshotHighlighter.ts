@@ -34,6 +34,8 @@ export default class SnapshotHighlighter {
 
     this.clear();
 
+    if (!snap.gameSnapshot) return;
+
     this.handleHighlighting(log, snap);
 
     if (this.hlHouseAreas) {

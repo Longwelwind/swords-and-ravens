@@ -336,43 +336,45 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               </Dropdown>
             </Nav>
           </Card.Header>
-          <Card.Body id="game-log-panel">
-            {/* This is an invisible div to force the parent to stretch to its remaining width */}
-            <div style={{ visibility: "hidden", width: "850px" }} />
+          <Card.Body id="game-log-panel" className="h-100 px-1">
             <Tab.Content className="h-100">
               <Tab.Pane
                 eventKey="game-logs"
-                className="d-flex flex-column h-100"
+                className="h-100 scrollable-content"
               >
-                <div
-                  style={{ overflowY: "auto", flex: 1, overflowX: "hidden" }}
-                >
-                  <GameLogListComponent
-                    ingameGameState={ingame}
-                    gameClient={gameClient}
-                    currentlyViewed={true}
-                  />
+                <div className="d-flex flex-column h-100">
+                  <div className="flex-grow-1">
+                    <GameLogListComponent
+                      ingameGameState={ingame}
+                      gameClient={gameClient}
+                      currentlyViewed={true}
+                    />
+                  </div>
                 </div>
               </Tab.Pane>
               {gameSnapshot?.ironBank && (
-                <Tab.Pane eventKey="iron-bank" className="h-100">
-                  <IronBankSnapshotTabComponent
-                    ingame={ingame}
-                    ironBank={gameSnapshot.ironBank}
-                  />
+                <Tab.Pane eventKey="iron-bank">
+                  <Row>
+                    <IronBankSnapshotTabComponent
+                      ingame={ingame}
+                      ironBank={gameSnapshot.ironBank}
+                    />
+                  </Row>
                 </Tab.Pane>
               )}
-              <Tab.Pane eventKey="settings" className="h-100">
-                <GameSettingsComponent
-                  gameClient={gameClient}
-                  entireGame={ingame.entireGame}
-                />
-                <div style={{ marginTop: -20 }}>
+              <Tab.Pane eventKey="settings">
+                <Row>
+                  <GameSettingsComponent
+                    gameClient={gameClient}
+                    entireGame={ingame.entireGame}
+                  />
+                </Row>
+                <Row className="justify-content-center">
                   <UserSettingsComponent
                     user={gameClient.authenticatedUser}
                     entireGame={ingame.entireGame}
                   />
-                </div>
+                </Row>
               </Tab.Pane>
             </Tab.Content>
           </Card.Body>

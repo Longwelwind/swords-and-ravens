@@ -859,3 +859,8 @@ hr.red {
   opacity: 0.9; // Slight transparency
   border-radius: 2px; // Rounded corners
 }
+
+.scrollable-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
