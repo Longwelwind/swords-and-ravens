@@ -10,6 +10,7 @@ import allKnownHouseCards from "../utils/houseCardHelper";
 import CombatSnapshotMigrator, {
   CombatResultData,
 } from "./CombatSnapshotMigrator";
+import { GameSettings } from "../../common/EntireGame";
 
 export default class SnapshotMigrator {
   private ingame: IngameGameState;
@@ -28,6 +29,10 @@ export default class SnapshotMigrator {
 
   private get supplyRestrictions(): number[][] {
     return this.ingame.game.supplyRestrictions;
+  }
+
+  private get gameSettings(): GameSettings {
+    return this.ingame.entireGame.gameSettings;
   }
 
   constructor(ingame: IngameGameState) {
@@ -199,8 +204,8 @@ export default class SnapshotMigrator {
         return snap;
       }
 
-      case "orders-revealed":
-        return new EntireGameSnapshot(
+      case "orders-revealed": {
+        const result = new EntireGameSnapshot(
           {
             worldSnapshot: log.worldState,
             gameSnapshot: log.gameSnapshot,
@@ -208,6 +213,26 @@ export default class SnapshotMigrator {
           this.ingame
         );
 
+        if (
+          log.gameSnapshot?.round !== 0 ||
+          this.gameSettings.thematicDraft ||
+          this.gameSettings.blindDraft ||
+          this.gameSettings.randomDraft
+        ) {
+          return result;
+        }
+
+        if (result.gameSnapshot && this.gameSettings.draftHouseCards) {
+          result.gameSnapshot.housesOnVictoryTrack.forEach((house) => {
+            house.houseCards = [];
+          });
+          result.gameSnapshot.ironThroneTrack = [];
+          result.gameSnapshot.fiefdomsTrack = [];
+          result.gameSnapshot.kingsCourtTrack = [];
+        }
+
+        return result;
+      }
       case "leave-power-token-choice": {
         const region = snap.getRegion(log.region);
         if (log.leftPowerToken) region.controlPowerToken = log.house;
@@ -993,7 +1018,7 @@ export default class SnapshotMigrator {
         const crd = this.combatResultData;
         const houseIsAttacker = crd.attacker == log.house;
         const region = snap.getRegion(
-          houseIsAttacker ? crd.attacker : crd.defenderRegion
+          houseIsAttacker ? crd.attackerRegion : crd.defenderRegion
         );
         region.removeUnit(log.casualty, log.house);
         return snap;
