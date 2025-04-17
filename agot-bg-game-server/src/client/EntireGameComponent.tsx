@@ -419,9 +419,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
               popperConfig={{ modifiers: [preventOverflow] }}
             >
               <h4>
-                <Badge variant="primary">
-                  <FontAwesomeIcon icon={faTriangleExclamation} />
-                </Badge>
+                <FontAwesomeIcon icon={faTriangleExclamation} />
               </h4>
             </OverlayTrigger>
           </Col>
@@ -475,9 +473,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
               }
               popperConfig={{ modifiers: [preventOverflow] }}
             >
-              <h4>
-                <Badge variant="primary">🐉</Badge>
-              </h4>
+              <h4>🐉</h4>
             </OverlayTrigger>
           </Col>
         )}
