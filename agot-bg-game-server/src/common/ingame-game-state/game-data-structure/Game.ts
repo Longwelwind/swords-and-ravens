@@ -330,14 +330,15 @@ export default class Game {
         return h != this.targaryen
           ? n >= this.victoryPointsCountNeededToWin
           : n >= this.loyaltyTokenCountNeededToWin;
-      }) || this.worldConquered()
+      }) || this.isWorldConquered()
     );
   }
 
-  worldConquered(): boolean {
+  isWorldConquered(): boolean {
+    const minimumAliveCount = this.ingame.players.size > 1 ? 2 : 1;
+    const playerHouses = this.ingame.players.values.map((p) => p.house);
     let aliveCount = 0;
-    const minimumAliveCount = this.ingame.players.size > 2 ? 2 : 1;
-    for (const house of this.houses.values) {
+    for (const house of playerHouses) {
       if (!this.ingame.isHouseDefeated(house)) {
         aliveCount++;
         if (aliveCount >= minimumAliveCount) {
