@@ -3,27 +3,97 @@
   "maxTurns": 10,
   "maxPowerTokens": 20,
   "tracks": {
-    "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell"],
-    "fiefdoms": ["greyjoy", "tyrell", "martell", "stark", "baratheon", "lannister"],
-    "kingsCourt": ["lannister", "stark", "martell", "baratheon", "tyrell", "greyjoy"]
+    "ironThrone": [
+      "baratheon",
+      "lannister",
+      "stark",
+      "martell",
+      "greyjoy",
+      "tyrell"
+    ],
+    "fiefdoms": [
+      "greyjoy",
+      "tyrell",
+      "martell",
+      "stark",
+      "baratheon",
+      "lannister"
+    ],
+    "kingsCourt": [
+      "lannister",
+      "stark",
+      "martell",
+      "baratheon",
+      "tyrell",
+      "greyjoy"
+    ]
   },
   "setups": {
     "base-game": {
-      "name": "2nd Edition Base Game (3p/6p)",
+      "name": "2nd Edition Base Game (3-6p)",
       "playerSetups": [
         {
           "playerCount": 3,
           "houses": ["baratheon", "lannister", "stark"],
           "blockedRegions": [
-            "pyke", "port-of-pyke", "highgarden", "oldtown", "port-of-oldtown", "sunspear",
-            "port-of-sunspear", "salt-shore", "yronwood", "starfall", "three-towers",
-            "dornish-marches", "princes-pass", "the-boneway", "storms-end", "port-of-storms-end"
+            "pyke",
+            "port-of-pyke",
+            "highgarden",
+            "oldtown",
+            "port-of-oldtown",
+            "sunspear",
+            "port-of-sunspear",
+            "salt-shore",
+            "yronwood",
+            "starfall",
+            "three-towers",
+            "dornish-marches",
+            "princes-pass",
+            "the-boneway",
+            "storms-end",
+            "port-of-storms-end"
           ],
           "removedUnits": ["port-of-lannisport"]
         },
         {
+          "playerCount": 4,
+          "houses": ["baratheon", "lannister", "stark", "greyjoy"],
+          "garrisons": {
+            "oldtown": 3,
+            "three-towers": 3,
+            "dornish-marches": 3,
+            "princes-pass": 3,
+            "starfall": 3,
+            "yronwood": 3,
+            "the-boneway": 3,
+            "storms-end": 4,
+            "salt-shore": 3,
+            "sunspear": 5
+          }
+        },
+        {
+          "playerCount": 5,
+          "houses": ["baratheon", "lannister", "stark", "greyjoy", "tyrell"],
+          "garrisons": {
+            "three-towers": 3,
+            "princes-pass": 3,
+            "the-boneway": 3,
+            "starfall": 3,
+            "yronwood": 3,
+            "salt-shore": 3,
+            "sunspear": 5
+          }
+        },
+        {
           "playerCount": 6,
-          "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell"]
+          "houses": [
+            "stark",
+            "greyjoy",
+            "lannister",
+            "baratheon",
+            "tyrell",
+            "martell"
+          ]
         }
       ]
     },
@@ -32,20 +102,88 @@
       "playerSetups": [
         {
           "playerCount": 7,
-          "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell", "arryn"],
+          "houses": [
+            "stark",
+            "greyjoy",
+            "lannister",
+            "baratheon",
+            "tyrell",
+            "martell",
+            "arryn"
+          ],
           "tracks": {
-            "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell", "arryn"],
-            "fiefdoms": ["greyjoy", "tyrell", "martell", "arryn", "stark", "baratheon", "lannister"],
-            "kingsCourt": ["lannister", "stark", "martell", "tyrell", "arryn", "baratheon", "greyjoy"]
+            "ironThrone": [
+              "baratheon",
+              "lannister",
+              "stark",
+              "martell",
+              "greyjoy",
+              "tyrell",
+              "arryn"
+            ],
+            "fiefdoms": [
+              "greyjoy",
+              "tyrell",
+              "martell",
+              "arryn",
+              "stark",
+              "baratheon",
+              "lannister"
+            ],
+            "kingsCourt": [
+              "lannister",
+              "stark",
+              "martell",
+              "tyrell",
+              "arryn",
+              "baratheon",
+              "greyjoy"
+            ]
           }
         },
         {
           "playerCount": 8,
-          "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell", "arryn", "targaryen"],
+          "houses": [
+            "stark",
+            "greyjoy",
+            "lannister",
+            "baratheon",
+            "tyrell",
+            "martell",
+            "arryn",
+            "targaryen"
+          ],
           "tracks": {
-            "ironThrone": ["baratheon", "lannister", "stark", "martell", "greyjoy", "tyrell", "arryn", "targaryen"],
-            "fiefdoms": ["greyjoy", "tyrell", "martell", "arryn", "stark", "baratheon", "lannister", "targaryen"],
-            "kingsCourt": ["lannister", "stark", "martell", "tyrell", "arryn", "baratheon", "greyjoy", "targaryen"]
+            "ironThrone": [
+              "baratheon",
+              "lannister",
+              "stark",
+              "martell",
+              "greyjoy",
+              "tyrell",
+              "arryn",
+              "targaryen"
+            ],
+            "fiefdoms": [
+              "greyjoy",
+              "tyrell",
+              "martell",
+              "arryn",
+              "stark",
+              "baratheon",
+              "lannister",
+              "targaryen"
+            ],
+            "kingsCourt": [
+              "lannister",
+              "stark",
+              "martell",
+              "tyrell",
+              "arryn",
+              "baratheon",
+              "greyjoy",
+              "targaryen"
+            ]
           },
           "loyaltyTokens": {
             "kings-landing": 1
@@ -94,371 +232,481 @@
     },
     "a-dance-with-dragons": {
       "name": "A Dance with Dragons (6p)",
-      "playerSetups": [{
-        "playerCount": 6,
-        "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell"],
-        "maxTurns": 6,
-        "tracks": {
-          "ironThrone": ["lannister", "tyrell", "greyjoy", "stark", "baratheon", "martell"],
-          "fiefdoms": ["greyjoy", "martell", "baratheon", "tyrell", "lannister", "stark"],
-          "kingsCourt": ["tyrell", "martell", "stark", "lannister", "baratheon", "greyjoy"]
-        },
-        "units": {
-          "winterfell": [{
-              "unitType": "footman",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 2
-            },
-            {
-              "unitType": "knight",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }
+      "playerSetups": [
+        {
+          "playerCount": 6,
+          "houses": [
+            "stark",
+            "greyjoy",
+            "lannister",
+            "baratheon",
+            "tyrell",
+            "martell"
           ],
-          "white-harbor": [{
-            "unitType": "knight",
-            "house": "stark",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "port-of-white-harbor": [{
-            "unitType": "ship",
-            "house": "stark",
-            "quantity": 0,
-            "quantityVassal": 1
-          }],
-          "moat-cailin": [{
-              "unitType": "footman",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 0
-            },
-            {
-              "unitType": "knight",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }
-          ],
-          "the-twins": [{
-            "unitType": "footman",
-            "house": "stark",
-            "quantity": 2,
-            "quantityVassal": 2
-          }],
-          "pyke": [{
-            "unitType": "knight",
-            "house": "greyjoy",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "bay-of-ice": [{
-            "unitType": "ship",
-            "house": "greyjoy",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "sunset-sea": [{
-            "unitType": "ship",
-            "house": "greyjoy",
-            "quantity": 1,
-            "quantityVassal": 2
-          }],
-          "ironmans-bay": [{
-            "unitType": "ship",
-            "house": "greyjoy",
-            "quantity": 1,
-            "quantityVassal": 2
-          }],
-          "greywater-watch": [{
-              "unitType": "footman",
-              "house": "greyjoy",
-              "quantity": 0,
-              "quantityVassal": 1
-          }],
-          "west-summer-sea": [{
-            "unitType": "ship",
-            "house": "greyjoy",
-            "quantity": 3,
-            "quantityVassal": 1
-          }],
-          "the-stony-shore": [{
-            "unitType": "footman",
-            "house": "greyjoy",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "searoad-marches": [{
-            "unitType": "footman",
-            "house": "greyjoy",
-            "quantity": 2,
-            "quantityVassal": 2
-          }],
-          "lannisport": [{
-            "unitType": "footman",
-            "house": "lannister",
-            "quantity": 1,
-            "quantityVassal": 1
-          }, {
-            "unitType": "knight",
-            "house": "lannister",
-            "quantity": 0,
-            "quantityVassal": 1
-          }],
-          "the-golden-sound": [{
-            "unitType": "ship",
-            "house": "lannister",
-            "quantity": 1,
-            "quantityVassal": 3
-          }],
-          "stoney-sept": [
-            {
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 0,
-              "quantityVassal": 1
-            }
-          ],
-          "riverrun": [{
-            "unitType": "footman",
-            "house": "lannister",
-            "quantity": 2,
-            "quantityVassal": 2
-          }],
-          "harrenhal": [{
-            "unitType": "footman",
-            "house": "lannister",
-            "quantity": 1,
-            "quantityVassal": 0
-          }, {
-            "unitType": "knight",
-            "house": "lannister",
-            "quantity": 0,
-            "quantityVassal": 1
-          }],
-          "kings-landing": [{
-            "unitType": "footman",
-            "house": "lannister",
-            "quantity": 2,
-            "quantityVassal": 1
-          }, {
-            "unitType": "knight",
-            "house": "lannister",
-            "quantity": 0,
-            "quantityVassal": 2
-          }],
-          "blackwater-bay": [
-            {
-              "unitType": "ship",
-              "house": "lannister",
-              "quantity": 0,
-              "quantityVassal": 1
-            }
-          ],
-          "port-of-lannisport": [
-            {
-              "unitType": "ship",
-              "house": "lannister",
-              "quantity": 0,
-              "quantityVassal": 1
-            }
-          ],
-          "port-of-dragonstone": [{
-            "unitType": "ship",
-            "house": "baratheon",
-            "quantity": 0,
-            "quantityVassal": 1
-          }],
-          "dragonstone": [{
-            "unitType": "knight",
-            "house": "baratheon",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "the-shivering-sea": [{
-            "unitType": "ship",
-            "house": "baratheon",
-            "quantity": 2,
-            "quantityVassal": 2
-          }],
-          "castle-black": [{
-              "unitType": "knight",
-              "house": "baratheon",
-              "quantity": 1,
-              "quantityVassal": 2
-            },
-            {
-              "unitType": "footman",
-              "house": "baratheon",
-              "quantity": 2,
-              "quantityVassal": 1
-            }
-          ],
-          "karhold": [{
-            "unitType": "footman",
-            "house": "baratheon",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "port-of-storms-end": [{
-            "unitType": "ship",
-            "house": "baratheon",
-            "quantity": 0,
-            "quantityVassal": 1
-          }],
-          "storms-end": [{
-            "unitType": "footman",
-            "house": "baratheon",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "highgarden": [{
-            "unitType": "footman",
-            "house": "tyrell",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "redwyne-straights": [
-            {
-              "unitType": "ship",
-              "house": "tyrell",
-              "quantity": 0,
-              "quantityVassal": 1
-            }
-          ],
-          "oldtown": [{
-            "unitType": "footman",
-            "house": "tyrell",
-            "quantity": 1,
-            "quantityVassal": 0
-          }, {
-            "unitType": "knight",
-            "house": "tyrell",
-            "quantity": 0,
-            "quantityVassal": 1
-          }],
-          "kingswood": [{
-            "unitType": "knight",
-            "house": "tyrell",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "the-reach": [{
-            "unitType": "footman",
-            "house": "tyrell",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "crackclaw-point": [{
-            "unitType": "footman",
-            "house": "tyrell",
-            "quantity": 2,
-            "quantityVassal": 2
-          }],
-          "shipbreaker-bay": [{
-            "unitType": "ship",
-            "house": "tyrell",
-            "quantity": 3,
-            "quantityVassal": 3
-          }],
-          "dornish-marches": [{
-              "unitType": "knight",
-              "house": "tyrell",
-              "quantity": 0,
-              "quantityVassal": 1
-          }],
-          "sunspear": [{
-              "unitType": "footman",
-              "house": "martell",
-              "quantity": 1,
-              "quantityVassal": 1
-            },
-            {
-              "unitType": "knight",
-              "house": "martell",
-              "quantity": 1,
-              "quantityVassal": 0
-            }
-          ],
-          "sea-of-dorne": [
-            {
-              "unitType": "ship",
-              "house": "martell",
-              "quantity": 0,
-              "quantityVassal": 1
-            }
-          ],
-          "east-summer-sea": [
-            {
-              "unitType": "ship",
-              "house": "martell",
-              "quantity": 0,
-              "quantityVassal": 2
-            }
-          ],
-          "port-of-sunspear": [{
-            "unitType": "ship",
-            "house": "martell",
-            "quantity": 1,
-            "quantityVassal": 0
-          }],
-          "salt-shore": [{
-            "unitType": "footman",
-            "house": "martell",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "yronwood": [{
-            "unitType": "footman",
-            "house": "martell",
-            "quantity": 0,
-            "quantityVassal": 1
+          "maxTurns": 6,
+          "tracks": {
+            "ironThrone": [
+              "lannister",
+              "tyrell",
+              "greyjoy",
+              "stark",
+              "baratheon",
+              "martell"
+            ],
+            "fiefdoms": [
+              "greyjoy",
+              "martell",
+              "baratheon",
+              "tyrell",
+              "lannister",
+              "stark"
+            ],
+            "kingsCourt": [
+              "tyrell",
+              "martell",
+              "stark",
+              "lannister",
+              "baratheon",
+              "greyjoy"
+            ]
           },
-          {
-            "unitType": "knight",
-            "house": "martell",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "the-boneway": [{
-            "unitType": "footman",
-            "house": "martell",
-            "quantity": 1,
-            "quantityVassal": 1
-          }],
-          "starfall": [
-            {
-              "unitType": "footman",
-              "house": "martell",
-              "quantity": 0,
-              "quantityVassal": 1
-            }
-          ]
-        },
-        "supplyLevels": {
-          "lannister": 5,
-          "stark": 2,
-          "baratheon": 1,
-          "greyjoy": 3,
-          "martell": 4,
-          "tyrell": 4
-        },
-        "powerTokensOnBoard": {
-          "stark": ["moat-cailin", "widows-watch"],
-          "greyjoy": ["searoad-marches"],
-          "lannister": ["stoney-sept", "blackwater"],
-          "baratheon": ["storms-end"],
-          "tyrell": ["oldtown", "the-reach", "dornish-marches", "three-towers", "the-arbor"],
-          "martell": ["princes-pass", "starfall"]
-        },
-        "garrisons": {
-          "storms-end": 4,
-          "oldtown": 3,
-          "kings-landing": 0
+          "units": {
+            "winterfell": [
+              {
+                "unitType": "footman",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 2
+              },
+              {
+                "unitType": "knight",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "white-harbor": [
+              {
+                "unitType": "knight",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "port-of-white-harbor": [
+              {
+                "unitType": "ship",
+                "house": "stark",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "moat-cailin": [
+              {
+                "unitType": "footman",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 0
+              },
+              {
+                "unitType": "knight",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-twins": [
+              {
+                "unitType": "footman",
+                "house": "stark",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "pyke": [
+              {
+                "unitType": "knight",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "bay-of-ice": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "sunset-sea": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 2
+              }
+            ],
+            "ironmans-bay": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 2
+              }
+            ],
+            "greywater-watch": [
+              {
+                "unitType": "footman",
+                "house": "greyjoy",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "west-summer-sea": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 3,
+                "quantityVassal": 1
+              }
+            ],
+            "the-stony-shore": [
+              {
+                "unitType": "footman",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "searoad-marches": [
+              {
+                "unitType": "footman",
+                "house": "greyjoy",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "lannisport": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              },
+              {
+                "unitType": "knight",
+                "house": "lannister",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "the-golden-sound": [
+              {
+                "unitType": "ship",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 3
+              }
+            ],
+            "stoney-sept": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "riverrun": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "harrenhal": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 0
+              },
+              {
+                "unitType": "knight",
+                "house": "lannister",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "kings-landing": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 2,
+                "quantityVassal": 1
+              },
+              {
+                "unitType": "knight",
+                "house": "lannister",
+                "quantity": 0,
+                "quantityVassal": 2
+              }
+            ],
+            "blackwater-bay": [
+              {
+                "unitType": "ship",
+                "house": "lannister",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "port-of-lannisport": [
+              {
+                "unitType": "ship",
+                "house": "lannister",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "port-of-dragonstone": [
+              {
+                "unitType": "ship",
+                "house": "baratheon",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "dragonstone": [
+              {
+                "unitType": "knight",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-shivering-sea": [
+              {
+                "unitType": "ship",
+                "house": "baratheon",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "castle-black": [
+              {
+                "unitType": "knight",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 2
+              },
+              {
+                "unitType": "footman",
+                "house": "baratheon",
+                "quantity": 2,
+                "quantityVassal": 1
+              }
+            ],
+            "karhold": [
+              {
+                "unitType": "footman",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "port-of-storms-end": [
+              {
+                "unitType": "ship",
+                "house": "baratheon",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "storms-end": [
+              {
+                "unitType": "footman",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "highgarden": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "redwyne-straights": [
+              {
+                "unitType": "ship",
+                "house": "tyrell",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "oldtown": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 0
+              },
+              {
+                "unitType": "knight",
+                "house": "tyrell",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "kingswood": [
+              {
+                "unitType": "knight",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-reach": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "crackclaw-point": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "shipbreaker-bay": [
+              {
+                "unitType": "ship",
+                "house": "tyrell",
+                "quantity": 3,
+                "quantityVassal": 3
+              }
+            ],
+            "dornish-marches": [
+              {
+                "unitType": "knight",
+                "house": "tyrell",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "sunspear": [
+              {
+                "unitType": "footman",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 1
+              },
+              {
+                "unitType": "knight",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 0
+              }
+            ],
+            "sea-of-dorne": [
+              {
+                "unitType": "ship",
+                "house": "martell",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ],
+            "east-summer-sea": [
+              {
+                "unitType": "ship",
+                "house": "martell",
+                "quantity": 0,
+                "quantityVassal": 2
+              }
+            ],
+            "port-of-sunspear": [
+              {
+                "unitType": "ship",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 0
+              }
+            ],
+            "salt-shore": [
+              {
+                "unitType": "footman",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "yronwood": [
+              {
+                "unitType": "footman",
+                "house": "martell",
+                "quantity": 0,
+                "quantityVassal": 1
+              },
+              {
+                "unitType": "knight",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-boneway": [
+              {
+                "unitType": "footman",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "starfall": [
+              {
+                "unitType": "footman",
+                "house": "martell",
+                "quantity": 0,
+                "quantityVassal": 1
+              }
+            ]
+          },
+          "supplyLevels": {
+            "lannister": 5,
+            "stark": 2,
+            "baratheon": 1,
+            "greyjoy": 3,
+            "martell": 4,
+            "tyrell": 4
+          },
+          "powerTokensOnBoard": {
+            "stark": ["moat-cailin", "widows-watch"],
+            "greyjoy": ["searoad-marches"],
+            "lannister": ["stoney-sept", "blackwater"],
+            "baratheon": ["storms-end"],
+            "tyrell": [
+              "oldtown",
+              "the-reach",
+              "dornish-marches",
+              "three-towers",
+              "the-arbor"
+            ],
+            "martell": ["princes-pass", "starfall"]
+          },
+          "garrisons": {
+            "storms-end": 4,
+            "oldtown": 3,
+            "kings-landing": 0
+          }
         }
-      }]
+      ]
     },
     "a-feast-for-crows": {
       "name": "A Feast for Crows (4p)",
@@ -467,9 +715,20 @@
           "playerCount": 4,
           "houses": ["baratheon", "stark", "lannister", "arryn"],
           "blockedRegions": [
-            "pyke", "port-of-pyke", "highgarden", "oldtown", "port-of-oldtown", "sunspear",
-            "port-of-sunspear", "salt-shore", "yronwood", "starfall", "three-towers",
-            "dornish-marches", "princes-pass", "the-boneway"
+            "pyke",
+            "port-of-pyke",
+            "highgarden",
+            "oldtown",
+            "port-of-oldtown",
+            "sunspear",
+            "port-of-sunspear",
+            "salt-shore",
+            "yronwood",
+            "starfall",
+            "three-towers",
+            "dornish-marches",
+            "princes-pass",
+            "the-boneway"
           ],
           "tracks": {
             "ironThrone": ["baratheon", "lannister", "arryn", "stark"],
@@ -483,7 +742,8 @@
             "stark": 2
           },
           "units": {
-            "winterfell": [{
+            "winterfell": [
+              {
                 "unitType": "footman",
                 "house": "stark",
                 "quantity": 1,
@@ -496,19 +756,24 @@
                 "quantityVassal": 1
               }
             ],
-            "port-of-winterfell": [{
-              "unitType": "ship",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "white-harbor": [{
-              "unitType": "knight",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "moat-cailin": [{
+            "port-of-winterfell": [
+              {
+                "unitType": "ship",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "white-harbor": [
+              {
+                "unitType": "knight",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "moat-cailin": [
+              {
                 "unitType": "footman",
                 "house": "stark",
                 "quantity": 1,
@@ -521,30 +786,38 @@
                 "quantityVassal": 1
               }
             ],
-            "seagard": [{
-              "unitType": "knight",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "the-shivering-sea": [{
-              "unitType": "ship",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "lannisport": [{
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
-            "the-golden-sound": [{
-              "unitType": "ship",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
+            "seagard": [
+              {
+                "unitType": "knight",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-shivering-sea": [
+              {
+                "unitType": "ship",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "lannisport": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "the-golden-sound": [
+              {
+                "unitType": "ship",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
             "stoney-sept": [
               {
                 "unitType": "footman",
@@ -553,23 +826,28 @@
                 "quantityVassal": 1
               }
             ],
-            "harrenhal": [{
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }, {
-              "unitType": "knight",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "kings-landing": [{
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
+            "harrenhal": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              },
+              {
+                "unitType": "knight",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "kings-landing": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
             "blackwater-bay": [
               {
                 "unitType": "ship",
@@ -578,19 +856,24 @@
                 "quantityVassal": 1
               }
             ],
-            "dragonstone": [{
-              "unitType": "footman",
-              "house": "baratheon",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "shipbreaker-bay": [{
-              "unitType": "ship",
-              "house": "baratheon",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
-            "kingswood": [{
+            "dragonstone": [
+              {
+                "unitType": "footman",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "shipbreaker-bay": [
+              {
+                "unitType": "ship",
+                "house": "baratheon",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "kingswood": [
+              {
                 "unitType": "footman",
                 "house": "baratheon",
                 "quantity": 1,
@@ -603,12 +886,14 @@
                 "quantityVassal": 1
               }
             ],
-            "storms-end": [{
-              "unitType": "knight",
-              "house": "baratheon",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
+            "storms-end": [
+              {
+                "unitType": "knight",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
             "the-eyrie": [
               {
                 "unitType": "knight",
@@ -657,7 +942,12 @@
             ]
           },
           "powerTokensOnBoard": {
-            "lannister": ["stoney-sept", "kings-landing", "blackwater", "searoad-marches"]
+            "lannister": [
+              "stoney-sept",
+              "kings-landing",
+              "blackwater",
+              "searoad-marches"
+            ]
           },
           "superPowerTokens": {
             "the-eyrie": "arryn"
@@ -666,34 +956,36 @@
             "arryn": 19
           },
           "westerosCards": [
-            [{
-              "type": "mustering-affc",
-              "quantity": 1
-            },
-            {
-              "type": "rally-the-men",
-              "quantity": 2
-            },
-            {
-              "type": "the-burden-of-power",
-              "quantity": 2
-            },
-            {
-              "type": "famine",
-              "quantity": 1
-            },
-            {
-              "type": "ironborn-raid",
-              "quantity": 1
-            },
-            {
-              "type": "shifting-ambitions",
-              "quantity": 2
-            },
-            {
-              "type": "new-information",
-              "quantity": 1
-            }],
+            [
+              {
+                "type": "mustering-affc",
+                "quantity": 1
+              },
+              {
+                "type": "rally-the-men",
+                "quantity": 2
+              },
+              {
+                "type": "the-burden-of-power",
+                "quantity": 2
+              },
+              {
+                "type": "famine",
+                "quantity": 1
+              },
+              {
+                "type": "ironborn-raid",
+                "quantity": 1
+              },
+              {
+                "type": "shifting-ambitions",
+                "quantity": 2
+              },
+              {
+                "type": "new-information",
+                "quantity": 1
+              }
+            ],
             null,
             null
           ]
@@ -706,11 +998,47 @@
         {
           "playerCount": 8,
           "maxTurns": 6,
-          "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell", "arryn", "targaryen"],
+          "houses": [
+            "stark",
+            "greyjoy",
+            "lannister",
+            "baratheon",
+            "tyrell",
+            "martell",
+            "arryn",
+            "targaryen"
+          ],
           "tracks": {
-            "ironThrone": ["lannister", "tyrell", "baratheon", "greyjoy", "martell", "arryn", "stark", "targaryen"],
-            "fiefdoms": ["greyjoy", "baratheon", "stark", "martell", "arryn", "lannister", "tyrell", "targaryen"],
-            "kingsCourt": ["arryn", "tyrell", "martell", "stark", "lannister", "greyjoy", "baratheon", "targaryen"]
+            "ironThrone": [
+              "lannister",
+              "tyrell",
+              "baratheon",
+              "greyjoy",
+              "martell",
+              "arryn",
+              "stark",
+              "targaryen"
+            ],
+            "fiefdoms": [
+              "greyjoy",
+              "baratheon",
+              "stark",
+              "martell",
+              "arryn",
+              "lannister",
+              "tyrell",
+              "targaryen"
+            ],
+            "kingsCourt": [
+              "arryn",
+              "tyrell",
+              "martell",
+              "stark",
+              "lannister",
+              "greyjoy",
+              "baratheon",
+              "targaryen"
+            ]
           },
           "loyaltyTokens": {
             "kings-landing": 1
@@ -758,7 +1086,13 @@
             "lannister": ["blackwater"],
             "greyjoy": ["searoad-marches"],
             "baratheon": ["storms-end"],
-            "tyrell": ["oldtown", "dornish-marches", "the-arbor", "three-towers", "the-reach"],
+            "tyrell": [
+              "oldtown",
+              "dornish-marches",
+              "the-arbor",
+              "three-towers",
+              "the-reach"
+            ],
             "martell": ["princes-pass", "starfall"],
             "targaryen": ["myr"]
           },
@@ -768,7 +1102,8 @@
             "kings-landing": 0
           },
           "units": {
-            "winterfell": [{
+            "winterfell": [
+              {
                 "unitType": "footman",
                 "house": "stark",
                 "quantity": 1,
@@ -781,19 +1116,24 @@
                 "quantityVassal": 1
               }
             ],
-            "white-harbor": [{
-              "unitType": "knight",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "port-of-white-harbor": [{
-              "unitType": "ship",
-              "house": "stark",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "moat-cailin": [{
+            "white-harbor": [
+              {
+                "unitType": "knight",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "port-of-white-harbor": [
+              {
+                "unitType": "ship",
+                "house": "stark",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "moat-cailin": [
+              {
                 "unitType": "footman",
                 "house": "stark",
                 "quantity": 1,
@@ -806,60 +1146,78 @@
                 "quantityVassal": 1
               }
             ],
-            "the-twins": [{
-              "unitType": "footman",
-              "house": "stark",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
-            "pyke": [{
-              "unitType": "knight",
-              "house": "greyjoy",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "bay-of-ice": [{
-              "unitType": "ship",
-              "house": "greyjoy",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "sunset-sea": [{
-              "unitType": "ship",
-              "house": "greyjoy",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "ironmans-bay": [{
-              "unitType": "ship",
-              "house": "greyjoy",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "west-summer-sea": [{
-              "unitType": "ship",
-              "house": "greyjoy",
-              "quantity": 3,
-              "quantityVassal": 3
-            }],
-            "the-stony-shore": [{
-              "unitType": "footman",
-              "house": "greyjoy",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "searoad-marches": [{
-              "unitType": "footman",
-              "house": "greyjoy",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
-            "lannisport": [{
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
+            "the-twins": [
+              {
+                "unitType": "footman",
+                "house": "stark",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "pyke": [
+              {
+                "unitType": "knight",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "bay-of-ice": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "sunset-sea": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "ironmans-bay": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "west-summer-sea": [
+              {
+                "unitType": "ship",
+                "house": "greyjoy",
+                "quantity": 3,
+                "quantityVassal": 3
+              }
+            ],
+            "the-stony-shore": [
+              {
+                "unitType": "footman",
+                "house": "greyjoy",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "searoad-marches": [
+              {
+                "unitType": "footman",
+                "house": "greyjoy",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "lannisport": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
             "port-of-lannisport": [
               {
                 "unitType": "ship",
@@ -876,54 +1234,70 @@
                 "quantityVassal": 1
               }
             ],
-            "riverrun": [{
-              "unitType": "knight",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }, {
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "stoney-sept": [{
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "harrenhal": [{
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "kings-landing": [{
-              "unitType": "footman",
-              "house": "lannister",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
-            "dragonstone": [{
-              "unitType": "knight",
-              "house": "baratheon",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "the-shivering-sea": [{
-              "unitType": "ship",
-              "house": "baratheon",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
-            "braavosian-coastlands": [{
-              "unitType": "ship",
-              "house": "baratheon",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "castle-black": [{
+            "riverrun": [
+              {
+                "unitType": "knight",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              },
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "stoney-sept": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "harrenhal": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "kings-landing": [
+              {
+                "unitType": "footman",
+                "house": "lannister",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "dragonstone": [
+              {
+                "unitType": "knight",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-shivering-sea": [
+              {
+                "unitType": "ship",
+                "house": "baratheon",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "braavosian-coastlands": [
+              {
+                "unitType": "ship",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "castle-black": [
+              {
                 "unitType": "knight",
                 "house": "baratheon",
                 "quantity": 1,
@@ -936,24 +1310,30 @@
                 "quantityVassal": 2
               }
             ],
-            "karhold": [{
-              "unitType": "footman",
-              "house": "baratheon",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "storms-end": [{
-              "unitType": "footman",
-              "house": "baratheon",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "highgarden": [{
-              "unitType": "footman",
-              "house": "tyrell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
+            "karhold": [
+              {
+                "unitType": "footman",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "storms-end": [
+              {
+                "unitType": "footman",
+                "house": "baratheon",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "highgarden": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
             "redwyne-straights": [
               {
                 "unitType": "ship",
@@ -962,43 +1342,56 @@
                 "quantityVassal": 1
               }
             ],
-            "oldtown": [{
-              "unitType": "footman",
-              "house": "tyrell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "port-of-oldtown": [{
-              "unitType": "ship",
-              "house": "tyrell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "kingswood": [{
-              "unitType": "knight",
-              "house": "tyrell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "the-reach": [{
-              "unitType": "footman",
-              "house": "tyrell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "crackclaw-point": [{
-              "unitType": "footman",
-              "house": "tyrell",
-              "quantity": 2,
-              "quantityVassal": 2
-            }],
-            "shipbreaker-bay": [{
-              "unitType": "ship",
-              "house": "tyrell",
-              "quantity": 3,
-              "quantityVassal": 3
-            }],
-            "sunspear": [{
+            "oldtown": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "port-of-oldtown": [
+              {
+                "unitType": "ship",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "kingswood": [
+              {
+                "unitType": "knight",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-reach": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "crackclaw-point": [
+              {
+                "unitType": "footman",
+                "house": "tyrell",
+                "quantity": 2,
+                "quantityVassal": 2
+              }
+            ],
+            "shipbreaker-bay": [
+              {
+                "unitType": "ship",
+                "house": "tyrell",
+                "quantity": 3,
+                "quantityVassal": 3
+              }
+            ],
+            "sunspear": [
+              {
                 "unitType": "footman",
                 "house": "martell",
                 "quantity": 1,
@@ -1027,24 +1420,30 @@
                 "quantityVassal": 1
               }
             ],
-            "salt-shore": [{
-              "unitType": "footman",
-              "house": "martell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "yronwood": [{
-              "unitType": "knight",
-              "house": "martell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
-            "the-boneway": [{
-              "unitType": "footman",
-              "house": "martell",
-              "quantity": 1,
-              "quantityVassal": 1
-            }],
+            "salt-shore": [
+              {
+                "unitType": "footman",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "yronwood": [
+              {
+                "unitType": "knight",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
+            "the-boneway": [
+              {
+                "unitType": "footman",
+                "house": "martell",
+                "quantity": 1,
+                "quantityVassal": 1
+              }
+            ],
             "the-eyrie": [
               {
                 "unitType": "knight",
@@ -1158,17 +1557,35 @@
           "playerCount": 4,
           "houses": ["stark", "greyjoy", "lannister", "baratheon"],
           "blockedRegions": [
-            "highgarden", "oldtown", "port-of-oldtown", "sunspear", "port-of-sunspear", "salt-shore",
-            "yronwood", "starfall", "three-towers", "dornish-marches", "princes-pass", "the-boneway",
-            "storms-end", "port-of-storms-end", "sea-of-dorne"
+            "highgarden",
+            "oldtown",
+            "port-of-oldtown",
+            "sunspear",
+            "port-of-sunspear",
+            "salt-shore",
+            "yronwood",
+            "starfall",
+            "three-towers",
+            "dornish-marches",
+            "princes-pass",
+            "the-boneway",
+            "storms-end",
+            "port-of-storms-end",
+            "sea-of-dorne"
           ]
         },
         {
           "playerCount": 5,
           "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell"],
           "blockedRegions": [
-            "sunspear", "port-of-sunspear", "salt-shore", "yronwood", "starfall",
-            "storms-end", "port-of-storms-end", "sea-of-dorne"
+            "sunspear",
+            "port-of-sunspear",
+            "salt-shore",
+            "yronwood",
+            "starfall",
+            "storms-end",
+            "port-of-storms-end",
+            "sea-of-dorne"
           ]
         }
       ]
@@ -1180,10 +1597,27 @@
           "playerCount": 4,
           "houses": ["lannister", "baratheon", "tyrell", "martell"],
           "blockedRegions": [
-            "bay-of-ice", "ironmans-bay", "flints-finger", "seagard", "the-narrow-sea",
-            "greywater-watch", "moat-cailin", "the-twins", "the-fingers", "the-eyrie",
-            "the-stony-shore", "winterfell", "port-of-winterfell", "white-harbor", "port-of-white-harbor",
-            "widows-watch", "castle-black", "karhold", "the-shivering-sea", "pyke", "port-of-pyke"
+            "bay-of-ice",
+            "ironmans-bay",
+            "flints-finger",
+            "seagard",
+            "the-narrow-sea",
+            "greywater-watch",
+            "moat-cailin",
+            "the-twins",
+            "the-fingers",
+            "the-eyrie",
+            "the-stony-shore",
+            "winterfell",
+            "port-of-winterfell",
+            "white-harbor",
+            "port-of-white-harbor",
+            "widows-watch",
+            "castle-black",
+            "karhold",
+            "the-shivering-sea",
+            "pyke",
+            "port-of-pyke"
           ],
           "removedUnits": ["port-of-lannisport"]
         }
@@ -1195,9 +1629,7 @@
         {
           "playerCount": 5,
           "houses": ["lannister", "stark", "greyjoy", "tyrell", "martell"],
-          "blockedRegions": [
-            "dragonstone", "port-of-dragonstone"
-          ],
+          "blockedRegions": ["dragonstone", "port-of-dragonstone"],
           "tracks": {
             "ironThrone": ["stark", "lannister", "martell", "greyjoy", "tyrell"]
           }
@@ -1210,9 +1642,7 @@
         {
           "playerCount": 5,
           "houses": ["baratheon", "lannister", "stark", "tyrell", "martell"],
-          "blockedRegions": [
-            "pyke", "port-of-pyke"
-          ],
+          "blockedRegions": ["pyke", "port-of-pyke"],
           "removedUnits": ["port-of-lannisport"]
         }
       ]
@@ -1222,7 +1652,14 @@
       "playerSetups": [
         {
           "playerCount": 2,
-          "houses": ["stark", "greyjoy", "lannister", "baratheon", "tyrell", "martell"]
+          "houses": [
+            "stark",
+            "greyjoy",
+            "lannister",
+            "baratheon",
+            "tyrell",
+            "martell"
+          ]
         }
       ]
     }
@@ -1706,12 +2143,14 @@
         "quantityVassal": 1
       }
     ],
-    "shipbreaker-bay": [{
-      "unitType": "ship",
-      "house": "baratheon",
-      "quantity": 1,
-      "quantityVassal": 2
-    }]
+    "shipbreaker-bay": [
+      {
+        "unitType": "ship",
+        "house": "baratheon",
+        "quantity": 1,
+        "quantityVassal": 2
+      }
+    ]
   },
   "starredOrderRestrictions": [
     [3, 2, 1, 0],
@@ -2507,8 +2946,7 @@
       }
     }
   },
-  "modAHouseCards": {
-  },
+  "modAHouseCards": {},
   "modBHouseCards": {
     "targaryen": {
       "houseCards": {

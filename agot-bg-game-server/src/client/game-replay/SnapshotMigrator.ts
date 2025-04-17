@@ -457,7 +457,7 @@ export default class SnapshotMigrator {
         region.loyaltyTokens = 0;
         if (!snap.gameSnapshot) return snap;
         const house = snap.getHouse("targaryen");
-        house.victoryPoints = log.count;
+        house.victoryPoints += log.count;
         return snap;
       }
 
@@ -815,11 +815,19 @@ export default class SnapshotMigrator {
       case "garrison-removed": {
         const region = snap.getRegion(log.region);
         region.garrison = undefined;
+        if (!snap.gameSnapshot) return snap;
+        if (region.id == "pentos") {
+          snap.getHouse("targaryen").victoryPoints--;
+        }
         return snap;
       }
       case "garrison-returned": {
         const region = snap.getRegion(log.region);
         region.garrison = log.strength;
+        if (!snap.gameSnapshot) return snap;
+        if (region.id == "pentos") {
+          snap.getHouse("targaryen").victoryPoints++;
+        }
         return snap;
       }
       case "commander-power-token-gained": {
