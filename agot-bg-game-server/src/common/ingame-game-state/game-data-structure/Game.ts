@@ -325,11 +325,27 @@ export default class Game {
       (h) => [h, this.getVictoryPoints(h)] as [House, number]
     );
 
-    return numberVictoryPointsPerHouse.some(([h, n]) => {
-      return h != this.targaryen
-        ? n >= this.victoryPointsCountNeededToWin
-        : n >= this.loyaltyTokenCountNeededToWin;
-    });
+    return (
+      numberVictoryPointsPerHouse.some(([h, n]) => {
+        return h != this.targaryen
+          ? n >= this.victoryPointsCountNeededToWin
+          : n >= this.loyaltyTokenCountNeededToWin;
+      }) || this.worldConquered()
+    );
+  }
+
+  worldConquered(): boolean {
+    let aliveCount = 0;
+    const minimumAliveCount = this.ingame.players.size > 2 ? 2 : 1;
+    for (const house of this.houses.values) {
+      if (!this.ingame.isHouseDefeated(house)) {
+        aliveCount++;
+        if (aliveCount >= minimumAliveCount) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   getPotentialWinners(lastRound = false): House[] {
