@@ -166,7 +166,6 @@ function getHouseCardSet(container: {
   });
   return set;
 }
-
 export const baseHouseCardsData = getHouseCardData(baseGameData.houses);
 export const adwdHouseCardsData = getHouseCardData(baseGameData.adwdHouseCards);
 export const ffcHouseCardsData = getHouseCardData(baseGameData.ffcHouseCards);
@@ -535,9 +534,6 @@ export default function createGame(
   }
 
   // Loading Tiled map
-  const garrisonsFromGameSetup = selectedGameSetup.garrisons
-    ? new BetterMap(Object.entries(selectedGameSetup.garrisons))
-    : null;
   const blockedRegions = selectedGameSetup.blockedRegions;
 
   const overwrittenSuperControlPowerToken = new BetterMap(
@@ -546,16 +542,13 @@ export default function createGame(
       : []
   );
 
+  const staticWorld = getStaticWorld(gameSettings);
+
   const regions = new BetterMap(
-    getStaticWorld(gameSettings).staticRegions.values.map((staticRegion) => {
+    staticWorld.staticRegions.values.map((staticRegion) => {
       const blocked = blockedRegions
         ? blockedRegions.includes(staticRegion.id)
         : false;
-      const garrisonValue =
-        garrisonsFromGameSetup && garrisonsFromGameSetup.has(staticRegion.id)
-          ? garrisonsFromGameSetup.get(staticRegion.id)
-          : staticRegion.startingGarrison;
-
       let superPowerToken = overwrittenSuperControlPowerToken.has(
         staticRegion.id
       )
@@ -580,7 +573,7 @@ export default function createGame(
         new Region(
           game,
           staticRegion.id,
-          blocked ? 1000 : garrisonValue,
+          blocked ? 1000 : staticRegion.startingGarrison,
           superPowerToken
         ),
       ];
@@ -800,6 +793,28 @@ export default function createGame(
       }
     );
   }
+
+  // Apply garrisons from game setup
+  if (selectedGameSetup.garrisons !== undefined) {
+    Object.entries(selectedGameSetup.garrisons).forEach(
+      ([regionId, garrison]) => {
+        const region = game.world.regions.get(regionId);
+        region.garrison = garrison;
+      }
+    );
+  }
+
+  // Remove starting garrisons from homes that are not in play:
+  staticWorld.staticRegions.values
+    .filter(
+      (r) =>
+        r.superControlPowerToken &&
+        r.startingGarrison > 0 &&
+        !game.world.regions.get(r.id).superControlPowerToken
+    )
+    .forEach((r) => {
+      game.world.regions.get(r.id).garrison = 0;
+    });
 
   // Apply loyalty tokens
   if (selectedGameSetup.loyaltyTokens !== undefined) {

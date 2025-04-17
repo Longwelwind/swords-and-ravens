@@ -30,7 +30,7 @@
   },
   "setups": {
     "base-game": {
-      "name": "2nd Edition Base Game (3p/6p)",
+      "name": "2nd Edition Base Game (3-6p)",
       "playerSetups": [
         {
           "playerCount": 3,
@@ -54,6 +54,35 @@
             "port-of-storms-end"
           ],
           "removedUnits": ["port-of-lannisport"]
+        },
+        {
+          "playerCount": 4,
+          "houses": ["baratheon", "lannister", "stark", "greyjoy"],
+          "garrisons": {
+            "oldtown": 3,
+            "three-towers": 3,
+            "dornish-marches": 3,
+            "princes-pass": 3,
+            "starfall": 3,
+            "yronwood": 3,
+            "the-boneway": 3,
+            "storms-end": 4,
+            "salt-shore": 3,
+            "sunspear": 5
+          }
+        },
+        {
+          "playerCount": 5,
+          "houses": ["baratheon", "lannister", "stark", "greyjoy", "tyrell"],
+          "garrisons": {
+            "three-towers": 3,
+            "princes-pass": 3,
+            "the-boneway": 3,
+            "starfall": 3,
+            "yronwood": 3,
+            "salt-shore": 3,
+            "sunspear": 5
+          }
         },
         {
           "playerCount": 6,
