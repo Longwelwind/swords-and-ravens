@@ -35,7 +35,6 @@ import IGameSnapshot from "../../../client/game-replay/IGameSnapshot";
 
 export const MAX_WILDLING_STRENGTH = 12;
 export const MAX_LOYALTY_TOKEN_COUNT = 20;
-
 export default class Game {
   ingame: IngameGameState;
 

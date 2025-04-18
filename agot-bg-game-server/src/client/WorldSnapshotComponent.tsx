@@ -24,7 +24,9 @@ import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
 import RegionSnapshot from "./game-replay/RegionSnapshot";
-import Region from "../common/ingame-game-state/game-data-structure/Region";
+import Region, {
+  BLOCKED,
+} from "../common/ingame-game-state/game-data-structure/Region";
 import GameSnapshot from "./game-replay/GameSnapshot";
 import { observer } from "mobx-react";
 import Xarrow from "react-xarrows";
@@ -101,7 +103,11 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     const garrisons = new BetterMap<string, string | null>();
 
     for (const region of this.worldSnapshot) {
-      if (region.garrison && region.garrison > 0 && region.garrison != 1000) {
+      if (
+        region.garrison &&
+        region.garrison > 0 &&
+        region.garrison != BLOCKED
+      ) {
         garrisons.set(region.id, getGarrisonToken(region.garrison));
       }
     }
@@ -276,7 +282,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
   renderRegions(): ReactNode {
     const regions = this.ingame.world.regions;
     return this.worldSnapshot.map((region) => {
-      const blocked = region.garrison == 1000;
+      const blocked = region.garrison == BLOCKED;
       const highlightColor =
         this.ingame.replayManager.highlighter.regionsToHighlight.tryGet(
           region.id,
