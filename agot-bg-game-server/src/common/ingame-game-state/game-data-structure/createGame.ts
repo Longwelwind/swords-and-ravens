@@ -1,7 +1,7 @@
 import * as baseGameData from "../../../../data/baseGameData.json";
 import HouseCard from "./house-card/HouseCard";
 import House from "./House";
-import Region from "./Region";
+import Region, { BLOCKED } from "./Region";
 import World from "./World";
 import WesterosCard from "./westeros-card/WesterosCard";
 import {
@@ -697,7 +697,7 @@ export default function createGame(
         // Check if the game setup removed units off this region
         if (
           selectedGameSetup.removedUnits?.includes(region.id) ||
-          region.garrison == 1000
+          region.garrison == BLOCKED
         ) {
           return;
         }
@@ -810,7 +810,8 @@ export default function createGame(
       (r) =>
         r.superControlPowerToken &&
         r.startingGarrison > 0 &&
-        !game.world.regions.get(r.id).superControlPowerToken
+        !game.world.regions.get(r.id).superControlPowerToken &&
+        !game.world.regions.get(r.id).isBlocked
     )
     .forEach((r) => {
       game.world.regions.get(r.id).garrison = 0;

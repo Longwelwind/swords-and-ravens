@@ -14,6 +14,8 @@ import SnrError from "../../../utils/snrError";
 import Player from "../Player";
 import IRegionSnapshot from "../../../client/game-replay/IRegionSnapshot";
 
+export const BLOCKED = 1000;
+
 export default class Region {
   game: Game;
 
@@ -107,7 +109,7 @@ export default class Region {
   }
 
   get isBlocked(): boolean {
-    return this.garrison == 1000;
+    return this.garrison == BLOCKED;
   }
 
   constructor(
