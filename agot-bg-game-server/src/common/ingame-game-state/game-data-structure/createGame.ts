@@ -794,6 +794,23 @@ export default function createGame(
     );
   }
 
+  // Remove starting garrisons from capitals that are not in play:
+  staticWorld.staticRegions.values.forEach((r) => {
+    if (
+      // We find them if the static region is a capital
+      r.superControlPowerToken &&
+      // and the static region has a garrison
+      r.startingGarrison > 0 &&
+      // but the world does not return them as a capital anymore
+      // because the house is not in play
+      !game.world.regions.get(r.id).superControlPowerToken &&
+      // But dont remove garrisons which are used for blocking a region
+      !game.world.regions.get(r.id).isBlocked
+    ) {
+      game.world.regions.get(r.id).garrison = 0;
+    }
+  });
+
   // Apply garrisons from game setup
   if (selectedGameSetup.garrisons !== undefined) {
     Object.entries(selectedGameSetup.garrisons).forEach(
@@ -803,19 +820,6 @@ export default function createGame(
       }
     );
   }
-
-  // Remove starting garrisons from homes that are not in play:
-  staticWorld.staticRegions.values
-    .filter(
-      (r) =>
-        r.superControlPowerToken &&
-        r.startingGarrison > 0 &&
-        !game.world.regions.get(r.id).superControlPowerToken &&
-        !game.world.regions.get(r.id).isBlocked
-    )
-    .forEach((r) => {
-      game.world.regions.get(r.id).garrison = 0;
-    });
 
   // Apply loyalty tokens
   if (selectedGameSetup.loyaltyTokens !== undefined) {
