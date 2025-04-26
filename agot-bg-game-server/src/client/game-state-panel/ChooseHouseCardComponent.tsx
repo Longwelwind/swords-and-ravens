@@ -18,7 +18,7 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 export default class ChooseHouseCardComponent extends Component<
   GameStateComponentProps<ChooseHouseCardGameState>
 > {
-  @observable burnValyrianSteelBlade: boolean;
+  @observable dontSkipVsbQuestion: boolean;
 
   get chosenHouseCard(): HouseCard | null {
     const commandedHouse = this.tryGetCommandedHouseInCombat();
@@ -58,25 +58,19 @@ export default class ChooseHouseCardComponent extends Component<
       return false;
     }
 
-    if (this.selectedHouseCard != this.chosenHouseCard) {
-      return true;
-    }
-
-    if (this.burnValyrianSteelBlade) {
-      return this.combat.valyrianSteelBladeUser != commandedHouse;
-    } else {
-      return this.combat.valyrianSteelBladeUser == commandedHouse;
-    }
+    return (
+      this.selectedHouseCard != this.chosenHouseCard ||
+      this.combat.dontSkipVsbQuestion != this.dontSkipVsbQuestion
+    );
   }
 
   constructor(props: GameStateComponentProps<ChooseHouseCardGameState>) {
     super(props);
     this.selectedHouseCard = this.chosenHouseCard;
     const commandedHouse = this.tryGetCommandedHouseInCombat();
-    this.burnValyrianSteelBlade =
+    this.dontSkipVsbQuestion =
       commandedHouse != null &&
-      this.props.gameState.combatGameState.valyrianSteelBladeUser ==
-        commandedHouse;
+      this.props.gameState.combatGameState.dontSkipVsbQuestion;
   }
 
   tryGetCommandedHouseInCombat(): House | null {
@@ -130,46 +124,31 @@ export default class ChooseHouseCardComponent extends Component<
                   <Row className="justify-content-center">
                     <Col xs="auto">
                       <FormCheck
-                        id="burn-vsb"
+                        id="dont-skip-vsb-question"
                         type="switch"
                         label={
                           <OverlayTrigger
                             overlay={
-                              <Tooltip id="burn-vsb-tooltip">
-                                If you choose this option, the Valyrian Steel
-                                Blade will be used to increase the final combat
-                                strength by 1 regardless of the outcome of the
-                                battle.
+                              <Tooltip id="donst-skip-vsb-tooltip">
+                                In case the +1 bonus won&apos;t affect the
+                                outcome of the battle, the game usually will
+                                skip the question of whether to use the blade or
+                                not.
                                 <br />
-                                <small>
-                                  (Otherwise you will of course be asked later
-                                  if you want to use the blade, if the use makes
-                                  a difference.)
-                                </small>
+                                In case you might want to be asked anyway, you
+                                can pre-mark it here.
+                                <br />
                               </Tooltip>
                             }
                           >
-                            <label htmlFor="burn-vsb">
-                              Burn Valyrian Steel Blade
+                            <label htmlFor="dont-skip-vsb-question">
+                              Don&apos;t skip VSB bonus question
                             </label>
                           </OverlayTrigger>
                         }
-                        checked={this.burnValyrianSteelBlade}
+                        checked={this.dontSkipVsbQuestion}
                         onChange={() => {
-                          if (
-                            !this.burnValyrianSteelBlade &&
-                            !window.confirm(
-                              "Are you sure you want to pre-mark the Valyrian Steel Blade for use without knowing which House card the opponent has selected?\n\n" +
-                                "This could be useful if you anticipate effects like those of Doran Martell or Ser Gerris Drinkwater, " +
-                                "potentially causing you to lose your first-place position on the fiefdoms track.\n" +
-                                "However, exercise caution, as facing Doran in this battle would render it too late to hand over a used blade. " +
-                                "Doran's immediate effect takes precedence and transfers the blade before you have the chance to burn it."
-                            )
-                          ) {
-                            return;
-                          }
-                          this.burnValyrianSteelBlade =
-                            !this.burnValyrianSteelBlade;
+                          this.dontSkipVsbQuestion = !this.dontSkipVsbQuestion;
                         }}
                         style={{ zIndex: "auto" }}
                       />
@@ -245,7 +224,7 @@ export default class ChooseHouseCardComponent extends Component<
 
     this.props.gameState.chooseHouseCard(
       this.selectedHouseCard,
-      this.burnValyrianSteelBlade
+      this.dontSkipVsbQuestion
     );
   }
 

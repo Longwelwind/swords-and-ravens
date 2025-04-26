@@ -34,7 +34,11 @@ export default class UseValyrianSteelBladeGameState extends GameState<CombatGame
     this.house = house;
     this.forNewTidesOfBattleCard = forNewTidesOfBattleCard;
 
-    if (!forNewTidesOfBattleCard && this.canBeSkipped(house)) {
+    if (
+      !forNewTidesOfBattleCard &&
+      this.canBeSkipped(house) &&
+      !this.combatGameState.dontSkipVsbQuestion
+    ) {
       // Using VSB would make no sense as battle is already won or VSB doesn't help to win it.
       // So we end this state with VSB not used
       this.combatGameState.onUseValyrianSteelBladeGameStateEnd();

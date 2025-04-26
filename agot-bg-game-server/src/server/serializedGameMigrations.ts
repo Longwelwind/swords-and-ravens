@@ -2918,6 +2918,23 @@ const serializedGameMigrations: {
       return serializedGame;
     },
   },
+  {
+    version: "125",
+    migrate: (serializedGame: any) => {
+      if (
+        serializedGame.childGameState.type == "ingame" &&
+        serializedGame.childGameState.childGameState.type == "action" &&
+        serializedGame.childGameState.childGameState.childGameState.type ==
+          "resolve-march-order" &&
+        serializedGame.childGameState.childGameState.childGameState
+          .childGameState.type == "combat"
+      ) {
+        serializedGame.childGameState.childGameState.childGameState.childGameState.dontSkipVsbQuestion =
+          false;
+      }
+      return serializedGame;
+    },
+  },
 ];
 
 export default serializedGameMigrations;

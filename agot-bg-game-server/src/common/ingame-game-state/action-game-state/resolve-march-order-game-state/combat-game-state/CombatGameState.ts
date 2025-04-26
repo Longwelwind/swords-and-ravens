@@ -90,6 +90,7 @@ export default class CombatGameState extends GameState<
   attacker: House;
   defender: House;
   houseCombatDatas: BetterMap<House, HouseCombatData>;
+  dontSkipVsbQuestion: boolean;
   @observable valyrianSteelBladeUser: House | null;
   revealTidesOfBattleCards: boolean;
   tidesOfBattleDeck: TidesOfBattleCard[] = this.isTidesOfBattleCardsActive
@@ -514,40 +515,6 @@ export default class CombatGameState extends GameState<
 
     if (this.isTidesOfBattleCardsActive && !forNewTidesOfBattleCard) {
       this.revealDrawnTidesOfBattleCards();
-    }
-
-    // Check if the sword has not been used this round
-    if (!this.game.valyrianSteelBladeUsed) {
-      // Check if VSB holder already decided to use (burn) the VSB during choose house card game state
-      // And check as well the blade user is still the VSB holder (Doran!)
-      const vsbHolderAndVassals = [
-        this.game.valyrianSteelBladeHolder,
-        ...this.ingameGameState.getVassalsControlledByPlayer(
-          this.ingameGameState.getControllerOfHouse(
-            this.game.valyrianSteelBladeHolder
-          )
-        ),
-      ];
-      if (
-        this.valyrianSteelBladeUser &&
-        vsbHolderAndVassals.includes(this.valyrianSteelBladeUser)
-      ) {
-        this.game.valyrianSteelBladeUsed = true;
-        this.ingameGameState.log({
-          type: "combat-valyrian-sword-used",
-          house: this.valyrianSteelBladeUser.id,
-          forNewTidesOfBattleCard: false,
-        });
-
-        this.entireGame.broadcastToClients({
-          type: "change-valyrian-steel-blade-use",
-          used: true,
-        });
-
-        return false;
-      } else {
-        this.valyrianSteelBladeUser = null;
-      }
     }
 
     const valyrianSteelBladeHolder = this.game.valyrianSteelBladeHolder;
@@ -1019,6 +986,7 @@ export default class CombatGameState extends GameState<
         ? this.tidesOfBattleDeck.map((tob) => tob.id)
         : [],
       revealTidesOfBattleCards: this.revealTidesOfBattleCards,
+      dontSkipVsbQuestion: this.dontSkipVsbQuestion,
       houseCombatDatas: this.houseCombatDatas.map((house, houseCombatData) => {
         const tidesOfBattleCardId =
           admin ||
@@ -1080,6 +1048,7 @@ export default class CombatGameState extends GameState<
     combatGameState.tidesOfBattleDeck = data.tidesOfBattleDeck.map((tob) =>
       tidesOfBattleCards.get(tob)
     );
+    combatGameState.dontSkipVsbQuestion = data.dontSkipVsbQuestion;
     combatGameState.revealTidesOfBattleCards = data.revealTidesOfBattleCards;
     combatGameState.houseCombatDatas = new BetterMap(
       data.houseCombatDatas.map(
@@ -1181,6 +1150,7 @@ export interface SerializedCombatGameState {
   defenderId: string;
   tidesOfBattleDeck: string[];
   revealTidesOfBattleCards: boolean;
+  dontSkipVsbQuestion: boolean;
   supporters: [string, string | null][];
   houseCombatDatas: [
     string,

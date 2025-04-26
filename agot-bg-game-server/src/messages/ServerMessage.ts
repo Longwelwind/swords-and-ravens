@@ -174,7 +174,7 @@ interface HouseCardChosen {
   type: "house-card-chosen";
   houseId: string;
   houseCardId: string | null;
-  valyrianSteelBladeUser?: string | null;
+  dontSkipVsbQuestion: boolean;
 }
 
 interface ChangeCombatHouseCard {

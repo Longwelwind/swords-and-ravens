@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import GameState from "../../../../../GameState";
 import CombatGameState from "../CombatGameState";
 import { ClientMessage } from "../../../../../../messages/ClientMessage";
@@ -88,7 +89,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     // In case a house just has one house card left it maybe can be chosen automatically.
     // But if the house received support or holds the unused VSB we cannot automatically choose the last card,
     // to allow the house to refuse their granted support (e.g. due to Roose Bolton or Stannis DWD)
-    // or to burn the VSB now in this game state.
+    // or to pre-mark not to skip the VSB question.
 
     if (
       this.canAutomaticallyChooseLastHouseCard(this.combatGameState.attacker) &&
@@ -121,10 +122,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       );
 
       this.combatGameState.houseCombatDatas.get(house).houseCardChosen = true;
-      this.combatGameState.valyrianSteelBladeUser =
-        message.valyrianSteelBladeUser
-          ? this.combatGameState.game.houses.get(message.valyrianSteelBladeUser)
-          : null;
+      this.combatGameState.dontSkipVsbQuestion = message.dontSkipVsbQuestion;
       this.combatGameState.rerender++;
     } else if (message.type == "support-refused") {
       const house = this.combatGameState.game.houses.get(message.houseId);
@@ -165,18 +163,18 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       this.houseCards.set(commandedHouse, houseCard);
 
       if (
-        message.burnValyrianSteelBlade &&
+        message.dontSkipVsbQuestion &&
         player.house == this.combatGameState.game.valyrianSteelBladeHolder &&
         !this.combatGameState.game.valyrianSteelBladeUsed
       ) {
-        this.combatGameState.valyrianSteelBladeUser = commandedHouse;
+        this.combatGameState.dontSkipVsbQuestion = true;
       }
 
       if (
-        !message.burnValyrianSteelBlade &&
+        !message.dontSkipVsbQuestion &&
         player.house == this.combatGameState.game.valyrianSteelBladeHolder
       ) {
-        this.combatGameState.valyrianSteelBladeUser = null;
+        this.combatGameState.dontSkipVsbQuestion = false;
       }
 
       this.entireGame.sendMessageToClients(
@@ -185,6 +183,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
           type: "house-card-chosen",
           houseId: commandedHouse.id,
           houseCardId: null,
+          dontSkipVsbQuestion: false,
         }
       );
 
@@ -192,12 +191,12 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         type: "house-card-chosen",
         houseId: commandedHouse.id,
         houseCardId: houseCard.id,
-        valyrianSteelBladeUser:
+        dontSkipVsbQuestion:
           this.ingameGameState.getControllerOfHouse(
             this.ingameGameState.game.valyrianSteelBladeHolder
           ) == player
-            ? (this.combatGameState.valyrianSteelBladeUser?.id ?? null)
-            : null,
+            ? this.combatGameState.dontSkipVsbQuestion
+            : false,
       });
 
       this.ingameGameState.log({
@@ -269,11 +268,11 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     return this.choosableHouseCards.get(house);
   }
 
-  chooseHouseCard(houseCard: HouseCard, burnValyrianSteelBlade: boolean): void {
+  chooseHouseCard(houseCard: HouseCard, dontSkipVsbQuestion: boolean): void {
     this.entireGame.sendMessageToServer({
       type: "choose-house-card",
       houseCardId: houseCard.id,
-      burnValyrianSteelBlade: burnValyrianSteelBlade,
+      dontSkipVsbQuestion: dontSkipVsbQuestion,
     });
   }
 
@@ -327,15 +326,13 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       this.ingameGameState.log({
         type: "combat-house-card-chosen",
         houseCards: [
-          // @ts-expect-error House card is never null here
           [
             this.combatGameState.attacker.id,
-            this.combatGameState.attackingHouseCombatData.houseCard.id,
+            this.combatGameState.attackingHouseCombatData.houseCard!.id,
           ],
-          // @ts-expect-error House card is never null here
           [
             this.combatGameState.defender.id,
-            this.combatGameState.defendingHouseCombatData.houseCard.id,
+            this.combatGameState.defendingHouseCombatData.houseCard!.id,
           ],
         ],
       });
@@ -343,10 +340,9 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       this.entireGame.broadcastToClients({
         type: "change-combat-house-card",
         // Same here, the houseCards will always be non-null
-        // @ts-expect-error House card is never null here
         houseCardIds: this.combatGameState.houseCombatDatas.map((h, hcd) => [
           h.id,
-          hcd.houseCard.id,
+          hcd.houseCard!.id,
         ]),
         animate: _.every(
           this.combatGameState.houseCombatDatas.values,
