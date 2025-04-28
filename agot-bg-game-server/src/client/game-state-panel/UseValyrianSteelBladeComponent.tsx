@@ -20,7 +20,12 @@ export default class UseValyrianSteelBladeComponent extends Component<
     return this.gameState.house;
   }
   render(): ReactNode {
-    const houseCardsAreRevealead =
+    // Because of the house card flip animation, there
+    // may be no house cards set client side yet.
+    // So we determine when house cards are finally revealed.
+    // This is the case when one house card is not null.
+    // The other may be null here, e.g. due to Tyrion Lannister's ability.
+    const houseCardsAreRevealed =
       this.gameState.combatGameState.houseCombatDatas.entries.some(
         ([_, hcd]) => hcd.houseCard != null
       );
@@ -38,30 +43,33 @@ export default class UseValyrianSteelBladeComponent extends Component<
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(this.house) ? (
             <>
-              {this.gameState.canBeSkipped(this.house) &&
-                // Because of the house card flip animation, for 2 seconds there
-                // are no house cards set in the combat game state.
-                // So we suppress the warning to not confuse the player.
-                houseCardsAreRevealead && (
-                  <Row className="justify-content-center">
-                    <Col xs="auto">
-                      <Alert variant="danger" className="text-center">
-                        <Alert.Heading>Warning</Alert.Heading>
-                        <p>
-                          Using the Valyrian Steel Blade won&apos;t change the
-                          outcome of the battle.
-                        </p>
-                      </Alert>
-                    </Col>
-                  </Row>
-                )}
+              {
+                // In case this state is not shown for a new ToB card,
+                // but it actually could be skipped as the +1 bonus won't
+                // change the outcome of the battle, we show a warning.
+                houseCardsAreRevealed &&
+                  !this.gameState.forNewTidesOfBattleCard &&
+                  this.gameState.canBeSkipped(this.house) && (
+                    <Row className="justify-content-center">
+                      <Col xs="auto">
+                        <Alert variant="danger" className="text-center">
+                          <Alert.Heading>Warning</Alert.Heading>
+                          <p>
+                            Using the Valyrian Steel Blade won&apos;t change the
+                            outcome of the battle.
+                          </p>
+                        </Alert>
+                      </Col>
+                    </Row>
+                  )
+              }
               <Row className="justify-content-center">
                 <Col xs="auto">
                   <Button
                     type="button"
                     variant="success"
                     onClick={() => this.choose(true)}
-                    disabled={!houseCardsAreRevealead}
+                    disabled={!houseCardsAreRevealed}
                   >
                     Use it
                   </Button>
@@ -71,7 +79,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     type="button"
                     variant="danger"
                     onClick={() => this.choose(false)}
-                    disabled={!houseCardsAreRevealead}
+                    disabled={!houseCardsAreRevealed}
                   >
                     Don&apos;t use it
                   </Button>
