@@ -20,6 +20,10 @@ export default class UseValyrianSteelBladeComponent extends Component<
     return this.gameState.house;
   }
   render(): ReactNode {
+    const houseCardsAreRevealead =
+      this.gameState.combatGameState.houseCombatDatas.entries.some(
+        ([_, hcd]) => hcd.houseCard != null
+      );
     return this.gameState.combatGameState.stats.length > 0 ? (
       <></>
     ) : (
@@ -34,25 +38,30 @@ export default class UseValyrianSteelBladeComponent extends Component<
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(this.house) ? (
             <>
-              {this.gameState.canBeSkipped(this.house) && (
-                <Row className="justify-content-center">
-                  <Col xs="auto">
-                    <Alert variant="danger" className="text-center">
-                      <Alert.Heading>Warning</Alert.Heading>
-                      <p>
-                        Using the Valyrian Steel Blade won&apos;t change the
-                        outcome of the battle.
-                      </p>
-                    </Alert>
-                  </Col>
-                </Row>
-              )}
+              {this.gameState.canBeSkipped(this.house) &&
+                // Because of the house card flip animation, for 2 seconds there
+                // are no house cards set in the combat game state.
+                // So we suppress the warning to not confuse the player.
+                houseCardsAreRevealead && (
+                  <Row className="justify-content-center">
+                    <Col xs="auto">
+                      <Alert variant="danger" className="text-center">
+                        <Alert.Heading>Warning</Alert.Heading>
+                        <p>
+                          Using the Valyrian Steel Blade won&apos;t change the
+                          outcome of the battle.
+                        </p>
+                      </Alert>
+                    </Col>
+                  </Row>
+                )}
               <Row className="justify-content-center">
                 <Col xs="auto">
                   <Button
                     type="button"
                     variant="success"
                     onClick={() => this.choose(true)}
+                    disabled={!houseCardsAreRevealead}
                   >
                     Use it
                   </Button>
@@ -62,6 +71,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     type="button"
                     variant="danger"
                     onClick={() => this.choose(false)}
+                    disabled={!houseCardsAreRevealead}
                   >
                     Don&apos;t use it
                   </Button>

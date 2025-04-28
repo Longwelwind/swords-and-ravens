@@ -131,7 +131,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               <Nav.Item>
                 <div
                   className={classNames({
-                    "new-event": this.publicChatRoom.areThereUnreadMessages,
+                    "orange-border": this.publicChatRoom.areThereUnreadMessages,
                     disconnected: !this.publicChatRoom.connected,
                   })}
                 >
@@ -154,7 +154,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                 <Nav.Item>
                   <div
                     className={classNames({
-                      "new-event":
+                      "orange-border":
                         this.gameClient.authenticatedPlayer?.isNeededForVote,
                     })}
                   >
@@ -213,7 +213,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   </Nav.Item>
                 )}
               <Nav.Item>
-                <div className={classNames({ "new-event": this.unseenNotes })}>
+                <div
+                  className={classNames({ "orange-border": this.unseenNotes })}
+                >
                   <Nav.Link eventKey="note">
                     <OverlayTrigger
                       overlay={
@@ -284,7 +286,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                 <Nav.Item key={roomId}>
                   <div
                     className={classNames({
-                      "new-event":
+                      "orange-border":
                         this.getPrivateChatRoomForPlayer(user)
                           .areThereUnreadMessages,
                       disconnected: !this.publicChatRoom.connected,

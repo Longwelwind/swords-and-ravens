@@ -586,11 +586,24 @@ hr {
   padding: 0.5rem 0.5rem !important;
 }
 
-div.new-event {
+div.orange-border {
   border: solid;
   border-color: #f39c12;
   border-radius: 5px;
   border-width: 3px;
+}
+
+div.orange-border-animation {
+  animation: orange-border-animation 0.3s ease-in-out forwards;
+}
+
+@keyframes orange-border-animation {
+  0% {
+    border-color: transparent;
+  }
+  100% {
+    border-color: #f39c12;
+  }
 }
 
 div.disconnected {
