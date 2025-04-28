@@ -174,32 +174,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
           if (clock == 5 * 60 && !this.timeoutWarningSent) {
             this.timeoutWarningSent = true;
-            toast(
-              <div>
-                <Card>
-                  <Card.Body className="d-flex align-items-center">
-                    <img
-                      src={stopwatchImage}
-                      width={64}
-                      className="dye-critical"
-                    />
-                    <h4 className="d-inline ml-3" style={{ color: "white" }}>
-                      {getUserLinkOrLabel(
-                        this.props.ingame.entireGame,
-                        controllerOfHouse.user,
-                        controllerOfHouse
-                      )}{" "}
-                      is runnig out of time!
-                    </h4>
-                  </Card.Body>
-                </Card>
-              </div>,
-              {
-                autoClose: 3000,
-                toastId: `${controllerOfHouse.user.id}-timeout-warning`,
-                theme: "light",
-              }
-            );
+            this.showTimeoutWarning(controllerOfHouse);
           }
         }
       }
@@ -218,7 +193,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         <>
           <ListGroupItem style={{ padding: 0, margin: 0 }}>
             <div
-              className={isWaitedFor ? "new-event" : ""}
+              className={
+                isWaitedFor ? "orange-border orange-border-animation" : ""
+              }
               style={{
                 paddingLeft: "8px",
                 paddingRight: "10px",
@@ -537,6 +514,31 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
           </ListGroupItem>
         </>
       )
+    );
+  }
+
+  private showTimeoutWarning(controllerOfHouse: Player): void {
+    toast(
+      <div>
+        <Card>
+          <Card.Body className="d-flex align-items-center">
+            <img src={stopwatchImage} width={64} className="dye-critical" />
+            <h4 className="d-inline ml-3" style={{ color: "white" }}>
+              {getUserLinkOrLabel(
+                this.props.ingame.entireGame,
+                controllerOfHouse.user,
+                controllerOfHouse
+              )}{" "}
+              is runnig out of time!
+            </h4>
+          </Card.Body>
+        </Card>
+      </div>,
+      {
+        autoClose: 3000,
+        toastId: `${controllerOfHouse.user.id}-timeout-warning`,
+        theme: "light",
+      }
     );
   }
 
