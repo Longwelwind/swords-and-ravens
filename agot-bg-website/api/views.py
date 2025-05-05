@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from agotboardgame.settings import DEFAULT_FROM_MAIL
-from agotboardgame_main.models import PbemResponseTime, User, Game
+from agotboardgame_main.models import PbemResponseTime, User, Game, CANCELLED
 from chat.models import Message
 from api.serializers import UserSerializer, GameSerializer, RoomSerializer
 from chat.models import Room
@@ -212,3 +212,13 @@ def add_pbem_response_time(request, user_id, response_time):
 def clear_chat_room(request, room_id):
     Message.objects.filter(room_id=room_id).delete()
     return Response({'status': 'ok'})
+
+
+@api_view(['GET'])
+@csrf_exempt
+def is_game_cancelled(request, game_id):
+    try:
+        game = Game.objects.get(id=game_id)
+        return Response({'cancelled': game.state == CANCELLED }, status=200)
+    except Game.DoesNotExist:
+        return Response({'error': 'Game not found'}, status=404)

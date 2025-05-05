@@ -18,6 +18,7 @@ import { compress, decompress } from "./utils/compression";
 import * as Sentry from "@sentry/node";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { getTimeDeltaInSeconds } from "../utils/getElapsedSeconds";
+import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 
 export default class GlobalServer {
   server: Server;
@@ -401,7 +402,12 @@ export default class GlobalServer {
   async getEntireGame(gameId: string): Promise<EntireGame | null> {
     // Check if it has already been loaded
     if (this.loadedGames.has(gameId)) {
-      return this.loadedGames.get(gameId);
+      const entireGame = this.loadedGames.get(gameId);
+      // Check if game was cancelled by a moderator
+      if (await this.websiteClient.isGameCancelled(gameId)) {
+        this.cancelGame(entireGame);
+      }
+      return entireGame;
     }
 
     // Otherwise, try to fetch it in the database
@@ -417,6 +423,7 @@ export default class GlobalServer {
       ? this.deserializeStoredGame(gameData)
       : await this.createGame(gameData.id, gameData.ownerId, gameData.name);
 
+
     if (needsDeserialization) {
       try {
         this.restartLiveClockTimers(entireGame);
@@ -429,6 +436,11 @@ export default class GlobalServer {
     entireGame.onSendClientMessage = (_) => {
       console.error("Server instance of ingame tried to send a client message");
     };
+
+    // Check if game was cancelled by a moderator
+    if (await this.websiteClient.isGameCancelled(gameId)) {
+      this.cancelGame(entireGame);
+    }
 
     entireGame.onSendServerMessage = (users, message) =>
       this.onSendServerMessage(users, message);
@@ -454,9 +466,30 @@ export default class GlobalServer {
     // Set the connection status of all users to false
     entireGame.users.values.forEach((u) => (u.connected = false));
 
+    console.log("Game loaded: " + gameId);
     this.loadedGames.set(gameId, entireGame);
 
     return entireGame;
+  }
+
+  cancelGame(entireGame: EntireGame) {
+    // Game is in lobby
+    if (!entireGame.ingameGameState) {
+      // but not cancelled yet
+      if (!(entireGame.childGameState instanceof CancelledGameState)) {
+        // Set the game state to cancelled
+        entireGame.setChildGameState(new CancelledGameState(entireGame)).firstStart();
+      }
+    } else if (entireGame.ingameGameState) {
+      const ingame = entireGame.ingameGameState;
+      if (!ingame.isEnded && !ingame.isCancelled) {
+        // Save current game state to allow an admit to restore it
+        ingame.childGameStateBeforeCancellation = ingame.childGameState;
+        // Set the game state to cancelled
+        ingame.setChildGameState(new CancelledGameState(ingame)).firstStart();
+        this.saveGame(entireGame, false);
+      }
+    }
   }
 
   send(socket: WebSocket, message: ServerMessage): void {
@@ -472,6 +505,7 @@ export default class GlobalServer {
       );
     }
 
+    // Check if game needs to be cancelled
     return EntireGame.deserializeFromServer(
       gameData.serializedGame as SerializedEntireGame
     );

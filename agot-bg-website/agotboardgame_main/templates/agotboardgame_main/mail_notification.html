@@ -1,6 +1,6 @@
 Hello {{ user.username }},
 
-It's your turn to play in "{{ game.name }}":
+It's your turn to play in "{{ game.name|safe }}":
 
 {{ game_url }}
 
