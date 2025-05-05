@@ -198,7 +198,7 @@ def about(request):
         {"name": "Game Statistics (win rates, ...)"},
         {"name": "Player Statistic (kicked rate, ...)"},
         {"name": "Player Reports & moderation tools"},
-        {"name": "Replays"}
+        {"name": "Replays", "done": True}
     ]
 
     return render(request, "agotboardgame_main/about.html", {"game_tasks": game_tasks, "meta_tasks": meta_tasks})

@@ -1,6 +1,6 @@
 Hello {{ user.username }},
 
-Your battle in "{{ game.name }}" is over:
+Your battle in "{{ game.name|safe }}" is over:
 
 {{ game_url }}
 

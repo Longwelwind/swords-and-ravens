@@ -1,6 +1,6 @@
 Hello {{ user.username }},
 
-a new vote has been started in "{{ game.name }}":
+a new vote has been started in "{{ game.name|safe }}":
 
 {{ game_url }}
 

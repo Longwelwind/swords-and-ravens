@@ -1,6 +1,6 @@
 Hello {{ user.username }},
 
-The game "{{ game.name }}" has ended:
+The game "{{ game.name|safe }}" has ended:
 
 {{ game_url }}
 

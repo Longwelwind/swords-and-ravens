@@ -1,6 +1,6 @@
 Hello {{ user.username }},
 
-Your game "{{ game.name }}" is ready to start:
+Your game "{{ game.name|safe }}" is ready to start:
 
 {{ game_url }}
 
