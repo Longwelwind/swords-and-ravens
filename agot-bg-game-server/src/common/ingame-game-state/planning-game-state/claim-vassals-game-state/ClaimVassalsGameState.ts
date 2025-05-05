@@ -1,4 +1,3 @@
-import PlanningGameState from "../PlanningGameState";
 import GameState from "../../../GameState";
 import ClaimVassalGameState, {
   SerializedClaimVassalGameState,
@@ -13,14 +12,19 @@ import _ from "lodash";
 import BetterMap from "../../../../utils/BetterMap";
 import popRandom from "../../../../utils/popRandom";
 
+interface ParentGameState extends GameState<any, any> {
+  game: Game;
+  onClaimVassalsFinished: () => void;
+}
+
 export default class ClaimVassalsGameState extends GameState<
-  PlanningGameState,
+  ParentGameState,
   ClaimVassalGameState
 > {
   passedVassalsCount = 0;
 
   get ingame(): IngameGameState {
-    return this.parentGameState.ingame;
+    return this.game.ingame;
   }
 
   get game(): Game {
@@ -175,10 +179,10 @@ export default class ClaimVassalsGameState extends GameState<
   }
 
   static deserializeFromServer(
-    planningGameState: PlanningGameState,
+    parent: ParentGameState,
     data: SerializedClaimVassalsGameState
   ): ClaimVassalsGameState {
-    const claimVassals = new ClaimVassalsGameState(planningGameState);
+    const claimVassals = new ClaimVassalsGameState(parent);
 
     claimVassals.childGameState = claimVassals.deserializeChildGameState(
       data.childGameState

@@ -13,7 +13,6 @@ import { observable } from "mobx";
 import House from "../game-data-structure/House";
 import Player from "../Player";
 import CombatGameState from "../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
-import ClaimVassalsGameState from "../planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 import { getTimeDeltaInSeconds } from "../../../utils/getElapsedSeconds";
 import BiddingGameState from "../westeros-game-state/bidding-game-state/BiddingGameState";
 import PlanningGameState from "../planning-game-state/PlanningGameState";
@@ -66,10 +65,6 @@ export default class Vote {
     if (this.type instanceof ReplaceVassalByPlayer) {
       if (this.ingame.hasChildGameState(CombatGameState)) {
         return { result: false, reason: "ongoing-combat" };
-      }
-
-      if (this.ingame.hasChildGameState(ClaimVassalsGameState)) {
-        return { result: false, reason: "ongoing-claim-vassals" };
       }
     }
 

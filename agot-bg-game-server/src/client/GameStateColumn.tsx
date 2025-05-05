@@ -59,6 +59,8 @@ import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponen
 import hourglassImage from "../../public/images/icons/hourglass.svg";
 import mammothImage from "../../public/images/icons/mammoth.svg";
 import spikedDragonHeadImage from "../../public/images/icons/spiked-dragon-head.svg";
+import ClaimVassalsGameState from "../common/ingame-game-state/planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
+import ClaimVassalsComponent from "./game-state-panel/ClaimVassalsComponent";
 
 interface GameStateColumnProps {
   ingame: IngameGameState;
@@ -225,6 +227,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                       [[GameEndedGameState, GameEndedComponent]],
                       [[CancelledGameState, IngameCancelledComponent]],
                       [[PayDebtsGameState, PayDebtsComponent]],
+                      [[ClaimVassalsGameState, ClaimVassalsComponent]],
                       [
                         [
                           ChooseInitialObjectivesGameState,

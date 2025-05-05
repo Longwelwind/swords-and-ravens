@@ -13,6 +13,7 @@ import GameEndedGameState from "../game-ended-game-state/GameEndedGameState";
 import ChooseInitialObjectivesGameState from "../choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import PlanningGameState from "../planning-game-state/PlanningGameState";
 import PlaceOrdersForVassalsGameState from "../planning-game-state/place-orders-for-vassals-game-state/PlaceOrdersForVassalsGameState";
+import ClaimVassalsGameState from "../planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 
 export type SerializedVoteType =
   | SerializedCancelGame
@@ -481,11 +482,9 @@ export class ReplacePlayer extends VoteType {
       house: this.forHouse.id,
     });
 
-    // Re-transmit the whole game, so newPlayer receives possible secrets like objectives in FFC
+    // Force reload, so newPlayer receives possible secrets like objectives in FFC
     newPlayer.user.send({
-      type: "authenticate-response",
-      game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
-      userId: newPlayer.user.id,
+      type: "reload",
     });
 
     // If we are waiting for newPlayer, notify him about his turn
@@ -627,7 +626,9 @@ export class ReplaceVassalByPlayer extends VoteType {
     vote.ingame.players.set(newPlayer.user, newPlayer);
 
     // Remove house from vassal relations
-    vote.ingame.game.vassalRelations.delete(this.forHouse);
+    if (vote.ingame.game.vassalRelations.has(this.forHouse)) {
+      vote.ingame.game.vassalRelations.delete(this.forHouse);
+    }
 
     // Broadcast new vassal relations
     vote.ingame.broadcastVassalRelations();
@@ -679,6 +680,9 @@ export class ReplaceVassalByPlayer extends VoteType {
       planning
         .setChildGameState(new PlaceOrdersGameState(planning))
         .firstStart();
+    } else if (vote.ingame.hasChildGameState(ClaimVassalsGameState)) {
+      // Restart ClaimVassalsGameState
+      vote.ingame.proceedWithClaimVassals();
     } else if (
       vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)
     ) {
@@ -687,11 +691,12 @@ export class ReplaceVassalByPlayer extends VoteType {
       vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
     }
 
-    // Re-transmit the whole game, so newPlayer receives possible secrets like objectives in FFC
+    // Remove house from vassalizedHouses
+    _.pull(vote.ingame.vassalizedHouses, this.forHouse);
+
+    // Force reload, so newPlayer receives possible secrets like objectives in FFC
     newPlayer.user.send({
-      type: "authenticate-response",
-      game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
-      userId: newPlayer.user.id,
+      type: "reload",
     });
 
     vote.ingame.entireGame.saveGame(true);
@@ -774,18 +779,14 @@ export class SwapHouses extends VoteType {
       swappingUser: this.swappingUser.id,
     });
 
-    // Re-transmit the whole game, so players receives possible secrets like objectives in FFC
-    initiator.user.send({
-      type: "authenticate-response",
-      game: vote.ingame.entireGame.serializeToClient(initiator.user),
-      userId: initiator.user.id,
+    // Force reload, so swappingPlayer receives possible secrets like objectives in FFC
+    swappingPlayer.user.send({
+      type: "reload",
     });
 
-    // Re-transmit the whole game, so players receives possible secrets like objectives in FFC
-    swappingPlayer.user.send({
-      type: "authenticate-response",
-      game: vote.ingame.entireGame.serializeToClient(swappingPlayer.user),
-      userId: swappingPlayer.user.id,
+    // Force reload for initiator as well
+    initiator.user.send({
+      type: "reload",
     });
 
     if (vote.ingame.hasChildGameState(ChooseInitialObjectivesGameState)) {

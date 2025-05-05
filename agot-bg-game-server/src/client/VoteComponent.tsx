@@ -176,13 +176,11 @@ export default class VoteComponent extends Component<VoteComponentProps> {
               <Tooltip id="voting-currently-disabled">
                 {reason == "ongoing-combat"
                   ? "You cannot vote during combat phase"
-                  : reason == "ongoing-claim-vassals"
-                    ? "You cannot vote during claim vassals phase"
-                    : reason == "ongoing-bidding"
-                      ? "You cannot vote during bidding phase"
-                      : reason == "secret-orders-placed"
-                        ? "You cannot vote because the houses to be swapped have already placed orders"
-                        : "Voting is currently not possible"}
+                  : reason == "ongoing-bidding"
+                    ? "You cannot vote during bidding phase"
+                    : reason == "secret-orders-placed"
+                      ? "You cannot vote because the houses to be swapped have already placed orders"
+                      : "Voting is currently not possible"}
               </Tooltip>
             }
             placement="auto"

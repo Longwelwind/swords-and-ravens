@@ -366,6 +366,8 @@ export default class GameClient {
       this.connectionState = ConnectionState.SYNCED;
       this.isReconnecting = false;
       this.loadVolumeSettingsFromLocalStorage();
+    } else if (message.type == "reload") {
+      window.location.reload();
     } else if (message.type == "new-private-chat-room") {
       if (this.entireGame == null) {
         return;
