@@ -199,4 +199,15 @@ export default class LiveWebsiteClient implements WebsiteClient {
         await httpDelete(`${this.masterApiBaseUrl}/clearChatRoom/${roomId}`)
             .auth(this.masterApiUsername, this.masterApiPassword, true)
     }
+
+    async isGameCancelled(gameId: string): Promise<boolean>
+    {
+        try {
+            const response = await this.request.get(`${this.masterApiBaseUrl}/game/${gameId}/isCancelled`);
+            return response.cancelled;
+        } catch (e) {
+            Sentry.captureException(e);
+            return false;
+        }
+    }
 }

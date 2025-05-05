@@ -215,4 +215,8 @@ export default class LocalWebsiteClient implements WebsiteClient {
   async clearChatRoom(roomId: string): Promise<void> {
     console.log("room " + roomId + " cleared.");
   }
+
+  async isGameCancelled(gameId: string): Promise<boolean> {
+    return false;
+  }
 }

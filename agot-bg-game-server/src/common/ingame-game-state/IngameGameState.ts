@@ -100,16 +100,29 @@ export interface UnitLossConsequence {
   takeOverPort?: TakeOverPort;
 }
 
-export default class IngameGameState extends GameState<
-  EntireGame,
-  | WesterosGameState
+export type IngameChildGameState =
+    WesterosGameState
   | PlanningGameState
   | ActionGameState
   | CancelledGameState
   | GameEndedGameState
   | DraftGameState
   | PayDebtsGameState
-  | ChooseInitialObjectivesGameState
+  | ChooseInitialObjectivesGameState;
+
+export type SerializedIngameChildGameState =
+    SerializedPlanningGameState
+  | SerializedActionGameState
+  | SerializedWesterosGameState
+  | SerializedGameEndedGameState
+  | SerializedCancelledGameState
+  | SerializedPayDebtsGameState
+  | SerializedDraftGameState
+  | SerializedChooseInitialObjectivesGameState;
+
+export default class IngameGameState extends GameState<
+  EntireGame,
+  IngameChildGameState
 > {
   players: BetterMap<User, Player> = new BetterMap();
   oldPlayerIds: string[] = [];
@@ -130,6 +143,8 @@ export default class IngameGameState extends GameState<
   @observable willBeAutoResumedAt: Date | null = null;
 
   @observable bannedUsers: Set<string> = new Set();
+
+  childGameStateBeforeCancellation: IngameChildGameState | null = null;
 
   // Server-side only
   autoResumeTimeout: NodeJS.Timeout | null = null;
@@ -2854,6 +2869,12 @@ export default class IngameGameState extends GameState<
         ? this.willBeAutoResumedAt.getTime()
         : null,
       bannedUsers: Array.from(this.bannedUsers.values()),
+      childGameStateBeforeCancellation: this.childGameStateBeforeCancellation
+        ? this.childGameStateBeforeCancellation.serializeToClient(
+            admin,
+            player
+          )
+        : null,
       childGameState: this.childGameState.serializeToClient(admin, player),
     };
   }
@@ -2913,6 +2934,9 @@ export default class IngameGameState extends GameState<
       ? new Date(data.willBeAutoResumedAt)
       : null;
     ingameGameState.bannedUsers = new Set(data.bannedUsers);
+    ingameGameState.childGameStateBeforeCancellation = data.childGameStateBeforeCancellation
+      ? ingameGameState.deserializeChildGameState(data.childGameStateBeforeCancellation)
+      : null;
     ingameGameState.childGameState = ingameGameState.deserializeChildGameState(
       data.childGameState
     );
@@ -2964,13 +2988,6 @@ export interface SerializedIngameGameState {
   paused: number | null;
   willBeAutoResumedAt: number | null;
   bannedUsers: string[];
-  childGameState:
-    | SerializedPlanningGameState
-    | SerializedActionGameState
-    | SerializedWesterosGameState
-    | SerializedGameEndedGameState
-    | SerializedCancelledGameState
-    | SerializedPayDebtsGameState
-    | SerializedDraftGameState
-    | SerializedChooseInitialObjectivesGameState;
+  childGameState: SerializedIngameChildGameState;
+  childGameStateBeforeCancellation: SerializedIngameChildGameState | null;
 }
