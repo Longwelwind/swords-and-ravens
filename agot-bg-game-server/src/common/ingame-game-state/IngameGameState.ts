@@ -59,7 +59,7 @@ import CombatGameState from "./action-game-state/resolve-march-order-game-state/
 import DeclareSupportGameState from "./action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import shuffle from "../../utils/shuffle";
 import shuffleInPlace from "../../utils/shuffleInPlace";
-import popRandom, { pickRandom } from "../../utils/popRandom";
+import popRandom from "../../utils/popRandom";
 import LoanCard from "./game-data-structure/loan-card/LoanCard";
 import PayDebtsGameState, {
   SerializedPayDebtsGameState,
@@ -84,9 +84,11 @@ import {
   isTakeControlOfEnemyPortRequired,
 } from "./port-helper/PortHelper";
 import { dragon } from "./game-data-structure/unitTypes";
-import groupBy from "../../utils/groupBy";
 import IRegionSnapshot from "../../client/game-replay/IRegionSnapshot";
 import GameReplayManager from "../../client/game-replay/GameReplayManager";
+import ClaimVassalsGameState, {
+  SerializedClaimVassalsGameState,
+} from "./planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -101,24 +103,26 @@ export interface UnitLossConsequence {
 }
 
 export type IngameChildGameState =
-    WesterosGameState
+  | WesterosGameState
   | PlanningGameState
   | ActionGameState
   | CancelledGameState
   | GameEndedGameState
   | DraftGameState
   | PayDebtsGameState
-  | ChooseInitialObjectivesGameState;
+  | ChooseInitialObjectivesGameState
+  | ClaimVassalsGameState;
 
 export type SerializedIngameChildGameState =
-    SerializedPlanningGameState
+  | SerializedPlanningGameState
   | SerializedActionGameState
   | SerializedWesterosGameState
   | SerializedGameEndedGameState
   | SerializedCancelledGameState
   | SerializedPayDebtsGameState
   | SerializedDraftGameState
-  | SerializedChooseInitialObjectivesGameState;
+  | SerializedChooseInitialObjectivesGameState
+  | SerializedClaimVassalsGameState;
 
 export default class IngameGameState extends GameState<
   EntireGame,
@@ -145,6 +149,8 @@ export default class IngameGameState extends GameState<
   @observable bannedUsers: Set<string> = new Set();
 
   childGameStateBeforeCancellation: IngameChildGameState | null = null;
+  childGameStateBeforeVassalsModification: IngameChildGameState | null = null;
+  vassalizedHouses: House[] = [];
 
   // Server-side only
   autoResumeTimeout: NodeJS.Timeout | null = null;
@@ -1160,19 +1166,6 @@ export default class IngameGameState extends GameState<
       // We don't need to call v.checkVoteFinished() here as we vote with Reject and therefore never call executeAccepted()
     });
 
-    const forbiddenCommanders: House[] = [];
-    // If we are in combat we can't assign the vassal to the opponent
-    const anyCombat = this.getFirstChildGameState(CombatGameState);
-    if (anyCombat) {
-      const combat = anyCombat as CombatGameState;
-      if (combat.isCommandingHouseInCombat(newVassalHouse)) {
-        const commandedHouse = combat.getCommandedHouseInCombat(newVassalHouse);
-        const enemy = combat.getEnemy(commandedHouse);
-
-        forbiddenCommanders.push(this.getControllerOfHouse(enemy).house);
-      }
-    }
-
     if (
       reason == ReplacementReason.VOTE &&
       !this.oldPlayerIds.includes(player.user.id)
@@ -1187,62 +1180,6 @@ export default class IngameGameState extends GameState<
 
     // Delete the old player so the house is a vassal now
     this.players.delete(player.user);
-
-    // Find new random commander
-    let newCommander: House | null = null;
-
-    const possibleCommanders = this.game.houses.values.filter(
-      (h) => !this.isVassalHouse(h) && !forbiddenCommanders.includes(h)
-    );
-    const commandersByVassalCount = groupBy(
-      possibleCommanders,
-      (h) =>
-        this.getVassalsControlledByPlayer(this.getControllerOfHouse(h)).length
-    );
-
-    const commanders = _.sortBy(
-      commandersByVassalCount.entries,
-      ([count, _commanders]) => count
-    ).shift();
-
-    if (!commanders) {
-      throw new SnrError(this.entireGame, "Unable to determine new commander");
-    }
-
-    newCommander = pickRandom(commanders[1]);
-
-    if (!newCommander) {
-      throw new SnrError(this.entireGame, "Unable to determine new commander");
-    }
-
-    // It may happen that you replace a player which commands vassals. Assign them to the potential winner.
-    this.game.vassalRelations.entries.forEach(([vassal, commander]) => {
-      if (newVassalHouse == commander) {
-        this.game.vassalRelations.set(vassal, newCommander as House);
-      }
-    });
-
-    // Assign new commander to replaced house
-    this.game.vassalRelations.set(newVassalHouse, newCommander);
-
-    // Broadcast new vassal relations before deletion of player!
-    this.broadcastVassalRelations();
-
-    newVassalHouse.hasBeenReplacedByVassal = true;
-
-    this.entireGame.broadcastToClients({
-      type: "player-replaced",
-      oldUser: player.user.id,
-      timedOut: reason == ReplacementReason.CLOCK_TIMEOUT,
-    });
-
-    this.log({
-      type: "player-replaced",
-      oldUser: player.user.id,
-      house: newVassalHouse.id,
-      reason: reason,
-      newCommanderHouse: newCommander.id,
-    });
 
     // Save the house cards, so vassalization can be undone and cards can be re-assigned to a new player
     this.game.oldPlayerHouseCards.set(
@@ -1269,9 +1206,6 @@ export default class IngameGameState extends GameState<
       });
     }
 
-    // Perform action of current state
-    this.leafState.actionAfterVassalReplacement(newVassalHouse);
-
     // In case the new vassal should execute a wildlings effect, skip it
     if (this.hasChildGameState(WildlingCardEffectInTurnOrderGameState)) {
       const wildlingEffect = this.getChildGameState(
@@ -1283,15 +1217,83 @@ export default class IngameGameState extends GameState<
       }
     }
 
-    const newCommanderPlayer = this.players.values.find(
-      (p) => p.house == newCommander
-    );
-    // If we are waiting for the new commander, notify them about their turn
-    if (
-      newCommanderPlayer &&
-      this.leafState.getWaitedUsers().includes(newCommanderPlayer.user)
-    ) {
-      this.entireGame.notifyWaitedUsers([newCommanderPlayer.user]);
+    this.log({
+      type: "player-replaced",
+      oldUser: player.user.id,
+      house: newVassalHouse.id,
+      reason: reason,
+    });
+
+    newVassalHouse.hasBeenReplacedByVassal = true;
+    this.vassalizedHouses.push(newVassalHouse);
+    this.proceedWithClaimVassals();
+
+    this.entireGame.broadcastToClients({
+      type: "player-replaced",
+      oldUser: player.user.id,
+      timedOut: reason == ReplacementReason.CLOCK_TIMEOUT,
+    });
+  }
+
+  proceedWithClaimVassals(): void {
+    // Another players might get vassalized during ClaimVassalsGameState or vassals
+    // may be replaced back to players. So we have to save the first child game state
+    // until the in-between ClaimVassalsGameState is resolved to continue with the correct
+    // state.parentGameState.onClaimVassalsFinished();
+    if (this.childGameStateBeforeVassalsModification == null) {
+      this.childGameStateBeforeVassalsModification = this.childGameState;
+    }
+
+    // As we do a full new claim vassals now => Clear vassal relations
+    this.game.vassalRelations.clear();
+    this.resetAllWaitedForData();
+
+    this.setChildGameState(new ClaimVassalsGameState(this)).firstStart();
+
+    // Transmit game-state-change now, so the client switches to the new game state
+    this.entireGame.checkGameStateChanged();
+
+    // But broadcast new vassal relations after clients have changed to claim-vassals
+    // as unclaimed vassals in the previous game-state could raise errors client-side
+    this.broadcastVassalRelations();
+  }
+
+  onClaimVassalsFinished(): void {
+    if (this.childGameStateBeforeVassalsModification == null) {
+      throw new SnrError(
+        this.entireGame,
+        "onClaimVassalsFinished called without previous state"
+      );
+    }
+    const state = this.childGameStateBeforeVassalsModification;
+    this.childGameStateBeforeVassalsModification = null;
+
+    const houses = this.vassalizedHouses;
+    this.vassalizedHouses = [];
+
+    if (state.hasChildGameState(ClaimVassalsGameState)) {
+      const claimVassals = state.getChildGameState(
+        ClaimVassalsGameState
+      ) as ClaimVassalsGameState;
+
+      // Previous state then must be planning and we have to set back this to the child of ingame
+      if (!(claimVassals.parentGameState instanceof PlanningGameState)) {
+        throw new SnrError(
+          this.entireGame,
+          `if state.hasChildGameState(ClaimVassalsGameState), parent must be PlanningGameState`
+        );
+      }
+
+      this.resetAllWaitedForData();
+      this.setChildGameState(claimVassals.parentGameState);
+      claimVassals.parentGameState.onClaimVassalsFinished();
+    } else {
+      this.resetAllWaitedForData();
+      this.setChildGameState(state);
+
+      houses.forEach((house) => {
+        this.leafState.actionAfterVassalReplacement(house);
+      });
     }
   }
 
@@ -2870,11 +2872,16 @@ export default class IngameGameState extends GameState<
         : null,
       bannedUsers: Array.from(this.bannedUsers.values()),
       childGameStateBeforeCancellation: this.childGameStateBeforeCancellation
-        ? this.childGameStateBeforeCancellation.serializeToClient(
+        ? this.childGameStateBeforeCancellation.serializeToClient(admin, player)
+        : null,
+      childGameStateBeforeVassalsModification: this
+        .childGameStateBeforeVassalsModification
+        ? this.childGameStateBeforeVassalsModification.serializeToClient(
             admin,
             player
           )
         : null,
+      vassalizedHouses: this.vassalizedHouses.map((h) => h.id),
       childGameState: this.childGameState.serializeToClient(admin, player),
     };
   }
@@ -2934,9 +2941,21 @@ export default class IngameGameState extends GameState<
       ? new Date(data.willBeAutoResumedAt)
       : null;
     ingameGameState.bannedUsers = new Set(data.bannedUsers);
-    ingameGameState.childGameStateBeforeCancellation = data.childGameStateBeforeCancellation
-      ? ingameGameState.deserializeChildGameState(data.childGameStateBeforeCancellation)
-      : null;
+    ingameGameState.childGameStateBeforeCancellation =
+      data.childGameStateBeforeCancellation
+        ? ingameGameState.deserializeChildGameState(
+            data.childGameStateBeforeCancellation
+          )
+        : null;
+    ingameGameState.childGameStateBeforeVassalsModification =
+      data.childGameStateBeforeVassalsModification
+        ? ingameGameState.deserializeChildGameState(
+            data.childGameStateBeforeVassalsModification
+          )
+        : null;
+    ingameGameState.vassalizedHouses = data.vassalizedHouses.map((hid) =>
+      ingameGameState.game.houses.get(hid)
+    );
     ingameGameState.childGameState = ingameGameState.deserializeChildGameState(
       data.childGameState
     );
@@ -2962,6 +2981,8 @@ export default class IngameGameState extends GameState<
         return DraftGameState.deserializeFromServer(this, data);
       case "pay-debts":
         return PayDebtsGameState.deserializeFromServer(this, data);
+      case "claim-vassals":
+        return ClaimVassalsGameState.deserializeFromServer(this, data);
       case "choose-initial-objectives":
         return ChooseInitialObjectivesGameState.deserializeFromServer(
           this,
@@ -2990,4 +3011,6 @@ export interface SerializedIngameGameState {
   bannedUsers: string[];
   childGameState: SerializedIngameChildGameState;
   childGameStateBeforeCancellation: SerializedIngameChildGameState | null;
+  childGameStateBeforeVassalsModification: SerializedIngameChildGameState | null;
+  vassalizedHouses: string[];
 }
