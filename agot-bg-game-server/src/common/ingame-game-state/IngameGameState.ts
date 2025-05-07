@@ -814,6 +814,20 @@ export default class IngameGameState extends GameState<
     return vote;
   }
 
+  safeGetControllerOfHouse(house: House): Player | null {
+    if (this.isVassalHouse(house)) {
+      const suzerainHouse = this.game.vassalRelations.tryGet(house, null);
+
+      if (suzerainHouse == null) {
+        return null;
+      }
+
+      return this.getControllerOfHouse(suzerainHouse);
+    } else {
+      return this.players.values.find((p) => p.house == house) ?? null;
+    }
+  }
+
   getControllerOfHouse(house: House): Player {
     if (this.isVassalHouse(house)) {
       const suzerainHouse = this.game.vassalRelations.tryGet(house, null);
@@ -1178,9 +1192,6 @@ export default class IngameGameState extends GameState<
       }
     }
 
-    // Delete the old player so the house is a vassal now
-    this.players.delete(player.user);
-
     // Save the house cards, so vassalization can be undone and cards can be re-assigned to a new player
     this.game.oldPlayerHouseCards.set(
       newVassalHouse,
@@ -1194,16 +1205,30 @@ export default class IngameGameState extends GameState<
       ]),
     });
 
-    // In case we are in combat we will do proceedHouseCardHandling() where we eventually recycle the deck,
-    // then save the oldPlayerHouseCards again and then remove the house cards from this vassal house.
+    let forbiddenCommander: House | null = null;
+
     if (!this.hasChildGameState(CombatGameState)) {
       // If we're not in combat, we have to remove the house cards from the new vassal now
+      // (During combat we will do proceedHouseCardHandling() where we eventually recycle the deck,
+      // then save the oldPlayerHouseCards again and then remove the house cards from this vassal house.)
+
       newVassalHouse.houseCards = new BetterMap();
       this.entireGame.broadcastToClients({
         type: "update-house-cards",
         house: newVassalHouse.id,
         houseCards: [],
       });
+    } else {
+      // If we are in combat we have to make sure the enemy doesn't claim this vassal
+      const combat = this.getFirstChildGameState(
+        CombatGameState
+      ) as CombatGameState;
+      if (combat.isCommandingHouseInCombat(newVassalHouse)) {
+        const commandedHouse = combat.getCommandedHouseInCombat(newVassalHouse);
+        const enemy = combat.getEnemy(commandedHouse);
+
+        forbiddenCommander = this.getControllerOfHouse(enemy).house;
+      }
     }
 
     // In case the new vassal should execute a wildlings effect, skip it
@@ -1226,8 +1251,10 @@ export default class IngameGameState extends GameState<
 
     newVassalHouse.hasBeenReplacedByVassal = true;
     this.vassalizedHouses.push(newVassalHouse);
-    this.proceedWithClaimVassals();
+    this.proceedWithClaimVassals([forbiddenCommander, newVassalHouse]);
 
+    // Delete the old player so the house is a vassal now
+    this.players.delete(player.user);
     this.entireGame.broadcastToClients({
       type: "player-replaced",
       oldUser: player.user.id,
@@ -1235,7 +1262,9 @@ export default class IngameGameState extends GameState<
     });
   }
 
-  proceedWithClaimVassals(): void {
+  proceedWithClaimVassals(
+    forbiddenRelation: [House | null, House] | null = null
+  ): void {
     // Another players might get vassalized during ClaimVassalsGameState or vassals
     // may be replaced back to players. So we have to save the first child game state
     // until the in-between ClaimVassalsGameState is resolved to continue with the correct
@@ -1248,7 +1277,18 @@ export default class IngameGameState extends GameState<
     this.game.vassalRelations.clear();
     this.resetAllWaitedForData();
 
-    this.setChildGameState(new ClaimVassalsGameState(this)).firstStart();
+    const oldClaimVassals = this.hasChildGameState(ClaimVassalsGameState)
+      ? (this.getChildGameState(ClaimVassalsGameState) as ClaimVassalsGameState)
+      : null;
+
+    const claimVassals = new ClaimVassalsGameState(this);
+    if (oldClaimVassals) {
+      oldClaimVassals.forbiddenRelations.entries.forEach(([c, v]) => {
+        claimVassals.forbiddenRelations.set(c, v);
+      });
+    }
+
+    this.setChildGameState(claimVassals).firstStart(forbiddenRelation);
 
     // Transmit game-state-change now, so the client switches to the new game state
     this.entireGame.checkGameStateChanged();
