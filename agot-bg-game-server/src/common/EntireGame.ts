@@ -425,7 +425,6 @@ export default class EntireGame extends GameState<
         mapScrollbar: profileSettings.mapScrollbar,
         gameStateColumnRight: profileSettings.responsiveLayout,
         muted: profileSettings.muted,
-        lastOpenedTab: null,
         musicVolume: profileSettings.muted ? 0 : 1,
         notificationsVolume: profileSettings.muted ? 0 : 1,
         sfxVolume: profileSettings.muted ? 0 : 1,

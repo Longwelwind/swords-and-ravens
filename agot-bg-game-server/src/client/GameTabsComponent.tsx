@@ -66,10 +66,18 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   private ingame = this.props.ingame;
   private gameSettings = this.ingame.entireGame.gameSettings;
 
-  @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
+  @observable currentOpenedTab = this.lastOpenedTab;
   @observable unseenNotes = false;
 
   @observable gameRoundElems: ReactNode | null = null;
+
+  get lastOpenedTab(): string {
+    return localStorage.getItem("lastOpenedTab") ?? "chat";
+  }
+
+  set lastOpenedTab(value: string) {
+    localStorage.setItem("lastOpenedTab", value);
+  }
 
   get logChatFullScreen(): boolean {
     return this.gameClient.logChatFullScreen;
@@ -557,9 +565,8 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
       return;
     }
 
-    if (this.currentOpenedTab != this.user.settings.lastOpenedTab) {
-      this.user.settings.lastOpenedTab = this.currentOpenedTab;
-      this.user.syncSettings();
+    if (this.currentOpenedTab != this.lastOpenedTab) {
+      this.lastOpenedTab = this.currentOpenedTab;
     }
   }
 
