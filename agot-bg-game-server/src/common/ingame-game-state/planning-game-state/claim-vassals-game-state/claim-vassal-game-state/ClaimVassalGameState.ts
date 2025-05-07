@@ -7,6 +7,7 @@ import House from "../../../../ingame-game-state/game-data-structure/House";
 import IngameGameState from "../../../IngameGameState";
 import User from "../../../../../server/User";
 import { observable } from "mobx";
+import _ from "lodash";
 
 export default class ClaimVassalGameState extends GameState<ClaimVassalsGameState> {
   house: House;
@@ -73,7 +74,14 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
   }
 
   private getClaimableVassals(): House[] {
-    return this.ingame.getNonClaimedVassalHouses();
+    const forbiddenVassals = this.parentGameState.forbiddenRelations.entries
+      .filter(([_v, commander]) => commander == this.house)
+      .map(([vassal, _c]) => vassal);
+
+    return _.without(
+      this.ingame.getNonClaimedVassalHouses(),
+      ...forbiddenVassals
+    );
   }
 
   serializeToClient(

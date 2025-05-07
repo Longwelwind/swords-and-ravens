@@ -289,7 +289,8 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         if (
           admin ||
           !this.ingameGameState.isVassalHouse(house) ||
-          this.ingameGameState.getControllerOfHouse(house) == player
+          (player &&
+            this.ingameGameState.safeGetControllerOfHouse(house) == player)
         ) {
           return [house.id, houseCards.map((hc) => hc.id)];
         } else {

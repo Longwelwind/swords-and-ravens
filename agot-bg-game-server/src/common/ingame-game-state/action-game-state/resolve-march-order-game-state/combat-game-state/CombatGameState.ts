@@ -991,7 +991,8 @@ export default class CombatGameState extends GameState<
         const tidesOfBattleCardId =
           admin ||
           this.revealTidesOfBattleCards ||
-          this.ingameGameState.getControllerOfHouse(house) == player
+          (player &&
+            this.ingameGameState.safeGetControllerOfHouse(house) == player)
             ? houseCombatData.tidesOfBattleCard === undefined
               ? undefined
               : houseCombatData.tidesOfBattleCard

@@ -22,6 +22,9 @@ export default class ClaimVassalsGameState extends GameState<
   ClaimVassalGameState
 > {
   passedVassalsCount = 0;
+  // Contains forbidden relations between commanders and vassals.
+  // Key is the commander and value is the vassal.
+  forbiddenRelations: BetterMap<House, House> = new BetterMap();
 
   get ingame(): IngameGameState {
     return this.game.ingame;
@@ -31,7 +34,10 @@ export default class ClaimVassalsGameState extends GameState<
     return this.parentGameState.game;
   }
 
-  firstStart(): void {
+  firstStart(forbiddenRelation: [House | null, House] | null = null): void {
+    if (forbiddenRelation && forbiddenRelation[0]) {
+      this.forbiddenRelations.set(forbiddenRelation[0], forbiddenRelation[1]);
+    }
     if (this.ingame.getVassalHouses().length > 0) {
       this.ingame.log({
         type: "claim-vassals-began",
@@ -99,7 +105,7 @@ export default class ClaimVassalsGameState extends GameState<
     this.parentGameState.onClaimVassalsFinished();
   }
 
-  proceedNextVassal(lastToClaim: House | null): void {
+  proceedNextVassal(previousToClaim: House | null): void {
     const vassalsToClaim = this.ingame.getNonClaimedVassalHouses();
 
     if (vassalsToClaim.length == 0) {
@@ -108,14 +114,57 @@ export default class ClaimVassalsGameState extends GameState<
     }
 
     const nextHouseToClaim =
-      this.ingame.getNextNonVassalInTurnOrder(lastToClaim);
+      this.ingame.getNextNonVassalInTurnOrder(previousToClaim);
 
     // If it is the last house to claim vassals,
-    // attribute all of them to him
-    if (nextHouseToClaim == _.last(this.ingame.getTurnOrderWithoutVassals())) {
-      this.assignVassals(nextHouseToClaim, vassalsToClaim, true);
+    // attribute all of them to him.
+    // But if it is a forbidden relation, then assign the remaining vassals to the previous house (lastToClaim).
+    const nonVassalTurnOrder = this.ingame.getTurnOrderWithoutVassals();
+    const lastHouseToClaim = _.last(nonVassalTurnOrder);
+    if (nextHouseToClaim == lastHouseToClaim) {
+      const vassalAssignments = new BetterMap<House, House[]>();
+      vassalsToClaim.forEach((v) => {
+        // Check if the vassal is forbidden for the last house to claim
+        if (this.isRelationForbidden(nextHouseToClaim, v)) {
+          // Find the previous house to claim
+          const reversedNonVassalTurnOrder = [...nonVassalTurnOrder].reverse();
+          _.pull(reversedNonVassalTurnOrder, nextHouseToClaim);
+          for (const h of reversedNonVassalTurnOrder) {
+            if (this.isRelationForbidden(h, v)) {
+              // If the relation is forbidden, continue to the next house
+              continue;
+            }
+            // Assign the vassal to the previous house to claim
+            vassalAssignments.set(
+              h,
+              vassalAssignments.tryGet(h, [] as House[]).concat(v)
+            );
+            return;
+          }
+        } else {
+          vassalAssignments.set(
+            nextHouseToClaim,
+            vassalAssignments.tryGet(nextHouseToClaim, [] as House[]).concat(v)
+          );
+        }
+      });
+
+      vassalAssignments.entries.forEach(([house, vassals]) => {
+        this.assignVassals(house, vassals, true);
+      });
 
       this.parentGameState.onClaimVassalsFinished();
+      return;
+    }
+
+    if (
+      // Check if there are still vassals to claim after removing the forbidden ones
+      _.without(
+        vassalsToClaim,
+        this.forbiddenRelations.tryGet(nextHouseToClaim, null)
+      ).length == 0
+    ) {
+      this.proceedNextVassal(nextHouseToClaim);
       return;
     }
 
@@ -135,6 +184,12 @@ export default class ClaimVassalsGameState extends GameState<
     this.setChildGameState(new ClaimVassalGameState(this)).firstStart(
       nextHouseToClaim,
       count
+    );
+  }
+
+  private isRelationForbidden(commander: House, vassal: House): boolean {
+    return this.forbiddenRelations.entries.some(
+      ([c, v]) => c == commander && v == vassal
     );
   }
 
@@ -175,6 +230,9 @@ export default class ClaimVassalsGameState extends GameState<
       type: "claim-vassals",
       childGameState: this.childGameState.serializeToClient(admin, player),
       passedVassalsCount: this.passedVassalsCount,
+      forbiddenRelations: this.forbiddenRelations.entries.map(
+        ([commander, vassal]) => [commander.id, vassal.id] as [string, string]
+      ),
     };
   }
 
@@ -188,6 +246,14 @@ export default class ClaimVassalsGameState extends GameState<
       data.childGameState
     );
     claimVassals.passedVassalsCount = data.passedVassalsCount;
+    claimVassals.forbiddenRelations = new BetterMap(
+      data.forbiddenRelations
+        ? data.forbiddenRelations.map(([commander, vassal]) => [
+            claimVassals.game.houses.get(commander),
+            claimVassals.game.houses.get(vassal),
+          ])
+        : []
+    );
 
     return claimVassals;
   }
@@ -206,4 +272,5 @@ export interface SerializedClaimVassalsGameState {
   type: "claim-vassals";
   childGameState: SerializedClaimVassalGameState;
   passedVassalsCount: number;
+  forbiddenRelations: [string, string][];
 }
