@@ -56,7 +56,6 @@ export default class SnapshotMigrator {
           });
         });
         snap.gameSnapshot.housesOnVictoryTrack.forEach((house) => {
-          house.isVassal = undefined;
           house.suzerainHouseId = undefined;
         });
         return snap;
@@ -1068,16 +1067,20 @@ export default class SnapshotMigrator {
     log: GameLogData
   ): EntireGameSnapshot {
     if (!snap.gameSnapshot) return snap;
-    if (log.type == "player-replaced" && log.newCommanderHouse) {
+    if (log.type == "player-replaced" && !log.newUser) {
       const house = snap.getHouse(log.house);
       house.isVassal = true;
-      house.suzerainHouseId = log.newCommanderHouse;
-    }
-
-    if (log.type == "vassal-replaced") {
+      if (log.newCommanderHouse) {
+        house.suzerainHouseId = log.newCommanderHouse;
+      }
+    } else if (log.type == "vassal-replaced") {
       const house = snap.getHouse(log.house);
       house.isVassal = undefined;
       house.suzerainHouseId = undefined;
+    } else if (log.type == "claim-vassals-began") {
+      snap.gameSnapshot.housesOnVictoryTrack.forEach((h) => {
+        h.suzerainHouseId = undefined;
+      });
     }
 
     return snap;

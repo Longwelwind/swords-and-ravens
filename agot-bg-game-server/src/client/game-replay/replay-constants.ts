@@ -111,6 +111,7 @@ const modifyingGameLogIds = new Set([
   "tywin-lannister-power-tokens-gained",
   "attack",
   "vassals-claimed",
+  "claim-vassals-began",
 ]);
 
 const relatedCombatResultTypes = new Set([
