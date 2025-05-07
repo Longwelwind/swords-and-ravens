@@ -75,8 +75,8 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
 
   private getClaimableVassals(): House[] {
     const forbiddenVassals = this.parentGameState.forbiddenRelations.entries
-      .filter(([_v, commander]) => commander == this.house)
-      .map(([vassal, _c]) => vassal);
+      .filter(([commander, _v]) => commander == this.house)
+      .map(([_c, vassal]) => vassal);
 
     return _.without(
       this.ingame.getNonClaimedVassalHouses(),
