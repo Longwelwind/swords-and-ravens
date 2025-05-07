@@ -2935,6 +2935,15 @@ const serializedGameMigrations: {
       return serializedGame;
     },
   },
+  {
+    version: "126",
+    migrate: (serializedGame: any) => {
+      if (serializedGame.childGameState.type == "ingame") {
+        serializedGame.childGameState.vassalizedHouses = [];
+      }
+      return serializedGame;
+    },
+  },
 ];
 
 export default serializedGameMigrations;
