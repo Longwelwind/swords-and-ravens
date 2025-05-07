@@ -13,7 +13,6 @@ import GameEndedGameState from "../game-ended-game-state/GameEndedGameState";
 import ChooseInitialObjectivesGameState from "../choose-initial-objectives-game-state/ChooseInitialObjectivesGameState";
 import PlanningGameState from "../planning-game-state/PlanningGameState";
 import PlaceOrdersForVassalsGameState from "../planning-game-state/place-orders-for-vassals-game-state/PlaceOrdersForVassalsGameState";
-import ClaimVassalsGameState from "../planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
 
 export type SerializedVoteType =
   | SerializedCancelGame
@@ -624,6 +623,7 @@ export class ReplaceVassalByPlayer extends VoteType {
     this.forHouse.hasBeenReplacedByVassal = false;
 
     vote.ingame.players.set(newPlayer.user, newPlayer);
+    _.pull(vote.ingame.vassalizedHouses, this.forHouse);
 
     // Remove house from vassal relations
     if (vote.ingame.game.vassalRelations.has(this.forHouse)) {
@@ -668,6 +668,7 @@ export class ReplaceVassalByPlayer extends VoteType {
       vote.ingame.hasChildGameState(PlanningGameState) &&
       (vote.ingame.hasChildGameState(PlaceOrdersGameState) ||
         vote.ingame.hasChildGameState(PlaceOrdersForVassalsGameState));
+
     if (hasPlaceOrders) {
       const planning = vote.ingame.getChildGameState(
         PlanningGameState
@@ -676,23 +677,15 @@ export class ReplaceVassalByPlayer extends VoteType {
       // Reset waitedFor data, to properly call ingame.setWaitedForPlayers() by the game-state-change
       vote.ingame.resetAllWaitedForData();
 
-      // game-state-change will notify all waited users, no need to do it explicitly
+      // Restart planning, so we will return to a fresh PlaceOrdersGameState where everyone has to
+      // submit their orders again
       planning
         .setChildGameState(new PlaceOrdersGameState(planning))
         .firstStart();
-    } else if (vote.ingame.hasChildGameState(ClaimVassalsGameState)) {
-      // Restart ClaimVassalsGameState
-      vote.ingame.proceedWithClaimVassals();
-    } else if (
-      vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)
-    ) {
-      // If we are waiting for the newPlayer, notify them about their turn
-      newPlayer.setWaitedFor();
-      vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
     }
 
-    // Remove house from vassalizedHouses
-    _.pull(vote.ingame.vassalizedHouses, this.forHouse);
+    // Force a new claim-vassals game-state, as undoing a vassal may steal a vassal from an earlier house on IT
+    vote.ingame.proceedWithClaimVassals();
 
     // Force reload, so newPlayer receives possible secrets like objectives in FFC
     newPlayer.user.send({
