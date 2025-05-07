@@ -1192,6 +1192,9 @@ export default class IngameGameState extends GameState<
       }
     }
 
+    // Delete the old player so the house is a vassal now
+    this.players.delete(player.user);
+
     // Save the house cards, so vassalization can be undone and cards can be re-assigned to a new player
     this.game.oldPlayerHouseCards.set(
       newVassalHouse,
@@ -1253,8 +1256,6 @@ export default class IngameGameState extends GameState<
     this.vassalizedHouses.push(newVassalHouse);
     this.proceedWithClaimVassals([forbiddenCommander, newVassalHouse]);
 
-    // Delete the old player so the house is a vassal now
-    this.players.delete(player.user);
     this.entireGame.broadcastToClients({
       type: "player-replaced",
       oldUser: player.user.id,

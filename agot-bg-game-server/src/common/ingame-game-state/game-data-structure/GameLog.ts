@@ -310,7 +310,8 @@ export type ModifyingGameLog =
   | ControlPowerTokenRemoved
   | LastLandUnitTransformedToDragon
   | CombatResult
-  | VassalsClaimed;
+  | VassalsClaimed
+  | ClaimVassalsBegan;
 
 export enum PlayerActionType {
   ORDERS_PLACED,
