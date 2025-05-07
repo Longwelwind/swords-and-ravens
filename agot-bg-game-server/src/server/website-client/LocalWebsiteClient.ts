@@ -15,7 +15,6 @@ const user = {
     mapScrollbar: true,
     gameStateColumnRight: false,
     muted: true,
-    lastOpenedTab: "game-logs",
     musicVolume: 1,
     notificationsVolume: 1,
     sfxVolume: 1,
@@ -216,7 +215,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
     console.log("room " + roomId + " cleared.");
   }
 
-  async isGameCancelled(gameId: string): Promise<boolean> {
+  async isGameCancelled(_gameId: string): Promise<boolean> {
     return false;
   }
 }

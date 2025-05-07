@@ -91,7 +91,6 @@ export default class User {
   static deserializeFromServer(game: EntireGame, data: SerializedUser): User {
     const emptySettings: UserSettings = {
       chatHouseNames: false,
-      lastOpenedTab: "",
       // Todo: Get rid of this as well and define two layouts for mobile and desktop
       mapScrollbar: false,
       muted: false,
