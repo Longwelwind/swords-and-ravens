@@ -1219,15 +1219,11 @@ export default class IngameGameState extends GameState<
       });
     } else {
       // If we are in combat we have to make sure the enemy doesn't claim this vassal
-      const combat = this.getFirstChildGameState(
-        CombatGameState
-      ) as CombatGameState;
-      if (
-        combat.attacker == newVassalHouse ||
-        combat.defender == newVassalHouse
-      ) {
-        forbiddenCommander =
-          combat.attacker == newVassalHouse ? combat.defender : combat.attacker;
+      const combat = this.getChildGameState(CombatGameState) as CombatGameState;
+      const commandedHouse = combat.tryGetCommandedHouseInCombat(player);
+      if (commandedHouse) {
+        const enemy = combat.getEnemy(commandedHouse);
+        forbiddenCommander = this.getControllerOfHouse(enemy).house;
       }
     }
 

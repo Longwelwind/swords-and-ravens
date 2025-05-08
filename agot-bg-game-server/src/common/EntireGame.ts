@@ -545,6 +545,7 @@ export default class EntireGame extends GameState<
         .getWaitedUsers()
         .map((u) => (this.ingameGameState as IngameGameState).players.get(u));
     } catch (e) {
+      console.error(e);
       throw new SnrError(
         this.entireGame,
         `Error in doPlayerClocksHandling: ${e}`
