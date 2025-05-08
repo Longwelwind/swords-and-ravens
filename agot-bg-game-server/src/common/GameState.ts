@@ -6,6 +6,7 @@ import House from "./ingame-game-state/game-data-structure/House";
 import { v4 } from "uuid";
 import Region from "./ingame-game-state/game-data-structure/Region";
 import Player from "./ingame-game-state/Player";
+import SnrError from "../utils/snrError";
 
 export type AnyGameState = GameState<any, any> | null;
 
@@ -78,7 +79,10 @@ export default class GameState<
     if (this.childGameState) {
       return this.childGameState.getWaitedUsers();
     } else {
-      throw new Error("getWaitedUsers should be overriden for leaf state");
+      throw new SnrError(
+        this.entireGame,
+        "getWaitedUsers should be overriden for leaf state"
+      );
     }
   }
 

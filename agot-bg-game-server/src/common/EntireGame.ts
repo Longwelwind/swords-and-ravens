@@ -539,9 +539,17 @@ export default class EntireGame extends GameState<
       return;
     }
 
-    const waitedPlayers = this.leafState
-      .getWaitedUsers()
-      .map((u) => (this.ingameGameState as IngameGameState).players.get(u));
+    let waitedPlayers: Player[] = [];
+    try {
+      waitedPlayers = this.leafState
+        .getWaitedUsers()
+        .map((u) => (this.ingameGameState as IngameGameState).players.get(u));
+    } catch (e) {
+      throw new SnrError(
+        this.entireGame,
+        `Error in doPlayerClocksHandling: ${e}`
+      );
+    }
     const notWaitedPlayers = _.difference(
       this.ingameGameState.players.values,
       waitedPlayers
