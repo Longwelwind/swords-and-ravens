@@ -22,7 +22,7 @@ import House from "../game-data-structure/House";
 import BetterMap from "../../../utils/BetterMap";
 import popRandom from "../../../utils/popRandom";
 import HouseCard from "../game-data-structure/house-card/HouseCard";
-
+import shuffleInPlace from "../../../utils/shuffleInPlace";
 import _ from "lodash";
 
 export const draftOrders: number[][][] = [
@@ -198,22 +198,31 @@ export default class DraftGameState extends GameState<
     }
   }
 
+  private get requiredHouseCardsCount(): number {
+    return this.ingame.players.size * 7;
+  }
+
+  private canRemoveCardFromDraftableHouseCards(): boolean {
+    return (
+      this.game.draftableHouseCards.size - 1 >= this.requiredHouseCardsCount
+    );
+  }
+
+  private removeCardFromDraftableHouseCards(id: string): void {
+    if (
+      this.game.draftableHouseCards.has(id) &&
+      this.canRemoveCardFromDraftableHouseCards()
+    ) {
+      this.game.draftableHouseCards.delete(id);
+    }
+  }
+
   private assignRandomHouseCardsAndTracks(): void {
-    if (!this.entireGame.gameSettings.limitedDraft) {
-      if (this.game.draftableHouseCards.has("khal-drogo")) {
-        this.game.draftableHouseCards.delete("khal-drogo");
-      }
+    this.removeCardFromDraftableHouseCards("khal-drogo");
+    this.removeCardFromDraftableHouseCards("doran-martell-dwd");
 
-      if (this.game.draftableHouseCards.has("doran-martell-dwd")) {
-        this.game.draftableHouseCards.delete("doran-martell-dwd");
-      }
-
-      if (
-        !this.entireGame.gameSettings.dragonWar &&
-        this.game.draftableHouseCards.has("daenerys-targaryen-a")
-      ) {
-        this.game.draftableHouseCards.delete("daenerys-targaryen-a");
-      }
+    if (!this.entireGame.gameSettings.dragonWar) {
+      this.removeCardFromDraftableHouseCards("daenerys-targaryen-a");
     }
 
     houseCardCombatStrengthAllocations.entries.forEach(
@@ -238,10 +247,19 @@ export default class DraftGameState extends GameState<
       (h) => h != this.game.targaryen
     );
 
-    const shuffledIndices = _.shuffle(_.range(0, housesWithoutTarg.length));
-
     const influenceIndices =
       influenceTrackIndices[housesWithoutTarg.length - 1];
+
+    // Shuffle the indices of the first influence track to randomize the order of houses
+    const shuffledIndices = shuffleInPlace(influenceIndices[0].slice());
+    while (
+      shuffledIndices.length > 2 &&
+      _.zipWith(influenceIndices[0], shuffledIndices, (a, b) => a === b).filter(
+        Boolean
+      ).length > 1
+    ) {
+      shuffleInPlace(shuffledIndices);
+    }
 
     const influenceTracks = influenceIndices.map((trackIndices) => {
       return trackIndices.map((index) => {
