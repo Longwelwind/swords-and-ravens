@@ -1,4 +1,4 @@
-const modifyingGameLogIds = new Set([
+const modifyingGameLogTypes = new Set([
   "combat-result",
   "turn-begin",
   "march-resolved",
@@ -123,7 +123,7 @@ const relatedCombatResultTypes = new Set([
   "retreat-casualties-suffered",
 ]);
 
-const combatTerminationTypes = new Set([
+const combatTerminationLogTypes = new Set([
   "attack",
   "march-resolved",
   "combat-result", // not really possible as "attack" must "preceed", but for safety...
@@ -133,13 +133,11 @@ const combatTerminationTypes = new Set([
   "westeros-phase-began",
 ]);
 
-export {
-  modifyingGameLogIds,
-  relatedCombatResultTypes,
-  combatTerminationTypes,
-};
+const replacementLogTypes = new Set(["player-replaced", "vassal-replaced"]);
+
 export default class ReplayConstants {
-  static modifyingGameLogIds = modifyingGameLogIds;
+  static modifyingGameLogTypes = modifyingGameLogTypes;
   static relatedCombatResultTypes = relatedCombatResultTypes;
-  static combatTerminationTypes = combatTerminationTypes;
+  static combatTerminationLogTypes = combatTerminationLogTypes;
+  static replacementLogTypes = replacementLogTypes;
 }

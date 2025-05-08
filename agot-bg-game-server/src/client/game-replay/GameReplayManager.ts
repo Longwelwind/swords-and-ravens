@@ -7,7 +7,7 @@ import EntireGameSnapshot from "./EntireGameSnapshot";
 import GameLogManager from "../../common/ingame-game-state/game-data-structure/GameLogManager";
 import EntireGame from "../../common/EntireGame";
 import { computed, observable } from "mobx";
-import ReplayConstants, { modifyingGameLogIds } from "./replay-constants";
+import ReplayConstants from "./replay-constants";
 import BetterMap from "../../utils/BetterMap";
 import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import SnapshotMigrator from "./SnapshotMigrator";
@@ -98,14 +98,22 @@ export default class GameReplayManager {
 
     for (let i = originalIndex + 1; i <= index; i++) {
       const log = this.logManager.logs[i].data;
-      if (ReplayConstants.combatTerminationTypes.has(log.type)) {
+      if (ReplayConstants.combatTerminationLogTypes.has(log.type)) {
         this.migrator.resetCombatLogData();
       }
 
-      if (!this.isModifyingGameLog(log)) continue;
+      if (!this.isModifyingGameLog(log) && !this.isReplacementGameLog(log))
+        continue;
       const clone = _.cloneDeep(this.logManager.logs[i]).data;
-      snap = this.migrator.applyLogEvent(snap, clone, i);
-      snap = this.migrator.handleVassalReplacement(snap, clone);
+      if (this.isModifyingGameLog(log)) {
+        snap = this.migrator.applyLogEvent(snap, clone, i);
+      } else if (this.isReplacementGameLog(log)) {
+        snap = this.migrator.handleVassalReplacement(snap, clone);
+      } else {
+        throw new Error(
+          `Unknown log type: ${log.type} in GameReplayManager.selectLog`
+        );
+      }
       snapCount++;
     }
 
@@ -135,7 +143,7 @@ export default class GameReplayManager {
     if (log.type == "orders-revealed") {
       return !log.onlySnapshot;
     }
-    return modifyingGameLogIds.has(log.type);
+    return ReplayConstants.modifyingGameLogTypes.has(log.type);
   }
 
   nextLog(): void {
@@ -302,6 +310,10 @@ export default class GameReplayManager {
   }
 
   private isModifyingGameLog(log: GameLogData): boolean {
-    return modifyingGameLogIds.has(log.type);
+    return ReplayConstants.modifyingGameLogTypes.has(log.type);
+  }
+
+  private isReplacementGameLog(log: GameLogData): boolean {
+    return ReplayConstants.replacementLogTypes.has(log.type);
   }
 }

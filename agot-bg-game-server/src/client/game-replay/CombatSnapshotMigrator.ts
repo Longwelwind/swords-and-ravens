@@ -178,7 +178,7 @@ export default class CombatSnapshotMigrator {
     const logsSlice = this.ingame.gameLogManager.logs.slice(logIndex + 1);
     const relatedCombatResultLogs = _.takeWhile(
       logsSlice,
-      (l) => !ReplayConstants.combatTerminationTypes.has(l.data.type)
+      (l) => !ReplayConstants.combatTerminationLogTypes.has(l.data.type)
     ).filter((l) => ReplayConstants.relatedCombatResultTypes.has(l.data.type));
 
     const retreatRegionChosen = _.remove(
