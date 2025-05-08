@@ -1056,6 +1056,13 @@ export default class SnapshotMigrator {
         track.unshift(log.house);
         return snap;
       }
+      case "claim-vassals-began": {
+        if (!snap.gameSnapshot) return snap;
+        snap.gameSnapshot.housesOnVictoryTrack.forEach((h) => {
+          h.suzerainHouseId = undefined;
+        });
+        return snap;
+      }
 
       default:
         throw new Error(`Unhandled modifying log type '${log.type}'`);
@@ -1077,10 +1084,6 @@ export default class SnapshotMigrator {
       const house = snap.getHouse(log.house);
       house.isVassal = undefined;
       house.suzerainHouseId = undefined;
-    } else if (log.type == "claim-vassals-began") {
-      snap.gameSnapshot.housesOnVictoryTrack.forEach((h) => {
-        h.suzerainHouseId = undefined;
-      });
     }
 
     return snap;

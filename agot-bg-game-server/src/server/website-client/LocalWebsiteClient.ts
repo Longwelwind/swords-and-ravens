@@ -57,6 +57,9 @@ export default class LocalWebsiteClient implements WebsiteClient {
     serializedGame.users = [];
     serializedGame.privateChatRoomIds = [];
 
+    serializedGame.gameSettings.onlyLive = false;
+    serializedGame.gameSettings.pbem = true;
+
     for (let i = 0; i < 8; i++) {
       const u = {
         ...user,
@@ -72,6 +75,10 @@ export default class LocalWebsiteClient implements WebsiteClient {
     }
 
     const ingame = serializedGame.childGameState;
+    ingame.players.forEach((player) => {
+      player.liveClockData = null;
+      player.waitedForData = null;
+    });
     ingame.votes = [];
     ingame.gameLogManager.lastSeenLogTimes = [];
     const log = ingame.gameLogManager.logs.find(
