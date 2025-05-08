@@ -21,7 +21,6 @@ import EntireGame from "../../../common/EntireGame";
 import House from "../game-data-structure/House";
 import BetterMap from "../../../utils/BetterMap";
 import popRandom from "../../../utils/popRandom";
-import shuffleInPlace from "../../../utils/shuffleInPlace";
 import HouseCard from "../game-data-structure/house-card/HouseCard";
 
 import _ from "lodash";
@@ -89,6 +88,41 @@ export const houseCardCombatStrengthAllocations = new BetterMap<number, number>(
   ]
 );
 
+const influenceTrackIndices: number[][][] = [
+  [[0], [0], [0]],
+  [
+    [0, 1],
+    [1, 0],
+    [0, 1],
+  ],
+  [
+    [0, 1, 2],
+    [2, 0, 1],
+    [1, 2, 0],
+  ],
+  [
+    [0, 1, 2, 3],
+    [3, 2, 0, 1],
+    [1, 2, 3, 0],
+  ],
+  [
+    [0, 1, 2, 3, 4],
+    [4, 3, 2, 0, 1],
+    [1, 2, 3, 0, 4],
+  ],
+  [
+    [0, 1, 2, 3, 4, 5],
+    [4, 5, 3, 2, 0, 1],
+    [1, 2, 3, 0, 5, 4],
+  ],
+  [
+    [0, 1, 2, 3, 4, 5, 6],
+    [4, 5, 3, 6, 2, 0, 1],
+    [1, 2, 3, 5, 6, 0, 4],
+  ],
+  // No need to define 8p indices, as Targaryen is always last on all tracks
+  // and the 7p indices are used for 8p games
+];
 export default class DraftGameState extends GameState<
   IngameGameState,
   | DraftHouseCardsGameState
@@ -124,7 +158,7 @@ export default class DraftGameState extends GameState<
     // In case of blind or random draft we want to assign the random house cards before drafting the map
     // to transmit the house cards with the game state change to IngameGameState
     if (this.isBlindOrRandom()) {
-      this.assignRandomHouseCards();
+      this.assignRandomHouseCardsAndTracks();
     } else {
       this.proceedDraft();
     }
@@ -164,7 +198,7 @@ export default class DraftGameState extends GameState<
     }
   }
 
-  private assignRandomHouseCards(): void {
+  private assignRandomHouseCardsAndTracks(): void {
     houseCardCombatStrengthAllocations.entries.forEach(
       ([hcStrength, count]) => {
         for (let i = 0; i < count; i++) {
@@ -183,71 +217,44 @@ export default class DraftGameState extends GameState<
 
     this.game.draftableHouseCards.clear();
 
-    do {
-      this.ingame.setInfluenceTrack(0, this.getRandomInitialInfluenceTrack());
-      this.ingame.setInfluenceTrack(1, this.getRandomInitialInfluenceTrack());
-      // Move blade holder to bottom of kings court
-      this.ingame.setInfluenceTrack(
-        2,
-        this.getRandomInitialInfluenceTrack(this.game.valyrianSteelBladeHolder)
-      );
-    } while (this.hasAnyHouseTooMuchDominanceTokens());
+    const housesWithoutTarg = this.game.houses.values.filter(
+      (h) => h != this.game.targaryen
+    );
+
+    const shuffledIndices = _.shuffle(_.range(0, housesWithoutTarg.length));
+
+    const influenceIndices =
+      influenceTrackIndices[housesWithoutTarg.length - 1];
+
+    const influenceTracks = influenceIndices.map((trackIndices) => {
+      return trackIndices.map((index) => {
+        return housesWithoutTarg[shuffledIndices[index]];
+      });
+    });
+
+    this.moveVassalsToBottom(influenceTracks);
+
+    influenceTracks.forEach((track, index) => {
+      this.ingame.setInfluenceTrack(index, track);
+    });
 
     this.proceedDraft();
   }
 
-  private hasAnyHouseTooMuchDominanceTokens(): boolean {
-    const uniqDominanceHolders = _.uniq(
-      this.game.influenceTracks.map((track) => this.game.getTokenHolder(track))
-    );
-
-    switch (this.ingame.players.size) {
-      case 0:
-        throw new Error("Games with 0 players cannot start");
-      case 1:
-        // Ensure a single player can hold all 3 dominance tokens in a debug game:
-        return false;
-      case 2:
-        // Ensure a player does not get all dominance tokens in 2p games
-        // With Targaryen the other player can hold all 3 tokens.
-        return this.game.targaryen
-          ? uniqDominanceHolders.length != 1
-          : uniqDominanceHolders.length != 2;
-      case 3:
-        // Ensure every dominance token is held by another house
-        // With Targaryen the other player can hold all 3 tokens.
-        return this.game.targaryen
-          ? uniqDominanceHolders.length != 2
-          : uniqDominanceHolders.length != 3;
-      default:
-        // Ensure every dominance token is held by another house
-        return uniqDominanceHolders.length != 3;
-    }
-  }
-
-  private getRandomInitialInfluenceTrack(
-    moveToBottom: House | null = null
-  ): House[] {
-    let track = shuffleInPlace(this.game.houses.values);
-
-    if (moveToBottom) {
-      track = _.without(track, moveToBottom);
-      track.push(moveToBottom);
-    }
-
+  private moveVassalsToBottom(tracks: House[][]): void {
     const playerHouses = this.ingame.players.values.map((p) => p.house);
-    const areVassalsInTopThreeSpaces = _.take(track, 3).some(
-      (h) => !playerHouses.includes(h)
-    );
 
-    if (areVassalsInTopThreeSpaces) {
-      const vassals = track.filter((h) => !playerHouses.includes(h));
-      const newTrack = _.difference(track, vassals);
-      newTrack.push(...vassals);
-      return newTrack;
-    }
+    tracks.forEach((track) => {
+      const areVassalsInTopThreeSpaces = _.take(track, 3).some(
+        (h) => !playerHouses.includes(h)
+      );
 
-    return track;
+      if (areVassalsInTopThreeSpaces) {
+        const vassals = track.filter((h) => !playerHouses.includes(h));
+        _.remove(track, (h) => vassals.includes(h));
+        track.push(...vassals);
+      }
+    });
   }
 
   onDraftHouseCardsGameStateEnd(): void {
