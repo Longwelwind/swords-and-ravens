@@ -199,19 +199,21 @@ export default class DraftGameState extends GameState<
   }
 
   private assignRandomHouseCardsAndTracks(): void {
-    if (this.game.draftableHouseCards.has("khal-drogo")) {
-      this.game.draftableHouseCards.delete("khal-drogo");
-    }
+    if (!this.entireGame.gameSettings.limitedDraft) {
+      if (this.game.draftableHouseCards.has("khal-drogo")) {
+        this.game.draftableHouseCards.delete("khal-drogo");
+      }
 
-    if (this.game.draftableHouseCards.has("doran-martell-dwd")) {
-      this.game.draftableHouseCards.delete("doran-martell-dwd");
-    }
+      if (this.game.draftableHouseCards.has("doran-martell-dwd")) {
+        this.game.draftableHouseCards.delete("doran-martell-dwd");
+      }
 
-    if (
-      !this.entireGame.gameSettings.dragonWar &&
-      this.game.draftableHouseCards.has("daenerys-targaryen-a")
-    ) {
-      this.game.draftableHouseCards.delete("daenerys-targaryen-a");
+      if (
+        !this.entireGame.gameSettings.dragonWar &&
+        this.game.draftableHouseCards.has("daenerys-targaryen-a")
+      ) {
+        this.game.draftableHouseCards.delete("daenerys-targaryen-a");
+      }
     }
 
     houseCardCombatStrengthAllocations.entries.forEach(
