@@ -1023,12 +1023,11 @@ export default class IngameGameState extends GameState<
         // Replacing a vassal now could lead to an invalid state.
         // E.G. PayDebtsGameState will fail because there is no-one left to do the destroy units choice
         // When we are in combat, replacing vassal will fail, as there is no house left to assign the new vassal
-        // Therefore we go to GameEnded first and then replace the last house with a vassal:
-
+        // Therefore we end the game now, keeping the last two houses in game.
         const winner = _.without(this.players.values, player)[0].house;
         this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
         updateLastActive = true;
-        this.entireGame.checkGameStateChanged();
+        return;
       }
 
       // Vassal replacement during drafting would crash the game!
@@ -1192,9 +1191,6 @@ export default class IngameGameState extends GameState<
       }
     }
 
-    // Delete the old player so the house is a vassal now
-    this.players.delete(player.user);
-
     // Save the house cards, so vassalization can be undone and cards can be re-assigned to a new player
     this.game.oldPlayerHouseCards.set(
       newVassalHouse,
@@ -1226,11 +1222,12 @@ export default class IngameGameState extends GameState<
       const combat = this.getFirstChildGameState(
         CombatGameState
       ) as CombatGameState;
-      if (combat.isCommandingHouseInCombat(newVassalHouse)) {
-        const commandedHouse = combat.getCommandedHouseInCombat(newVassalHouse);
-        const enemy = combat.getEnemy(commandedHouse);
-
-        forbiddenCommander = this.getControllerOfHouse(enemy).house;
+      if (
+        combat.attacker == newVassalHouse ||
+        combat.defender == newVassalHouse
+      ) {
+        forbiddenCommander =
+          combat.attacker == newVassalHouse ? combat.defender : combat.attacker;
       }
     }
 
@@ -1252,6 +1249,8 @@ export default class IngameGameState extends GameState<
       reason: reason,
     });
 
+    // Delete the old player so the house is a vassal now
+    this.players.delete(player.user);
     newVassalHouse.hasBeenReplacedByVassal = true;
     this.vassalizedHouses.push(newVassalHouse);
     this.proceedWithClaimVassals([forbiddenCommander, newVassalHouse]);

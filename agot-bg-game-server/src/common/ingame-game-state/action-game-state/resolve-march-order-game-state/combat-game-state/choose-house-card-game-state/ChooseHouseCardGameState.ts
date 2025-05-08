@@ -302,7 +302,8 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         if (
           hc &&
           (admin ||
-            (player && this.ingameGameState.getControllerOfHouse(h) == player))
+            (player &&
+              this.ingameGameState.safeGetControllerOfHouse(h) == player))
         ) {
           return [h.id, hc.id];
         } else {
