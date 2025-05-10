@@ -714,7 +714,7 @@ export default class EntireGame extends GameState<
     // Creating a view of the current turn of the game
     const turn = this.ingameGameState?.game.turn ?? -1;
     const maxPlayerCount = this.gameSettings.playerCount;
-    const settings = this.gameSettings;
+    const settings = this.gameSettings.serializeToClient();
     const _waitingFor =
       this.ingameGameState?.leafState
         .getWaitedUsers()
