@@ -183,6 +183,12 @@ export class GameSettings {
       initialLiveClock: this.onlyLive ? this.initialLiveClock : undefined,
       noPrivateChats: this.noPrivateChats || undefined,
       tournamentMode: this.tournamentMode || undefined,
+      fixedClock: this.fixedClock || undefined,
+      fogOfWar: this.fogOfWar || undefined,
+      dragonWar: this.dragonWar || undefined,
+      dragonRevenge: this.dragonRevenge || undefined,
+      holdVictoryPointsUntilEndOfRound:
+        this.holdVictoryPointsUntilEndOfRound || undefined,
     };
   }
 }
