@@ -2954,6 +2954,22 @@ const serializedGameMigrations: {
       return serializedGame;
     },
   },
+  {
+    version: "128",
+    migrate: (serializedGame: SerializedEntireGame) => {
+      if (serializedGame.childGameState.type == "ingame") {
+        const nonCorruptSettings =
+          serializedGame.childGameState.game.world.settings;
+        serializedGame.gameSettings.fogOfWar = nonCorruptSettings.fogOfWar;
+        serializedGame.gameSettings.dragonWar = nonCorruptSettings.dragonWar;
+        serializedGame.gameSettings.dragonRevenge =
+          nonCorruptSettings.dragonRevenge;
+        serializedGame.gameSettings.holdVictoryPointsUntilEndOfRound =
+          nonCorruptSettings.holdVictoryPointsUntilEndOfRound;
+      }
+      return serializedGame;
+    },
+  },
 ];
 
 export default serializedGameMigrations;

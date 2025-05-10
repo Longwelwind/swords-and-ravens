@@ -13,7 +13,10 @@ import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { dragon } from "./unitTypes";
 import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
 import StaticIronBankView from "./static-data-structure/StaticIronBankView";
-import { GameSettings } from "../../../common/GameSettings";
+import {
+  GameSettings,
+  SerializedGameSettings,
+} from "../../../common/GameSettings";
 import Player from "../Player";
 import IRegionSnapshot from "../../../client/game-replay/IRegionSnapshot";
 
@@ -330,7 +333,7 @@ export default class World {
       regions: this.regions.values.map((r) =>
         r.serializeToClient(admin, player)
       ),
-      settings: this.settings,
+      settings: this.settings.serializeToClient(),
     };
   }
 
@@ -339,11 +342,14 @@ export default class World {
       data.regions.map((r) => [r.id, Region.deserializeFromServer(game, r)])
     );
 
-    return new World(regions, data.settings);
+    return new World(
+      regions,
+      GameSettings.deserializeFromServer(data.settings)
+    );
   }
 }
 
 export interface SerializedWorld {
   regions: SerializedRegion[];
-  settings: GameSettings;
+  settings: SerializedGameSettings;
 }
