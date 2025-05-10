@@ -731,7 +731,7 @@ export default class EntireGame extends GameState<
       )
       .join(", ");
     const waitingForIds = _waitingFor.map((wf) => wf.user.id);
-    let winner: any = null;
+    let winner: string | undefined = undefined;
     if (this.ingameGameState?.leafState instanceof GameEndedGameState) {
       const user = this.ingameGameState.getControllerOfHouse(
         this.ingameGameState.leafState.winner
@@ -745,15 +745,17 @@ export default class EntireGame extends GameState<
           v.state == VoteState.ONGOING &&
           (v.type instanceof ReplacePlayer ||
             v.type instanceof ReplacePlayerByVassal)
-      ).length ?? -1) > 0;
+      ).length ?? -1) > 0 || undefined;
 
-    const oldPlayerIds = this.entireGame.ingameGameState?.oldPlayerIds ?? [];
+    const oldPlayerIds =
+      this.entireGame.ingameGameState?.oldPlayerIds ?? undefined;
     const timeoutPlayerIds =
-      this.entireGame.ingameGameState?.timeoutPlayerIds ?? [];
-    const replacerIds = this.entireGame.ingameGameState?.replacerIds ?? [];
+      this.entireGame.ingameGameState?.timeoutPlayerIds ?? undefined;
+    const replacerIds =
+      this.entireGame.ingameGameState?.replacerIds ?? undefined;
     const isPasswordProtected = this.entireGame.lobbyGameState?.password
       ? this.entireGame.lobbyGameState.password.length > 0
-      : false;
+      : undefined;
 
     return {
       turn,
