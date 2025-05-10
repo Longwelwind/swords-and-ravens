@@ -653,7 +653,7 @@ export class ReplaceVassalByPlayer extends VoteType {
     vote.ingame.entireGame.broadcastToClients({
       type: "update-house-cards",
       house: this.forHouse.id,
-      houseCards: this.forHouse.houseCards.values.map((hc) => hc.id),
+      houseCards: this.forHouse.houseCards.keys,
     });
 
     vote.ingame.game.oldPlayerHouseCards.delete(this.forHouse);

@@ -102,18 +102,9 @@ export default class GameReplayManager {
         this.migrator.resetCombatLogData();
       }
 
-      if (!this.isModifyingGameLog(log) && !this.isReplacementGameLog(log))
-        continue;
+      if (!this.isModifyingGameLog(log)) continue;
       const clone = _.cloneDeep(this.logManager.logs[i]).data;
-      if (this.isModifyingGameLog(log)) {
-        snap = this.migrator.applyLogEvent(snap, clone, i);
-      } else if (this.isReplacementGameLog(log)) {
-        snap = this.migrator.handleVassalReplacement(snap, clone);
-      } else {
-        throw new Error(
-          `Unknown log type: ${log.type} in GameReplayManager.selectLog`
-        );
-      }
+      snap = this.migrator.applyLogEvent(snap, clone, i);
       snapCount++;
     }
 
@@ -311,9 +302,5 @@ export default class GameReplayManager {
 
   private isModifyingGameLog(log: GameLogData): boolean {
     return ReplayConstants.modifyingGameLogTypes.has(log.type);
-  }
-
-  private isReplacementGameLog(log: GameLogData): boolean {
-    return ReplayConstants.replacementLogTypes.has(log.type);
   }
 }

@@ -1,8 +1,5 @@
-import EntireGame, {
-  GameSettings,
-  HouseCardDecks,
-  NotificationType,
-} from "../EntireGame";
+import EntireGame, { NotificationType } from "../EntireGame";
+import { GameSettings, HouseCardDecks } from "../GameSettings";
 import GameState from "../GameState";
 import User from "../../server/User";
 import { ClientMessage } from "../../messages/ClientMessage";
@@ -203,24 +200,15 @@ export default class LobbyGameState extends GameState<EntireGame> {
         password: answer,
       });
     } else if (message.type == "change-game-settings") {
-      const settings = message.settings as GameSettings;
+      const settings = GameSettings.deserializeFromServer(message.settings);
 
-      if (
-        !this.isValidDraftDeckChoice(
-          this.entireGame.gameSettings.thematicDraft,
-          this.entireGame.gameSettings.selectedDraftDecks
-        )
-      ) {
+      if (!this.isValidDraftDeckChoice(this.entireGame.gameSettings)) {
         this.entireGame.gameSettings.selectedDraftDecks = HouseCardDecks.All;
       }
 
-      if (
-        !this.isValidDraftDeckChoice(
-          settings.thematicDraft,
-          settings.selectedDraftDecks
-        )
-      ) {
+      if (!this.isValidDraftDeckChoice(settings)) {
         settings.thematicDraft = this.entireGame.gameSettings.thematicDraft;
+        settings.perpetuumRandom = this.entireGame.gameSettings.perpetuumRandom;
         settings.selectedDraftDecks =
           this.entireGame.gameSettings.selectedDraftDecks;
       }
@@ -277,6 +265,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.limitedDraft = false;
         settings.blindDraft = false;
         settings.randomDraft = false;
+        settings.perpetuumRandom = false;
       }
 
       if (settings.setupId == "a-feast-for-crows") {
@@ -304,6 +293,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.limitedDraft = false;
         settings.blindDraft = false;
         settings.randomDraft = false;
+        settings.perpetuumRandom = false;
       }
 
       if (settings.limitedDraft) {
@@ -379,7 +369,11 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.asosHouseCards = false;
       }
 
-      if (settings.blindDraft || settings.randomDraft) {
+      if (
+        settings.blindDraft ||
+        settings.randomDraft ||
+        settings.perpetuumRandom
+      ) {
         settings.draftHouseCards = true;
         settings.randomDraft = true;
         settings.thematicDraft = false;
@@ -426,15 +420,12 @@ export default class LobbyGameState extends GameState<EntireGame> {
     return updateLastActive;
   }
 
-  isValidDraftDeckChoice(
-    thematicDraft: boolean,
-    decks: HouseCardDecks
-  ): boolean {
-    if (thematicDraft) {
-      return this.hasAtLeastTwoBitsSet(decks);
+  isValidDraftDeckChoice(settings: GameSettings): boolean {
+    if (settings.thematicDraft || settings.perpetuumRandom) {
+      return this.hasAtLeastTwoBitsSet(settings.selectedDraftDecks);
     }
 
-    return decks >= 1;
+    return settings.selectedDraftDecks >= 1;
   }
 
   hasAtLeastTwoBitsSet(num: number): boolean {

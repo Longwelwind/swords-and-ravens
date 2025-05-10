@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import * as React from "react";
 import FormCheck from "react-bootstrap/FormCheck";
 import GameClient from "./GameClient";
-import { GameSettings, HouseCardDecks } from "../common/EntireGame";
+import { GameSettings, HouseCardDecks } from "../common/GameSettings";
 import EntireGame from "../common/EntireGame";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -1713,6 +1713,34 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 }
                 onChange={(e) =>
                   this.selectHouseCardDeck(e, HouseCardDecks.StormOfSwords)
+                }
+              />
+            </Col>
+            <Col xs="12">
+              <FormCheck
+                id="perpetuum-draft-setting"
+                type="switch"
+                label={
+                  <OverlayTrigger
+                    overlay={
+                      <Tooltip id="perpetuum-draft-tooltip">
+                        Players will receive a new deck every time after last
+                        House card has been played.
+                      </Tooltip>
+                    }
+                  >
+                    <label htmlFor="perpetuum-draft-setting">
+                      Perpetuum Random
+                    </label>
+                  </OverlayTrigger>
+                }
+                checked={this.gameSettings.perpetuumRandom}
+                onChange={() =>
+                  this.changeGameSettings(
+                    () =>
+                      (this.gameSettings.perpetuumRandom =
+                        !this.gameSettings.perpetuumRandom)
+                  )
                 }
               />
             </Col>

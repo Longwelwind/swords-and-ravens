@@ -2944,6 +2944,16 @@ const serializedGameMigrations: {
       return serializedGame;
     },
   },
+  {
+    version: "127",
+    migrate: (serializedGame: any) => {
+      if (serializedGame.childGameState.type == "ingame") {
+        serializedGame.childGameState.game.draftPool =
+          serializedGame.childGameState.game.draftableHouseCards;
+      }
+      return serializedGame;
+    },
+  },
 ];
 
 export default serializedGameMigrations;

@@ -74,7 +74,7 @@ export type ServerMessage =
   | VassalRelations
   | UpdateHouseCardModifier
   | UpdateHouseCards
-  | UpdateDraftableHouseCards
+  | UpdateDraftPool
   | UpdateCombatStats
   | UpdateDraftState
   | RevealBids
@@ -435,8 +435,8 @@ interface UpdateHouseCards {
   houseCards: string[];
 }
 
-interface UpdateDraftableHouseCards {
-  type: "update-draftable-house-cards";
+interface UpdateDraftPool {
+  type: "update-draft-pool";
   houseCards: string[];
 }
 

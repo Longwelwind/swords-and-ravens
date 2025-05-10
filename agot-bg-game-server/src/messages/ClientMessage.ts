@@ -1,3 +1,5 @@
+import { SerializedGameSettings } from "../common/GameSettings";
+
 export type ClientMessage =
   | Ping
   | Authenticate
@@ -240,7 +242,7 @@ export interface UserSettings {
 
 export interface ChangeGameSettings {
   type: "change-game-settings";
-  settings: any;
+  settings: SerializedGameSettings;
 }
 
 interface CreatePrivateChatRoom {

@@ -423,7 +423,6 @@ export default class GlobalServer {
       ? this.deserializeStoredGame(gameData)
       : await this.createGame(gameData.id, gameData.ownerId, gameData.name);
 
-
     if (needsDeserialization) {
       try {
         this.restartLiveClockTimers(entireGame);
@@ -472,13 +471,15 @@ export default class GlobalServer {
     return entireGame;
   }
 
-  cancelGame(entireGame: EntireGame) {
+  cancelGame(entireGame: EntireGame): void {
     // Game is in lobby
     if (!entireGame.ingameGameState) {
       // but not cancelled yet
       if (!(entireGame.childGameState instanceof CancelledGameState)) {
         // Set the game state to cancelled
-        entireGame.setChildGameState(new CancelledGameState(entireGame)).firstStart();
+        entireGame
+          .setChildGameState(new CancelledGameState(entireGame))
+          .firstStart();
       }
     } else if (entireGame.ingameGameState) {
       const ingame = entireGame.ingameGameState;

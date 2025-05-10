@@ -64,8 +64,7 @@ export default class Game {
     string,
     HouseCard
   >();
-  @observable draftableHouseCards: BetterMap<string, HouseCard> =
-    new BetterMap();
+  @observable draftPool: BetterMap<string, HouseCard> = new BetterMap();
   deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
   oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> =
     new BetterMap();
@@ -486,7 +485,7 @@ export default class Game {
     });
 
     allCards.setRange(this.vassalHouseCards.entries);
-    allCards.setRange(this.draftableHouseCards.entries);
+    allCards.setRange(this.draftPool.entries);
     allCards.setRange(this.deletedHouseCards.entries);
 
     this.oldPlayerHouseCards.values.forEach((hcs) => {
@@ -728,9 +727,10 @@ export default class Game {
       // The game state tree reveals already chosen cards by other houses during Thematic Draft.
       // But as the info is not super critical and as it's easier this was to reveal all cards once drafting is done,
       // hiding other player cards by the UI must be sufficient.
-      draftableHouseCards: this.draftableHouseCards.entries.map(
-        ([hcid, hc]) => [hcid, hc.serializeToClient()]
-      ),
+      draftPool: this.draftPool.entries.map(([hcid, hc]) => [
+        hcid,
+        hc.serializeToClient(),
+      ]),
       deletedHouseCards: this.deletedHouseCards.entries.map(([hcid, hc]) => [
         hcid,
         hc.serializeToClient(),
@@ -803,8 +803,8 @@ export default class Game {
         game.houses.get(hid),
       ])
     );
-    game.draftableHouseCards = new BetterMap(
-      data.draftableHouseCards.map(([hcid, hc]) => [
+    game.draftPool = new BetterMap(
+      data.draftPool.map(([hcid, hc]) => [
         hcid,
         HouseCard.deserializeFromServer(hc),
       ])
@@ -873,7 +873,7 @@ export interface SerializedGame {
   clientNextWildlingCardId: number | null;
   vassalRelations: [string, string][];
   vassalHouseCards: [string, SerializedHouseCard][];
-  draftableHouseCards: [string, SerializedHouseCard][];
+  draftPool: [string, SerializedHouseCard][];
   draftMapRegionsPerHouse: [string, string[]][];
   deletedHouseCards: [string, SerializedHouseCard][];
   oldPlayerHouseCards: [string, [string, SerializedHouseCard][]][];
