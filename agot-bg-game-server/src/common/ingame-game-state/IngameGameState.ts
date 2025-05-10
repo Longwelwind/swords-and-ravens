@@ -306,12 +306,12 @@ export default class IngameGameState extends GameState<
   onDraftGameStateEnd(): void {
     if (!this.entireGame.gameSettings.perpetuumRandom) {
       this.game.draftPool.clear();
+
+      this.entireGame.broadcastToClients({
+        type: "update-draft-pool",
+        houseCards: [],
+      });
     }
-    // Clients never need the draft pool again
-    this.entireGame.broadcastToClients({
-      type: "update-draft-pool",
-      houseCards: [],
-    });
     if (this.entireGame.isFeastForCrows) {
       this.proceedWithChooseObjectives();
     } else {

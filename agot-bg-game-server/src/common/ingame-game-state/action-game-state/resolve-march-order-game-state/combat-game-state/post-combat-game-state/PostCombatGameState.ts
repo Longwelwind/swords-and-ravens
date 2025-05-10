@@ -677,6 +677,11 @@ export default class PostCombatGameState extends GameState<
       });
 
       this.entireGame.broadcastToClients({
+        type: "update-draft-pool",
+        houseCards: this.game.draftPool.keys,
+      });
+
+      this.entireGame.broadcastToClients({
         type: "update-house-cards",
         house: house.id,
         houseCards: house.houseCards.keys,
