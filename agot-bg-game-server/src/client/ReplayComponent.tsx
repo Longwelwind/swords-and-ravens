@@ -9,7 +9,7 @@ import { MAP_HEIGHT } from "./MapComponent";
 import GameClient from "./GameClient";
 import User from "../server/User";
 import { observable } from "mobx";
-import { GameSettings } from "../common/EntireGame";
+import { GameSettings } from "../common/GameSettings";
 import houseCardsBackImages from "./houseCardsBackImages";
 import houseInfluenceImages from "./houseInfluenceImages";
 import houseOrderImages from "./houseOrderImages";

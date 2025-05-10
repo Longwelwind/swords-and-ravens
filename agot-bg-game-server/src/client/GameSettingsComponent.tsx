@@ -3,7 +3,7 @@ import { Component, ReactNode } from "react";
 import * as React from "react";
 import FormCheck from "react-bootstrap/FormCheck";
 import GameClient from "./GameClient";
-import { GameSettings, HouseCardDecks } from "../common/EntireGame";
+import { GameSettings, HouseCardDecks } from "../common/GameSettings";
 import EntireGame from "../common/EntireGame";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";

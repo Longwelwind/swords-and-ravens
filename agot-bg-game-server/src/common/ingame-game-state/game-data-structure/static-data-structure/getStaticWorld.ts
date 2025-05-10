@@ -1,4 +1,4 @@
-import { GameSettings } from "../../../../common/EntireGame";
+import { GameSettings } from "../../../../common/GameSettings";
 import staticWorld from "./globalStaticWorld";
 import staticWorld7p from "./globalStaticWorld7p";
 import staticWorld8p from "./globalStaticWorld8p";

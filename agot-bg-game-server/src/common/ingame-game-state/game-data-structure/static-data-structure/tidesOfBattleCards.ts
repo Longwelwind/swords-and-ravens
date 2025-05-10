@@ -1,6 +1,6 @@
 import shuffleInPlace from "../../../../utils/shuffle";
 import BetterMap from "../../../../utils/BetterMap";
-import { GameSettings } from "../../../../common/EntireGame";
+import { GameSettings } from "../../../../common/GameSettings";
 import _ from "lodash";
 
 export class TidesOfBattleCard {

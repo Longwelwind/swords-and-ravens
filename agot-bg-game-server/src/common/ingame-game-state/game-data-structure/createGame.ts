@@ -25,7 +25,7 @@ import loanCardTypes from "./loan-card/loanCardTypes";
 import LoanCard from "./loan-card/LoanCard";
 import { specialObjectiveCards } from "./static-data-structure/objectiveCards";
 import popRandom, { pickRandom } from "../../../utils/popRandom";
-import { HouseCardDecks } from "../../../common/EntireGame";
+import { HouseCardDecks } from "../../../common/GameSettings";
 import RegionKind from "./RegionKind";
 
 interface HouseCardContainer {

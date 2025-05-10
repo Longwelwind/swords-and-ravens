@@ -1,8 +1,5 @@
-import EntireGame, {
-  GameSettings,
-  HouseCardDecks,
-  NotificationType,
-} from "../EntireGame";
+import EntireGame, { NotificationType } from "../EntireGame";
+import { GameSettings, HouseCardDecks } from "../GameSettings";
 import GameState from "../GameState";
 import User from "../../server/User";
 import { ClientMessage } from "../../messages/ClientMessage";

@@ -42,6 +42,7 @@ import getElapsedSeconds from "../utils/getElapsedSeconds";
 import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import House from "./ingame-game-state/game-data-structure/House";
 import SnrError from "../utils/snrError";
+import { GameSettings, SerializedGameSettings } from "./GameSettings";
 
 export enum NotificationType {
   READY_TO_START,
@@ -69,55 +70,7 @@ export default class EntireGame extends GameState<
   lastMessageReceivedAt: Date | null = null;
   multiAccountProtectionMap: BetterMap<string, Set<string>> = new BetterMap();
 
-  @observable gameSettings: GameSettings = {
-    setupId: "mother-of-dragons",
-    playerCount: 8,
-    pbem: true,
-    onlyLive: false,
-    startWhenFull: false,
-    private: false,
-    addPortToTheEyrie: false,
-    adwdHouseCards: false,
-    asosHouseCards: false,
-    houseCardsEvolution: false,
-    houseCardsEvolutionRound: 5,
-    vassals: true,
-    ironBank: true,
-    seaOrderTokens: true,
-    allowGiftingPowerTokens: true,
-    randomVassalAssignment: false,
-    customBalancing: false,
-    randomHouses: false,
-    randomChosenHouses: false,
-    tidesOfBattle: false,
-    removeTob3: false,
-    removeTobSkulls: false,
-    limitTob2: false,
-    draftHouseCards: false,
-    thematicDraft: false,
-    limitedDraft: false,
-    randomDraft: false,
-    blindDraft: false,
-    draftMap: false,
-    selectedDraftDecks: HouseCardDecks.All,
-    mixedWesterosDeck1: false,
-    cokWesterosPhase: false,
-    fogOfWar: false,
-    victoryPointsCountNeededToWin: 7,
-    loyaltyTokenCountNeededToWin: 7,
-    endless: false,
-    faceless: false,
-    useVassalPositions: false,
-    precedingMustering: false,
-    randomStartPositions: false,
-    initialLiveClock: 60,
-    noPrivateChats: false,
-    tournamentMode: false,
-    fixedClock: false,
-    holdVictoryPointsUntilEndOfRound: false,
-    dragonWar: false,
-    dragonRevenge: false,
-  };
+  @observable gameSettings: GameSettings = new GameSettings();
 
   onSendClientMessage?: (message: ClientMessage) => void;
   onSendServerMessage?: (users: User[], message: ServerMessage) => void;
@@ -923,7 +876,7 @@ export default class EntireGame extends GameState<
       ),
       ownerUserId: this.ownerUserId,
       publicChatRoomId: this.publicChatRoomId,
-      gameSettings: this.gameSettings,
+      gameSettings: this.gameSettings.serializeToClient(),
       privateChatRoomIds: this.privateChatRoomsIds.map((u1, v) => [
         u1.id,
         v.map((u2, rid) => [u2.id, rid]),
@@ -950,7 +903,9 @@ export default class EntireGame extends GameState<
     );
     entireGame.ownerUserId = data.ownerUserId;
     entireGame.publicChatRoomId = data.publicChatRoomId;
-    entireGame.gameSettings = data.gameSettings;
+    entireGame.gameSettings = GameSettings.deserializeFromServer(
+      data.gameSettings
+    );
     entireGame.privateChatRoomsIds = new BetterMap(
       data.privateChatRoomIds.map(([uid1, bm]) => [
         entireGame.users.get(uid1),
@@ -997,65 +952,7 @@ export interface SerializedEntireGame {
     | SerializedCancelledGameState;
   publicChatRoomId: string;
   privateChatRoomIds: [string, [string, string][]][];
-  gameSettings: GameSettings;
+  gameSettings: SerializedGameSettings;
   leafStateId: string;
   multiAccountProtectionMap: [string, string[]][];
-}
-
-export enum HouseCardDecks {
-  None = 0,
-  BaseAndModA = 1 << 0, // 001
-  DwdFfcModB = 1 << 1, // 010
-  StormOfSwords = 1 << 2, // 100
-  All = ~(~0 << 3), // 111
-}
-
-export interface GameSettings {
-  setupId: string;
-  playerCount: number;
-  pbem: boolean;
-  onlyLive: boolean;
-  startWhenFull: boolean;
-  private: boolean;
-  randomHouses: boolean;
-  randomChosenHouses: boolean;
-  adwdHouseCards: boolean;
-  asosHouseCards: boolean;
-  cokWesterosPhase: boolean;
-  vassals: boolean;
-  seaOrderTokens: boolean;
-  allowGiftingPowerTokens: boolean;
-  ironBank: boolean;
-  tidesOfBattle: boolean;
-  draftHouseCards: boolean;
-  thematicDraft: boolean;
-  limitedDraft: boolean;
-  randomDraft: boolean;
-  blindDraft: boolean;
-  draftMap: boolean;
-  selectedDraftDecks: HouseCardDecks;
-  endless: boolean;
-  useVassalPositions: boolean;
-  precedingMustering: boolean;
-  mixedWesterosDeck1: boolean;
-  removeTob3: boolean;
-  removeTobSkulls: boolean;
-  limitTob2: boolean;
-  faceless: boolean;
-  randomStartPositions: boolean;
-  addPortToTheEyrie: boolean;
-  victoryPointsCountNeededToWin: number;
-  loyaltyTokenCountNeededToWin: number;
-  randomVassalAssignment: boolean;
-  customBalancing: boolean;
-  houseCardsEvolution: boolean;
-  houseCardsEvolutionRound: number;
-  initialLiveClock: number;
-  noPrivateChats: boolean;
-  tournamentMode: boolean;
-  fixedClock: boolean;
-  holdVictoryPointsUntilEndOfRound: boolean;
-  fogOfWar: boolean;
-  dragonWar: boolean;
-  dragonRevenge: boolean;
 }

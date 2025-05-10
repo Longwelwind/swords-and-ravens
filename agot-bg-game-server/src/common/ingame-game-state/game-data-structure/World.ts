@@ -13,7 +13,7 @@ import getStaticWorld from "./static-data-structure/getStaticWorld";
 import { dragon } from "./unitTypes";
 import staticWorld7p from "./static-data-structure/globalStaticWorld7p";
 import StaticIronBankView from "./static-data-structure/StaticIronBankView";
-import { GameSettings } from "../../../common/EntireGame";
+import { GameSettings } from "../../../common/GameSettings";
 import Player from "../Player";
 import IRegionSnapshot from "../../../client/game-replay/IRegionSnapshot";
 

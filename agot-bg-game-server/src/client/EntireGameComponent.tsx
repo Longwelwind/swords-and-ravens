@@ -1,6 +1,7 @@
 import { observer } from "mobx-react";
 import { Component, default as React, ReactNode } from "react";
-import EntireGame, { GameSettings } from "../common/EntireGame";
+import EntireGame from "../common/EntireGame";
+import { GameSettings } from "../common/GameSettings";
 import GameClient from "./GameClient";
 import LobbyGameState from "../common/lobby-game-state/LobbyGameState";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";

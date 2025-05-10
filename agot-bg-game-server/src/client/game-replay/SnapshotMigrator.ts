@@ -10,7 +10,7 @@ import allKnownHouseCards from "../utils/houseCardHelper";
 import CombatSnapshotMigrator, {
   CombatResultData,
 } from "./CombatSnapshotMigrator";
-import { GameSettings } from "../../common/EntireGame";
+import { GameSettings } from "../../common/GameSettings";
 
 export default class SnapshotMigrator {
   private ingame: IngameGameState;
