@@ -1064,28 +1064,30 @@ export default class SnapshotMigrator {
         });
         return snap;
       }
-      case "player-replaced": {
-        if (!snap.gameSnapshot || !log.newUser) return snap;
-        const house = snap.getHouse(log.house);
-        house.isVassal = true;
-        if (log.newCommanderHouse) {
-          house.suzerainHouseId = log.newCommanderHouse;
-        } else {
-          house.suzerainHouseId = undefined;
-        }
-        return snap;
-      }
-      case "vassal-replaced": {
-        if (!snap.gameSnapshot) return snap;
-        const house = snap.getHouse(log.house);
-        house.isVassal = undefined;
-        house.suzerainHouseId = undefined;
-        return snap;
-      }
 
       default:
         throw new Error(`Unhandled modifying log type '${log.type}'`);
     }
+  }
+
+  handleVassalReplacement(
+    snap: EntireGameSnapshot,
+    log: GameLogData
+  ): EntireGameSnapshot {
+    if (!snap.gameSnapshot) return snap;
+    if (log.type == "player-replaced" && !log.newUser) {
+      const house = snap.getHouse(log.house);
+      house.isVassal = true;
+      if (log.newCommanderHouse) {
+        house.suzerainHouseId = log.newCommanderHouse;
+      }
+    } else if (log.type == "vassal-replaced") {
+      const house = snap.getHouse(log.house);
+      house.isVassal = undefined;
+      house.suzerainHouseId = undefined;
+    }
+
+    return snap;
   }
 
   resetCombatLogData(): void {
