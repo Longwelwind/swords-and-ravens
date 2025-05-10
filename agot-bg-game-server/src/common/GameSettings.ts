@@ -9,7 +9,7 @@ export enum HouseCardDecks {
 export class GameSettings {
   setupId = "mother-of-dragons";
   playerCount = 8;
-  pbem = false;
+  pbem = true;
   onlyLive = false;
   startWhenFull = false;
   private = false;
