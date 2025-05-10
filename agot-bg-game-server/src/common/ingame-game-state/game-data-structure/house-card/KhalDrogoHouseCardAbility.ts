@@ -54,7 +54,7 @@ export default class KhalDrogoHouseCardAbility extends HouseCardAbility {
       afterCombat.entireGame.broadcastToClients({
         type: "update-house-cards",
         house: house.id,
-        houseCards: house.houseCards.values.map((hc) => hc.id),
+        houseCards: house.houseCards.keys,
       });
 
       afterCombat.combatGameState.ingameGameState.log({

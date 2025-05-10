@@ -304,6 +304,14 @@ export default class IngameGameState extends GameState<
   }
 
   onDraftGameStateEnd(): void {
+    if (!this.entireGame.gameSettings.perpetuumRandom) {
+      this.game.draftPool.clear();
+    }
+    // Clients never need the draft pool again
+    this.entireGame.broadcastToClients({
+      type: "update-draft-pool",
+      houseCards: [],
+    });
     if (this.entireGame.isFeastForCrows) {
       this.proceedWithChooseObjectives();
     } else {
@@ -1647,9 +1655,9 @@ export default class IngameGameState extends GameState<
       });
 
       house.laterHouseCards = null;
-    } else if (message.type == "update-draftable-house-cards") {
+    } else if (message.type == "update-draft-pool") {
       const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
-      this.game.draftableHouseCards = new BetterMap(
+      this.game.draftPool = new BetterMap(
         message.houseCards.map((hcid) => {
           const hc = allHouseCardsInGame.get(hcid);
           return [hcid, hc];

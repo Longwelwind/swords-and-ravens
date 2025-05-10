@@ -1716,6 +1716,34 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 }
               />
             </Col>
+            <Col xs="12">
+              <FormCheck
+                id="perpetuum-draft-setting"
+                type="switch"
+                label={
+                  <OverlayTrigger
+                    overlay={
+                      <Tooltip id="perpetuum-draft-tooltip">
+                        Players will receive a new deck every time after last
+                        House card has been played.
+                      </Tooltip>
+                    }
+                  >
+                    <label htmlFor="perpetuum-draft-setting">
+                      Perpetuum Random
+                    </label>
+                  </OverlayTrigger>
+                }
+                checked={this.gameSettings.perpetuumRandom}
+                onChange={() =>
+                  this.changeGameSettings(
+                    () =>
+                      (this.gameSettings.perpetuumRandom =
+                        !this.gameSettings.perpetuumRandom)
+                  )
+                }
+              />
+            </Col>
           </Col>
         )}
       </Row>

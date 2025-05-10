@@ -82,7 +82,6 @@ export default class DraftHouseCardsGameState extends GameState<
     const houseToResolve = this.getNextHouse();
 
     if (houseToResolve == null) {
-      this.game.draftableHouseCards.clear();
       // Append vassals back to the tracks:
       for (let i = 0; i < this.vassalsOnInfluenceTracks.length; i++) {
         const newInfluenceTrack = _.concat(
@@ -174,7 +173,7 @@ export default class DraftHouseCardsGameState extends GameState<
   getAllHouseCards(): HouseCard[] {
     return _.sortBy(
       _.unionBy(
-        this.game.draftableHouseCards.values,
+        this.game.draftPool.values,
         _.flatMap(this.game.houses.values.map((h) => h.houseCards.values)),
         (hc) => hc.id
       ),
@@ -185,7 +184,7 @@ export default class DraftHouseCardsGameState extends GameState<
 
   getFilteredHouseCardsForHouse(house: House): HouseCard[] {
     let availableCards = _.sortBy(
-      this.game.draftableHouseCards.values,
+      this.game.draftPool.values,
       (hc) => -hc.combatStrength,
       (hc) => hc.houseId
     );
@@ -296,13 +295,13 @@ export default class DraftHouseCardsGameState extends GameState<
     this.entireGame.broadcastToClients({
       type: "update-house-cards",
       house: house.id,
-      houseCards: house.houseCards.values.map((hc) => hc.id),
+      houseCards: house.houseCards.keys,
     });
 
-    this.game.draftableHouseCards.delete(houseCard.id);
+    this.game.draftPool.delete(houseCard.id);
     this.entireGame.broadcastToClients({
-      type: "update-draftable-house-cards",
-      houseCards: this.game.draftableHouseCards.values.map((hc) => hc.id),
+      type: "update-draft-pool",
+      houseCards: this.game.draftPool.keys,
     });
 
     this.ingame.log(

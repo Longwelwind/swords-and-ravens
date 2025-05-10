@@ -112,6 +112,8 @@ const modifyingGameLogTypes = new Set([
   "attack",
   "vassals-claimed",
   "claim-vassals-began",
+  "player-replaced",
+  "vassal-replaced",
 ]);
 
 const relatedCombatResultTypes = new Set([
@@ -133,11 +135,8 @@ const combatTerminationLogTypes = new Set([
   "westeros-phase-began",
 ]);
 
-const replacementLogTypes = new Set(["player-replaced", "vassal-replaced"]);
-
 export default class ReplayConstants {
   static modifyingGameLogTypes = modifyingGameLogTypes;
   static relatedCombatResultTypes = relatedCombatResultTypes;
   static combatTerminationLogTypes = combatTerminationLogTypes;
-  static replacementLogTypes = replacementLogTypes;
 }

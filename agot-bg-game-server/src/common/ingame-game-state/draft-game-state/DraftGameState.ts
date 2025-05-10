@@ -202,27 +202,22 @@ export default class DraftGameState extends GameState<
     return this.ingame.players.size * 7;
   }
 
-  private canRemoveCardFromDraftableHouseCards(): boolean {
-    return (
-      this.game.draftableHouseCards.size - 1 >= this.requiredHouseCardsCount
-    );
+  private canRemoveCardFromDraftPool(): boolean {
+    return this.game.draftPool.size - 1 >= this.requiredHouseCardsCount;
   }
 
-  private removeCardFromDraftableHouseCards(id: string): void {
-    if (
-      this.game.draftableHouseCards.has(id) &&
-      this.canRemoveCardFromDraftableHouseCards()
-    ) {
-      this.game.draftableHouseCards.delete(id);
+  private removeCardFromDraftPool(id: string): void {
+    if (this.game.draftPool.has(id) && this.canRemoveCardFromDraftPool()) {
+      this.game.draftPool.delete(id);
     }
   }
 
   private assignRandomHouseCardsAndTracks(): void {
-    this.removeCardFromDraftableHouseCards("khal-drogo");
-    this.removeCardFromDraftableHouseCards("doran-martell-dwd");
+    this.removeCardFromDraftPool("khal-drogo");
+    this.removeCardFromDraftPool("doran-martell-dwd");
 
     if (!this.entireGame.gameSettings.dragonWar) {
-      this.removeCardFromDraftableHouseCards("daenerys-targaryen-a");
+      this.removeCardFromDraftPool("daenerys-targaryen-a");
     }
 
     houseCardCombatStrengthAllocations.entries.forEach(
@@ -230,18 +225,16 @@ export default class DraftGameState extends GameState<
         for (let i = 0; i < count; i++) {
           this.ingame.players.values.forEach((p) => {
             const house = p.house;
-            const availableCards = this.game.draftableHouseCards.values.filter(
+            const availableCards = this.game.draftPool.values.filter(
               (hc) => hc.combatStrength == hcStrength
             );
             const houseCard = popRandom(availableCards) as HouseCard;
             house.houseCards.set(houseCard.id, houseCard);
-            this.game.draftableHouseCards.delete(houseCard.id);
+            this.game.draftPool.delete(houseCard.id);
           });
         }
       }
     );
-
-    this.game.draftableHouseCards.clear();
 
     const housesWithoutTarg = this.game.houses.values.filter(
       (h) => h != this.game.targaryen

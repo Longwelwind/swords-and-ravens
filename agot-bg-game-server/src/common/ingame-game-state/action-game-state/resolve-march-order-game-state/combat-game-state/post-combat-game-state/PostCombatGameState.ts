@@ -27,6 +27,8 @@ import ResolveRetreatGameState, {
 import BetterMap from "../../../../../../utils/BetterMap";
 import { TidesOfBattleCard } from "../../../../game-data-structure/static-data-structure/tidesOfBattleCards";
 import { NotificationType } from "../../../../../EntireGame";
+import { houseCardCombatStrengthAllocations } from "../../../../../../common/ingame-game-state/draft-game-state/DraftGameState";
+import popRandom from "../../../../../../utils/popRandom";
 
 export default class PostCombatGameState extends GameState<
   CombatGameState,
@@ -616,62 +618,98 @@ export default class PostCombatGameState extends GameState<
     // If all cards are used or discarded, put all used as available,
     // except the one that has been used.
     if (
-      house.houseCards.values.every((hc) => hc.state == HouseCardState.USED)
+      !house.houseCards.values.every((hc) => hc.state == HouseCardState.USED)
     ) {
-      if (
-        this.entireGame.gameSettings.houseCardsEvolution &&
-        house.laterHouseCards != null &&
-        this.combat.ingameGameState.game.turn >=
-          this.entireGame.gameSettings.houseCardsEvolutionRound
-      ) {
-        // We need to swap to the new deck now
-        this.game.previousPlayerHouseCards.set(house, new BetterMap());
-        house.houseCards.keys.forEach((hcid) => {
-          this.game.previousPlayerHouseCards
-            .get(house)
-            .set(hcid, house.houseCards.get(hcid));
-          house.houseCards.delete(hcid);
-        });
+      return;
+    }
+    if (
+      this.entireGame.gameSettings.houseCardsEvolution &&
+      house.laterHouseCards != null &&
+      this.combat.ingameGameState.game.turn >=
+        this.entireGame.gameSettings.houseCardsEvolutionRound
+    ) {
+      // We need to swap to the new deck now
+      this.game.previousPlayerHouseCards.set(house, new BetterMap());
+      house.houseCards.keys.forEach((hcid) => {
+        this.game.previousPlayerHouseCards
+          .get(house)
+          .set(hcid, house.houseCards.get(hcid));
+        house.houseCards.delete(hcid);
+      });
 
-        house.laterHouseCards.entries.forEach(([hcid, hc]) =>
-          house.houseCards.set(hcid, hc)
-        );
-        house.laterHouseCards = null;
+      house.laterHouseCards.entries.forEach(([hcid, hc]) =>
+        house.houseCards.set(hcid, hc)
+      );
+      house.laterHouseCards = null;
 
-        this.entireGame.broadcastToClients({
-          type: "later-house-cards-applied",
-          house: house.id,
-        });
+      this.entireGame.broadcastToClients({
+        type: "later-house-cards-applied",
+        house: house.id,
+      });
 
-        this.combat.ingameGameState.log({
-          type: "house-cards-returned",
-          house: house.id,
-          houseCards: house.houseCards.keys,
-          houseCardDiscarded: undefined,
-        });
-      } else {
-        const houseCardsToMakeAvailable = house.houseCards.values.filter(
-          (hc) => hc != houseCard
-        );
+      this.combat.ingameGameState.log({
+        type: "house-cards-returned",
+        house: house.id,
+        houseCards: house.houseCards.keys,
+        houseCardDiscarded: undefined,
+      });
+    } else if (this.entireGame.gameSettings.perpetuumRandom) {
+      // House receives a completely new random deck
+      const oldHouseCards = house.houseCards.values;
+      house.houseCards.clear();
+      houseCardCombatStrengthAllocations.entries.forEach(
+        ([hcStrength, count]) => {
+          for (let i = 0; i < count; i++) {
+            const availableCards = this.game.draftPool.values.filter(
+              (hc) => hc.combatStrength == hcStrength
+            );
+            const houseCard = popRandom(availableCards) as HouseCard;
+            house.houseCards.set(houseCard.id, houseCard);
+            this.game.draftPool.delete(houseCard.id);
+          }
+        }
+      );
 
-        houseCardsToMakeAvailable.forEach(
-          (hc) => (hc.state = HouseCardState.AVAILABLE)
-        );
+      // Put old house cards back to the draft pool
+      oldHouseCards.forEach((hc) => {
+        hc.state = HouseCardState.AVAILABLE;
+        this.game.draftPool.set(hc.id, hc);
+      });
 
-        this.combat.ingameGameState.log({
-          type: "house-cards-returned",
-          house: house.id,
-          houseCards: houseCardsToMakeAvailable.map((hc) => hc.id),
-          houseCardDiscarded: houseCard ? houseCard.id : undefined,
-        });
+      this.entireGame.broadcastToClients({
+        type: "update-house-cards",
+        house: house.id,
+        houseCards: house.houseCards.keys,
+      });
 
-        this.entireGame.broadcastToClients({
-          type: "change-state-house-card",
-          houseId: house.id,
-          cardIds: houseCardsToMakeAvailable.map((hc) => hc.id),
-          state: HouseCardState.AVAILABLE,
-        });
-      }
+      this.combat.ingameGameState.log({
+        type: "house-cards-returned",
+        house: house.id,
+        houseCards: house.houseCards.keys,
+        houseCardDiscarded: undefined,
+      });
+    } else {
+      const houseCardsToMakeAvailable = house.houseCards.values.filter(
+        (hc) => hc != houseCard
+      );
+
+      houseCardsToMakeAvailable.forEach(
+        (hc) => (hc.state = HouseCardState.AVAILABLE)
+      );
+
+      this.combat.ingameGameState.log({
+        type: "house-cards-returned",
+        house: house.id,
+        houseCards: houseCardsToMakeAvailable.map((hc) => hc.id),
+        houseCardDiscarded: houseCard ? houseCard.id : undefined,
+      });
+
+      this.entireGame.broadcastToClients({
+        type: "change-state-house-card",
+        houseId: house.id,
+        cardIds: houseCardsToMakeAvailable.map((hc) => hc.id),
+        state: HouseCardState.AVAILABLE,
+      });
     }
   }
 

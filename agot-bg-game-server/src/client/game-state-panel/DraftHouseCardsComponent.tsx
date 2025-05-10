@@ -50,7 +50,7 @@ export default class DraftHouseCardsComponent extends Component<
         : [];
     const remainingCardsForSpectators = !this.player
       ? _.sortBy(
-          this.props.gameState.ingame.game.draftableHouseCards.values,
+          this.props.gameState.ingame.game.draftPool.values,
           (hc) => -hc.combatStrength,
           (hc) => hc.houseId
         )

@@ -53,9 +53,7 @@ export default class ThematicDraftHouseCardsGameState extends GameState<DraftGam
     }
 
     let availableCards = _.sortBy(
-      this.game.draftableHouseCards.values.filter(
-        (hc) => hc.houseId == house.id
-      ),
+      this.game.draftPool.values.filter((hc) => hc.houseId == house.id),
       (hc) => -hc.combatStrength
     );
     house.houseCards.forEach((card) => {
@@ -114,13 +112,13 @@ export default class ThematicDraftHouseCardsGameState extends GameState<DraftGam
       this.entireGame.broadcastToClients({
         type: "update-house-cards",
         house: house.id,
-        houseCards: house.houseCards.values.map((hc) => hc.id),
+        houseCards: house.houseCards.keys,
       });
 
-      this.game.draftableHouseCards.delete(houseCard.id);
+      this.game.draftPool.delete(houseCard.id);
       this.entireGame.broadcastToClients({
-        type: "update-draftable-house-cards",
-        houseCards: this.game.draftableHouseCards.values.map((hc) => hc.id),
+        type: "update-draft-pool",
+        houseCards: this.game.draftPool.keys,
       });
 
       if (house.houseCards.size == 7) {
@@ -137,12 +135,6 @@ export default class ThematicDraftHouseCardsGameState extends GameState<DraftGam
       }
 
       if (this.participatingHouses.every((h) => h.houseCards.size == 7)) {
-        this.game.draftableHouseCards.clear();
-        this.entireGame.broadcastToClients({
-          type: "update-draftable-house-cards",
-          houseCards: [],
-        });
-
         this.parentGameState.onDraftHouseCardsGameStateEnd();
       }
     }

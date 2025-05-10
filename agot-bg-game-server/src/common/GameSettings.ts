@@ -27,7 +27,7 @@ export class GameSettings {
   thematicDraft = false;
   limitedDraft = false;
   randomDraft = false;
-  perpetuumDraft = false;
+  perpetuumRandom = false;
   blindDraft = false;
   draftMap = false;
   selectedDraftDecks = HouseCardDecks.All;
@@ -81,7 +81,7 @@ export class GameSettings {
     settings.thematicDraft = data.thematicDraft ?? settings.thematicDraft;
     settings.limitedDraft = data.limitedDraft ?? settings.limitedDraft;
     settings.randomDraft = data.randomDraft ?? settings.randomDraft;
-    settings.perpetuumDraft = data.perpetuumDraft ?? settings.perpetuumDraft;
+    settings.perpetuumRandom = data.perpetuumRandom ?? settings.perpetuumRandom;
     settings.blindDraft = data.blindDraft ?? settings.blindDraft;
     settings.draftMap = data.draftMap ?? settings.draftMap;
     settings.selectedDraftDecks =
@@ -150,7 +150,7 @@ export class GameSettings {
       thematicDraft: this.thematicDraft || undefined,
       limitedDraft: this.limitedDraft || undefined,
       randomDraft: this.randomDraft || undefined,
-      perpetuumDraft: this.perpetuumDraft || undefined,
+      perpetuumRandom: this.perpetuumRandom || undefined,
       blindDraft: this.blindDraft || undefined,
       draftMap: this.draftMap || undefined,
       selectedDraftDecks: this.draftHouseCards
@@ -209,7 +209,7 @@ export class SerializedGameSettings {
   limitedDraft?: boolean;
   randomDraft?: boolean;
   blindDraft?: boolean;
-  perpetuumDraft?: boolean;
+  perpetuumRandom?: boolean;
   draftMap?: boolean;
   selectedDraftDecks?: HouseCardDecks;
   endless?: boolean;

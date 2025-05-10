@@ -498,18 +498,16 @@ export default function createGame(
         }
         return housesToCreate.includes(hc.houseId);
       });
-      game.draftableHouseCards = new BetterMap(
-        limited.map((hc) => [hc.id, hc])
-      );
+      game.draftPool = new BetterMap(limited.map((hc) => [hc.id, hc]));
     } else {
-      game.draftableHouseCards = selectedHouseCards;
+      game.draftPool = selectedHouseCards;
     }
 
     if (
       gameSettings.setupId == "a-feast-for-crows" &&
-      game.draftableHouseCards.has("margaery-tyrell-dwd")
+      game.draftPool.has("margaery-tyrell-dwd")
     ) {
-      game.draftableHouseCards.delete("margaery-tyrell-dwd");
+      game.draftPool.delete("margaery-tyrell-dwd");
     }
 
     game.houses.forEach((h) => {
@@ -1046,8 +1044,8 @@ function findUnitToReplace(
 }
 
 function nerfHouseCard(game: Game, hcId: string, newAbilityId: string): void {
-  const houseCard = game.draftableHouseCards.has(hcId)
-    ? game.draftableHouseCards.get(hcId)
+  const houseCard = game.draftPool.has(hcId)
+    ? game.draftPool.get(hcId)
     : _.flatMap(game.houses.values.map((h) => h.houseCards.values)).find(
         (hc) => hc.id == hcId
       );
@@ -1062,9 +1060,9 @@ function nerfHouseCard(game: Game, hcId: string, newAbilityId: string): void {
       house.houseCards.set(houseCard.id, houseCard);
     }
 
-    if (game.draftableHouseCards.has(hcId)) {
-      game.draftableHouseCards.delete(hcId);
-      game.draftableHouseCards.set(houseCard.id, houseCard);
+    if (game.draftPool.has(hcId)) {
+      game.draftPool.delete(hcId);
+      game.draftPool.set(houseCard.id, houseCard);
     }
   }
 }
