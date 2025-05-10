@@ -1,167 +1,202 @@
 import GameState from "../../../../../../../GameState";
 import AfterCombatHouseCardAbilitiesGameState from "../AfterCombatHouseCardAbilitiesGameState";
 import Player from "../../../../../../Player";
-import {ClientMessage} from "../../../../../../../../messages/ClientMessage";
-import {ServerMessage} from "../../../../../../../../messages/ServerMessage";
+import { ClientMessage } from "../../../../../../../../messages/ClientMessage";
+import { ServerMessage } from "../../../../../../../../messages/ServerMessage";
 import House from "../../../../../../game-data-structure/House";
 import CombatGameState from "../../../CombatGameState";
 import Game from "../../../../../../game-data-structure/Game";
 import IngameGameState from "../../../../../../IngameGameState";
-import SimpleChoiceGameState, { SerializedSimpleChoiceGameState } from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
+import SimpleChoiceGameState, {
+  SerializedSimpleChoiceGameState,
+} from "../../../../../../simple-choice-game-state/SimpleChoiceGameState";
 import { robertArryn } from "../../../../../../game-data-structure/house-card/houseCardAbilities";
-import HouseCard, { HouseCardState } from "../../../../../../game-data-structure/house-card/HouseCard";
+import HouseCard, {
+  HouseCardState,
+} from "../../../../../../game-data-structure/house-card/HouseCard";
 import _ from "lodash";
-import SelectHouseCardGameState, { SerializedSelectHouseCardGameState } from "../../../../../../../ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
+import SelectHouseCardGameState, {
+  SerializedSelectHouseCardGameState,
+} from "../../../../../../../ingame-game-state/select-house-card-game-state/SelectHouseCardGameState";
 
 export default class RobertArrynAbilityGameState extends GameState<
-    AfterCombatHouseCardAbilitiesGameState["childGameState"],
-    SimpleChoiceGameState | SelectHouseCardGameState<RobertArrynAbilityGameState>
+  AfterCombatHouseCardAbilitiesGameState["childGameState"],
+  SimpleChoiceGameState | SelectHouseCardGameState<RobertArrynAbilityGameState>
 > {
-    house: House;
-    get game(): Game {
-        return this.combat.game;
+  house: House;
+  get game(): Game {
+    return this.combat.game;
+  }
+
+  get ingame(): IngameGameState {
+    return this.parentGameState.parentGameState.parentGameState.parentGameState
+      .ingameGameState;
+  }
+
+  get combat(): CombatGameState {
+    return this.parentGameState.combatGameState;
+  }
+
+  get possibleEnemyHouseCards(): HouseCard[] {
+    // Due to Roose Bolton, vassals and HC evo the enemy discard pile may be empty
+    const enemy = this.combat.getEnemy(this.house);
+    const enemyDiscardPile = _.sortBy(
+      enemy.houseCards.values.filter((hc) => hc.state == HouseCardState.USED),
+      (sorted) => sorted.combatStrength
+    );
+    if (enemyDiscardPile.length == 0) {
+      return [];
     }
 
-    get ingame(): IngameGameState {
-        return this.parentGameState.parentGameState.parentGameState.parentGameState.ingameGameState;
-    }
+    const lowestCombatStrength = enemyDiscardPile[0].combatStrength;
+    return enemyDiscardPile.filter(
+      (hc) => hc.combatStrength == lowestCombatStrength
+    );
+  }
 
-    get combat(): CombatGameState {
-        return this.parentGameState.combatGameState;
-    }
+  firstStart(house: House): void {
+    this.house = house;
+    this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
+      house,
+      "",
+      ["Activate", "Ignore"]
+    );
+  }
 
-    get possibleEnemyHouseCards(): HouseCard[] {
-        // Due to Roose Bolton, vassals and HC evo the enemy discard pile may be empty
-        const enemy = this.combat.getEnemy(this.house);
-        const enemyDiscardPile = _.sortBy(enemy.houseCards.values.filter(hc => hc.state == HouseCardState.USED), sorted => sorted.combatStrength);
-        if (enemyDiscardPile.length == 0) {
-            return [];
-        }
+  onSimpleChoiceGameStateEnd(choice: number): void {
+    if (choice == 0) {
+      const possibleEnemyHouseCards = this.possibleEnemyHouseCards;
 
-        const lowestCombatStrength = enemyDiscardPile[0].combatStrength;
-        return enemyDiscardPile.filter(hc => hc.combatStrength == lowestCombatStrength);
-    }
-
-    firstStart(house: House): void {
-        this.house = house;
-        this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
-            house,
-            "",
-            ["Activate", "Ignore"]
+      if (possibleEnemyHouseCards.length == 0) {
+        this.executeRobertsAbility(null);
+      } else if (possibleEnemyHouseCards.length == 1) {
+        this.executeRobertsAbility(possibleEnemyHouseCards[0]);
+      } else {
+        this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(
+          this.house,
+          possibleEnemyHouseCards
         );
+        return;
+      }
+    } else {
+      this.ingame.log({
+        type: "house-card-ability-not-used",
+        house: this.house.id,
+        houseCard: robertArryn.id,
+      });
     }
 
-    onSimpleChoiceGameStateEnd(choice: number): void {
-        if (choice == 0) {
-            const possibleEnemyHouseCards = this.possibleEnemyHouseCards;
+    this.parentGameState.onHouseCardResolutionFinish(this.house);
+  }
 
-            if (possibleEnemyHouseCards.length == 0) {
-                this.executeRobertsAbility(null);
-            } else if (possibleEnemyHouseCards.length == 1) {
-                this.executeRobertsAbility(possibleEnemyHouseCards[0]);
-            } else {
-                this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(
-                    this.house,
-                    possibleEnemyHouseCards);
-                return;
-            }
-        } else {
-            this.ingame.log({
-                type: "house-card-ability-not-used",
-                house: this.house.id,
-                houseCard: robertArryn.id
-            });
-        }
+  executeRobertsAbility(enemyHouseCardToRemove: HouseCard | null): void {
+    const enemy = this.combat.getEnemy(this.house);
 
-        this.parentGameState.onHouseCardResolutionFinish(this.house);
+    this.ingame.log({
+      type: "robert-arryn-used",
+      house: this.house.id,
+      affectedHouse: enemy.id,
+      removedHouseCard: enemyHouseCardToRemove
+        ? enemyHouseCardToRemove.id
+        : null,
+    });
+
+    if (enemyHouseCardToRemove) {
+      this.game.deletedHouseCards.set(
+        enemyHouseCardToRemove.id,
+        enemyHouseCardToRemove
+      );
+      this.entireGame.broadcastToClients({
+        type: "update-deleted-house-cards",
+        houseCards: this.game.deletedHouseCards.values.map((hc) => hc.id),
+      });
+
+      enemy.houseCards.delete(enemyHouseCardToRemove.id);
+      this.entireGame.broadcastToClients({
+        type: "update-house-cards",
+        house: enemy.id,
+        houseCards: enemy.houseCards.values.map((hc) => hc.id),
+      });
     }
 
-    executeRobertsAbility(enemyHouseCardToRemove: HouseCard | null): void {
-        const enemy = this.combat.getEnemy(this.house);
+    const robertArrynHc = this.house.houseCards.values.find(
+      (hc) => hc.ability?.id == robertArryn.id
+    );
 
-        this.ingame.log({
-            type: "robert-arryn-used",
-            house: this.house.id,
-            affectedHouse: enemy.id,
-            removedHouseCard: enemyHouseCardToRemove ? enemyHouseCardToRemove.id : null
-        });
+    // Due to HC evo, Robert Arryn may no longer be present in players house card deck
+    if (robertArrynHc) {
+      this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
+      this.entireGame.broadcastToClients({
+        type: "update-deleted-house-cards",
+        houseCards: this.game.deletedHouseCards.values.map((hc) => hc.id),
+      });
 
-        if (enemyHouseCardToRemove) {
-            this.game.deletedHouseCards.set(enemyHouseCardToRemove.id, enemyHouseCardToRemove);
-            this.entireGame.broadcastToClients({
-                type: "update-deleted-house-cards",
-                houseCards: this.game.deletedHouseCards.values.map(hc => hc.id)
-            });
-
-            enemy.houseCards.delete(enemyHouseCardToRemove.id);
-            this.entireGame.broadcastToClients({
-                type: "update-house-cards",
-                house: enemy.id,
-                houseCards: enemy.houseCards.values.map(hc => hc.id)
-            });
-        }
-
-        const robertArrynHc = this.house.houseCards.values.find(hc => hc.ability?.id == robertArryn.id);
-
-        // Due to HC evo, Robert Arryn may no longer be present in players house card deck
-        if (robertArrynHc) {
-            this.game.deletedHouseCards.set(robertArrynHc.id, robertArrynHc);
-            this.entireGame.broadcastToClients({
-                type: "update-deleted-house-cards",
-                houseCards: this.game.deletedHouseCards.values.map(hc => hc.id)
-            });
-
-            this.house.houseCards.delete(robertArrynHc.id);
-            this.entireGame.broadcastToClients({
-                type: "update-house-cards",
-                house: this.house.id,
-                houseCards: this.house.houseCards.values.map(hc => hc.id)
-            });
-        }
+      this.house.houseCards.delete(robertArrynHc.id);
+      this.entireGame.broadcastToClients({
+        type: "update-house-cards",
+        house: this.house.id,
+        houseCards: this.house.houseCards.values.map((hc) => hc.id),
+      });
     }
+  }
 
-    onSelectHouseCardFinish(_house: House, houseCard: HouseCard | null): void {
-        this.executeRobertsAbility(houseCard);
-        this.parentGameState.onHouseCardResolutionFinish(this.house);
+  onSelectHouseCardFinish(_house: House, houseCard: HouseCard | null): void {
+    this.executeRobertsAbility(houseCard);
+    this.parentGameState.onHouseCardResolutionFinish(this.house);
+  }
+
+  onPlayerMessage(player: Player, message: ClientMessage): void {
+    this.childGameState.onPlayerMessage(player, message);
+  }
+
+  onServerMessage(message: ServerMessage): void {
+    this.childGameState.onServerMessage(message);
+  }
+
+  serializeToClient(
+    admin: boolean,
+    player: Player | null
+  ): SerializedRobertArrynAbilityGameState {
+    return {
+      type: "robert-arryn-ability",
+      house: this.house.id,
+      childGameState: this.childGameState.serializeToClient(admin, player),
+    };
+  }
+
+  static deserializeFromServer(
+    afterCombat: AfterCombatHouseCardAbilitiesGameState["childGameState"],
+    data: SerializedRobertArrynAbilityGameState
+  ): RobertArrynAbilityGameState {
+    const robertArrynAbilityGameState = new RobertArrynAbilityGameState(
+      afterCombat
+    );
+
+    robertArrynAbilityGameState.house = afterCombat.game.houses.get(data.house);
+    robertArrynAbilityGameState.childGameState =
+      robertArrynAbilityGameState.deserializeChildGameState(
+        data.childGameState
+      );
+
+    return robertArrynAbilityGameState;
+  }
+
+  deserializeChildGameState(
+    data: SerializedRobertArrynAbilityGameState["childGameState"]
+  ): RobertArrynAbilityGameState["childGameState"] {
+    switch (data.type) {
+      case "simple-choice":
+        return SimpleChoiceGameState.deserializeFromServer(this, data);
+      case "select-house-card":
+        return SelectHouseCardGameState.deserializeFromServer(this, data);
     }
-
-    onPlayerMessage(player: Player, message: ClientMessage): void {
-        this.childGameState.onPlayerMessage(player, message);
-    }
-
-    onServerMessage(message: ServerMessage): void {
-        this.childGameState.onServerMessage(message);
-    }
-
-    serializeToClient(admin: boolean, player: Player | null): SerializedRobertArrynAbilityGameState {
-        return {
-            type: "robert-arryn-ability",
-            house: this.house.id,
-            childGameState: this.childGameState.serializeToClient(admin, player)
-        };
-    }
-
-    static deserializeFromServer(afterCombat: AfterCombatHouseCardAbilitiesGameState["childGameState"], data: SerializedRobertArrynAbilityGameState): RobertArrynAbilityGameState {
-        const robertArrynAbilityGameState = new RobertArrynAbilityGameState(afterCombat);
-
-        robertArrynAbilityGameState.house = afterCombat.game.houses.get(data.house);
-        robertArrynAbilityGameState.childGameState = robertArrynAbilityGameState.deserializeChildGameState(data.childGameState);
-
-        return robertArrynAbilityGameState;
-    }
-
-    deserializeChildGameState(data: SerializedRobertArrynAbilityGameState["childGameState"]): RobertArrynAbilityGameState["childGameState"] {
-        switch (data.type) {
-            case "simple-choice":
-                return SimpleChoiceGameState.deserializeFromServer(this, data);
-            case "select-house-card":
-                return SelectHouseCardGameState.deserializeFromServer(this, data);
-        }
-    }
+  }
 }
 
 export interface SerializedRobertArrynAbilityGameState {
-    type: "robert-arryn-ability";
-    house: string;
-    childGameState: SerializedSimpleChoiceGameState | SerializedSelectHouseCardGameState;
+  type: "robert-arryn-ability";
+  house: string;
+  childGameState:
+    | SerializedSimpleChoiceGameState
+    | SerializedSelectHouseCardGameState;
 }
