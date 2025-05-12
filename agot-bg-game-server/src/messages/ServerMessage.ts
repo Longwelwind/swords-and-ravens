@@ -75,6 +75,7 @@ export type ServerMessage =
   | UpdateHouseCardModifier
   | UpdateHouseCards
   | UpdateDraftPool
+  | UpdateGameHouseCards
   | UpdateCombatStats
   | UpdateDraftState
   | RevealBids
@@ -438,6 +439,12 @@ interface UpdateHouseCards {
 interface UpdateDraftPool {
   type: "update-draft-pool";
   houseCards: string[];
+}
+
+interface UpdateGameHouseCards {
+  type: "update-game-house-cards";
+  draftPool: string[];
+  houseCards: [string, string[]];
 }
 
 interface UpdateCombatStats {

@@ -1642,6 +1642,36 @@ export default class IngameGameState extends GameState<
           return [hcid, hc];
         })
       );
+    } else if (message.type == "update-draft-pool") {
+      const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
+      this.game.draftPool = new BetterMap(
+        message.houseCards.map((hcid) => {
+          const hc = allHouseCardsInGame.get(hcid);
+          return [hcid, hc];
+        })
+      );
+    } else if (message.type == "update-game-house-cards") {
+      const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
+      const [hid, hcids] = message.houseCards;
+      const house = this.game.houses.get(hid);
+      const oldHouseCards = house.houseCards;
+      house.houseCards = new BetterMap(
+        hcids.map((hcid) => {
+          const hc = allHouseCardsInGame.get(hcid);
+          return [hcid, hc];
+        })
+      );
+
+      oldHouseCards.forEach((hc) => {
+        allHouseCardsInGame.set(hc.id, hc);
+      });
+
+      this.game.draftPool = new BetterMap(
+        message.draftPool.map((hcid) => {
+          const hc = allHouseCardsInGame.get(hcid);
+          return [hcid, hc];
+        })
+      );
     } else if (message.type == "later-house-cards-applied") {
       const house = this.game.houses.get(message.house);
       this.game.previousPlayerHouseCards.set(house, new BetterMap());
@@ -1655,14 +1685,6 @@ export default class IngameGameState extends GameState<
       });
 
       house.laterHouseCards = null;
-    } else if (message.type == "update-draft-pool") {
-      const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
-      this.game.draftPool = new BetterMap(
-        message.houseCards.map((hcid) => {
-          const hc = allHouseCardsInGame.get(hcid);
-          return [hcid, hc];
-        })
-      );
     } else if (message.type == "update-deleted-house-cards") {
       const allHouseCardsInGame = this.game.getAllHouseCardsInGame();
       this.game.deletedHouseCards = new BetterMap(

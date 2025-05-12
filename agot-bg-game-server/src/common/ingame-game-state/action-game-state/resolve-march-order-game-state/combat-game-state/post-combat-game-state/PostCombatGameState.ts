@@ -672,19 +672,14 @@ export default class PostCombatGameState extends GameState<
 
       // Put old house cards back to the draft pool
       oldHouseCards.forEach((hc) => {
-        hc.state = HouseCardState.AVAILABLE;
+        this.markHouseCardAsAvailable(house, hc);
         this.game.draftPool.set(hc.id, hc);
       });
 
       this.entireGame.broadcastToClients({
-        type: "update-draft-pool",
-        houseCards: this.game.draftPool.keys,
-      });
-
-      this.entireGame.broadcastToClients({
-        type: "update-house-cards",
-        house: house.id,
-        houseCards: house.houseCards.keys,
+        type: "update-game-house-cards",
+        draftPool: this.game.draftPool.keys,
+        houseCards: [house.id, house.houseCards.keys],
       });
 
       this.combat.ingameGameState.log({
