@@ -194,9 +194,15 @@ export default class SelectUnitsGameState<
     const selectUnits = new SelectUnitsGameState(parent);
 
     selectUnits.house = parent.game.houses.get(data.house);
-    selectUnits.possibleUnits = data.possibleUnits.map((uid) =>
-      parent.game.world.getUnitById(uid)
-    );
+    if (parent.ingame.fogOfWar) {
+      selectUnits.possibleUnits = data.possibleUnits
+        .map((uid) => parent.game.world.findUnitById(uid))
+        .filter((u) => u != null) as Unit[];
+    } else {
+      selectUnits.possibleUnits = data.possibleUnits.map((uid) =>
+        parent.game.world.getUnitById(uid)
+      );
+    }
     selectUnits.count = data.count;
     selectUnits.canBeSkipped = data.canBeSkipped;
     selectUnits.selectedUnitsMustBeOfSameRegion =

@@ -304,14 +304,22 @@ export default class World {
     );
   }
 
-  getUnitById(unitId: number): Unit {
+  findUnitById(unitId: number): Unit | null {
     const region = this.regions.values.find((r) => r.units.has(unitId));
-
     if (!region) {
+      return null;
+    }
+    return region.units.get(unitId);
+  }
+
+  getUnitById(unitId: number): Unit {
+    const unit = this.findUnitById(unitId);
+
+    if (!unit) {
       throw new Error(`Couldn't find region with unit of id ${unitId}`);
     }
 
-    return region.units.get(unitId);
+    return unit;
   }
 
   getCapitalOfHouse(house: House): Region {
