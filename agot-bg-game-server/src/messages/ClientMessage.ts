@@ -62,7 +62,11 @@ export type ClientMessage =
   | LaunchDeclareWinnerVote
   | ChangeAcceptAllLoyaltyTokenMovements
   | BanUser
-  | UnbanUser;
+  | UnbanUser
+  | RemovePowerToken
+  | AddPowerToken
+  | RemoveGarrison
+  | AddGarrison;
 
 interface Ping {
   type: "ping";
@@ -317,7 +321,6 @@ interface DistributePowerTokens {
 
 interface DropPowerTokens {
   type: "drop-power-tokens";
-  house: string;
 }
 
 interface MoveLoyaltyToken {
@@ -399,4 +402,25 @@ interface BanUser {
 interface UnbanUser {
   type: "unban-user";
   userId: string;
+}
+
+interface AddGarrison {
+  type: "add-garrison";
+  region: string;
+  garrison: number;
+}
+
+interface RemoveGarrison {
+  type: "remove-garrison";
+  region: string;
+}
+
+interface AddPowerToken {
+  type: "add-power-token";
+  region: string;
+}
+
+interface RemovePowerToken {
+  type: "remove-power-token";
+  region: string;
 }

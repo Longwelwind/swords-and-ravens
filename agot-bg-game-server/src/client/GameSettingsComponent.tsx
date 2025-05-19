@@ -1599,19 +1599,33 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="draft-map-tooltip">
-                      This option allows all players to adjust their starting
-                      positions by adding and removing units in their
-                      territories according to their supply limits before the
-                      game begins. The game then distributes the unclaimed
-                      territories as fairly as possible among all houses.
-                      Territories with only one neighboring house are assigned
-                      to that house, while those with multiple potential
-                      neighbors remain unassigned. All players must confirm the
-                      changes before the game starts.
+                      <p>
+                        Players can adjust starting positions by adding and
+                        removing Units, Power tokens, or Garrisons.
+                        <br />
+                        <small>
+                          Unit and supply limits must be respected at all times.
+                        </small>
+                      </p>
+                      <p>
+                        Unclaimed territories are distributed fairly among
+                        houses:
+                        <ul>
+                          <li>
+                            Territories with one neighboring house are assigned
+                            to that house.
+                          </li>
+                          <li>
+                            Territories with multiple neighbors remain
+                            unassigned.
+                          </li>
+                        </ul>
+                        All players must confirm changes before the game starts.
+                      </p>
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="draft-map-setting">Draft Map</label>
+                  <label htmlFor="draft-map-setting">Draft Scenario</label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.draftMap}

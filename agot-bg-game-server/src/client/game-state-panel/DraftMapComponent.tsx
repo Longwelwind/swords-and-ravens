@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Component, ReactElement, ReactNode } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
@@ -20,6 +21,8 @@ import UnitType from "../../common/ingame-game-state/game-data-structure/UnitTyp
 import { preventOverflow } from "@popperjs/core";
 import _ from "lodash";
 import UnitIconComponent from "../UnitIconComponent";
+import housePowerTokensImages from "../housePowerTokensImages";
+import getGarrisonToken from "../garrisonTokens";
 
 @observer
 export default class DraftMapComponent extends Component<
@@ -46,15 +49,15 @@ export default class DraftMapComponent extends Component<
       <>
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            All players can add and remove units according to their unit and
+            All players can add and remove pieces according to their unit and
             supply limits.
           </Col>
         </Row>
         {this.isParticipatingInDraft && this.player != null && (
           <Row className="justify-content-center">
             <Col xs="12" className="text-center text-normal">
-              Click on a unit to remove it, or click on a highlighted region to
-              add units.
+              Click on a piece to remove it, or click on a highlighted region to
+              add pieces.
             </Col>
             <Col xs="auto">
               <Button
@@ -176,7 +179,7 @@ export default class DraftMapComponent extends Component<
                 <>
                   {this.getValidUnitsForRegion(region)
                     .filter((ut) =>
-                      this.props.gameState.isLegalAdd(
+                      this.props.gameState.isLegalUnitAdd(
                         this.player!.house,
                         ut,
                         region
@@ -199,8 +202,83 @@ export default class DraftMapComponent extends Component<
                     ))}
                 </>
               )}
+            {this.player &&
+              this.props.gameState.isLegalPowerTokenAdd(
+                this.player.house,
+                region
+              ) && (
+                <Col xs="auto">
+                  <Button
+                    type="button"
+                    onClick={() => this.props.gameState.addPowerToken(region)}
+                  >
+                    <img
+                      className="house-power-token"
+                      src={housePowerTokensImages.get(this.player.house.id)}
+                    />
+                  </Button>
+                </Col>
+              )}
           </>
         </Row>
+        {this.player && this.player.house == region.controlPowerToken && (
+          <Row className="justify-content-center">
+            <Col xs="auto">
+              <Button
+                type="button"
+                onClick={() => this.props.gameState.removePowerToken(region)}
+              >
+                Remove Power token
+              </Button>
+            </Col>
+          </Row>
+        )}
+        {this.player && region.garrison == 0 && (
+          <Row className="justify-content-center">
+            {this.props.gameState.allowedGarrisonStrengths.map((garrison) => {
+              if (
+                !this.props.gameState.isLegalGarrisonAdd(
+                  this.player!.house,
+                  garrison,
+                  region
+                )
+              ) {
+                return null;
+              }
+              return (
+                <Col xs="auto" key={garrison}>
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      this.props.gameState.addGarrison(region, garrison)
+                    }
+                  >
+                    <img
+                      className="garrison-icon"
+                      src={getGarrisonToken(garrison) ?? ""}
+                    />
+                  </Button>
+                </Col>
+              );
+            })}
+          </Row>
+        )}
+        {this.player &&
+          region.garrison > 0 &&
+          this.props.gameState
+            .getAvailableRegionsForHouse(this.player.house)
+            .includes(region) && (
+            <Row className="justify-content-center">
+              <Col xs="auto">
+                <Button
+                  type="button"
+                  onClick={() => this.props.gameState.removeGarrison(region)}
+                >
+                  Remove Garrison
+                </Button>
+              </Col>
+            </Row>
+          )}
       </Popover>
     );
   }

@@ -37,6 +37,10 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
     return this.ingame.entireGame;
   }
 
+  get allowedGarrisonStrengths(): number[] {
+    return [2, 3, 4, 5, 6];
+  }
+
   constructor(draftGameState: DraftGameState) {
     super(draftGameState);
   }
@@ -70,7 +74,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
     return this.game.getAvailableUnitsOfType(house, unitType);
   }
 
-  isLegalAdd(house: House, unitType: UnitType, region: Region): boolean {
+  isLegalUnitAdd(house: House, unitType: UnitType, region: Region): boolean {
     const addedUnits = new BetterMap<Region, UnitType[]>([
       [region, [unitType]],
     ]);
@@ -80,6 +84,29 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
       unitType.walksOn == region.type.kind &&
       !this.game.hasTooMuchArmies(house, addedUnits)
     );
+  }
+
+  isLegalPowerTokenAdd(house: House, region: Region): boolean {
+    return (
+      region.type.kind == "land" &&
+      this.hasEnoughPowerTokens(house) &&
+      region.controlPowerToken == null &&
+      this.getAvailableRegionsForHouse(house).includes(region)
+    );
+  }
+
+  isLegalGarrisonAdd(house: House, strength: number, region: Region): boolean {
+    return (
+      region.type.kind == "land" &&
+      this.getAvailableRegionsForHouse(house).includes(region) &&
+      this.allowedGarrisonStrengths.includes(strength)
+    );
+  }
+
+  hasEnoughPowerTokens(house: House): boolean {
+    const availablePower = house.powerTokens;
+    const powerTokensOnBoard = this.game.countPowerTokensOnBoard(house);
+    return house.maxPowerTokens - availablePower - powerTokensOnBoard > 0;
   }
 
   onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -121,6 +148,70 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
         this.ingame.broadcastRemoveUnits(unit.region, [unit], true);
         unit.region.units.delete(unit.id);
       }
+    } else if (message.type == "add-power-token") {
+      const region = this.world.regions.get(message.region);
+      const house = player.house;
+      if (!this.parentGameState.participatingHouses.includes(house)) return;
+      if (!this.isLegalPowerTokenAdd(house, region)) return;
+
+      region.controlPowerToken = house;
+      this.ingame.sendMessageToUsersWhoCanSeeRegion(
+        {
+          type: "change-control-power-token",
+          regionId: region.id,
+          houseId: house.id,
+        },
+        region
+      );
+    } else if (message.type == "remove-power-token") {
+      const region = this.world.regions.get(message.region);
+      const house = player.house;
+      if (!this.parentGameState.participatingHouses.includes(house)) return;
+
+      if (region.controlPowerToken != house) return;
+
+      region.controlPowerToken = null;
+      this.ingame.sendMessageToUsersWhoCanSeeRegion(
+        {
+          type: "change-control-power-token",
+          regionId: region.id,
+          houseId: null,
+        },
+        region
+      );
+    } else if (message.type == "add-garrison") {
+      const region = this.world.regions.get(message.region);
+      const house = player.house;
+      if (!this.parentGameState.participatingHouses.includes(house)) return;
+      if (!this.isLegalGarrisonAdd(house, message.garrison, region)) return;
+
+      region.garrison = message.garrison;
+      this.ingame.sendMessageToUsersWhoCanSeeRegion(
+        {
+          type: "change-garrison",
+          newGarrison: message.garrison,
+          region: region.id,
+        },
+        region
+      );
+    } else if (message.type == "remove-garrison") {
+      const region = this.world.regions.get(message.region);
+      const house = player.house;
+      if (
+        !this.parentGameState.participatingHouses.includes(house) ||
+        !this.getAvailableRegionsForHouse(house).includes(region) ||
+        region.garrison == 0
+      )
+        return;
+      region.garrison = 0;
+      this.ingame.sendMessageToUsersWhoCanSeeRegion(
+        {
+          type: "change-garrison",
+          newGarrison: 0,
+          region: region.id,
+        },
+        region
+      );
     } else if (message.type == "muster") {
       const house = player.house;
       if (!this.parentGameState.participatingHouses.includes(house)) return;
@@ -148,7 +239,8 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
       if (musterings.size != 1 || musterings.values[0].length != 1) return;
       const newUnitType = musterings.values[0][0];
 
-      if (!this.isLegalAdd(house, newUnitType.to, newUnitType.region)) return;
+      if (!this.isLegalUnitAdd(house, newUnitType.to, newUnitType.region))
+        return;
 
       _.pull(this.readyHouses, house);
       this.entireGame.broadcastToClients({
@@ -172,6 +264,35 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
     this.entireGame.sendMessageToServer({
       type: "muster",
       units: [[region.id, [{ from: null, to: type.id, region: region.id }]]],
+    });
+  }
+
+  addGarrison(region: Region, strength: number): void {
+    this.entireGame.sendMessageToServer({
+      type: "add-garrison",
+      region: region.id,
+      garrison: strength,
+    });
+  }
+
+  removeGarrison(region: Region): void {
+    this.entireGame.sendMessageToServer({
+      type: "remove-garrison",
+      region: region.id,
+    });
+  }
+
+  addPowerToken(region: Region): void {
+    this.entireGame.sendMessageToServer({
+      type: "add-power-token",
+      region: region.id,
+    });
+  }
+
+  removePowerToken(region: Region): void {
+    this.entireGame.sendMessageToServer({
+      type: "remove-power-token",
+      region: region.id,
     });
   }
 
