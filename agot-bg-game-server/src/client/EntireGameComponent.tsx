@@ -17,6 +17,7 @@ import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
 import trophyCupImage from "../../public/images/icons/trophy-cup.svg";
 import crownedSkullImage from "../../public/images/icons/crowned-skull.svg";
+import perpetuumRandomImage from "../../public/images/icons/perpetuum-random.svg";
 import { Helmet } from "react-helmet";
 import {
   Alert,
@@ -154,6 +155,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 {this.renderGameName()}
                 {this.renderGameTypeBadge()}
                 {this.renderTidesOfBattleImage()}
+                {this.renderPerpetuumRandomImage()}
                 {this.renderHouseCardsEvolutionImage()}
                 {this.renderMapSwitch()}
                 {this.renderWarnings()}
@@ -273,6 +275,33 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             popperConfig={{ modifiers: [preventOverflow] }}
           >
             <img src={rollingDicesImage} width="30" />
+          </OverlayTrigger>
+        </Col>
+      )
+    );
+  }
+
+  renderPerpetuumRandomImage(): ReactNode {
+    return (
+      this.settings.perpetuumRandom && (
+        <Col xs="auto">
+          <OverlayTrigger
+            placement="auto"
+            overlay={
+              <Tooltip id="perpetuum-random-tooltip" className="tooltip-w-100">
+                <p className="text-center">
+                  <h6>Perpetuum Random</h6>
+                  <small>
+                    Every time a player&apos;s last House card has been played,
+                    <br />
+                    they will receive a new set of 7 random House cards.
+                  </small>
+                </p>
+              </Tooltip>
+            }
+            popperConfig={{ modifiers: [preventOverflow] }}
+          >
+            <img src={perpetuumRandomImage} width="30" />
           </OverlayTrigger>
         </Col>
       )
@@ -463,8 +492,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         <p>
                           <h6>Dragon Revenge</h6>
                           <small>
-                            The last remaining non-dragon land unit will
-                            transform into a dragon!
+                            The last remaining non-dragon land unit of defeated
+                            houses will transform into a dragon!
                           </small>
                         </p>
                       </>
