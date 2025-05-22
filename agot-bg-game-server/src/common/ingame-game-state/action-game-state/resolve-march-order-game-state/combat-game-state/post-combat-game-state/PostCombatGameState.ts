@@ -27,7 +27,6 @@ import ResolveRetreatGameState, {
 import BetterMap from "../../../../../../utils/BetterMap";
 import { TidesOfBattleCard } from "../../../../game-data-structure/static-data-structure/tidesOfBattleCards";
 import { NotificationType } from "../../../../../EntireGame";
-import { houseCardCombatStrengthAllocations } from "../../../../../../common/ingame-game-state/draft-game-state/DraftGameState";
 import popRandom from "../../../../../../utils/popRandom";
 
 export default class PostCombatGameState extends GameState<
@@ -654,26 +653,28 @@ export default class PostCombatGameState extends GameState<
         houseCardDiscarded: undefined,
       });
     } else if (this.entireGame.gameSettings.perpetuumRandom) {
-      // House receives a completely new random deck
+      // House receives new cards from the draft pool
       const oldHouseCards = house.houseCards.values;
       house.houseCards.clear();
-      houseCardCombatStrengthAllocations.entries.forEach(
-        ([hcStrength, count]) => {
-          for (let i = 0; i < count; i++) {
-            const availableCards = this.game.draftPool.values.filter(
-              (hc) => hc.combatStrength == hcStrength
-            );
-            const houseCard = popRandom(availableCards) as HouseCard;
-            house.houseCards.set(houseCard.id, houseCard);
-            this.game.draftPool.delete(houseCard.id);
-          }
-        }
-      );
-
-      // Put old house cards back to the draft pool
       oldHouseCards.forEach((hc) => {
-        this.markHouseCardAsAvailable(house, hc);
+        // Mark card as available again
+        hc.state = HouseCardState.AVAILABLE;
+        const availableCards = this.game.draftPool.values.filter(
+          (fromPool) => fromPool.combatStrength == hc.combatStrength
+        );
+        const houseCard = popRandom(availableCards) as HouseCard;
+        house.houseCards.set(houseCard.id, houseCard);
+        this.game.draftPool.delete(houseCard.id);
+        // Put card back to the draft pool
         this.game.draftPool.set(hc.id, hc);
+      });
+
+      // Notify clients about the new cards
+      this.entireGame.broadcastToClients({
+        type: "change-state-house-card",
+        cardIds: oldHouseCards.map((hc) => hc.id),
+        state: HouseCardState.AVAILABLE,
+        houseId: house.id,
       });
 
       this.entireGame.broadcastToClients({
