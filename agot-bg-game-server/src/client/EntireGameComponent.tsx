@@ -294,7 +294,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   <small>
                     Every time a player&apos;s last House card has been played,
                     <br />
-                    they will receive a new set of 7 random House cards.
+                    they will receive a new set of random House cards.
                   </small>
                 </p>
               </Tooltip>
