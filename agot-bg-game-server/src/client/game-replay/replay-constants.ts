@@ -105,7 +105,6 @@ const modifyingGameLogTypes = new Set([
   "massing-on-the-milkwater-house-cards-back",
   "qarl-the-maid-tokens-gained",
   "queen-of-thorns-order-removed",
-  "renly-baratheon-footman-upgraded-to-knight",
   "roose-bolton-house-cards-returned",
   "ser-ilyn-payne-footman-killed",
   "tywin-lannister-power-tokens-gained",
@@ -121,6 +120,7 @@ const relatedCombatResultTypes = new Set([
   "arianne-martell-prevent-movement",
   "arianne-martell-force-retreat",
   "retreat-casualties-suffered",
+  "renly-baratheon-footman-upgraded-to-knight",
 ]);
 
 const combatTerminationLogTypes = new Set([

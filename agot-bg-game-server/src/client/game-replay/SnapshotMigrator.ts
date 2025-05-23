@@ -894,12 +894,6 @@ export default class SnapshotMigrator {
         house.markHouseCardAsAvailable(log.houseCard);
         return snap;
       }
-      case "renly-baratheon-footman-upgraded-to-knight": {
-        const region = snap.getRegion(log.region);
-        region.removeUnit("footman", log.house);
-        region.createUnit("knight", log.house);
-        return snap;
-      }
       case "ser-gerris-drinkwater-used": {
         if (!snap.gameSnapshot) return snap;
         const track = snap.getInfluenceTrack(log.influenceTrack);
