@@ -292,6 +292,14 @@ export default class CombatSnapshotMigrator {
           throw new Error(`Unable to apply log ${JSON.stringify(log)}`);
         }
       }
+      case "renly-baratheon-footman-upgraded-to-knight": {
+        const region = snap.getRegion(log.region);
+        region.removeUnit("footman", log.house);
+        region.createUnit("knight", log.house);
+        pullFirst(this.combatResultData.winnerArmy, "footman");
+        this.combatResultData.winnerArmy.push("knight");
+        return snap;
+      }
       default:
         throw new Error(`Unhandled combat result log type '${log.type}'`);
     }
