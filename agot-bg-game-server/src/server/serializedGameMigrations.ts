@@ -2970,6 +2970,31 @@ const serializedGameMigrations: {
       return serializedGame;
     },
   },
+  {
+    version: "129",
+    migrate: (serializedGame: any) => {
+      if (
+        serializedGame.gameSettings.perpetuumRandom &&
+        serializedGame.childGameState.type == "ingame"
+      ) {
+        serializedGame.childGameState.game.draftPool =
+          serializedGame.childGameState.game.draftPool.filter(
+            ([hcid, _shc]: any) => hcid != "roose-bolton"
+          );
+        serializedGame.childGameState.game.houses.forEach((h: any) =>
+          h.houseCards.forEach((hc: any) => {
+            if (hc[0] == "roose-bolton") {
+              hc[0] = "roose-bolton-dwd";
+              hc[1].abilityId = null;
+              hc[1].combatStrength = 4;
+              hc[1].swordIcons = 1;
+            }
+          })
+        );
+      }
+      return serializedGame;
+    },
+  },
 ];
 
 export default serializedGameMigrations;
