@@ -216,6 +216,10 @@ export default class DraftGameState extends GameState<
     this.removeCardFromDraftPool("khal-drogo");
     this.removeCardFromDraftPool("doran-martell-dwd");
 
+    if (this.entireGame.gameSettings.perpetuumRandom) {
+      this.removeCardFromDraftPool("roose-bolton");
+    }
+
     if (!this.entireGame.gameSettings.dragonWar) {
       this.removeCardFromDraftPool("daenerys-targaryen-a");
     }
