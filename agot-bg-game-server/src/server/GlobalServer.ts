@@ -25,7 +25,7 @@ export default class GlobalServer {
 
   websiteClient: WebsiteClient;
   loadedGames = new BetterMap<string, EntireGame>();
-  clientToUser: Map<WebSocket, User> = new Map<WebSocket, User>();
+  clientToUser = new BetterMap<WebSocket, User>();
   clientMessageValidator: ValidateFunction;
   debug = false;
 
@@ -171,6 +171,18 @@ export default class GlobalServer {
           user: user.id,
           otherUsers: Array.from(user.otherUsersFromSameNetwork),
         });
+      }
+
+      // Check that a user cannot be connected to more than 2 games simultaneously
+      const allConnectedGamesOfUser = this.clientToUser.values.filter(
+        (u) => u.id == user.id
+      );
+
+      if (
+        allConnectedGamesOfUser.length >= 2 &&
+        allConnectedGamesOfUser[0].connectedClients.length > 0
+      ) {
+        allConnectedGamesOfUser[0].connectedClients[0].close();
       }
 
       this.clientToUser.set(client, user);
