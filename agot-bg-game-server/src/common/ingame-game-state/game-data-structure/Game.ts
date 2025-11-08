@@ -30,7 +30,6 @@ import IronBank, { SerializedIronBank } from "./IronBank";
 import Player from "../Player";
 import { ObjectiveCard } from "./static-data-structure/ObjectiveCard";
 import { objectiveCards } from "./static-data-structure/objectiveCards";
-import SnrError from "../../../utils/snrError";
 import IGameSnapshot from "../../../client/game-replay/IGameSnapshot";
 
 export const MAX_WILDLING_STRENGTH = 12;
@@ -108,10 +107,7 @@ export default class Game {
 
   get theIronBank(): IronBank {
     if (this.ironBank == null) {
-      throw new SnrError(
-        this.ingame.entireGame,
-        "Iron Bank must be initalized when this is called!"
-      );
+      throw new Error("Iron Bank must be initalized when this is called!");
     }
 
     return this.ironBank;
@@ -202,10 +198,7 @@ export default class Game {
     const nonVassalTrack = track.filter((h) => !this.ingame.isVassalHouse(h));
 
     if (nonVassalTrack.length == 0) {
-      throw new SnrError(
-        this.ingame.entireGame,
-        "There must be at least one non-vassal in the track"
-      );
+      throw new Error("There must be at least one non-vassal in the track");
     }
 
     return nonVassalTrack[0];
@@ -502,7 +495,7 @@ export default class Game {
   getHouseCardById(id: string): HouseCard {
     const allCards = this.getAllHouseCardsInGame();
     if (!allCards.has(id)) {
-      throw new SnrError(this.ingame.entireGame, `House card ${id} not found`);
+      throw new Error(`House card ${id} not found`);
     }
     return allCards.get(id);
   }

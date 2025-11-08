@@ -173,7 +173,11 @@ export default class DraftGameState extends GameState<
 
   private proceedDraft(): void {
     if (
+      // Only remove houses from influence tracks when drafting house cards and influence tracks
+      this.entireGame.gameSettings.draftHouseCards &&
+      // but not in blind or random draft where the initial order is necessary to randomly switch positions
       !this.isBlindOrRandom() &&
+      // and not in thematic draft mode, where only house cards are drafted and influence tracks remain unchanged
       !this.entireGame.gameSettings.thematicDraft
     ) {
       // Remove player houses but not Targaryen from the influence tracks

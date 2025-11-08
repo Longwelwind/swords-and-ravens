@@ -77,7 +77,6 @@ import {
   UnitOnMapProperties,
 } from "../../client/MapControls";
 import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilities";
-import SnrError from "../../utils/snrError";
 import {
   TakeOverPort,
   findOrphanedShipsAndDestroyThem,
@@ -841,8 +840,7 @@ export default class IngameGameState extends GameState<
       const suzerainHouse = this.game.vassalRelations.tryGet(house, null);
 
       if (suzerainHouse == null) {
-        throw new SnrError(
-          this.entireGame,
+        throw new Error(
           `getControllerOfHouse(${house.name}) failed as there is no suzerainHouse`
         );
       }
@@ -852,8 +850,7 @@ export default class IngameGameState extends GameState<
       const player = this.players.values.find((p) => p.house == house);
 
       if (player == null) {
-        throw new SnrError(
-          this.entireGame,
+        throw new Error(
           `getControllerOfHouse(${house.name}) failed due to a fatal error`
         );
       }
@@ -1019,8 +1016,7 @@ export default class IngameGameState extends GameState<
 
     try {
       if (!player.liveClockData) {
-        throw new SnrError(
-          this.entireGame,
+        throw new Error(
           "LiveClockData must be present in onPlayerClockTimeout"
         );
       }
@@ -1304,10 +1300,7 @@ export default class IngameGameState extends GameState<
 
   onClaimVassalsFinished(): void {
     if (this.childGameStateBeforeVassalsModification == null) {
-      throw new SnrError(
-        this.entireGame,
-        "onClaimVassalsFinished called without previous state"
-      );
+      throw new Error("onClaimVassalsFinished called without previous state");
     }
     const state = this.childGameStateBeforeVassalsModification;
     this.childGameStateBeforeVassalsModification = null;
@@ -1322,9 +1315,8 @@ export default class IngameGameState extends GameState<
 
       // Previous state then must be planning and we have to set back this to the child of ingame
       if (!(claimVassals.parentGameState instanceof PlanningGameState)) {
-        throw new SnrError(
-          this.entireGame,
-          `if state.hasChildGameState(ClaimVassalsGameState), parent must be PlanningGameState`
+        throw new Error(
+          "if state.hasChildGameState(ClaimVassalsGameState), parent must be PlanningGameState"
         );
       }
 
@@ -2746,7 +2738,7 @@ export default class IngameGameState extends GameState<
 
   isVassalControlledByPlayer(vassal: House, player: Player): boolean {
     if (!this.isVassalHouse(vassal)) {
-      throw new SnrError(this.entireGame);
+      throw new Error(`${vassal.name} is not a vassal house`);
     }
 
     return this.game.vassalRelations.tryGet(vassal, null) == player.house;
