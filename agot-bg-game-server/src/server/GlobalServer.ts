@@ -221,54 +221,73 @@ export default class GlobalServer {
       );
       */
 
-      // Chat related messages are handled by GlobalServer because they must use the website client
-      if (message.type == "create-private-chat-room") {
-        const ingame =
-          entireGame.childGameState instanceof IngameGameState
-            ? entireGame.childGameState
-            : null;
-        if (
-          !ingame ||
-          !ingame.players.has(user) ||
-          entireGame.gameSettings.noPrivateChats
-        ) {
-          return;
-        }
-        const otherUser = user.entireGame.users.get(message.otherUser);
-        // Check if a chat room has not already been started between these 2 users
-        const users = _.sortBy([user, otherUser], (u) => u.id);
+      try {
+        // Chat related messages are handled by GlobalServer because they must use the website client
+        if (message.type == "create-private-chat-room") {
+          const ingame =
+            entireGame.childGameState instanceof IngameGameState
+              ? entireGame.childGameState
+              : null;
+          if (
+            !ingame ||
+            !ingame.players.has(user) ||
+            entireGame.gameSettings.noPrivateChats
+          ) {
+            return;
+          }
+          const otherUser = user.entireGame.users.get(message.otherUser);
+          // Check if a chat room has not already been started between these 2 users
+          const users = _.sortBy([user, otherUser], (u) => u.id);
 
-        if (
-          entireGame.privateChatRoomsIds.has(users[0]) &&
-          entireGame.privateChatRoomsIds.get(users[0]).has(users[1])
-        ) {
-          return;
-        }
+          if (
+            entireGame.privateChatRoomsIds.has(users[0]) &&
+            entireGame.privateChatRoomsIds.get(users[0]).has(users[1])
+          ) {
+            return;
+          }
 
-        // Create a chat room between these 2 players
-        const roomId = await this.websiteClient.createPrivateChatRoom(
-          users,
-          `Chat room for ${users.map((u) => u.name).join(" and ")} in game ${user.entireGame.id}`
-        );
+          // Create a chat room between these 2 players
+          const roomId = await this.websiteClient.createPrivateChatRoom(
+            users,
+            `Chat room for ${users.map((u) => u.name).join(" and ")} in game ${user.entireGame.id}`
+          );
 
-        if (!entireGame.privateChatRoomsIds.has(users[0])) {
-          entireGame.privateChatRoomsIds.set(users[0], new BetterMap());
-        }
+          if (!entireGame.privateChatRoomsIds.has(users[0])) {
+            entireGame.privateChatRoomsIds.set(users[0], new BetterMap());
+          }
 
-        entireGame.privateChatRoomsIds.get(users[0]).set(users[1], roomId);
+          entireGame.privateChatRoomsIds.get(users[0]).set(users[1], roomId);
 
-        users.forEach((u) => {
-          u.send({
-            type: "new-private-chat-room",
-            users: users.map((u) => u.id),
-            roomId,
-            initiator: user.id,
+          users.forEach((u) => {
+            u.send({
+              type: "new-private-chat-room",
+              users: users.map((u) => u.id),
+              roomId,
+              initiator: user.id,
+            });
           });
-        });
 
-        this.saveGame(entireGame, false);
-      } else {
-        entireGame.onClientMessage(user, message);
+          this.saveGame(entireGame, false);
+        } else {
+          entireGame.onClientMessage(user, message);
+        }
+      } catch (e) {
+        Sentry.withScope((scope) => {
+          scope.setUser({
+            id: user.id,
+            username: user.name,
+            ip_address: clientIp,
+          });
+          scope.setContext("game", {
+            id: entireGame.id,
+            name: entireGame.name,
+            settings: entireGame.gameSettings,
+            message: message,
+            leafState: entireGame.leafState?.constructor?.name,
+          });
+          Sentry.captureException(e);
+        });
+        throw e;
       }
     }
 

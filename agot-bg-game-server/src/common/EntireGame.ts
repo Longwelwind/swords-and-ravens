@@ -41,7 +41,6 @@ import SimpleChoiceGameState from "./ingame-game-state/simple-choice-game-state/
 import getElapsedSeconds from "../utils/getElapsedSeconds";
 import WildlingCardType from "./ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import House from "./ingame-game-state/game-data-structure/House";
-import SnrError from "../utils/snrError";
 import { GameSettings, SerializedGameSettings } from "./GameSettings";
 
 export enum NotificationType {
@@ -134,8 +133,7 @@ export default class EntireGame extends GameState<
     );
 
     if (gameSetup == undefined) {
-      throw new SnrError(
-        this,
+      throw new Error(
         `Invalid playerCount ${this.gameSettings.playerCount} for setupId ${this.gameSettings.setupId}`
       );
     }
@@ -224,7 +222,7 @@ export default class EntireGame extends GameState<
         );
 
         if (!serializedGameState) {
-          throw new SnrError(this);
+          throw new Error("Failed to serialize game state for transmission");
         }
 
         return {
@@ -499,10 +497,7 @@ export default class EntireGame extends GameState<
         .map((u) => (this.ingameGameState as IngameGameState).players.get(u));
     } catch (e) {
       console.error(e);
-      throw new SnrError(
-        this.entireGame,
-        `Error in doPlayerClocksHandling: ${e}`
-      );
+      throw new Error(`Error in doPlayerClocksHandling: ${e}`);
     }
     const notWaitedPlayers = _.difference(
       this.ingameGameState.players.values,
@@ -540,16 +535,14 @@ export default class EntireGame extends GameState<
 
     notWaitedPlayers.forEach((p) => {
       if (!p.liveClockData) {
-        throw new SnrError(
-          this,
+        throw new Error(
           "LiveClockData must be present in doPlayerClocksHandling"
         );
       }
 
       if (p.liveClockData.timerStartedAt) {
         if (!p.liveClockData.serverTimer) {
-          throw new SnrError(
-            this,
+          throw new Error(
             "serverTimer must be present in doPlayerClocksHandling"
           );
         }
