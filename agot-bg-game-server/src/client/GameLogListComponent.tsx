@@ -3334,10 +3334,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         );
       }
       case "westeros-deck-4-skipped": {
-        const westerosCardType = westerosCardTypes.get(data.westerosCardType);
+        const westerosCardType = data.westerosCardType
+          ? westerosCardTypes.get(data.westerosCardType)
+          : null;
         return (
           <>
-            The execution of the Westeros card <b>{westerosCardType.name}</b>{" "}
+            The execution of{" "}
+            {westerosCardType ? (
+              <>
+                the Westeros card <b>{westerosCardType.name}</b> :{" "}
+              </>
+            ) : (
+              <>Westeros deck 4 </>
+            )}
             was skipped because House <b>Targaryen</b> is <b>{data.reason}</b>.
           </>
         );

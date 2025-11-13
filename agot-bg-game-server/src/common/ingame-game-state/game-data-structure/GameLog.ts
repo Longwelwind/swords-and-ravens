@@ -1431,7 +1431,7 @@ export interface HousesSwapped {
 
 export interface WesterosDeck4Skipped {
   type: "westeros-deck-4-skipped";
-  westerosCardType: string;
+  westerosCardType?: string;
   reason: "defeated" | "vassalized";
 }
 
