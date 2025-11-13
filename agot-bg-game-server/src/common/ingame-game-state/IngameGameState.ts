@@ -88,6 +88,7 @@ import GameReplayManager from "../../client/game-replay/GameReplayManager";
 import ClaimVassalsGameState, {
   SerializedClaimVassalsGameState,
 } from "./planning-game-state/claim-vassals-game-state/ClaimVassalsGameState";
+import WesterosDeck4GameState from "./westeros-game-state/westeros-deck-4-game-state/WesterosDeck4GameState";
 
 export const NOTE_MAX_LENGTH = 5000;
 
@@ -1240,6 +1241,21 @@ export default class IngameGameState extends GameState<
       if (leaf.house && leaf.house == newVassalHouse) {
         wildlingEffect.proceedNextHouse(newVassalHouse);
       }
+    }
+
+    if (
+      newVassalHouse == this.game.targaryen &&
+      this.hasChildGameState(WesterosDeck4GameState)
+    ) {
+      const wd4State = this.getChildGameState(
+        WesterosDeck4GameState
+      ) as WesterosDeck4GameState;
+
+      this.log({
+        type: "westeros-deck-4-skipped",
+        reason: "vassalized",
+      });
+      wd4State.parentGameState.onWesterosCardEnd();
     }
 
     this.log({
