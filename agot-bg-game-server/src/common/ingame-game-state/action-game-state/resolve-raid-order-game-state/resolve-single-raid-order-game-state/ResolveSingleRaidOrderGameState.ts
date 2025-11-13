@@ -15,6 +15,7 @@ import ConsolidatePowerOrderType from "../../../game-data-structure/order-types/
 import User from "../../../../../server/User";
 import RaidSupportOrderType from "../../../../../common/ingame-game-state/game-data-structure/order-types/RaidSupportOrderType";
 import IronBankOrderType from "../../../../../common/ingame-game-state/game-data-structure/order-types/IronBankOrderType";
+import _ from "lodash";
 
 export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRaidOrderGameState> {
   house: House;
@@ -246,6 +247,19 @@ export default class ResolveSingleRaidOrderGameState extends GameState<ResolveRa
     return {
       houseId: this.house.id,
     };
+  }
+
+  getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+    if (this.ingameGameState.getControllerOfHouse(this.house) == player) {
+      const regionsWithRaidOrders =
+        this.parentGameState.getRegionsWithRaidOrderOfHouse(this.house);
+      return _.uniq(
+        regionsWithRaidOrders
+          .map(([r, ot]) => this.getRaidableRegions(r, ot))
+          .flat()
+      );
+    }
+    return [];
   }
 
   static deserializeFromServer(
