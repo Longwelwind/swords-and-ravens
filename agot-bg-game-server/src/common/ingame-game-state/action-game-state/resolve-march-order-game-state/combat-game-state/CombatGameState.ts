@@ -975,8 +975,11 @@ export default class CombatGameState extends GameState<
   ): SerializedCombatGameState {
     const playerIsVsbUser =
       this.valyrianSteelBladeUser != null &&
-      this.ingameGameState.getControllerOfHouse(this.valyrianSteelBladeUser) ==
-        player;
+      // Use safeGetControllerOfHouse as it might happen that the VSB user gets vassalized during post-combat
+      // and then childGameStateBeforeVassalsModification cannot be serialized properly
+      this.ingameGameState.safeGetControllerOfHouse(
+        this.valyrianSteelBladeUser
+      ) == player;
     return {
       type: "combat",
       order: this.order.id,

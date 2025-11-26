@@ -830,7 +830,7 @@ export default class IngameGameState extends GameState<
         return null;
       }
 
-      return this.getControllerOfHouse(suzerainHouse);
+      return this.safeGetControllerOfHouse(suzerainHouse);
     } else {
       return this.players.values.find((p) => p.house == house) ?? null;
     }
