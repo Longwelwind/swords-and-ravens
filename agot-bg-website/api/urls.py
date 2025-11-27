@@ -19,4 +19,6 @@ urlpatterns = [
     path('addPbemResponseTime/<uuid:user_id>/<int:response_time>', views.add_pbem_response_time),
     path('clearChatRoom/<uuid:room_id>', views.clear_chat_room),
     path('game/<uuid:game_id>/isCancelled', views.is_game_cancelled),
+    # Public API endpoint for authenticated users
+    path('public/game/<uuid:game_id>', views.get_game_view),
 ]

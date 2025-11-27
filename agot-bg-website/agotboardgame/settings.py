@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'chat',
     'debug_toolbar',
     'storages',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -217,6 +218,7 @@ AWS_QUERYSTRING_AUTH=False
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
