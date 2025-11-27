@@ -69,12 +69,15 @@ INSTALLED_APPS = [
     'chat',
     'debug_toolbar',
     'storages',
+    'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -217,6 +220,7 @@ AWS_QUERYSTRING_AUTH=False
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -291,3 +295,13 @@ CACHES = {
         'LOCATION': 'snr-cache-table',
     }
 }
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    'https://ravenscore.zlatanov.xyz',
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'GET',
+]
+CORS_URLS_REGEX = r'^/(api/public/|play/).*$'

@@ -432,7 +432,7 @@ export default class IngameGameState extends GameState<
     }
 
     if (this.game.turn == this.game.maxTurns) {
-      const winner = this.game.getPotentialWinner(true);
+      const winner = this.game.getPotentialWinner();
       this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
       return;
     }

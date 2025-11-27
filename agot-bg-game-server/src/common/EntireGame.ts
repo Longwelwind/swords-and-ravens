@@ -750,6 +750,26 @@ export default class EntireGame extends GameState<
       ? this.entireGame.lobbyGameState.password.length > 0
       : undefined;
 
+    const victoryTrack =
+      this.ingameGameState?.game
+        .getPotentialWinners()
+        .filter((h) => !this.ingameGameState!.isVassalHouse(h))
+        .map((h) => {
+          const controller = this.ingameGameState!.getControllerOfHouse(h);
+          return {
+            house: h.name,
+            player: this.gameSettings.faceless
+              ? controller.user.facelessName
+              : controller.user.name,
+            victoryPoints: this.ingameGameState!.game.getVictoryPoints(h),
+            totalLandAreas:
+              this.ingameGameState!.game.getTotalControlledLandRegions(h),
+            supplyLevel: h.supplyLevel,
+            ironThronePosition:
+              this.ingameGameState!.game.ironThroneTrack.indexOf(h) + 1,
+          };
+        }) ?? [];
+
     return {
       turn,
       maxPlayerCount,
@@ -762,6 +782,7 @@ export default class EntireGame extends GameState<
       timeoutPlayerIds,
       replacerIds,
       isPasswordProtected,
+      victoryTrack,
       publicChatRoomId: this.publicChatRoomId,
     };
   }

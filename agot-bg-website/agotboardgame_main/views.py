@@ -204,6 +204,10 @@ def about(request):
     return render(request, "agotboardgame_main/about.html", {"game_tasks": game_tasks, "meta_tasks": meta_tasks})
 
 
+def rules(request):
+    return render(request, "agotboardgame_main/rules.html")
+
+
 @login_required
 def my_games(request):
     now = timezone.now()

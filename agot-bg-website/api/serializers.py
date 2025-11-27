@@ -1,6 +1,6 @@
 import django.utils.timezone
 from rest_framework.relations import PrimaryKeyRelatedField
-from rest_framework.serializers import ModelSerializer, BooleanField
+from rest_framework.serializers import ModelSerializer, BooleanField, SerializerMethodField
 
 from agotboardgame_main.models import User, Group, Game, PlayerInGame, PbemResponseTime
 from chat.models import Room, UserInRoom
@@ -43,6 +43,7 @@ class GameSerializer(ModelSerializer):
         model = Game
         fields = ['id', 'name', 'owner', 'serialized_game', 'view_of_game', 'state', 'version', 'players', 'update_last_active']
 
+
     def update(self, instance, validated_data):
         instance.version = validated_data.pop('version', instance.version)
         instance.serialized_game = validated_data.pop('serialized_game', instance.serialized_game)
@@ -60,6 +61,36 @@ class GameSerializer(ModelSerializer):
         instance.save()
 
         return instance
+
+
+class GameViewSerializer(ModelSerializer):
+    """Read-only serializer for public API access to view_of_game"""
+    view_of_game = SerializerMethodField()
+    
+    class Meta:
+        model = Game
+        fields = ['id', 'name', 'view_of_game', 'state']
+    
+    def get_view_of_game(self, obj):
+        """Return sanitized view_of_game with sensitive data removed"""
+        if obj.view_of_game is None:
+            return None
+        
+        # Create a copy to avoid modifying the original
+        sanitized_view = obj.view_of_game.copy()
+        
+        # Remove sensitive fields
+        sanitized_view.pop('replacerIds', None)
+        sanitized_view.pop('oldPlayerIds', None)
+        sanitized_view.pop('waitingForIds', None)
+        sanitized_view.pop('publicChatRoomId', None)
+        sanitized_view.pop('timeoutPlayerIds', None)
+        
+        # Rename 'turn' to 'round'
+        if 'turn' in sanitized_view:
+            sanitized_view['round'] = sanitized_view.pop('turn')
+        
+        return sanitized_view
 
 
 class UserInRoomSerializer(ModelSerializer):

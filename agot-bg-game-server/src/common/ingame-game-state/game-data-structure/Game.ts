@@ -340,7 +340,8 @@ export default class Game {
     return true;
   }
 
-  getPotentialWinners(lastRound = false): House[] {
+  getPotentialWinners(): House[] {
+    const lastRound = this.turn == this.maxTurns;
     const victoryConditions: ((h: House) => number)[] = !this.ingame.entireGame
       .isFeastForCrows
       ? [
@@ -372,8 +373,8 @@ export default class Game {
       .filter((r) => r.getController() == h).length;
   }
 
-  getPotentialWinner(lastRound = false): House {
-    return this.getPotentialWinners(lastRound)[0];
+  getPotentialWinner(): House {
+    return this.getPotentialWinners()[0];
   }
 
   getCountUnitsOfType(house: House, unitType: UnitType): number {
