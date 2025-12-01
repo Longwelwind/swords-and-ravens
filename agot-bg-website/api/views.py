@@ -235,9 +235,9 @@ def is_game_cancelled(request, game_id):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([])
 def get_game_view(request, game_id):
-    """Public API endpoint for authenticated users to access view_of_game"""
+    """Public API endpoint for anonymous access to view_of_game"""
     try:
         game = Game.objects.get(id=game_id)
         serializer = GameViewSerializer(game)
