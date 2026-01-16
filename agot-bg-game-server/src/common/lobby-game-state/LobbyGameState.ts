@@ -228,8 +228,8 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.loyaltyTokenCountNeededToWin = 7;
       }
 
-      if (settings.initialLiveClock < 45) {
-        settings.initialLiveClock = 45;
+      if (settings.initialLiveClock < 30) {
+        settings.initialLiveClock = 30;
       }
 
       if (settings.initialLiveClock > 120) {
