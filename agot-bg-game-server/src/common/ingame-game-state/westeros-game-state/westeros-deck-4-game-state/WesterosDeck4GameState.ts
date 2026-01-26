@@ -76,60 +76,60 @@ export default class WesterosDeck4GameState extends GameState<
       case southronAmbitions.id:
       case strongholdsOfResistance.id: {
         const regions = type.choosableLoyaltyTokenRegions.map((rid) =>
-          this.parentGameState.world.regions.get(rid)
+          this.parentGameState.world.regions.get(rid),
         );
         this.setChildGameState(
-          new ChooseRegionForLoyaltyTokenGameState(this)
+          new ChooseRegionForLoyaltyTokenGameState(this),
         ).firstStart(this.game.targaryen, regions);
         break;
       }
       case domesticDisputes.id: {
         const regions = this.game.world.westerosLandRegions.filter(
-          (r) => r.superControlPowerToken != null
+          (r) => r.superControlPowerToken != null,
         );
         this.setChildGameState(
-          new ChooseMultipleRegionsForLoyaltyTokenGameState(this)
+          new ChooseMultipleRegionsForLoyaltyTokenGameState(this),
         ).firstStart(
           this.game.targaryen,
           1,
           regions,
           4,
           "House Targaryen may place loyalty\xa0tokens in up to 4 capitals.",
-          true
+          true,
         );
         break;
       }
       case wateringTheSeed.id: {
         const regions = this.game.world.regionsAdjacentToARiver.filter(
-          (r) => r.getController() != this.game.targaryen
+          (r) => r.getController() != this.game.targaryen,
         );
         this.setChildGameState(
-          new ChooseMultipleRegionsForLoyaltyTokenGameState(this)
+          new ChooseMultipleRegionsForLoyaltyTokenGameState(this),
         ).firstStart(
           this.game.targaryen,
           this.game.getVictoryPoints(this.game.targaryen),
           regions,
           2,
           "House Targaryen may place 1 loyalty\xa0token on 2 different regions adjacent to a river.",
-          false
+          false,
         );
         break;
       }
       case fireMadeFlesh.id: {
         this.setChildGameState(new FireMadeFleshGameState(this)).firstStart(
-          this.game.targaryen
+          this.game.targaryen,
         );
         break;
       }
       case playingWithFire.id: {
         this.setChildGameState(new PlayingWithFireGameState(this)).firstStart(
-          this.game.targaryen
+          this.game.targaryen,
         );
         break;
       }
       case theLongPlan.id: {
         this.setChildGameState(new TheLongPlanGameState(this)).firstStart(
-          this.game.targaryen
+          this.game.targaryen,
         );
         break;
       }
@@ -140,7 +140,7 @@ export default class WesterosDeck4GameState extends GameState<
         this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(
           resolveOrder,
           2,
-          null
+          null,
         );
         break;
       }
@@ -152,7 +152,7 @@ export default class WesterosDeck4GameState extends GameState<
         this.setChildGameState(new MoveLoyaltyTokensGameState(this)).firstStart(
           resolveOrder,
           1,
-          null
+          null,
         );
         break;
       }
@@ -171,7 +171,7 @@ export default class WesterosDeck4GameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedWesterosDeck4GameState {
     return {
       type: "westeros-deck-4",
@@ -181,29 +181,29 @@ export default class WesterosDeck4GameState extends GameState<
 
   static deserializeFromServer(
     westeros: WesterosGameState,
-    data: SerializedWesterosDeck4GameState
+    data: SerializedWesterosDeck4GameState,
   ): WesterosDeck4GameState {
     const westerosDeck4 = new WesterosDeck4GameState(westeros);
 
     westerosDeck4.childGameState = westerosDeck4.deserializeChildGameState(
-      data.childGameState
+      data.childGameState,
     );
 
     return westerosDeck4;
   }
 
   deserializeChildGameState(
-    data: SerializedWesterosDeck4GameState["childGameState"]
+    data: SerializedWesterosDeck4GameState["childGameState"],
   ): WesterosDeck4GameState["childGameState"] {
     if (data.type == "choose-region-for-loyalty-token") {
       return ChooseRegionForLoyaltyTokenGameState.deserializeFromServer(
         this,
-        data
+        data,
       );
     } else if (data.type == "choose-multiple-regions-for-loyalty-token") {
       return ChooseMultipleRegionsForLoyaltyTokenGameState.deserializeFromServer(
         this,
-        data
+        data,
       );
     } else if (data.type == "fire-made-flesh") {
       return FireMadeFleshGameState.deserializeFromServer(this, data);

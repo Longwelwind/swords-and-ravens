@@ -73,10 +73,10 @@ export default class PostCombatGameState extends GameState<
     // Final combat strength can't be negative but only attacker is able to generate a negative final combat strength
     const attackerTotalStrength = Math.max(
       this.combat.getTotalCombatStrength(this.attacker),
-      0
+      0,
     );
     const defenderTotalStrength = this.combat.getTotalCombatStrength(
-      this.defender
+      this.defender,
     );
 
     this.winner =
@@ -87,7 +87,7 @@ export default class PostCombatGameState extends GameState<
           : this.game.whoIsAheadInTrack(
               this.game.fiefdomsTrack,
               this.attacker,
-              this.defender
+              this.defender,
             );
     this.loser = this.winner == this.attacker ? this.defender : this.attacker;
 
@@ -147,7 +147,7 @@ export default class PostCombatGameState extends GameState<
     house: House,
     region: Region,
     selectedCasualties: Unit[],
-    resolvedAutomatically: boolean
+    resolvedAutomatically: boolean,
   ): void {
     // If there is just a garrison, the selectedCasualties might be an empty array here
     if (selectedCasualties.length > 0) {
@@ -157,7 +157,7 @@ export default class PostCombatGameState extends GameState<
           house: house.id,
           killed: selectedCasualties.map((u) => u.type.id),
         },
-        resolvedAutomatically
+        resolvedAutomatically,
       );
 
       // Remove the selected casualties
@@ -175,7 +175,7 @@ export default class PostCombatGameState extends GameState<
 
       this.combat.ingameGameState.broadcastRemoveUnits(
         region,
-        selectedCasualties
+        selectedCasualties,
       );
     }
 
@@ -197,7 +197,7 @@ export default class PostCombatGameState extends GameState<
           region: this.combat.defendingRegion.id,
           newGarrison: 0,
         },
-        this.combat.defendingRegion
+        this.combat.defendingRegion,
       );
 
       this.parentGameState.ingameGameState.log({
@@ -237,11 +237,11 @@ export default class PostCombatGameState extends GameState<
     const loserArmyLeft = this.loserCombatData.army;
     const maxLoserCasualtiesCount = Math.max(
       0,
-      winnerSwordIcons - loserTowerIcons
+      winnerSwordIcons - loserTowerIcons,
     );
     const loserCasualtiesCount = Math.min(
       maxLoserCasualtiesCount,
-      loserArmyLeft.length
+      loserArmyLeft.length,
     );
 
     if (loserCasualtiesCount > 0) {
@@ -249,7 +249,7 @@ export default class PostCombatGameState extends GameState<
       if (!this.combat.areCasualtiesPrevented(this.loser)) {
         if (loserCasualtiesCount < loserArmyLeft.length) {
           this.setChildGameState(
-            new ChooseCasualtiesGameState(this)
+            new ChooseCasualtiesGameState(this),
           ).firstStart(this.loser, loserArmyLeft, loserCasualtiesCount);
         } else {
           // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameState
@@ -258,7 +258,7 @@ export default class PostCombatGameState extends GameState<
             this.loser,
             locationLoserArmy,
             loserArmyLeft,
-            true
+            true,
           );
         }
         return;
@@ -280,7 +280,7 @@ export default class PostCombatGameState extends GameState<
     const loserArmy = this.loserCombatData.army;
     const locationLoserArmy = this.loserCombatData.region;
     const immediatelyKilledLoserUnits = loserArmy.filter(
-      (u) => u.wounded || !u.type.canRetreat
+      (u) => u.wounded || !u.type.canRetreat,
     );
 
     if (immediatelyKilledLoserUnits.length > 0) {
@@ -297,7 +297,7 @@ export default class PostCombatGameState extends GameState<
 
       this.loserCombatData.army = _.difference(
         this.loserCombatData.army,
-        immediatelyKilledLoserUnits
+        immediatelyKilledLoserUnits,
       );
       this.entireGame.broadcastToClients({
         type: "combat-change-army",
@@ -307,11 +307,11 @@ export default class PostCombatGameState extends GameState<
       });
 
       immediatelyKilledLoserUnits.forEach((u) =>
-        locationLoserArmy.units.delete(u.id)
+        locationLoserArmy.units.delete(u.id),
       );
       this.combat.ingameGameState.broadcastRemoveUnits(
         locationLoserArmy,
-        immediatelyKilledLoserUnits
+        immediatelyKilledLoserUnits,
       );
     }
   }
@@ -322,7 +322,7 @@ export default class PostCombatGameState extends GameState<
         ([h, hcd]) =>
           !this.resolvedSkullIcons.includes(h) &&
           hcd.tidesOfBattleCard &&
-          hcd.tidesOfBattleCard.skullIcons > 0
+          hcd.tidesOfBattleCard.skullIcons > 0,
       )
       .map(([h, _hcd]) => h);
 
@@ -339,7 +339,7 @@ export default class PostCombatGameState extends GameState<
       if (!this.combat.areCasualtiesPrevented(enemy, true)) {
         if (skullCount < enemyCombatData.army.length) {
           this.setChildGameState(
-            new ChooseCasualtiesGameState(this)
+            new ChooseCasualtiesGameState(this),
           ).firstStart(enemy, enemyCombatData.army, skullCount);
         } else {
           // If the count of casualties is bigger or equal than the remaining army, a ChooseCasualtiesGameState
@@ -348,7 +348,7 @@ export default class PostCombatGameState extends GameState<
             enemy,
             enemyCombatData.region,
             enemyCombatData.army,
-            true
+            true,
           );
         }
         return;
@@ -384,7 +384,7 @@ export default class PostCombatGameState extends GameState<
           this.entireGame.broadcastToClients({
             type: "update-old-player-house-cards",
             houseCards: this.game.oldPlayerHouseCards.entries.map(
-              ([h, hcs]) => [h.id, hcs.values.map((hc) => hc.id)]
+              ([h, hcs]) => [h.id, hcs.values.map((hc) => hc.id)],
             ),
           });
         }
@@ -394,7 +394,7 @@ export default class PostCombatGameState extends GameState<
     });
 
     this.setChildGameState(
-      new AfterCombatHouseCardAbilitiesGameState(this)
+      new AfterCombatHouseCardAbilitiesGameState(this),
     ).firstStart();
   }
 
@@ -414,7 +414,7 @@ export default class PostCombatGameState extends GameState<
 
     // Do abilities
     this.setChildGameState(
-      new AfterWinnerDeterminationGameState(this)
+      new AfterWinnerDeterminationGameState(this),
     ).firstStart();
   }
 
@@ -460,7 +460,7 @@ export default class PostCombatGameState extends GameState<
           this.combat.resolveMarchOrderGameState.moveUnits(
             this.combat.attackingRegion,
             this.combat.attackingArmy,
-            this.combat.defendingRegion
+            this.combat.defendingRegion,
           );
         } else {
           this.combat.ingameGameState.log({
@@ -497,7 +497,7 @@ export default class PostCombatGameState extends GameState<
             houseCard.ability.doesPreventAttackingArmyFromMoving(
               this,
               h,
-              houseCard
+              houseCard,
             )
         : s;
     }, false);
@@ -516,7 +516,7 @@ export default class PostCombatGameState extends GameState<
             houseCard.ability.forcesRetreatOfVictoriousDefender(
               this,
               h,
-              houseCard
+              houseCard,
             )
         : s;
     }, false);
@@ -526,9 +526,9 @@ export default class PostCombatGameState extends GameState<
     // Notify combatans about end of combat
     this.combat.entireGame.notifyUsers(
       this.combat.houseCombatDatas.keys.map(
-        (h) => this.combat.ingameGameState.getControllerOfHouse(h).user
+        (h) => this.combat.ingameGameState.getControllerOfHouse(h).user,
       ),
-      NotificationType.BATTLE_RESULTS
+      NotificationType.BATTLE_RESULTS,
     );
 
     this.combat.houseCombatDatas.keys.forEach((house) => {
@@ -546,7 +546,7 @@ export default class PostCombatGameState extends GameState<
           this.entireGame.broadcastToClients({
             type: "update-old-player-house-cards",
             houseCards: this.game.oldPlayerHouseCards.entries.map(
-              ([h, hcs]) => [h.id, hcs.values.map((hc) => hc.id)]
+              ([h, hcs]) => [h.id, hcs.values.map((hc) => hc.id)],
             ),
           });
         }
@@ -577,7 +577,7 @@ export default class PostCombatGameState extends GameState<
     }
 
     this.combat.resolveMarchOrderGameState.onResolveSingleMarchOrderGameStateFinish(
-      this.attacker
+      this.attacker,
     );
   }
 
@@ -612,7 +612,7 @@ export default class PostCombatGameState extends GameState<
 
   checkAndPerformHouseCardHandlingPerHouse(
     house: House,
-    houseCard: HouseCard | null
+    houseCard: HouseCard | null,
   ): void {
     // If all cards are used or discarded, put all used as available,
     // except the one that has been used.
@@ -637,7 +637,7 @@ export default class PostCombatGameState extends GameState<
       });
 
       house.laterHouseCards.entries.forEach(([hcid, hc]) =>
-        house.houseCards.set(hcid, hc)
+        house.houseCards.set(hcid, hc),
       );
       house.laterHouseCards = null;
 
@@ -660,7 +660,7 @@ export default class PostCombatGameState extends GameState<
         // Mark card as available again
         hc.state = HouseCardState.AVAILABLE;
         const availableCards = this.game.draftPool.values.filter(
-          (fromPool) => fromPool.combatStrength == hc.combatStrength
+          (fromPool) => fromPool.combatStrength == hc.combatStrength,
         );
         const houseCard = popRandom(availableCards) as HouseCard;
         house.houseCards.set(houseCard.id, houseCard);
@@ -691,11 +691,11 @@ export default class PostCombatGameState extends GameState<
       });
     } else {
       const houseCardsToMakeAvailable = house.houseCards.values.filter(
-        (hc) => hc != houseCard
+        (hc) => hc != houseCard,
       );
 
       houseCardsToMakeAvailable.forEach(
-        (hc) => (hc.state = HouseCardState.AVAILABLE)
+        (hc) => (hc.state = HouseCardState.AVAILABLE),
       );
 
       this.combat.ingameGameState.log({
@@ -716,7 +716,7 @@ export default class PostCombatGameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedPostCombatGameState {
     return {
       type: "post-combat",
@@ -730,7 +730,7 @@ export default class PostCombatGameState extends GameState<
 
   static deserializeFromServer(
     combat: CombatGameState,
-    data: SerializedPostCombatGameState
+    data: SerializedPostCombatGameState,
   ): PostCombatGameState {
     const postCombat = new PostCombatGameState(combat);
 
@@ -740,17 +740,17 @@ export default class PostCombatGameState extends GameState<
       ? combat.game.houses.get(data.originalLoser)
       : null;
     postCombat.resolvedSkullIcons = data.resolvedSkullIcons.map((hid) =>
-      combat.game.houses.get(hid)
+      combat.game.houses.get(hid),
     );
     postCombat.childGameState = postCombat.deserializeChildGameState(
-      data.childGameState
+      data.childGameState,
     );
 
     return postCombat;
   }
 
   deserializeChildGameState(
-    data: SerializedPostCombatGameState["childGameState"]
+    data: SerializedPostCombatGameState["childGameState"],
   ): PostCombatGameState["childGameState"] {
     switch (data.type) {
       case "resolve-retreat":
@@ -760,12 +760,12 @@ export default class PostCombatGameState extends GameState<
       case "after-winner-determination":
         return AfterWinnerDeterminationGameState.deserializeFromServer(
           this,
-          data
+          data,
         );
       case "after-combat-house-card-abilities":
         return AfterCombatHouseCardAbilitiesGameState.deserializeFromServer(
           this,
-          data
+          data,
         );
     }
   }

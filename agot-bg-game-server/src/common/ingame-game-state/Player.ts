@@ -24,7 +24,7 @@ export default class Player {
   get totalRemainingSeconds(): number {
     if (!this.liveClockData) {
       throw new Error(
-        "totalRemainingSeconds requested but no liveClockData present"
+        "totalRemainingSeconds requested but no liveClockData present",
       );
     }
 
@@ -40,7 +40,7 @@ export default class Player {
   clientGetTotalRemainingSeconds(now: Date): number {
     if (!this.liveClockData) {
       throw new Error(
-        "totalRemainingSeconds requested but no liveClockData present"
+        "totalRemainingSeconds requested but no liveClockData present",
       );
     }
 
@@ -57,7 +57,7 @@ export default class Player {
     user: User,
     house: House,
     waitedForData: WaitedForData | null = null,
-    liveClockData: LiveClockData | null = null
+    liveClockData: LiveClockData | null = null,
   ) {
     this.user = user;
     this.house = house;
@@ -117,7 +117,7 @@ export default class Player {
     ) {
       this.user.entireGame.onNewPbemResponseTime(
         this.user,
-        responseTimeInSeconds
+        responseTimeInSeconds,
       );
     } else {
       // console.log(`${this.user.name} has ben REACTIVATED`);
@@ -157,7 +157,7 @@ export default class Player {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedPlayer
+    data: SerializedPlayer,
   ): Player {
     return new Player(
       ingame.entireGame.users.get(data.userId),
@@ -178,7 +178,7 @@ export default class Player {
               ? new Date(data.liveClockData.timerStartedAt)
               : null,
           }
-        : null
+        : null,
     );
   }
 }

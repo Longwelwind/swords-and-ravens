@@ -39,7 +39,7 @@ export default abstract class VoteType {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedVoteType
+    data: SerializedVoteType,
   ): VoteType {
     switch (data.type) {
       case "cancel-game":
@@ -105,7 +105,7 @@ export class PauseGame extends VoteType {
       if (p.liveClockData.timerStartedAt) {
         if (!p.liveClockData.serverTimer) {
           throw new Error(
-            "A serverTimer must be present when timerStartedAt is set"
+            "A serverTimer must be present when timerStartedAt is set",
           );
         }
 
@@ -130,7 +130,7 @@ export class PauseGame extends VoteType {
         ingame.resumeGame();
       }, tenMinutesInMs);
       ingame.willBeAutoResumedAt = new Date(
-        new Date().getTime() + tenMinutesInMs
+        new Date().getTime() + tenMinutesInMs,
       );
     }
 
@@ -153,7 +153,7 @@ export class PauseGame extends VoteType {
 
   static deserializeFromServer(
     _ingame: IngameGameState,
-    _data: SerializedPauseGame
+    _data: SerializedPauseGame,
   ): PauseGame {
     return new PauseGame();
   }
@@ -192,7 +192,7 @@ export class ResumeGame extends VoteType {
 
   static deserializeFromServer(
     _ingame: IngameGameState,
-    _data: SerializedResumeGame
+    _data: SerializedResumeGame,
   ): ResumeGame {
     return new ResumeGame();
   }
@@ -229,7 +229,7 @@ export class ExtendPlayerClocks extends VoteType {
       } else {
         if (!p.liveClockData.serverTimer) {
           throw new Error(
-            "A serverTimer must be present when timerStartedAt is set"
+            "A serverTimer must be present when timerStartedAt is set",
           );
         }
 
@@ -265,7 +265,7 @@ export class ExtendPlayerClocks extends VoteType {
 
   static deserializeFromServer(
     _ingame: IngameGameState,
-    _data: SerializedExtendPlayerClocks
+    _data: SerializedExtendPlayerClocks,
   ): ExtendPlayerClocks {
     return new ExtendPlayerClocks();
   }
@@ -300,14 +300,14 @@ export class CancelGame extends VoteType {
 
     if (ingame.hasChildGameState(PlanningGameState)) {
       const planning = vote.ingame.getChildGameState(
-        PlanningGameState
+        PlanningGameState,
       ) as PlanningGameState;
       ingame.ordersOnBoard = planning.placedOrders as BetterMap<Region, Order>;
       ingame.entireGame.broadcastToClients({
         type: "reveal-orders",
         orders: vote.ingame.ordersOnBoard.mapOver(
           (r) => r.id,
-          (o) => o.id
+          (o) => o.id,
         ),
       });
     }
@@ -323,7 +323,7 @@ export class CancelGame extends VoteType {
 
   static deserializeFromServer(
     _ingame: IngameGameState,
-    _data: SerializedCancelGame
+    _data: SerializedCancelGame,
   ): CancelGame {
     return new CancelGame();
   }
@@ -358,7 +358,7 @@ export class EndGame extends VoteType {
 
   static deserializeFromServer(
     _ingame: IngameGameState,
-    _data: SerializedEndGame
+    _data: SerializedEndGame,
   ): EndGame {
     return new EndGame();
   }
@@ -410,7 +410,7 @@ export class DeclareWinner extends VoteType {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedDeclareWinner
+    data: SerializedDeclareWinner,
   ): DeclareWinner {
     const voteWinner = new DeclareWinner(ingame.game.houses.get(data.winner));
     return voteWinner;
@@ -443,7 +443,7 @@ export class ReplacePlayer extends VoteType {
 
     // Create a new player to replace the old one
     const oldPlayer = vote.ingame.players.values.find(
-      (p) => p.house == this.forHouse
+      (p) => p.house == this.forHouse,
     ) as Player;
     vote.ingame.endPlayerClock(oldPlayer);
 
@@ -506,7 +506,7 @@ export class ReplacePlayer extends VoteType {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedReplacePlayer
+    data: SerializedReplacePlayer,
   ): ReplacePlayer {
     const replacer = ingame.entireGame.users.get(data.replacer);
     const replaced = ingame.entireGame.users.get(data.replaced);
@@ -540,7 +540,7 @@ export class ReplacePlayerByVassal extends VoteType {
   executeAccepted(vote: Vote): void {
     const ingame = vote.ingame;
     const oldPlayer = ingame.players.values.find(
-      (p) => p.user == this.replaced
+      (p) => p.user == this.replaced,
     ) as Player;
     ingame.endPlayerClock(oldPlayer);
 
@@ -571,7 +571,7 @@ export class ReplacePlayerByVassal extends VoteType {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedReplacePlayerByVassal
+    data: SerializedReplacePlayerByVassal,
   ): ReplacePlayerByVassal {
     const replaced = ingame.entireGame.users.get(data.replaced);
     const forHouse = ingame.game.houses.get(data.forHouse);
@@ -648,7 +648,7 @@ export class ReplaceVassalByPlayer extends VoteType {
 
     // Reset original house cards
     this.forHouse.houseCards = vote.ingame.game.oldPlayerHouseCards.get(
-      this.forHouse
+      this.forHouse,
     );
     vote.ingame.entireGame.broadcastToClients({
       type: "update-house-cards",
@@ -660,7 +660,7 @@ export class ReplaceVassalByPlayer extends VoteType {
     vote.ingame.entireGame.broadcastToClients({
       type: "update-old-player-house-cards",
       houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(
-        ([h, hcs]) => [h.id, hcs.values.map((hc) => hc.id)]
+        ([h, hcs]) => [h.id, hcs.values.map((hc) => hc.id)],
       ),
     });
 
@@ -671,7 +671,7 @@ export class ReplaceVassalByPlayer extends VoteType {
 
     if (hasPlaceOrders) {
       const planning = vote.ingame.getChildGameState(
-        PlanningGameState
+        PlanningGameState,
       ) as PlanningGameState;
 
       // Reset waitedFor data, to properly call ingame.setWaitedForPlayers() by the game-state-change
@@ -705,7 +705,7 @@ export class ReplaceVassalByPlayer extends VoteType {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedReplaceVassalByPlayer
+    data: SerializedReplaceVassalByPlayer,
   ): ReplaceVassalByPlayer {
     const replacer = ingame.entireGame.users.get(data.replacer);
     const forHouse = ingame.game.houses.get(data.forHouse);
@@ -730,7 +730,7 @@ export class SwapHouses extends VoteType {
     initiator: User,
     swappingPlayer: User,
     initiatorHouse: House,
-    swappingHouse: House
+    swappingHouse: House,
   ) {
     super();
     this.initiator = initiator;
@@ -786,7 +786,7 @@ export class SwapHouses extends VoteType {
       // In case players are choosing their objectives we have to restart ChooseInitialObjectivesGameState
       // so the child state SelectObjectiveCards now has the correct set for each house
       const chooseInitialObjectives = vote.ingame.getChildGameState(
-        ChooseInitialObjectivesGameState
+        ChooseInitialObjectivesGameState,
       ) as ChooseInitialObjectivesGameState;
       chooseInitialObjectives.proceedToSelectObjectiveCardsGameState();
     }
@@ -812,7 +812,7 @@ export class SwapHouses extends VoteType {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedSwapHouses
+    data: SerializedSwapHouses,
   ): SwapHouses {
     const initiator = ingame.entireGame.users.get(data.initiator);
     const swappingUser = ingame.entireGame.users.get(data.swappingUser);
@@ -823,7 +823,7 @@ export class SwapHouses extends VoteType {
       initiator,
       swappingUser,
       initiatorHouse,
-      swappingHouse
+      swappingHouse,
     );
   }
 }

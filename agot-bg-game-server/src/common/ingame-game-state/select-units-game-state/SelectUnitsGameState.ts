@@ -18,7 +18,7 @@ interface SelectUnitsParentGameState extends GameState<any, any> {
   onSelectUnitsEnd: (
     house: House,
     selectedUnit: [Region, Unit[]][],
-    resolvedAutomatically: boolean
+    resolvedAutomatically: boolean,
   ) => void;
 }
 
@@ -44,7 +44,7 @@ export default class SelectUnitsGameState<
     possibleUnits: Unit[],
     count: number,
     canBeSkipped = false,
-    unitsMustBeOfSameRegion = false
+    unitsMustBeOfSameRegion = false,
   ): void {
     this.house = house;
     this.possibleUnits = possibleUnits;
@@ -54,13 +54,13 @@ export default class SelectUnitsGameState<
 
     if (possibleUnits.length == 0) {
       throw new Error(
-        "SelectUnitsGameState called with possibleUnits.length == 0!"
+        "SelectUnitsGameState called with possibleUnits.length == 0!",
       );
     }
 
     if (count > possibleUnits.length) {
       throw new Error(
-        "User has to select more units than possible and therefore SelectUnitsGameState will never end!"
+        "User has to select more units than possible and therefore SelectUnitsGameState will never end!",
       );
     }
 
@@ -70,7 +70,7 @@ export default class SelectUnitsGameState<
         this.parentGameState.onSelectUnitsEnd(
           house,
           groupBy(possibleUnits, (u) => u.region).entries,
-          true
+          true,
         );
       } else {
         const region = possibleUnits[0].region;
@@ -80,16 +80,16 @@ export default class SelectUnitsGameState<
         // If all units are of same type and of same region this state can be fast-tracked
         if (
           possibleUnits.every(
-            (u) => u.region == region && u.type == type && u.wounded == wounded
+            (u) => u.region == region && u.type == type && u.wounded == wounded,
           )
         ) {
           const selectedUnits = possibleUnits.slice(
-            possibleUnits.length - count
+            possibleUnits.length - count,
           );
           this.parentGameState.onSelectUnitsEnd(
             house,
             groupBy(selectedUnits, (u) => u.region).entries,
-            true
+            true,
           );
         }
       }
@@ -132,13 +132,13 @@ export default class SelectUnitsGameState<
   }
 
   selectedCountMatchesExpectedCount(
-    selectedUnits: [Region, Unit[]][]
+    selectedUnits: [Region, Unit[]][],
   ): boolean {
     // Check if the user has selected a correct amount of units.
     // There might not be enough units to select, so compute the number of available
     // units to check.
     const selectedUnitsCount = _.sum(
-      selectedUnits.map(([_region, units]) => units.length)
+      selectedUnits.map(([_region, units]) => units.length),
     );
     const possibleSelectCount = Math.min(this.count, this.possibleUnits.length);
 
@@ -175,7 +175,7 @@ export default class SelectUnitsGameState<
 
   serializeToClient(
     _admin: boolean,
-    _player: Player | null
+    _player: Player | null,
   ): SerializedSelectUnitsGameState {
     return {
       type: "select-units",
@@ -189,7 +189,7 @@ export default class SelectUnitsGameState<
 
   static deserializeFromServer<P extends SelectUnitsParentGameState>(
     parent: P,
-    data: SerializedSelectUnitsGameState
+    data: SerializedSelectUnitsGameState,
   ): SelectUnitsGameState<P> {
     const selectUnits = new SelectUnitsGameState(parent);
 
@@ -200,7 +200,7 @@ export default class SelectUnitsGameState<
         .filter((u) => u != null) as Unit[];
     } else {
       selectUnits.possibleUnits = data.possibleUnits.map((uid) =>
-        parent.game.world.getUnitById(uid)
+        parent.game.world.getUnitById(uid),
       );
     }
     selectUnits.count = data.count;

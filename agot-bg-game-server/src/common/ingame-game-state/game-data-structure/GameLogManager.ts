@@ -73,7 +73,7 @@ export default class GameLogManager {
 
   serializeToClient(
     admin: boolean,
-    user: User | null
+    user: User | null,
   ): SerializedGameLogManager {
     const filteredLogs = admin ? this.logs : this.logs.filter(this.logFilter);
 
@@ -95,7 +95,7 @@ export default class GameLogManager {
 
   static deserializeFromServer(
     ingameGameState: IngameGameState,
-    data: SerializedGameLogManager
+    data: SerializedGameLogManager,
   ): GameLogManager {
     const gameLogManager = new GameLogManager(ingameGameState);
 
@@ -108,7 +108,7 @@ export default class GameLogManager {
       data.lastSeenLogTimes.map(([uid, time]) => [
         ingameGameState.entireGame.users.get(uid),
         time,
-      ])
+      ]),
     );
 
     return gameLogManager;

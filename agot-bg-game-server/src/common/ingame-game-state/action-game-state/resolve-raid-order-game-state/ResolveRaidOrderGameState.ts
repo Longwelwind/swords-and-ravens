@@ -72,7 +72,7 @@ export default class ResolveRaidOrderGameState extends GameState<
   }
 
   proceedNextResolveSingleRaidOrder(
-    lastHouseToResolve: House | null = null
+    lastHouseToResolve: House | null = null,
   ): void {
     const houseToResolve =
       this.getNextHouseToResolveRaidOrder(lastHouseToResolve);
@@ -85,12 +85,12 @@ export default class ResolveRaidOrderGameState extends GameState<
     }
 
     this.setChildGameState(
-      new ResolveSingleRaidOrderGameState(this)
+      new ResolveSingleRaidOrderGameState(this),
     ).firstStart(houseToResolve);
   }
 
   getNextHouseToResolveRaidOrder(
-    lastHouseToResolve: House | null
+    lastHouseToResolve: House | null,
   ): House | null {
     let currentHouseToCheck = lastHouseToResolve
       ? this.ingameGameState.getNextInTurnOrder(lastHouseToResolve)
@@ -112,7 +112,7 @@ export default class ResolveRaidOrderGameState extends GameState<
   }
 
   getRegionsWithRaidOrderOfHouse(
-    house: House
+    house: House,
   ): [Region, RaidOrderType | RaidSupportOrderType][] {
     return this.actionGameState
       .getRegionsWithRaidOrderOfHouse(house)
@@ -121,20 +121,20 @@ export default class ResolveRaidOrderGameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedResolveRaidOrderGameState {
     return {
       type: "resolve-raid-order",
       childGameState: this.childGameState.serializeToClient(admin, player),
       resolvedRaidSupportOrderRegions: this.resolvedRaidSupportOrderRegions.map(
-        (r) => r.id
+        (r) => r.id,
       ),
     };
   }
 
   static deserializeFromServer(
     actionGameState: ActionGameState,
-    data: SerializedResolveRaidOrderGameState
+    data: SerializedResolveRaidOrderGameState,
   ): ResolveRaidOrderGameState {
     const resolveRaidOrder = new ResolveRaidOrderGameState(actionGameState);
 
@@ -142,14 +142,14 @@ export default class ResolveRaidOrderGameState extends GameState<
       resolveRaidOrder.deserializeChildGameState(data.childGameState);
     resolveRaidOrder.resolvedRaidSupportOrderRegions =
       data.resolvedRaidSupportOrderRegions.map((rid) =>
-        actionGameState.game.world.regions.get(rid)
+        actionGameState.game.world.regions.get(rid),
       );
 
     return resolveRaidOrder;
   }
 
   deserializeChildGameState(
-    data: SerializedResolveRaidOrderGameState["childGameState"]
+    data: SerializedResolveRaidOrderGameState["childGameState"],
   ): ResolveSingleRaidOrderGameState {
     return ResolveSingleRaidOrderGameState.deserializeFromServer(this, data);
   }

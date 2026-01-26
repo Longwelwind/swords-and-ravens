@@ -39,13 +39,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
       Object.entries(baseGameData.houses).map(([hid, h]) => [
         hid,
         { id: hid, name: h.name, color: h.color },
-      ])
+      ]),
     );
   }
 
   getAvailableHouses(): LobbyHouse[] {
     return this.lobbyHouses.values.filter((h) =>
-      this.entireGame.selectedGameSetup.houses.includes(h.id)
+      this.entireGame.selectedGameSetup.houses.includes(h.id),
     );
   }
 
@@ -72,7 +72,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
       while (freeHouses.length > 0 && usersForReassignment.length > 0) {
         this.players.set(
           freeHouses.shift() as LobbyHouse,
-          usersForReassignment.shift() as User
+          usersForReassignment.shift() as User,
         );
       }
     }
@@ -175,7 +175,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
           {
             type: "password-response",
             password: message.password == "" ? "" : answer,
-          }
+          },
         );
         // Always send back the chosen password to the owner
         answer = message.password;
@@ -476,7 +476,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
     this.entireGame.proceedToIngameGameState(
       housesToCreate,
-      new BetterMap(this.players.map((h, u) => [h.id, u]))
+      new BetterMap(this.players.map((h, u) => [h.id, u])),
     );
   }
 
@@ -493,7 +493,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
     this.players.values.forEach(
       (u) =>
         (u.onConnectionStateChanged = (user) =>
-          this.connectionStateChangedWhileReadyCheck(user))
+          this.connectionStateChangedWhileReadyCheck(user)),
     );
     this.broadcastReadyCheckUpdate();
   }
@@ -610,7 +610,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         message.players.map(([hid, uid]) => [
           this.lobbyHouses.get(hid),
           this.entireGame.users.get(uid),
-        ])
+        ]),
       );
 
       if (this.entireGame.onClientGameStateChange) {
@@ -697,7 +697,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
   serializeToClient(
     admin: boolean,
-    user: User | null
+    user: User | null,
   ): SerializedLobbyGameState {
     return {
       type: "lobby",
@@ -718,18 +718,18 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
   static deserializeFromServer(
     entireGame: EntireGame,
-    data: SerializedLobbyGameState
+    data: SerializedLobbyGameState,
   ): LobbyGameState {
     const lobbyGameState = new LobbyGameState(entireGame);
 
     lobbyGameState.lobbyHouses = new BetterMap(
-      data.lobbyHouses.map((h) => [h.id, h])
+      data.lobbyHouses.map((h) => [h.id, h]),
     );
     lobbyGameState.players = new BetterMap(
       data["players"].map(([hid, uid]) => [
         lobbyGameState.lobbyHouses.get(hid),
         entireGame.users.get(uid),
-      ])
+      ]),
     );
     lobbyGameState.password = data.password;
     lobbyGameState.readyUsers = data.readyUsers
