@@ -263,7 +263,7 @@ export const theLongPlan = new TheLongPlanWesterosCardType(
 );
 export const wateringTheSeed = new WateringTheSeedWesterosCardType(
   "watering-the-seed",
-  "Watering\xa0The\xa0Seed",
+  "Watering\xa0the\xa0Seed",
   "The Targaryen player may discard Power\xa0tokens equal to their current position on the victory track to place 1 loyalty\xa0token on 2 different land areas they do not control and that are adjacent to a river.",
   "Place loyalty\xa0tokens adjacent to a river",
   0,
