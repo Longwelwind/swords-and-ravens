@@ -70,7 +70,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
   allHouseCardsByAbilityId = new BetterMap(
     this.allHouseCards.values
       .filter((hc) => hc.ability != null)
-      .map((hc) => [hc.ability?.id ?? "ability-never-null-here", hc])
+      .map((hc) => [hc.ability?.id ?? "ability-never-null-here", hc]),
   );
 
   currentRound = 0;
@@ -103,7 +103,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     const lastSeenLogTicks = this.props.gameClient.authenticatedUser
       ? this.logManager.lastSeenLogTimes.tryGet(
           this.props.gameClient.authenticatedUser,
-          null
+          null,
         )
       : null;
 
@@ -259,7 +259,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     forHouses.map((h) => (
                       <b key={`for_vassal_house_${h.id}`}>{h.name}</b>
                     )),
-                    ", "
+                    ", ",
                   )
                 )}
               </>
@@ -287,7 +287,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   {getUserLinkOrLabel(
                     this.ingame.entireGame,
                     user,
-                    this.ingame.players.tryGet(user, null)
+                    this.ingame.players.tryGet(user, null),
                   )}
                 </b>
                 .
@@ -335,10 +335,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
       case "support-refused": {
         const house = this.game.houses.get(data.house);
+        const from = data.from ? this.game.houses.get(data.from) : null;
         return (
           <p>
-            House <b>{house.name}</b> chose to refuse all the support they
-            received.
+            House <b>{house.name}</b> chose to refuse{" "}
+            {from == null ? "all" : ""} the support they received
+            {from ? (
+              <>
+                {" "}
+                from House <b>{from.name}</b>
+              </>
+            ) : null}
+            .
           </p>
         );
       }
@@ -350,7 +358,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           ? this.game.houses.get(data.attacked)
           : null;
         const attackingRegion = this.game.world.regions.get(
-          data.attackingRegion
+          data.attackingRegion,
         );
         const attackedRegion = this.game.world.regions.get(data.attackedRegion);
         const army = data.units.map((utid) => unitTypes.get(utid));
@@ -386,7 +394,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   army.map((ut, i) => (
                     <b key={`attack_${ut.id}_${i}`}>{ut.name}</b>
                   )),
-                  ", "
+                  ", ",
                 )}
               </>
               .
@@ -441,7 +449,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                               {ut.name}
                             </b>
                           )),
-                          ", "
+                          ", ",
                         )}{" "}
                         to <b>{region.name}</b>
                       </li>
@@ -493,7 +501,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
       case "westeros-cards-drawn":
         const drawnWesterosCardTypes = data.westerosCardTypes.map((wctid) =>
-          westerosCardTypes.get(wctid)
+          westerosCardTypes.get(wctid),
         );
 
         return (
@@ -565,7 +573,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         );
       case "wildling-card-revealed":
         const wildlingCard = this.game.wildlingDeck.find(
-          (wc) => wc.id == data.wildlingCard
+          (wc) => wc.id == data.wildlingCard,
         ) as WildlingCard;
 
         return (
@@ -588,9 +596,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const bids = _.flatMap(
           data.results.map(([bid, hids]) =>
             hids.map(
-              (hid) => [this.game.houses.get(hid), bid] as [House, number]
-            )
-          )
+              (hid) => [this.game.houses.get(hid), bid] as [House, number],
+            ),
+          ),
         );
 
         return (
@@ -649,7 +657,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             ] as [
               Region,
               { region: Region; from: UnitType | null; to: UnitType }[],
-            ]
+            ],
         );
 
         return (
@@ -1050,7 +1058,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
       case "clash-of-kings-final-ordering":
         const finalOrder = data.finalOrder.map((hid) =>
-          this.game.houses.get(hid)
+          this.game.houses.get(hid),
         );
 
         return (
@@ -1073,9 +1081,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const bids = _.flatMap(
           data.results.map(([bid, hids]) =>
             hids.map(
-              (hid) => [this.game.houses.get(hid), bid] as [House, number]
-            )
-          )
+              (hid) => [this.game.houses.get(hid), bid] as [House, number],
+            ),
+          ),
         );
         const distributor = data.distributor
           ? this.game.houses.get(data.distributor)
@@ -1147,7 +1155,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             [
               this.world.regions.get(rid),
               utids.map((utid) => unitTypes.get(utid)),
-            ] as [Region, UnitType[]]
+            ] as [Region, UnitType[]],
         );
 
         return (
@@ -1164,7 +1172,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         {ut.name}
                       </b>
                     )),
-                    ", "
+                    ", ",
                   )}{" "}
                   in <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                 </li>
@@ -1224,7 +1232,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         const affectedHouse = this.game.houses.get(data.affectedHouse);
         const influenceTrack = this.game.getNameInfluenceTrack(
-          data.influenceTrack
+          data.influenceTrack,
         );
         const skippedHouse = data.skippedHouse
           ? this.game.houses.get(data.skippedHouse)
@@ -1248,7 +1256,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "ser-gerris-drinkwater-used": {
         const house = this.game.houses.get(data.house);
         const influenceTrack = this.game.getNameInfluenceTrack(
-          data.influenceTrack
+          data.influenceTrack,
         );
 
         return (
@@ -1378,7 +1386,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "roose-bolton-house-cards-returned": {
         const house = this.game.houses.get(data.house);
         const returnedHouseCards = data.houseCards.map((hcid) =>
-          this.allHouseCards.get(hcid)
+          this.allHouseCards.get(hcid),
         );
 
         return returnedHouseCards.length > 0 ? (
@@ -1389,7 +1397,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               returnedHouseCards.map((hc) => (
                 <b key={`roose_${hc.id}`}>{hc.name}</b>
               )),
-              ", "
+              ", ",
             )}
             ).
           </p>
@@ -1604,7 +1612,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     {unitType}
                   </b>
                 )),
-                ", "
+                ", ",
               )}
             </>
             .
@@ -1696,7 +1704,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             [
               this.world.regions.get(rid),
               utids.map((utid) => unitTypes.get(utid)),
-            ] as [Region, UnitType[]]
+            ] as [Region, UnitType[]],
         );
 
         return (
@@ -1713,13 +1721,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         unitTypes.map((ut, i) => (
                           <b key={`preemptive_${ut.id}_${i}`}>{ut.name}</b>
                         )),
-                        ", "
+                        ", ",
                       )}{" "}
                       in{" "}
                       <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                     </span>
                   )),
-                  " and "
+                  " and ",
                 )}
                 .
               </>
@@ -1743,7 +1751,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "massing-on-the-milkwater-house-cards-back": {
         const house = this.game.houses.get(data.house);
         const houseCardsReturned = data.houseCardsReturned.map((hcid) =>
-          this.allHouseCards.get(hcid)
+          this.allHouseCards.get(hcid),
         );
 
         return (
@@ -1758,7 +1766,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                       {hc.name}
                     </b>
                   )),
-                  ", "
+                  ", ",
                 )}
                 .
               </>
@@ -1782,7 +1790,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "massing-on-the-milkwater-house-cards-removed": {
         const house = this.game.houses.get(data.house);
         const houseCardsUsed = data.houseCardsUsed.map((hcid) =>
-          this.allHouseCards.get(hcid)
+          this.allHouseCards.get(hcid),
         );
 
         return houseCardsUsed.length > 0 ? (
@@ -1794,7 +1802,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   {hc.name}
                 </b>
               )),
-              ", "
+              ", ",
             )}
             .
           </p>
@@ -1857,13 +1865,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         unitTypes.map((ut, i) => (
                           <b key={`mammoth-riders_${ut.id}_${i}`}>{ut.name}</b>
                         )),
-                        ", "
+                        ", ",
                       )}{" "}
                       in{" "}
                       <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                     </span>
                   )),
-                  ", "
+                  ", ",
                 )}
                 .
               </>
@@ -1917,13 +1925,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             {ut.name}
                           </b>
                         )),
-                        ", "
+                        ", ",
                       )}{" "}
                       in{" "}
                       <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                     </span>
                   )),
-                  ", "
+                  ", ",
                 )}
                 .
               </>
@@ -1953,7 +1961,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                       <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                     </span>
                   )),
-                  ", "
+                  ", ",
                 )}{" "}
                 with Footmen.
               </>
@@ -1984,7 +1992,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                 </span>
               )),
-              ", "
+              ", ",
             )}
             .
           </p>
@@ -2009,7 +2017,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                 </span>
               )),
-              ", "
+              ", ",
             )}{" "}
             with Knights.
           </p>
@@ -2035,7 +2043,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         const powerTokensLost = data.powerTokensLost.map(
           ([hid, amount]) =>
-            [this.game.houses.get(hid), amount] as [House, number]
+            [this.game.houses.get(hid), amount] as [House, number],
         );
 
         return (
@@ -2070,7 +2078,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const lowestBidder = this.game.houses.get(data.lowestBidder);
         const newSupply = data.newSupply.map(
           ([hid, supply]) =>
-            [this.game.houses.get(hid), supply] as [House, number]
+            [this.game.houses.get(hid), supply] as [House, number],
         );
 
         return (
@@ -2089,7 +2097,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       }
       case "game-of-thrones-power-tokens-gained":
         const gains = data.gains.map(
-          ([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number]
+          ([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number],
         );
 
         return (
@@ -2105,10 +2113,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "immediatly-killed-after-combat": {
         const house = this.game.houses.get(data.house);
         const killedBecauseWounded = data.killedBecauseWounded.map(
-          (utid) => unitTypes.get(utid).name
+          (utid) => unitTypes.get(utid).name,
         );
         const killedBecauseCantRetreat = data.killedBecauseCantRetreat.map(
-          (utid) => unitTypes.get(utid).name
+          (utid) => unitTypes.get(utid).name,
         );
         return (
           <p>
@@ -2121,7 +2129,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     killedBecauseWounded.map((unitType, i) => (
                       <b key={`wounded_${unitType}_${i}`}>{unitType}</b>
                     )),
-                    ", "
+                    ", ",
                   )}
                 </>
                 .
@@ -2138,7 +2146,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                     killedBecauseCantRetreat.map((unitType, i) => (
                       <b key={`cant-retreat_${unitType}_${i}`}>{unitType}</b>
                     )),
-                    ", "
+                    ", ",
                   )}
                 </>
                 .
@@ -2159,7 +2167,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 killed.map((unitType, i) => (
                   <b key={`casualties_${unitType}_${i}`}>{unitType}</b>
                 )),
-                ", "
+                ", ",
               )}
             </>
             .
@@ -2170,7 +2178,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       }
       case "supply-adjusted":
         const supplies: [House, number][] = data.supplies.map(
-          ([hid, supply]) => [this.game.houses.get(hid), supply]
+          ([hid, supply]) => [this.game.houses.get(hid), supply],
         );
 
         return (
@@ -2197,7 +2205,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           ? getUserLinkOrLabel(
               this.ingame.entireGame,
               newUser,
-              this.ingame.players.tryGet(newUser, null)
+              this.ingame.players.tryGet(newUser, null),
             )
           : null;
         const reason =
@@ -2213,7 +2221,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               {getUserLinkOrLabel(
                 this.ingame.entireGame,
                 oldUser,
-                this.ingame.players.tryGet(oldUser, null)
+                this.ingame.players.tryGet(oldUser, null),
               )}
             </b>{" "}
             ({this.renderHouseName(house)}) was replaced by{" "}
@@ -2240,7 +2248,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               {getUserLinkOrLabel(
                 this.ingame.entireGame,
                 user,
-                this.ingame.players.tryGet(user, null)
+                this.ingame.players.tryGet(user, null),
               )}
             </b>
             .
@@ -2260,7 +2268,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   vassals.map((v) => (
                     <b key={`vassals-claimed_${v.id}`}>{v.name}</b>
                   )),
-                  ", "
+                  ", ",
                 )}{" "}
                 as vassal{vassals.length > 1 && "s"}.
               </>
@@ -2370,7 +2378,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       }
       case "anya-waynwood-power-tokens-gained": {
         const gains = data.gains.map(
-          ([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number]
+          ([hid, gain]) => [this.game.houses.get(hid), gain] as [House, number],
         );
 
         return (
@@ -2716,13 +2724,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                         unitTypes.map((ut, i) => (
                           <b key={`pay-debt_${ut.id}_${i}`}>{ut.name}</b>
                         )),
-                        ", "
+                        ", ",
                       )}{" "}
                       in{" "}
                       <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                     </span>
                   )),
-                  ", "
+                  ", ",
                 )}{" "}
                 of House <b>{house.name}</b>.
               </>
@@ -2750,7 +2758,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             [
               this.world.regions.get(regionId),
               units.map((ut) => unitTypes.get(ut)),
-            ] as [Region, UnitType[]]
+            ] as [Region, UnitType[]],
         );
         const loan = loanCardTypes.get(data.loanType);
         return (
@@ -2769,13 +2777,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                             {ut.name}
                           </b>
                         )),
-                        ", "
+                        ", ",
                       )}{" "}
                       in{" "}
                       <b>{this.fogOfWar ? fogOfWarPlaceholder : region.name}</b>
                     </span>
                   )),
-                  " and "
+                  " and ",
                 )}
                 .
               </>
@@ -2810,7 +2818,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                       <b>{unitInfo.region.name}</b>
                     </span>
                   )),
-                  " and "
+                  " and ",
                 )}
                 .
               </>
@@ -2857,7 +2865,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   {this.fogOfWar ? fogOfWarPlaceholder : r.name}
                 </b>
               )),
-              " and in "
+              " and in ",
             )}
             .
           </p>
@@ -2876,7 +2884,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                   {this.fogOfWar ? fogOfWarPlaceholder : r.name}
                 </b>
               )),
-              " and in "
+              " and in ",
             )}
             .
           </p>
@@ -3022,7 +3030,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             [
               this.game.houses.get(hid),
               ocids.map((ocid) => objectiveCards.get(ocid)),
-            ] as [House, ObjectiveCard[]]
+            ] as [House, ObjectiveCard[]],
         );
 
         return objectivesOfHouses.map(([house, objectives]) => (
@@ -3085,7 +3093,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "house-cards-returned": {
         const house = this.game.houses.get(data.house);
         const returnedHouseCards = data.houseCards.map((hcid) =>
-          this.allHouseCards.get(hcid)
+          this.allHouseCards.get(hcid),
         );
         const houseCardDiscarded = data.houseCardDiscarded
           ? this.allHouseCards.get(data.houseCardDiscarded)
@@ -3098,7 +3106,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               returnedHouseCards.map((hc) => (
                 <b key={`house-cards-returned_${hc.id}`}>{hc.name}</b>
               )),
-              ", "
+              ", ",
             )}
             ).
             {houseCardDiscarded ? (
@@ -3309,14 +3317,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "houses-swapped": {
         const initiator = this.ingame.entireGame.users.get(data.initiator);
         const swappingUser = this.ingame.entireGame.users.get(
-          data.swappingUser
+          data.swappingUser,
         );
         const initiatorHouse = this.game.houses.get(data.initiatorHouse);
         const swappingHouse = this.game.houses.get(data.swappingHouse);
         const newUserLabel = getUserLinkOrLabel(
           this.ingame.entireGame,
           swappingUser,
-          this.ingame.players.tryGet(swappingUser, null)
+          this.ingame.players.tryGet(swappingUser, null),
         );
 
         return (
@@ -3325,7 +3333,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               {getUserLinkOrLabel(
                 this.ingame.entireGame,
                 initiator,
-                this.ingame.players.tryGet(initiator, null)
+                this.ingame.players.tryGet(initiator, null),
               )}
             </b>{" "}
             (House <b>{initiatorHouse.name}</b>) swapped houses with{" "}
@@ -3402,12 +3410,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       this.logManager.sendGameLogSeen(time);
     },
     2000,
-    { trailing: true }
+    { trailing: true },
   );
 
   componentDidUpdate(
     prevProps: Readonly<GameLogListComponentProps>,
-    _prevState: Readonly<Record<string, unknown>>
+    _prevState: Readonly<Record<string, unknown>>,
   ): void {
     if (this.props.currentlyViewed) {
       this.debounceSendGameLogSeen(timeToTicks(new Date()));
@@ -3420,7 +3428,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
     ) {
       this.logManager.lastSeenLogTimes.set(
         this.props.gameClient.authenticatedUser,
-        timeToTicks(new Date())
+        timeToTicks(new Date()),
       );
     }
   }

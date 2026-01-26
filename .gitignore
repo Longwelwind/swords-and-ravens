@@ -1,4 +1,4 @@
-.vscode/
+agot-bg-game-server/.vscode/settings.json
 .idea/
 .favorites.json
 
@@ -34,5 +34,6 @@ Temporary Items
 .apdisk
 
 # End of https://www.gitignore.io/api/macos
+
 
 

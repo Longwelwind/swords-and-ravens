@@ -124,6 +124,7 @@ interface DeclareSupport {
 
 interface RefuseSupport {
   type: "refuse-support";
+  from?: string;
 }
 
 interface UseValyrianSteelBlade {

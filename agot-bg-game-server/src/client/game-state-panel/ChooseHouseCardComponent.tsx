@@ -75,12 +75,17 @@ export default class ChooseHouseCardComponent extends Component<
 
   tryGetCommandedHouseInCombat(): House | null {
     return this.combat.tryGetCommandedHouseInCombat(
-      this.props.gameClient.authenticatedPlayer
+      this.props.gameClient.authenticatedPlayer,
     );
   }
 
   render(): JSX.Element {
     const waitingFor = this.props.gameState.getWaitingForHouses();
+    const supportingHouses = this.props.gameState.getSupportingHouses(
+      this.combat.tryGetCommandedHouseInCombat(
+        this.props.gameClient.authenticatedPlayer,
+      ),
+    );
     return this.combat.stats.length > 0 ? (
       <></>
     ) : (
@@ -166,12 +171,14 @@ export default class ChooseHouseCardComponent extends Component<
                     Confirm
                   </Button>
                 </Col>
-                {this.props.gameClient.authenticatedPlayer &&
-                  this.props.gameState.canRefuseSupport(
-                    this.combat.tryGetCommandedHouseInCombat(
-                      this.props.gameClient.authenticatedPlayer
-                    )
-                  ) && (
+              </Row>
+              {this.props.gameClient.authenticatedPlayer &&
+                this.props.gameState.canRefuseSupport(
+                  this.combat.tryGetCommandedHouseInCombat(
+                    this.props.gameClient.authenticatedPlayer,
+                  ),
+                ) && (
+                  <Row className="justify-content-center mt-2">
                     <Col xs="auto">
                       <Button
                         type="button"
@@ -179,18 +186,43 @@ export default class ChooseHouseCardComponent extends Component<
                         onClick={() => {
                           if (
                             window.confirm(
-                              "Are you sure you want to refuse all the support you have received?"
+                              "Are you sure you want to refuse all the support you have received?",
                             )
                           ) {
                             this.props.gameState.refuseSupport();
                           }
                         }}
                       >
-                        Refuse received support
+                        Refuse ALL received support
                       </Button>
                     </Col>
-                  )}
-              </Row>
+                    {supportingHouses.length > 1 &&
+                      supportingHouses.map((supportingHouse) => (
+                        <Col
+                          xs="auto"
+                          key={`refuse-support-from-${supportingHouse.id}`}
+                        >
+                          <Button
+                            type="button"
+                            variant="warning"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `Are you sure you want to refuse the support you have received from House ${supportingHouse.name}?`,
+                                )
+                              ) {
+                                this.props.gameState.refuseSupport(
+                                  supportingHouse,
+                                );
+                              }
+                            }}
+                          >
+                            Refuse support from {supportingHouse.name}
+                          </Button>
+                        </Col>
+                      ))}
+                  </Row>
+                )}
             </Col>
           </>
         )}
@@ -200,7 +232,8 @@ export default class ChooseHouseCardComponent extends Component<
             {waitingFor
               .map(
                 (h) =>
-                  this.combat.ingameGameState.getControllerOfHouse(h).house.name
+                  this.combat.ingameGameState.getControllerOfHouse(h).house
+                    .name,
               )
               .join(" and ")}{" "}
             to choose their House&nbsp;card{waitingFor.length != 1 ? "s" : ""}
@@ -213,7 +246,7 @@ export default class ChooseHouseCardComponent extends Component<
 
   shouldChooseHouseCard(): boolean {
     return this.props.gameState.combatGameState.houseCombatDatas.keys.some(
-      (h) => this.props.gameClient.doesControlHouse(h)
+      (h) => this.props.gameClient.doesControlHouse(h),
     );
   }
 
@@ -224,14 +257,14 @@ export default class ChooseHouseCardComponent extends Component<
 
     this.props.gameState.chooseHouseCard(
       this.selectedHouseCard,
-      this.dontSkipVsbQuestion
+      this.dontSkipVsbQuestion,
     );
   }
 
   getChoosableHouseCards(): HouseCard[] {
     const commandedHouse =
       this.props.gameState.combatGameState.tryGetCommandedHouseInCombat(
-        this.props.gameClient.authenticatedPlayer
+        this.props.gameClient.authenticatedPlayer,
       );
     if (!commandedHouse) {
       return [];

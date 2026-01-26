@@ -170,6 +170,7 @@ interface SupportDeclared {
 interface SupportRefused {
   type: "support-refused";
   houseId: string;
+  fromId?: string;
 }
 
 interface HouseCardChosen {

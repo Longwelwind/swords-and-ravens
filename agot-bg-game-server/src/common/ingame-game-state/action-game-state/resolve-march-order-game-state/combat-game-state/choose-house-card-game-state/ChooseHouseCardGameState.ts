@@ -39,11 +39,11 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
   // To support assigning the same vassal cards after Refuse support has been triggered
   // we allow passing the previous chosen house cards
   firstStart(
-    choosableHouseCards: BetterMap<House, HouseCard[]> | null = null
+    choosableHouseCards: BetterMap<House, HouseCard[]> | null = null,
   ): void {
     // Setup the choosable house cards
     const vassalHouseCards = shuffleInPlace(
-      this.ingameGameState.game.vassalHouseCards.values
+      this.ingameGameState.game.vassalHouseCards.values,
     );
     if (choosableHouseCards) {
       _.pull(vassalHouseCards, ..._.flatMap(choosableHouseCards.values));
@@ -60,7 +60,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
           houseCards = (
             !this.ingameGameState.isVassalHouse(h)
               ? h.houseCards.values.filter(
-                  (hc) => hc.state == HouseCardState.AVAILABLE
+                  (hc) => hc.state == HouseCardState.AVAILABLE,
                 )
               : vassalHouseCards.splice(0, 3)
           ).sort((a, b) => a.combatStrength - b.combatStrength);
@@ -75,7 +75,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
               if (this.entireGame.onCaptureSentryMessage) {
                 this.entireGame.onCaptureSentryMessage(
                   `Vassal house card ${hc.id} is marked as USED`,
-                  "error"
+                  "error",
                 );
               }
             }
@@ -83,7 +83,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         }
 
         return [h, houseCards];
-      })
+      }),
     );
 
     // In case a house just has one house card left it maybe can be chosen automatically.
@@ -118,7 +118,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         house,
         message.houseCardId
           ? this.combatGameState.game.getHouseCardById(message.houseCardId)
-          : null
+          : null,
       );
 
       this.combatGameState.houseCombatDatas.get(house).houseCardChosen = true;
@@ -126,7 +126,13 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       this.combatGameState.rerender++;
     } else if (message.type == "support-refused") {
       const house = this.combatGameState.game.houses.get(message.houseId);
-      this.removeSupportForHouse(house);
+      if (message.fromId === undefined) {
+        this.removeSupportForHouse(house);
+      } else {
+        const from = this.combatGameState.game.houses.get(message.fromId);
+        this.combatGameState.supporters.delete(from);
+        this.selectedHouseCard = null;
+      }
       this.combatGameState.houseCombatDatas.keys.forEach((h) => {
         const hcd = this.combatGameState.houseCombatDatas.get(h);
         hcd.houseCardChosen = false;
@@ -150,10 +156,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       }
 
       const commandedHouse = this.combatGameState.getCommandedHouseInCombat(
-        player.house
+        player.house,
       );
       const houseCard = this.getChoosableCards(commandedHouse).find(
-        (hc) => hc.id == message.houseCardId
+        (hc) => hc.id == message.houseCardId,
       );
 
       if (!houseCard) {
@@ -184,7 +190,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
           houseId: commandedHouse.id,
           houseCardId: null,
           dontSkipVsbQuestion: false,
-        }
+        },
       );
 
       player.user.send({
@@ -193,7 +199,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         houseCardId: houseCard.id,
         dontSkipVsbQuestion:
           this.ingameGameState.getControllerOfHouse(
-            this.ingameGameState.game.valyrianSteelBladeHolder
+            this.ingameGameState.game.valyrianSteelBladeHolder,
           ) == player
             ? this.combatGameState.dontSkipVsbQuestion
             : false,
@@ -215,24 +221,53 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         return;
       }
 
-      this.removeSupportForHouse(commandedHouse);
-      this.combatGameState.ingameGameState.log({
-        type: "support-refused",
-        house: commandedHouse.id,
-      });
+      if (message.from === undefined) {
+        // Refuse all support
+        this.removeSupportForHouse(commandedHouse);
+        this.combatGameState.ingameGameState.log({
+          type: "support-refused",
+          house: commandedHouse.id,
+        });
 
-      this.entireGame.broadcastToClients({
-        type: "support-refused",
-        houseId: commandedHouse.id,
-      });
+        this.entireGame.broadcastToClients({
+          type: "support-refused",
+          houseId: commandedHouse.id,
+        });
+      } else {
+        const from = this.combatGameState.game.houses.tryGet(
+          message.from,
+          null,
+        );
+        if (
+          !from ||
+          this.combatGameState.supporters.tryGet(from, null) != commandedHouse
+        ) {
+          return;
+        }
+
+        this.combatGameState.ingameGameState.log({
+          type: "support-refused",
+          house: commandedHouse.id,
+          from: from.id,
+        });
+
+        this.entireGame.broadcastToClients({
+          type: "support-refused",
+          houseId: commandedHouse.id,
+          fromId: from.id,
+        });
+
+        this.combatGameState.supporters.delete(from);
+        this.selectedHouseCard = null;
+      }
 
       const vassals = this.choosableHouseCards.keys.filter((h) =>
-        this.ingameGameState.isVassalHouse(h)
+        this.ingameGameState.isVassalHouse(h),
       );
       const choosableHouseCards =
         vassals.length > 0
           ? new BetterMap(
-              vassals.map((h) => [h, this.choosableHouseCards.get(h)])
+              vassals.map((h) => [h, this.choosableHouseCards.get(h)]),
             )
           : null;
 
@@ -254,13 +289,13 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
   getWaitingForHouses(): House[] {
     return _.difference(
       this.combatGameState.houseCombatDatas.keys,
-      this.houseCards.keys
+      this.houseCards.keys,
     );
   }
 
   getWaitedUsers(): User[] {
     return this.getWaitingForHouses().map(
-      (h) => this.ingameGameState.getControllerOfHouse(h).user
+      (h) => this.ingameGameState.getControllerOfHouse(h).user,
     );
   }
 
@@ -278,7 +313,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedChooseHouseCardGameState {
     return {
       type: "choose-house-card",
@@ -318,7 +353,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       this.houseCards.forEach(
         (houseCard, house) =>
           (this.combatGameState.houseCombatDatas.get(house).houseCard =
-            houseCard)
+            houseCard),
       );
 
       // "this.combatGameState.attackingHouseCombatData.houseCard" and
@@ -350,12 +385,21 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
           this.combatGameState.houseCombatDatas.values,
           (hcd) =>
             hcd.houseCard?.ability == null ||
-            !hcd.houseCard.ability.changesEnemyHouseCardImmediately()
+            !hcd.houseCard.ability.changesEnemyHouseCardImmediately(),
         ),
       });
 
       this.combatGameState.onChooseHouseCardGameStateEnd();
     }
+  }
+
+  getSupportingHouses(house: House | null): House[] {
+    if (house == null) {
+      return [];
+    }
+    return this.combatGameState.supporters.entries
+      .filter(([_, supported]) => supported == house)
+      .map(([supporter, _]) => supporter);
   }
 
   canRefuseSupport(house: House | null): boolean {
@@ -365,9 +409,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     );
   }
 
-  refuseSupport(): void {
+  refuseSupport(from?: House): void {
     this.entireGame.sendMessageToServer({
       type: "refuse-support",
+      from: from ? from.id : undefined,
     });
   }
 
@@ -390,7 +435,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
           house: house.id,
           action: PlayerActionType.HOUSE_CARD_CHOSEN,
         },
-        true
+        true,
       );
     }
   }
@@ -408,7 +453,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       (ingame.game.valyrianSteelBladeHolder == house ||
         ingame
           .getVassalsControlledByPlayer(
-            ingame.getControllerOfHouse(ingame.game.valyrianSteelBladeHolder)
+            ingame.getControllerOfHouse(ingame.game.valyrianSteelBladeHolder),
           )
           .includes(house));
 
@@ -420,10 +465,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
   static deserializeFromServer(
     combatGameState: CombatGameState,
-    data: SerializedChooseHouseCardGameState
+    data: SerializedChooseHouseCardGameState,
   ): ChooseHouseCardGameState {
     const chooseHouseCardGameState = new ChooseHouseCardGameState(
-      combatGameState
+      combatGameState,
     );
 
     chooseHouseCardGameState.choosableHouseCards = new BetterMap(
@@ -433,7 +478,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
           house,
           hcids.map((hcid) => combatGameState.game.getHouseCardById(hcid)),
         ];
-      })
+      }),
     );
 
     chooseHouseCardGameState.houseCards = new BetterMap(
@@ -446,7 +491,7 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
             ? combatGameState.ingameGameState.game.getHouseCardById(hcid)
             : null,
         ];
-      })
+      }),
     );
 
     const combat = chooseHouseCardGameState.combatGameState;
