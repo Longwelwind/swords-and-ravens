@@ -173,8 +173,19 @@ export default class ClaimVassalsGameState extends GameState<
     const countVassals = this.ingame.getVassalHouses().length;
     const countNonVassals = this.game.houses.size - countVassals;
     // Get the position in the Iron Throne track, but without considering the vassals
+    // and houses that have all remaining vassals as forbidden
     const positionInTrack = this.game.ironThroneTrack
-      .filter((h) => !this.ingame.isVassalHouse(h))
+      .filter((h) => {
+        if (this.ingame.isVassalHouse(h)) {
+          return false;
+        }
+        // Exclude houses that have all remaining vassals forbidden
+        const availableVassals = _.without(
+          vassalsToClaim,
+          this.forbiddenRelations.tryGet(h, null),
+        );
+        return availableVassals.length > 0;
+      })
       .indexOf(nextHouseToClaim);
     const count =
       this.passedVassalsCount +
