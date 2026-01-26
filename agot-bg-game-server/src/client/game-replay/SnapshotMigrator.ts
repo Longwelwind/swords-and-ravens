@@ -234,7 +234,11 @@ export default class SnapshotMigrator {
       }
       case "leave-power-token-choice": {
         const region = snap.getRegion(log.region);
-        if (log.leftPowerToken) region.controlPowerToken = log.house;
+        if (log.leftPowerToken) {
+          region.controlPowerToken = log.house;
+          const house = snap.getHouse(log.house);
+          house.removePowerTokens(1);
+        }
         return snap;
       }
 
@@ -381,7 +385,11 @@ export default class SnapshotMigrator {
         if (!snap.gameSnapshot) return snap;
         log.powerTokensLost.forEach(([hid, amount]) => {
           const h = snap.getHouse(hid);
-          h.removePowerTokens(-amount); // as amount should be stored negative we remove a negative amount
+          // Old logs always logged 2 PT, even if house had less than 2 PT, so we have to remove amount or remaining PT of house
+          if (h.powerTokens < amount) {
+            amount = h.powerTokens;
+          }
+          h.removePowerTokens(amount);
         });
       }
 

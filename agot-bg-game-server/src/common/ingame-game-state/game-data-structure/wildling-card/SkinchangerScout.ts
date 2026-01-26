@@ -32,14 +32,19 @@ export default class SkinchangerScout extends WildlingCardType {
       )
       .map((h, i) => [h, i == 0 ? -h.powerTokens : -2] as [House, number]);
 
-    powerTokensToLose.forEach(([house, powerTokens]) => {
-      wildlingsAttack.ingame.changePowerTokens(house, powerTokens);
-    });
+    const actuallyLostPowerTokens = powerTokensToLose.map(
+      ([house, powerTokens]) => {
+        const lost = Math.abs(
+          wildlingsAttack.ingame.changePowerTokens(house, powerTokens),
+        );
+        return [house, lost] as [House, number];
+      },
+    );
 
     wildlingsAttack.ingame.log({
       type: "skinchanger-scout-wildling-victory",
       house: wildlingsAttack.lowestBidder.id,
-      powerTokensLost: powerTokensToLose.map(([house, amount]) => [
+      powerTokensLost: actuallyLostPowerTokens.map(([house, amount]) => [
         house.id,
         amount,
       ]),

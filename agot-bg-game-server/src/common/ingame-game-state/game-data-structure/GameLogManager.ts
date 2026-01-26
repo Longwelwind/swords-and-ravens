@@ -115,7 +115,13 @@ export default class GameLogManager {
   }
 }
 
+export interface SerializedGameLogEntry {
+  time: number;
+  data: GameLogData;
+  resolvedAutomatically?: boolean;
+}
+
 export interface SerializedGameLogManager {
-  logs: { time: number; data: GameLogData; resolvedAutomatically?: boolean }[];
+  logs: SerializedGameLogEntry[];
   lastSeenLogTimes: [string, number][];
 }

@@ -4,10 +4,10 @@ import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes
 import staticWorld from "../common/ingame-game-state/game-data-structure/static-data-structure/globalStaticWorld";
 import { CrowKillersStep } from "../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import { SerializedHouse } from "../common/ingame-game-state/game-data-structure/House";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   HouseCardState,
-  //SerializedHouseCard,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  SerializedHouseCard,
 } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import { vassalHouseCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/vassalHouseCards";
 import { DraftStep } from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
@@ -18,6 +18,8 @@ import facelessMenNames from "../../data/facelessMenNames.json";
 import popRandom from "../utils/popRandom";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SerializedEntireGame } from "../common/EntireGame";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { SerializedGameLogEntry } from "../common/ingame-game-state/game-data-structure/GameLogManager";
 
 function replaceHouseCard(
   deck: [string, any][],
@@ -2975,6 +2977,24 @@ const serializedGameMigrations: {
     migrate: (serializedGame: any) => {
       // This was a buggy migration for perpetuum random games.
       // If applied in some PBEM games, I will fix them manually.
+      return serializedGame;
+    },
+  },
+  {
+    version: "130",
+    migrate: (serializedGame: any) => {
+      if (serializedGame.childGameState.type == "ingame") {
+        const ingame = serializedGame.childGameState;
+        ingame.gameLogManager.logs.forEach((log: any) => {
+          // Make removed power tokens positive for easier log replay
+          if (log.data.type === "skinchanger-scout-wildling-victory") {
+            log.data.powerTokensLost = log.data.powerTokensLost.map(
+              ([house, tokens]: any) => [house, Math.abs(tokens)],
+            );
+          }
+        });
+      }
+
       return serializedGame;
     },
   },
