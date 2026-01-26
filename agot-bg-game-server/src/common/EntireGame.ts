@@ -83,7 +83,7 @@ export default class EntireGame extends GameState<
   onClearChatRoom?: (roomId: string) => void;
   onCaptureSentryMessage?: (
     message: string,
-    severity: "info" | "warning" | "error" | "fatal"
+    severity: "info" | "warning" | "error" | "fatal",
   ) => void;
   onSaveGame?: (updateLastActive: boolean) => void;
   onGetUser?: (userId: string) => Promise<StoredUserData | null>;
@@ -91,7 +91,7 @@ export default class EntireGame extends GameState<
   // Throttled saveGame so we don't spam the website client
   saveGame: (updateLastActive: boolean) => void = _.throttle(
     this.privateSaveGame,
-    2000
+    2000,
   );
 
   // Client-side callbacks
@@ -104,7 +104,7 @@ export default class EntireGame extends GameState<
         wildingCard: WildlingCardType,
         biddings: [number, House[]][] | null,
         highestBidder: House | null,
-        lowestBidder: House | null
+        lowestBidder: House | null,
       ) => void)
     | null = null;
 
@@ -129,12 +129,12 @@ export default class EntireGame extends GameState<
     const playerSetups = container.playerSetups;
 
     const gameSetup = playerSetups.find(
-      (gameSetup) => this.gameSettings.playerCount == gameSetup.playerCount
+      (gameSetup) => this.gameSettings.playerCount == gameSetup.playerCount,
     );
 
     if (gameSetup == undefined) {
       throw new Error(
-        `Invalid playerCount ${this.gameSettings.playerCount} for setupId ${this.gameSettings.setupId}`
+        `Invalid playerCount ${this.gameSettings.playerCount} for setupId ${this.gameSettings.setupId}`,
       );
     }
 
@@ -176,7 +176,7 @@ export default class EntireGame extends GameState<
 
   proceedToIngameGameState(
     housesToCreate: string[],
-    futurePlayers: BetterMap<string, User>
+    futurePlayers: BetterMap<string, User>,
   ): void {
     if (this.gameSettings.faceless && this.onClearChatRoom) {
       this.onClearChatRoom(this.publicChatRoomId);
@@ -188,7 +188,7 @@ export default class EntireGame extends GameState<
 
     this.setChildGameState(new IngameGameState(this)).beginGame(
       housesToCreate,
-      futurePlayers
+      futurePlayers,
     );
 
     this.checkGameStateChanged();
@@ -218,7 +218,7 @@ export default class EntireGame extends GameState<
         const serializedEntireGame = this.serializeToClient(u);
         const serializedGameState = _.range(level).reduce(
           (s, _) => s.childGameState,
-          serializedEntireGame as SerializedGameState
+          serializedEntireGame as SerializedGameState,
         );
 
         if (!serializedGameState) {
@@ -254,12 +254,12 @@ export default class EntireGame extends GameState<
           // Basically this should not happen, but we keep it for safety!
           if (p.waitedForData?.handled === false) {
             console.warn(
-              `Unhandled waitedForData for user ${p.user.name} (${p.user.id})`
+              `Unhandled waitedForData for user ${p.user.name} (${p.user.id})`,
             );
             if (this.onCaptureSentryMessage) {
               this.onCaptureSentryMessage(
                 `Unhandled waitedForData for user ${p.user.name} (${p.user.id})`,
-                "warning"
+                "warning",
               );
             }
           }
@@ -364,7 +364,7 @@ export default class EntireGame extends GameState<
   addUser(
     userId: string,
     userName: string,
-    profileSettings: StoredProfileSettings
+    profileSettings: StoredProfileSettings,
   ): User {
     const user = new User(
       userId,
@@ -379,7 +379,7 @@ export default class EntireGame extends GameState<
         musicVolume: profileSettings.muted ? 0 : 1,
         notificationsVolume: profileSettings.muted ? 0 : 1,
         sfxVolume: profileSettings.muted ? 0 : 1,
-      }
+      },
     );
     this.users.set(user.id, user);
 
@@ -477,7 +477,7 @@ export default class EntireGame extends GameState<
       this.ingameGameState?.checkWaitedForPlayers() ?? [];
     const gameStateChanged = this.checkGameStateChanged();
     this.ingameGameState?.setWaitedForPlayers(
-      gameStateChanged ? notWaitedAnymore : []
+      gameStateChanged ? notWaitedAnymore : [],
     );
 
     this.doPlayerClocksHandling();
@@ -501,14 +501,14 @@ export default class EntireGame extends GameState<
     }
     const notWaitedPlayers = _.difference(
       this.ingameGameState.players.values,
-      waitedPlayers
+      waitedPlayers,
     );
 
     if (!this.ingameGameState.paused) {
       waitedPlayers.forEach((p) => {
         if (!p.liveClockData) {
           throw new Error(
-            "LiveClockData must be present in doPlayerClocksHandling"
+            "LiveClockData must be present in doPlayerClocksHandling",
           );
         }
 
@@ -536,14 +536,14 @@ export default class EntireGame extends GameState<
     notWaitedPlayers.forEach((p) => {
       if (!p.liveClockData) {
         throw new Error(
-          "LiveClockData must be present in doPlayerClocksHandling"
+          "LiveClockData must be present in doPlayerClocksHandling",
         );
       }
 
       if (p.liveClockData.timerStartedAt) {
         if (!p.liveClockData.serverTimer) {
           throw new Error(
-            "serverTimer must be present in doPlayerClocksHandling"
+            "serverTimer must be present in doPlayerClocksHandling",
           );
         }
 
@@ -554,11 +554,11 @@ export default class EntireGame extends GameState<
         // This user is no longer waited for
         // Calculate new remainingSeconds and broadcast to clients
         p.liveClockData.remainingSeconds -= getElapsedSeconds(
-          p.liveClockData.timerStartedAt
+          p.liveClockData.timerStartedAt,
         );
         p.liveClockData.remainingSeconds = Math.max(
           0,
-          p.liveClockData.remainingSeconds
+          p.liveClockData.remainingSeconds,
         );
         p.liveClockData.timerStartedAt = null;
 
@@ -577,7 +577,7 @@ export default class EntireGame extends GameState<
       const parentGameState = this.getGameStateNthLevelDown(message.level - 1);
 
       const newChildGameState = parentGameState.deserializeChildGameState(
-        message.serializedGameState
+        message.serializedGameState,
       );
 
       this.checkGameStatesFastTracked(parentGameState, newChildGameState);
@@ -617,7 +617,7 @@ export default class EntireGame extends GameState<
 
   checkGameStatesFastTracked(
     parentGameState: GameState<any, any>,
-    newChildGameState: GameState<any, any>
+    newChildGameState: GameState<any, any>,
   ): void {
     // Wait 5 seconds when CombatGameState was completely fast-tracked to show the battle results via the CombatInfoComponent
     if (
@@ -629,7 +629,7 @@ export default class EntireGame extends GameState<
     ) {
       if (this.onCombatFastTracked) {
         const combat = this.getChildGameState(
-          CombatGameState
+          CombatGameState,
         ) as CombatGameState;
         this.onCombatFastTracked(combat.stats);
       }
@@ -645,7 +645,7 @@ export default class EntireGame extends GameState<
       // As we checked earlier that WildlingsAttackGameState is no longer part of the tree we now know that no other WildlingsAttack
       // child state was set which would have shown the revealed Wildling card to the clients.
       const wildlings = this.getChildGameState(
-        WildlingsAttackGameState
+        WildlingsAttackGameState,
       ) as WildlingsAttackGameState;
       if (
         wildlings.childGameState instanceof BiddingGameState ||
@@ -656,7 +656,7 @@ export default class EntireGame extends GameState<
             wildlings.wildlingCard.type,
             wildlings.biddingResults,
             wildlings._highestBidder,
-            wildlings._lowestBidder
+            wildlings._lowestBidder,
           );
         }
       }
@@ -720,14 +720,14 @@ export default class EntireGame extends GameState<
     const waitingFor = _waitingFor
       .map(
         (wf) =>
-          `${wf.house}${this.gameSettings.faceless ? "" : ` (${wf.user.name})`}`
+          `${wf.house}${this.gameSettings.faceless ? "" : ` (${wf.user.name})`}`,
       )
       .join(", ");
     const waitingForIds = _waitingFor.map((wf) => wf.user.id);
     let winner: string | undefined = undefined;
     if (this.ingameGameState?.leafState instanceof GameEndedGameState) {
       const user = this.ingameGameState.getControllerOfHouse(
-        this.ingameGameState.leafState.winner
+        this.ingameGameState.leafState.winner,
       ).user;
       winner = `${user.name} (${this.ingameGameState.leafState.winner.name})`;
     }
@@ -737,7 +737,7 @@ export default class EntireGame extends GameState<
         (v) =>
           v.state == VoteState.ONGOING &&
           (v.type instanceof ReplacePlayer ||
-            v.type instanceof ReplacePlayerByVassal)
+            v.type instanceof ReplacePlayerByVassal),
       ).length ?? -1) > 0 || undefined;
 
     const oldPlayerIds =
@@ -857,8 +857,8 @@ export default class EntireGame extends GameState<
             const otherUser = user == u1 ? u2 : u1;
 
             return { user: otherUser, roomId };
-          })
-      )
+          }),
+      ),
     );
   }
 
@@ -871,7 +871,7 @@ export default class EntireGame extends GameState<
       type: "hide-or-reveal-user-names",
       names: this.users.values
         .map((u) =>
-          u.serializeToClient(false, null, this.gameSettings.faceless)
+          u.serializeToClient(false, null, this.gameSettings.faceless),
         )
         .map((su) => [su.id, su.name]),
     });
@@ -890,7 +890,7 @@ export default class EntireGame extends GameState<
       id: this.id,
       name: this.name,
       users: this.users.values.map((u) =>
-        u.serializeToClient(admin, user, this.gameSettings.faceless)
+        u.serializeToClient(admin, user, this.gameSettings.faceless),
       ),
       ownerUserId: this.ownerUserId,
       publicChatRoomId: this.publicChatRoomId,
@@ -917,35 +917,35 @@ export default class EntireGame extends GameState<
       data.users.map((ur) => [
         ur.id,
         User.deserializeFromServer(entireGame, ur),
-      ])
+      ]),
     );
     entireGame.ownerUserId = data.ownerUserId;
     entireGame.publicChatRoomId = data.publicChatRoomId;
     entireGame.gameSettings = GameSettings.deserializeFromServer(
-      data.gameSettings
+      data.gameSettings,
     );
     entireGame.privateChatRoomsIds = new BetterMap(
       data.privateChatRoomIds.map(([uid1, bm]) => [
         entireGame.users.get(uid1),
         new BetterMap(
-          bm.map(([uid2, roomId]) => [entireGame.users.get(uid2), roomId])
+          bm.map(([uid2, roomId]) => [entireGame.users.get(uid2), roomId]),
         ),
-      ])
+      ]),
     );
 
     entireGame.leafStateId = data.leafStateId;
     entireGame.multiAccountProtectionMap = new BetterMap(
-      data.multiAccountProtectionMap.map(([uid, uix]) => [uid, new Set(uix)])
+      data.multiAccountProtectionMap.map(([uid, uix]) => [uid, new Set(uix)]),
     );
     entireGame.childGameState = entireGame.deserializeChildGameState(
-      data.childGameState
+      data.childGameState,
     );
 
     return entireGame;
   }
 
   deserializeChildGameState(
-    data: SerializedEntireGame["childGameState"]
+    data: SerializedEntireGame["childGameState"],
   ): this["childGameState"] {
     if (data.type == "lobby") {
       return LobbyGameState.deserializeFromServer(this, data);

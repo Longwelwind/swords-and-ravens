@@ -30,7 +30,7 @@ export default class World {
 
   get regionsThatRegainGarrison(): StaticRegion[] {
     return getStaticWorld(this.settings).staticRegions.values.filter(
-      (region) => region.canRegainGarrison
+      (region) => region.canRegainGarrison,
     );
   }
 
@@ -43,7 +43,7 @@ export default class World {
   get westerosLandRegions(): Region[] {
     const westerosLandRegionIds = this.westerosLandRegionIds;
     return this.regions.values.filter((r) =>
-      westerosLandRegionIds.includes(r.id)
+      westerosLandRegionIds.includes(r.id),
     );
   }
 
@@ -94,7 +94,7 @@ export default class World {
 
       borders = _.pull(borders, border);
       continuousPoints.push(
-        ...(reverse ? border.polygon.slice().reverse() : border.polygon)
+        ...(reverse ? border.polygon.slice().reverse() : border.polygon),
       );
     }
 
@@ -103,7 +103,7 @@ export default class World {
 
   private getClosestNextBorder(
     start: Point,
-    borders: StaticBorder[]
+    borders: StaticBorder[],
   ): { border: StaticBorder; reverse: boolean } {
     let minDistanceSquared = Number.MAX_VALUE;
     let border: StaticBorder | null = null;
@@ -119,7 +119,7 @@ export default class World {
 
       const distanceSquaredEnd = distanceSquared(
         start,
-        b.polygon[b.polygon.length - 1]
+        b.polygon[b.polygon.length - 1],
       );
       if (distanceSquaredEnd < minDistanceSquared) {
         minDistanceSquared = distanceSquaredEnd;
@@ -146,7 +146,7 @@ export default class World {
         .filter((b) => b.isPart(region.staticRegion))
         .filter((b) => b.to != null)
         .map((b) => b.getNeighbour(region.staticRegion) as StaticRegion)
-        .map((sr) => this.getRegion(sr))
+        .map((sr) => this.getRegion(sr)),
     );
   }
 
@@ -155,7 +155,7 @@ export default class World {
     house: House,
     army: Unit[],
     viaTransportOnly = false,
-    retreat = false
+    retreat = false,
   ): Region[] {
     if (army.length == 0) {
       return [];
@@ -168,19 +168,19 @@ export default class World {
     const regionKindOfArmy = army[0].type.walksOn;
     if (!army.every((u) => u.type.walksOn == regionKindOfArmy)) {
       throw new Error(
-        `Different walksOn unit types present in '${startingRegion.name}'`
+        `Different walksOn unit types present in '${startingRegion.name}'`,
       );
     }
 
     if (army.every((u) => u.type == dragon) && !retreat && !viaTransportOnly) {
       return this.regions.values.filter(
-        (r) => r != startingRegion && r.type == land
+        (r) => r != startingRegion && r.type == land,
       );
     }
 
     if (viaTransportOnly) {
       regionsToCheck = regionsToCheck.filter((r) =>
-        this.canActAsBridge(r, house, regionKindOfArmy)
+        this.canActAsBridge(r, house, regionKindOfArmy),
       );
     }
 
@@ -211,7 +211,7 @@ export default class World {
   canActAsBridge(
     region: Region,
     house: House,
-    regionKindOfArmy: RegionKind
+    regionKindOfArmy: RegionKind,
   ): boolean {
     return (
       region.getController() == house &&
@@ -230,7 +230,7 @@ export default class World {
   getValidRetreatRegions(
     startingRegion: Region,
     house: House,
-    army: Unit[]
+    army: Unit[],
   ): Region[] {
     return (
       this.getReachableRegions(startingRegion, house, army, false, true)
@@ -241,11 +241,11 @@ export default class World {
             !(
               r.type == port &&
               this.getAdjacentLandOfPort(r).getController() != house
-            )
+            ),
         )
         // Remove regions with enemy units
         .filter(
-          (r) => !(r.getController() != null && r.getController() != house)
+          (r) => !(r.getController() != null && r.getController() != house),
         )
         // Remove regions with neutral forces
         .filter((r) => !(r.garrison > 0 && r.getController() == null))
@@ -254,12 +254,12 @@ export default class World {
 
   getAdjacentSeaOfPort(region: Region): Region {
     const adjacentSeas = this.getNeighbouringRegions(region).filter(
-      (r) => r.type == sea
+      (r) => r.type == sea,
     );
 
     if (adjacentSeas.length != 1) {
       throw new Error(
-        `Port "${region.id}" has more than one adjacent sea regions`
+        `Port "${region.id}" has more than one adjacent sea regions`,
       );
     }
 
@@ -268,12 +268,12 @@ export default class World {
 
   getAdjacentLandOfPort(region: Region): Region {
     const adjacentLands = this.getNeighbouringRegions(region).filter(
-      (r) => r.type == land
+      (r) => r.type == land,
     );
 
     if (adjacentLands.length != 1) {
       throw new Error(
-        `Port "${region.id}" has more than one adjacent land regions`
+        `Port "${region.id}" has more than one adjacent land regions`,
       );
     }
 
@@ -286,7 +286,7 @@ export default class World {
     }
 
     const adjacentPorts = this.getNeighbouringRegions(region).filter(
-      (r) => r.type == port
+      (r) => r.type == port,
     );
 
     if (adjacentPorts.length == 0) {
@@ -300,7 +300,7 @@ export default class World {
 
   getUnitsOfHouse(house: House): Unit[] {
     return _.flatMap(this.regions.values.map((r) => r.units.values)).filter(
-      (u) => u.allegiance == house
+      (u) => u.allegiance == house,
     );
   }
 
@@ -324,7 +324,7 @@ export default class World {
 
   getCapitalOfHouse(house: House): Region {
     const capital = this.regions.values.filter(
-      (r) => r.superControlPowerToken == house
+      (r) => r.superControlPowerToken == house,
     );
     if (capital.length != 1) {
       throw new Error("Every house must have exactly one capital");
@@ -339,7 +339,7 @@ export default class World {
   serializeToClient(admin: boolean, player: Player | null): SerializedWorld {
     return {
       regions: this.regions.values.map((r) =>
-        r.serializeToClient(admin, player)
+        r.serializeToClient(admin, player),
       ),
       settings: this.settings.serializeToClient(),
     };
@@ -347,12 +347,12 @@ export default class World {
 
   static deserializeFromServer(game: Game, data: SerializedWorld): World {
     const regions = new BetterMap(
-      data.regions.map((r) => [r.id, Region.deserializeFromServer(game, r)])
+      data.regions.map((r) => [r.id, Region.deserializeFromServer(game, r)]),
     );
 
     return new World(
       regions,
-      GameSettings.deserializeFromServer(data.settings)
+      GameSettings.deserializeFromServer(data.settings),
     );
   }
 }

@@ -98,7 +98,7 @@ function getHouseCardData(container: {
   new BetterMap(Object.entries(container)).values.forEach((container) => {
     result = _.concat(
       result,
-      Object.entries(container.houseCards as { [key: string]: HouseCardData })
+      Object.entries(container.houseCards as { [key: string]: HouseCardData }),
     );
   });
   return result;
@@ -106,15 +106,15 @@ function getHouseCardData(container: {
 
 function getTrackWithAdjustedVassalPositions(
   track: House[],
-  playerHouses: string[]
+  playerHouses: string[],
 ): House[] {
   const areVassalsInTopThreeSpaces = _.take(track, 3).some(
-    (h) => !playerHouses.includes(h.id)
+    (h) => !playerHouses.includes(h.id),
   );
 
   if (areVassalsInTopThreeSpaces) {
     const vassalsAndTargaryen = track.filter(
-      (h) => !playerHouses.includes(h.id) || h.id == "targaryen"
+      (h) => !playerHouses.includes(h.id) || h.id == "targaryen",
     );
     const newTrack = _.difference(track, vassalsAndTargaryen);
     newTrack.push(...vassalsAndTargaryen);
@@ -127,7 +127,7 @@ function getTrackWithAdjustedVassalPositions(
 export function createHouseCard(
   id: string,
   houseCardData: HouseCardData,
-  houseId: string
+  houseId: string,
 ): HouseCard {
   return new HouseCard(
     id,
@@ -138,7 +138,7 @@ export function createHouseCard(
     houseCardData.ability
       ? houseCardAbilities.get(houseCardData.ability)
       : null,
-    houseId
+    houseId,
   );
 }
 
@@ -152,16 +152,16 @@ function getHouseCardSet(container: {
         [hid, Object.entries(hcc.houseCards)] as [
           string,
           [string, HouseCardData][],
-        ]
-    )
+        ],
+    ),
   );
   const set: HouseCard[] = [];
   houseCardDatasMap.keys.forEach((houseId) => {
     const houseCardsData = houseCardDatasMap.get(houseId);
     set.push(
       ...houseCardsData.map(([hcid, hcd]) =>
-        createHouseCard(hcid, hcd, houseId)
-      )
+        createHouseCard(hcid, hcd, houseId),
+      ),
     );
   });
   return set;
@@ -173,13 +173,13 @@ export const modBHouseCardsData = getHouseCardData(baseGameData.modBHouseCards);
 export const asosHouseCardsData = getHouseCardData(baseGameData.asosHouseCards);
 
 export const allGameSetups = new BetterMap(
-  Object.entries(baseGameData.setups as { [key: string]: GameSetupContainer })
+  Object.entries(baseGameData.setups as { [key: string]: GameSetupContainer }),
 );
 
 export function getGameSetupContainer(setupId: string): GameSetupContainer {
   if (!allGameSetups.has(setupId)) {
     throw new Error(
-      `Invalid setupId ${setupId}. All setups: ${JSON.stringify(allGameSetups)}`
+      `Invalid setupId ${setupId}. All setups: ${JSON.stringify(allGameSetups)}`,
     );
   }
 
@@ -189,7 +189,7 @@ export function getGameSetupContainer(setupId: string): GameSetupContainer {
 export default function createGame(
   ingame: IngameGameState,
   housesToCreate: string[],
-  playerHouses: string[]
+  playerHouses: string[],
 ): Game {
   const entireGame = ingame.entireGame;
   const gameSettings = entireGame.gameSettings;
@@ -200,8 +200,8 @@ export default function createGame(
 
   const baseGameHousesToCreate = new BetterMap(
     Object.entries(baseGameData.houses as { [key: string]: HouseData }).filter(
-      ([hid, _]) => housesToCreate.includes(hid)
-    )
+      ([hid, _]) => housesToCreate.includes(hid),
+    ),
   );
 
   /* In the previous version the productive system sometimes applied the garrisons (only the garrisons,
@@ -214,12 +214,12 @@ export default function createGame(
   const startingPositionsMap = new BetterMap(
     baseGameHousesToCreate.keys
       .filter((hid) => hid != "targaryen")
-      .map((hid) => [hid, hid])
+      .map((hid) => [hid, hid]),
   );
   if (gameSettings.randomStartPositions) {
     const randomizedList = shuffleInPlace(startingPositionsMap.values);
     startingPositionsMap.keys.forEach((hid, i) =>
-      startingPositionsMap.set(hid, randomizedList[i])
+      startingPositionsMap.set(hid, randomizedList[i]),
     );
   }
 
@@ -227,8 +227,8 @@ export default function createGame(
   if (entireGame.isFeastForCrows) {
     const ffcHouseCards = new BetterMap(
       Object.entries(
-        baseGameData.ffcHouseCards as { [key: string]: HouseCardContainer }
-      )
+        baseGameData.ffcHouseCards as { [key: string]: HouseCardContainer },
+      ),
     );
     ffcHouseCards.keys.forEach((hid) => {
       // Arryn must be part of baseGameHousesToCreate in Feast for Crows, so no need for a filter here!
@@ -252,8 +252,8 @@ export default function createGame(
       _.concat(
         Object.entries(adwdHouseCards),
         Object.entries(ffcHouseCards),
-        Object.entries(modBHouseCards)
-      ).filter(([hid, _]) => housesToCreate.includes(hid))
+        Object.entries(modBHouseCards),
+      ).filter(([hid, _]) => housesToCreate.includes(hid)),
     );
 
     if (gameSettings.adwdHouseCards) {
@@ -274,8 +274,8 @@ export default function createGame(
   if (gameSettings.asosHouseCards) {
     const asosHouseCards = new BetterMap(
       Object.entries(
-        baseGameData.asosHouseCards as { [key: string]: HouseCardContainer }
-      )
+        baseGameData.asosHouseCards as { [key: string]: HouseCardContainer },
+      ),
     );
     asosHouseCards.keys
       .filter((hid) => housesToCreate.includes(hid))
@@ -306,13 +306,13 @@ export default function createGame(
 
   // So for now the only work around is to hard code it:
   const maxPowerTokensPerHouse = new BetterMap(
-    entireGame.isFeastForCrows ? [["arryn", 19]] : []
+    entireGame.isFeastForCrows ? [["arryn", 19]] : [],
   );
 
   game.houses = new BetterMap(
     baseGameHousesToCreate.entries.map(([hid, houseData]) => {
       const houseCards: BetterMap<string, HouseCard> = playerHouses.includes(
-        hid
+        hid,
       )
         ? new BetterMap<string, HouseCard>(
             Object.entries(houseData.houseCards).map(
@@ -320,11 +320,11 @@ export default function createGame(
                 const houseCard = createHouseCard(
                   houseCardId,
                   houseCardData,
-                  hid
+                  hid,
                 );
                 return [houseCardId, houseCard];
-              }
-            )
+              },
+            ),
           )
         : // Vassals have no own house cards
           new BetterMap<string, HouseCard>();
@@ -337,19 +337,19 @@ export default function createGame(
                   const houseCard = createHouseCard(
                     houseCardId,
                     houseCardData,
-                    hid
+                    hid,
                   );
                   return [houseCardId, houseCard];
-                }
-              )
+                },
+              ),
             )
           : // Vassals have no house cards
             null;
 
       const unitLimits = new BetterMap(
         Object.entries(houseData.unitLimits as { [key: string]: number }).map(
-          ([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit]
-        )
+          ([unitTypeId, limit]) => [unitTypes.get(unitTypeId), limit],
+        ),
       );
 
       // Vassals always start with a supply of 4
@@ -370,12 +370,12 @@ export default function createGame(
         maxPowerTokens,
         supplyLevel,
         houseCards,
-        laterHouseCards
+        laterHouseCards,
       );
 
       if (entireGame.isFeastForCrows) {
         const soc = specialObjectiveCards.values.find(
-          (soc) => soc.houseId == house.id
+          (soc) => soc.houseId == house.id,
         );
         if (!soc) {
           throw new Error(`Special objective not found for house ${house.id}`);
@@ -384,7 +384,7 @@ export default function createGame(
       }
 
       return [hid, house];
-    })
+    }),
   );
 
   game.maxTurns = selectedGameSetup.maxTurns
@@ -445,15 +445,15 @@ export default function createGame(
   // Remove vassals from the top 3 spaces on each track
   game.ironThroneTrack = getTrackWithAdjustedVassalPositions(
     game.ironThroneTrack,
-    playerHouses
+    playerHouses,
   );
   game.fiefdomsTrack = getTrackWithAdjustedVassalPositions(
     game.fiefdomsTrack,
-    playerHouses
+    playerHouses,
   );
   game.kingsCourtTrack = getTrackWithAdjustedVassalPositions(
     game.kingsCourtTrack,
-    playerHouses
+    playerHouses,
   );
 
   if (gameSettings.draftHouseCards) {
@@ -524,7 +524,7 @@ export default function createGame(
   const overwrittenSuperControlPowerToken = new BetterMap(
     selectedGameSetup.superPowerTokens !== undefined
       ? Object.entries(selectedGameSetup.superPowerTokens)
-      : []
+      : [],
   );
 
   const staticWorld = getStaticWorld(gameSettings);
@@ -535,10 +535,10 @@ export default function createGame(
         ? blockedRegions.includes(staticRegion.id)
         : false;
       let superPowerToken = overwrittenSuperControlPowerToken.has(
-        staticRegion.id
+        staticRegion.id,
       )
         ? game.houses.get(
-            overwrittenSuperControlPowerToken.get(staticRegion.id)
+            overwrittenSuperControlPowerToken.get(staticRegion.id),
           )
         : null;
 
@@ -548,7 +548,7 @@ export default function createGame(
         startingPositionsMap.has(staticRegion.superControlPowerToken)
       ) {
         const newCapitalOwner = startingPositionsMap.get(
-          staticRegion.superControlPowerToken
+          staticRegion.superControlPowerToken,
         );
         superPowerToken = game.houses.get(newCapitalOwner);
       }
@@ -559,10 +559,10 @@ export default function createGame(
           game,
           staticRegion.id,
           blocked ? 1000 : staticRegion.startingGarrison,
-          superPowerToken
+          superPowerToken,
         ),
       ];
-    })
+    }),
   );
 
   game.world = new World(regions, gameSettings);
@@ -637,7 +637,7 @@ export default function createGame(
   if (gameSettings.fogOfWar) {
     const id = ++lastWesterosCardId;
     game.westerosDecks[2].push(
-      new WesterosCard(id, westerosCardTypes.get("dense-fog"))
+      new WesterosCard(id, westerosCardTypes.get("dense-fog")),
     );
     shuffleInPlace(game.westerosDecks[2]);
   }
@@ -650,7 +650,7 @@ export default function createGame(
   game.wildlingDeck = baseGameData.wildlingCards.map((wildlingCardData) => {
     return new WildlingCard(
       ++lastWildlingCardId,
-      wildlingCardTypes.get(wildlingCardData.type)
+      wildlingCardTypes.get(wildlingCardData.type),
     );
   });
   // Shuffle the deck
@@ -671,7 +671,7 @@ export default function createGame(
           gameSettings.randomStartPositions &&
             startingPositionsMap.has(unitData.house)
             ? startingPositionsMap.get(unitData.house)
-            : unitData.house
+            : unitData.house,
         );
         const unitType = unitTypes.get(unitData.unitType);
         const quantity =
@@ -710,7 +710,7 @@ export default function createGame(
   ) {
     // Apply the new starting positions
     Object.entries(
-      baseGameData.customModBalancing as { [key: string]: UnitData[] }
+      baseGameData.customModBalancing as { [key: string]: UnitData[] },
     ).forEach(([regionId, data]) => {
       data
         .filter((unitData) => housesToCreate.includes(unitData.house))
@@ -720,7 +720,7 @@ export default function createGame(
             gameSettings.randomStartPositions &&
               startingPositionsMap.has(unitData.house)
               ? startingPositionsMap.get(unitData.house)
-              : unitData.house
+              : unitData.house,
           );
           const unitType = unitTypes.get(unitData.unitType);
           const quantity =
@@ -751,7 +751,7 @@ export default function createGame(
       const newShip = game.createUnit(
         redwyneStraights,
         unitTypes.get("ship"),
-        house
+        house,
       );
       redwyneStraights.units.set(newShip.id, newShip);
     }
@@ -760,7 +760,7 @@ export default function createGame(
   game.starredOrderRestrictions =
     baseGameData.starredOrderRestrictions[
       baseGameData.starredOrderRestrictions.findIndex(
-        (restrictions) => game.houses.size <= restrictions.length
+        (restrictions) => game.houses.size <= restrictions.length,
       )
     ];
 
@@ -773,9 +773,9 @@ export default function createGame(
             ? game.houses.tryGet(startingPositionsMap.get(houseId), null)
             : game.houses.tryGet(houseId, null);
         regions.forEach(
-          (r) => (game.world.regions.get(r).controlPowerToken = house)
+          (r) => (game.world.regions.get(r).controlPowerToken = house),
         );
-      }
+      },
     );
   }
 
@@ -802,14 +802,14 @@ export default function createGame(
       ([regionId, garrison]) => {
         const region = game.world.regions.get(regionId);
         region.garrison = garrison;
-      }
+      },
     );
   }
 
   // Apply loyalty tokens
   if (selectedGameSetup.loyaltyTokens !== undefined) {
     const loyaltyTokens = new BetterMap(
-      Object.entries(selectedGameSetup.loyaltyTokens)
+      Object.entries(selectedGameSetup.loyaltyTokens),
     );
     loyaltyTokens.entries.forEach(([regionId, count]) => {
       regions.get(regionId).loyaltyTokens = count;
@@ -818,7 +818,7 @@ export default function createGame(
 
   // Init the vassal house cards
   game.vassalHouseCards = new BetterMap(
-    vassalHouseCards.map((hc) => [hc.id, hc])
+    vassalHouseCards.map((hc) => [hc.id, hc]),
   );
 
   // Init the Iron Bank
@@ -827,7 +827,7 @@ export default function createGame(
 
     // Load the Loan card deck
     game.ironBank.loanCardDeck = shuffleInPlace(
-      loanCardTypes.values.map((lct, i) => new LoanCard(i, lct))
+      loanCardTypes.values.map((lct, i) => new LoanCard(i, lct)),
     );
   } else {
     game.ironBank = null;
@@ -845,7 +845,7 @@ export default function createGame(
 }
 
 export function applyCustomizationsOnCreatedGame(
-  ingame: IngameGameState
+  ingame: IngameGameState,
 ): void {
   if (ingame.entireGame.isDanceWithMotherOfDragons) {
     applyChangesForDanceWithMotherOfDragons(ingame);
@@ -902,7 +902,7 @@ function distributeUnassignedRegions(ingame: IngameGameState): void {
       processedRegions.push(...regionsToProcess);
       const freeAdjacents = _.uniq(
         _.difference(
-          _.flatMap(regionsToProcess.map((r) => getAdjacentRegions(ingame, r)))
+          _.flatMap(regionsToProcess.map((r) => getAdjacentRegions(ingame, r))),
         ).filter((r) => {
           const controller = r.getController();
           return (
@@ -910,7 +910,7 @@ function distributeUnassignedRegions(ingame: IngameGameState): void {
             !allAssignedRegions.includes(r) &&
             r.garrison == 0
           );
-        }, regionsToProcess)
+        }, regionsToProcess),
       );
       freeAdjacents.forEach((r) => {
         const possibleHouses = newAssignments.tryGet(r, [] as House[]);
@@ -921,13 +921,13 @@ function distributeUnassignedRegions(ingame: IngameGameState): void {
 
     newAssignments.entries
       .filter(
-        ([r, houses]) => !blockedRegions.includes(r) && houses.length == 1
+        ([r, houses]) => !blockedRegions.includes(r) && houses.length == 1,
       )
       .forEach(([r, houses]) => {
         assignmentDone = true;
         regionsPerHouse.set(
           houses[0],
-          _.union(regionsPerHouse.get(houses[0]), [r])
+          _.union(regionsPerHouse.get(houses[0]), [r]),
         );
       });
 
@@ -941,13 +941,13 @@ function distributeUnassignedRegions(ingame: IngameGameState): void {
 }
 
 function applyChangesForDanceWithMotherOfDragons(
-  ingame: IngameGameState
+  ingame: IngameGameState,
 ): void {
   const game = ingame.game;
   const lannister = game.houses.tryGet("lannister", null);
   if (!game.targaryen || !game.ironBank || !lannister) {
     throw new Error(
-      "Targaryen, Lannister and the Iron Bank must be present in Dance with Mother of Dragons variant"
+      "Targaryen, Lannister and the Iron Bank must be present in Dance with Mother of Dragons variant",
     );
   }
   game.targaryen.powerTokens = 9;
@@ -955,7 +955,7 @@ function applyChangesForDanceWithMotherOfDragons(
 
   if (!ingame.isVassalHouse(lannister)) {
     const initialLoanForLannister = popRandom(
-      game.ironBank.loanCardDeck
+      game.ironBank.loanCardDeck,
     ) as LoanCard;
     game.ironBank.purchasedLoans.push(initialLoanForLannister);
     initialLoanForLannister.purchasedBy = lannister;
@@ -1015,18 +1015,20 @@ function ensureDragonStrengthTokensArePresent(ingame: IngameGameState): void {
 function findUnitToReplace(
   ingame: IngameGameState,
   house: House,
-  unitType: string
+  unitType: string,
 ): Unit | null {
   const capital = ingame.world.getCapitalOfHouse(house);
   const unit = _.first(
-    capital.units.values.filter((u) => u.type.id == unitType)
+    capital.units.values.filter((u) => u.type.id == unitType),
   );
 
   // Return either the first unit in the capital or any random unit on the board.
   return unit
     ? unit
     : pickRandom(
-        ingame.world.getUnitsOfHouse(house).filter((u) => u.type.id == unitType)
+        ingame.world
+          .getUnitsOfHouse(house)
+          .filter((u) => u.type.id == unitType),
       );
 }
 
@@ -1034,7 +1036,7 @@ function nerfHouseCard(game: Game, hcId: string, newAbilityId: string): void {
   const houseCard = game.draftPool.has(hcId)
     ? game.draftPool.get(hcId)
     : _.flatMap(game.houses.values.map((h) => h.houseCards.values)).find(
-        (hc) => hc.id == hcId
+        (hc) => hc.id == hcId,
       );
 
   if (houseCard) {

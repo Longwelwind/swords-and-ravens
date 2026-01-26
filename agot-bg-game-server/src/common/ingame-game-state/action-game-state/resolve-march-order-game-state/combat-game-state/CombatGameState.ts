@@ -201,7 +201,7 @@ export default class CombatGameState extends GameState<
     attacker: House,
     defender: House,
     army: Unit[],
-    order: Order
+    order: Order,
   ): void {
     this.order = order;
     this.attacker = attacker;
@@ -253,14 +253,14 @@ export default class CombatGameState extends GameState<
 
     this.ingameGameState.addPublicVisibleRegions(
       attackerComingFrom,
-      combatRegion
+      combatRegion,
     );
   }
 
   declareSupport(
     supportingHouse: House,
     supportedHouse: House | null,
-    writeToGameLog: boolean
+    writeToGameLog: boolean,
   ): void {
     if (supportedHouse != null) {
       if (
@@ -317,7 +317,7 @@ export default class CombatGameState extends GameState<
   getCombatStrengthOfArmy(
     houseSide: House,
     army: Unit[],
-    support: boolean
+    support: boolean,
   ): number {
     return army
       .map((u) => this.getCombatStrengthOfUnit(houseSide, u, support))
@@ -327,7 +327,7 @@ export default class CombatGameState extends GameState<
   getCombatStrengthOfUnit(
     houseSide: House,
     unit: Unit,
-    support: boolean
+    support: boolean,
   ): number {
     const attackingAStructure = this.isAttackingAStructure(houseSide);
 
@@ -347,7 +347,7 @@ export default class CombatGameState extends GameState<
               houseSide,
               unit,
               support,
-              s
+              s,
             )
         : s;
     }, unit.getCombatStrength(attackingAStructure));
@@ -361,7 +361,7 @@ export default class CombatGameState extends GameState<
     }
 
     const order = this.actionGameState.ordersOnBoard.get(
-      combatHouseData.region
+      combatHouseData.region,
     );
 
     if (house == this.attacker) {
@@ -382,7 +382,7 @@ export default class CombatGameState extends GameState<
         return this.computeModifiedStat(
           orderType.defenseModifier,
           (h, hc, hca, cv) =>
-            hca.modifyDefenseOrderBonus(this, h, hc, house, orderType, cv)
+            hca.modifyDefenseOrderBonus(this, h, hc, house, orderType, cv),
         );
       }
     }
@@ -402,7 +402,7 @@ export default class CombatGameState extends GameState<
             const strengthOfArmy = this.getCombatStrengthOfArmy(
               supportedHouse,
               region.units.values,
-              true
+              true,
             );
             // Take into account the possible support order bonus
             const supportOrder = this.actionGameState.ordersOnBoard.get(region);
@@ -431,13 +431,13 @@ export default class CombatGameState extends GameState<
 
   isHouseSupported(house: House): boolean {
     const supportsForHouse = this.supporters.entries.filter(
-      ([_supporter, supportedHouse]) => supportedHouse == house
+      ([_supporter, supportedHouse]) => supportedHouse == house,
     );
 
     // Check if the initial support order of the supporter is still present, it may have been removed by e.g. Queen of Thorns
     return supportsForHouse.some(([supporter, _supportedHouse]) => {
       return this.getPossibleSupportingRegions().some(
-        ({ region }) => region.getController() == supporter
+        ({ region }) => region.getController() == supporter,
       );
     });
   }
@@ -469,7 +469,7 @@ export default class CombatGameState extends GameState<
 
   proceedCancelHouseCardAbilities(): void {
     this.setChildGameState(
-      new CancelHouseCardAbilitiesGameState(this)
+      new CancelHouseCardAbilitiesGameState(this),
     ).firstStart();
   }
 
@@ -479,7 +479,7 @@ export default class CombatGameState extends GameState<
 
   proceedImmediatelyResolution(): void {
     this.setChildGameState(
-      new ImmediatelyHouseCardAbilitiesResolutionGameState(this)
+      new ImmediatelyHouseCardAbilitiesResolutionGameState(this),
     ).firstStart();
   }
 
@@ -489,7 +489,7 @@ export default class CombatGameState extends GameState<
 
   proceedBeforeCombatResolution(): void {
     this.setChildGameState(
-      new BeforeCombatHouseCardAbilitiesGameState(this)
+      new BeforeCombatHouseCardAbilitiesGameState(this),
     ).firstStart();
   }
 
@@ -501,7 +501,7 @@ export default class CombatGameState extends GameState<
         ([house, hcd]) => [
           house.id,
           hcd.tidesOfBattleCard ? hcd.tidesOfBattleCard.id : null,
-        ]
+        ],
       ),
     });
   }
@@ -519,7 +519,7 @@ export default class CombatGameState extends GameState<
 
     const valyrianSteelBladeHolder = this.game.valyrianSteelBladeHolder;
     const commandedHouseOfVsbHolder = this.tryGetCommandedHouseInCombat(
-      this.ingameGameState.getControllerOfHouse(valyrianSteelBladeHolder)
+      this.ingameGameState.getControllerOfHouse(valyrianSteelBladeHolder),
     );
 
     // Check if the sword has not been used this round and no house card has set final combat strength of VSB holder
@@ -535,7 +535,7 @@ export default class CombatGameState extends GameState<
         valyrianSteelBladeHolder
       ) {
         this.setChildGameState(
-          new UseValyrianSteelBladeGameState(this)
+          new UseValyrianSteelBladeGameState(this),
         ).firstStart(this.attacker, forNewTidesOfBattleCard);
         return true;
       } else if (
@@ -543,7 +543,7 @@ export default class CombatGameState extends GameState<
         valyrianSteelBladeHolder
       ) {
         this.setChildGameState(
-          new UseValyrianSteelBladeGameState(this)
+          new UseValyrianSteelBladeGameState(this),
         ).firstStart(this.defender, forNewTidesOfBattleCard);
         return true;
       }
@@ -574,7 +574,7 @@ export default class CombatGameState extends GameState<
 
   areCasualtiesPrevented(
     affectedHouse: House,
-    isSkullCasualty = false
+    isSkullCasualty = false,
   ): boolean {
     const affectedHouseCard =
       this.houseCombatDatas.get(affectedHouse).houseCard;
@@ -587,7 +587,7 @@ export default class CombatGameState extends GameState<
           this,
           affectedHouse,
           affectedHouseCard,
-          isSkullCasualty
+          isSkullCasualty,
         )
       : false;
   }
@@ -603,7 +603,7 @@ export default class CombatGameState extends GameState<
       ? affectedHouseCard.ability.doesPreventWounds(
           this,
           affectedHouse,
-          affectedHouseCard
+          affectedHouseCard,
         )
       : false;
   }
@@ -628,7 +628,7 @@ export default class CombatGameState extends GameState<
               this,
               affectedHouse,
               houseCard,
-              affectedHouseCard
+              affectedHouseCard,
             )
         : res;
     }, false);
@@ -646,7 +646,7 @@ export default class CombatGameState extends GameState<
           houseCardId
             ? this.ingameGameState.game.getHouseCardById(houseCardId)
             : null,
-        ]
+        ],
       );
       const action = (): void => {
         houseCards.forEach(([house, houseCard]) => {
@@ -678,7 +678,7 @@ export default class CombatGameState extends GameState<
 
       drawnTidesOfBattleCards.forEach(
         ([house, tob]) =>
-          (this.houseCombatDatas.get(house).tidesOfBattleCard = tob)
+          (this.houseCombatDatas.get(house).tidesOfBattleCard = tob),
       );
       this.rerender++;
     } else if (message.type == "combat-change-army") {
@@ -755,10 +755,10 @@ export default class CombatGameState extends GameState<
   }
 
   proceedToChooseGeneral(
-    choosableHouseCards: BetterMap<House, HouseCard[]> | null = null
+    choosableHouseCards: BetterMap<House, HouseCard[]> | null = null,
   ): void {
     this.setChildGameState(new ChooseHouseCardGameState(this)).firstStart(
-      choosableHouseCards
+      choosableHouseCards,
     );
   }
 
@@ -778,12 +778,12 @@ export default class CombatGameState extends GameState<
       // Notify the defender that he can bribe for support now
       this.entireGame.notifyUsers(
         [this.ingameGameState.getControllerOfHouse(this.defender).user],
-        NotificationType.BRIBE_FOR_SUPPORT
+        NotificationType.BRIBE_FOR_SUPPORT,
       );
     }
 
     this.setChildGameState(new DeclareSupportGameState(this)).firstStart(
-      nextHouseToDeclareSupport
+      nextHouseToDeclareSupport,
     );
 
     return true;
@@ -827,8 +827,8 @@ export default class CombatGameState extends GameState<
       this.getStatOfHouseCard(
         house,
         (hc) => Math.max(0, hc.combatStrength + specialModifier),
-        (h, hc, a, ahc, bv) => a.modifyCombatStrength(this, h, hc, ahc, bv)
-      )
+        (h, hc, a, ahc, bv) => a.modifyCombatStrength(this, h, hc, ahc, bv),
+      ),
     );
   }
 
@@ -836,7 +836,7 @@ export default class CombatGameState extends GameState<
     return this.getStatOfHouseCard(
       house,
       (hc) => hc.swordIcons,
-      (h, hc, a, ahc, _bv) => a.modifySwordIcons(this, h, hc, ahc)
+      (h, hc, a, ahc, _bv) => a.modifySwordIcons(this, h, hc, ahc),
     );
   }
 
@@ -844,7 +844,7 @@ export default class CombatGameState extends GameState<
     return this.getStatOfHouseCard(
       house,
       (hc) => hc.towerIcons,
-      (h, hc, a, ahc, _bv) => a.modifyTowerIcons(this, h, hc, ahc)
+      (h, hc, a, ahc, _bv) => a.modifyTowerIcons(this, h, hc, ahc),
     );
   }
 
@@ -863,7 +863,7 @@ export default class CombatGameState extends GameState<
             house,
             houseCard,
             affectedHouseCard,
-            s
+            s,
           )
         : s;
     }, strength);
@@ -877,8 +877,8 @@ export default class CombatGameState extends GameState<
       houseCard: HouseCard,
       ability: HouseCardAbility,
       affectedHouseCard: HouseCard,
-      baseValue: number
-    ) => number
+      baseValue: number,
+    ) => number,
   ): number {
     const affectedHouseCard =
       this.houseCombatDatas.get(affectedHouse).houseCard;
@@ -901,7 +901,7 @@ export default class CombatGameState extends GameState<
               houseCard,
               houseCard.ability,
               affectedHouseCard,
-              baseAmount(affectedHouseCard)
+              baseAmount(affectedHouseCard),
             )
         : s;
     }, baseAmount(affectedHouseCard));
@@ -913,8 +913,8 @@ export default class CombatGameState extends GameState<
       house: House,
       houseCard: HouseCard,
       houseCardAbility: HouseCardAbility,
-      currentValue: number
-    ) => number
+      currentValue: number,
+    ) => number,
   ): number {
     return this.getOrderResolutionHouseCard().reduce((s, h) => {
       const houseCard = this.houseCombatDatas.get(h).houseCard;
@@ -940,7 +940,7 @@ export default class CombatGameState extends GameState<
     support: SupportOrderType;
   }[] {
     return this.actionGameState.getPossibleSupportingRegions(
-      this.defendingRegion
+      this.defendingRegion,
     );
   }
 
@@ -949,7 +949,7 @@ export default class CombatGameState extends GameState<
       this.getPossibleSupportingRegions()
         // Since a region that contains units _must_ be controlled by a house,
         // r.getController() can be safely casted
-        .map(({ region }) => region.getController() as House)
+        .map(({ region }) => region.getController() as House),
     );
   }
 
@@ -971,14 +971,14 @@ export default class CombatGameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedCombatGameState {
     const playerIsVsbUser =
       this.valyrianSteelBladeUser != null &&
       // Use safeGetControllerOfHouse as it might happen that the VSB user gets vassalized during post-combat
       // and then childGameStateBeforeVassalsModification cannot be serialized properly
       this.ingameGameState.safeGetControllerOfHouse(
-        this.valyrianSteelBladeUser
+        this.valyrianSteelBladeUser,
       ) == player;
     return {
       type: "combat",
@@ -1038,19 +1038,19 @@ export default class CombatGameState extends GameState<
 
   static deserializeFromServer(
     resolveMarchOrderGameState: ResolveMarchOrderGameState,
-    data: SerializedCombatGameState
+    data: SerializedCombatGameState,
   ): CombatGameState {
     const combatGameState = new CombatGameState(resolveMarchOrderGameState);
 
     combatGameState.order = orders.get(data.order);
     combatGameState.attacker = resolveMarchOrderGameState.game.houses.get(
-      data.attackerId
+      data.attackerId,
     );
     combatGameState.defender = resolveMarchOrderGameState.game.houses.get(
-      data.defenderId
+      data.defenderId,
     );
     combatGameState.tidesOfBattleDeck = data.tidesOfBattleDeck.map((tob) =>
-      tidesOfBattleCards.get(tob)
+      tidesOfBattleCards.get(tob),
     );
     combatGameState.dontSkipVsbQuestion = data.dontSkipVsbQuestion;
     combatGameState.revealTidesOfBattleCards = data.revealTidesOfBattleCards;
@@ -1077,8 +1077,8 @@ export default class CombatGameState extends GameState<
                     : null,
             },
           ];
-        }
-      )
+        },
+      ),
     );
     combatGameState.supporters = new BetterMap(
       data.supporters.map(([houseId, supportedHouseId]) => [
@@ -1086,13 +1086,13 @@ export default class CombatGameState extends GameState<
         supportedHouseId
           ? resolveMarchOrderGameState.game.houses.get(supportedHouseId)
           : null,
-      ])
+      ]),
     );
     combatGameState.houseCardModifiers = new BetterMap(data.houseCardModifiers);
     combatGameState.specialHouseCardModifier = data.specialHouseCardModifier
       ? {
           houseCard: combatGameState.game.getHouseCardById(
-            data.specialHouseCardModifier.houseCardId
+            data.specialHouseCardModifier.houseCardId,
           ),
           combatStrength: data.specialHouseCardModifier.combatStrength,
         }
@@ -1102,7 +1102,7 @@ export default class CombatGameState extends GameState<
       : null;
     combatGameState.stats = data.stats;
     combatGameState.childGameState = combatGameState.deserializeChildGameState(
-      data.childGameState
+      data.childGameState,
     );
 
     return combatGameState;
@@ -1117,7 +1117,7 @@ export default class CombatGameState extends GameState<
   }
 
   deserializeChildGameState(
-    data: SerializedCombatGameState["childGameState"]
+    data: SerializedCombatGameState["childGameState"],
   ): CombatGameState["childGameState"] {
     switch (data.type) {
       case "support":
@@ -1131,17 +1131,17 @@ export default class CombatGameState extends GameState<
       case "immediately-house-card-abilities-resolution":
         return ImmediatelyHouseCardAbilitiesResolutionGameState.deserializeFromServer(
           this,
-          data
+          data,
         );
       case "cancel-house-card-abilities":
         return CancelHouseCardAbilitiesGameState.deserializeFromServer(
           this,
-          data
+          data,
         );
       case "before-combat-house-card-abilities-resolution":
         return BeforeCombatHouseCardAbilitiesGameState.deserializeFromServer(
           this,
-          data
+          data,
         );
     }
   }

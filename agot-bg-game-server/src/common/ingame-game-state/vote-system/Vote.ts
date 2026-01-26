@@ -88,7 +88,7 @@ export default class Vote {
       const swapHousesVoteType = this.type;
       if (this.ingame.hasChildGameState(PlanningGameState)) {
         const planning = this.ingame.getChildGameState(
-          PlanningGameState
+          PlanningGameState,
         ) as PlanningGameState;
         if (
           planning.placedOrders.keys.some((r) => {
@@ -123,7 +123,7 @@ export default class Vote {
     type: VoteType,
     votes: BetterMap<House, boolean> = new BetterMap(),
     createdAt = new Date(),
-    cancelled = false
+    cancelled = false,
   ) {
     this.ingame = ingame;
     this.id = id;
@@ -173,7 +173,7 @@ export default class Vote {
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedVote
+    data: SerializedVote,
   ): Vote {
     const initiator = ingame.entireGame.users.get(data.initiator);
 
@@ -182,7 +182,7 @@ export default class Vote {
       data.votes.map(([hid, vote]) => {
         const house = ingame.game.houses.get(hid);
         return [house, vote];
-      })
+      }),
     );
 
     return new Vote(
@@ -193,7 +193,7 @@ export default class Vote {
       type,
       votes,
       new Date(data.createdAt),
-      data.cancelled
+      data.cancelled,
     );
   }
 }
