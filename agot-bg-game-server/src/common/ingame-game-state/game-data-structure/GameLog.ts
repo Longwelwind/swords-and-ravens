@@ -345,6 +345,7 @@ interface SupportDeclared {
 interface SupportRefused {
   type: "support-refused";
   house: string;
+  from?: string;
 }
 
 interface Attack {

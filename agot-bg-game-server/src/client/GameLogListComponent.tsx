@@ -335,10 +335,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
       case "support-refused": {
         const house = this.game.houses.get(data.house);
+        const from = data.from ? this.game.houses.get(data.from) : null;
         return (
           <p>
-            House <b>{house.name}</b> chose to refuse all the support they
-            received.
+            House <b>{house.name}</b> chose to refuse{" "}
+            {from == null ? "all" : ""} the support they received
+            {from ? (
+              <>
+                {" "}
+                from House <b>{from.name}</b>
+              </>
+            ) : null}
+            .
           </p>
         );
       }

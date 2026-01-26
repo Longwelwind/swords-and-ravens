@@ -126,7 +126,13 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
       this.combatGameState.rerender++;
     } else if (message.type == "support-refused") {
       const house = this.combatGameState.game.houses.get(message.houseId);
-      this.removeSupportForHouse(house);
+      if (message.fromId === undefined) {
+        this.removeSupportForHouse(house);
+      } else {
+        const from = this.combatGameState.game.houses.get(message.fromId);
+        this.combatGameState.supporters.delete(from);
+        this.selectedHouseCard = null;
+      }
       this.combatGameState.houseCombatDatas.keys.forEach((h) => {
         const hcd = this.combatGameState.houseCombatDatas.get(h);
         hcd.houseCardChosen = false;
@@ -215,16 +221,45 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         return;
       }
 
-      this.removeSupportForHouse(commandedHouse);
-      this.combatGameState.ingameGameState.log({
-        type: "support-refused",
-        house: commandedHouse.id,
-      });
+      if (message.from === undefined) {
+        // Refuse all support
+        this.removeSupportForHouse(commandedHouse);
+        this.combatGameState.ingameGameState.log({
+          type: "support-refused",
+          house: commandedHouse.id,
+        });
 
-      this.entireGame.broadcastToClients({
-        type: "support-refused",
-        houseId: commandedHouse.id,
-      });
+        this.entireGame.broadcastToClients({
+          type: "support-refused",
+          houseId: commandedHouse.id,
+        });
+      } else {
+        const from = this.combatGameState.game.houses.tryGet(
+          message.from,
+          null,
+        );
+        if (
+          !from ||
+          this.combatGameState.supporters.tryGet(from, null) != commandedHouse
+        ) {
+          return;
+        }
+
+        this.combatGameState.ingameGameState.log({
+          type: "support-refused",
+          house: commandedHouse.id,
+          from: from.id,
+        });
+
+        this.entireGame.broadcastToClients({
+          type: "support-refused",
+          houseId: commandedHouse.id,
+          fromId: from.id,
+        });
+
+        this.combatGameState.supporters.delete(from);
+        this.selectedHouseCard = null;
+      }
 
       const vassals = this.choosableHouseCards.keys.filter((h) =>
         this.ingameGameState.isVassalHouse(h),
@@ -358,6 +393,15 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     }
   }
 
+  getSupportingHouses(house: House | null): House[] {
+    if (house == null) {
+      return [];
+    }
+    return this.combatGameState.supporters.entries
+      .filter(([_, supported]) => supported == house)
+      .map(([supporter, _]) => supporter);
+  }
+
   canRefuseSupport(house: House | null): boolean {
     // Support can only be refused if house is supported
     return (
@@ -365,9 +409,10 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
     );
   }
 
-  refuseSupport(): void {
+  refuseSupport(from?: House): void {
     this.entireGame.sendMessageToServer({
       type: "refuse-support",
+      from: from ? from.id : undefined,
     });
   }
 
