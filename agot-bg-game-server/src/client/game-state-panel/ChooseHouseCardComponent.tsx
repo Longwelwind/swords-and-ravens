@@ -75,7 +75,7 @@ export default class ChooseHouseCardComponent extends Component<
 
   tryGetCommandedHouseInCombat(): House | null {
     return this.combat.tryGetCommandedHouseInCombat(
-      this.props.gameClient.authenticatedPlayer
+      this.props.gameClient.authenticatedPlayer,
     );
   }
 
@@ -169,8 +169,8 @@ export default class ChooseHouseCardComponent extends Component<
                 {this.props.gameClient.authenticatedPlayer &&
                   this.props.gameState.canRefuseSupport(
                     this.combat.tryGetCommandedHouseInCombat(
-                      this.props.gameClient.authenticatedPlayer
-                    )
+                      this.props.gameClient.authenticatedPlayer,
+                    ),
                   ) && (
                     <Col xs="auto">
                       <Button
@@ -179,7 +179,7 @@ export default class ChooseHouseCardComponent extends Component<
                         onClick={() => {
                           if (
                             window.confirm(
-                              "Are you sure you want to refuse all the support you have received?"
+                              "Are you sure you want to refuse all the support you have received?",
                             )
                           ) {
                             this.props.gameState.refuseSupport();
@@ -200,7 +200,8 @@ export default class ChooseHouseCardComponent extends Component<
             {waitingFor
               .map(
                 (h) =>
-                  this.combat.ingameGameState.getControllerOfHouse(h).house.name
+                  this.combat.ingameGameState.getControllerOfHouse(h).house
+                    .name,
               )
               .join(" and ")}{" "}
             to choose their House&nbsp;card{waitingFor.length != 1 ? "s" : ""}
@@ -213,7 +214,7 @@ export default class ChooseHouseCardComponent extends Component<
 
   shouldChooseHouseCard(): boolean {
     return this.props.gameState.combatGameState.houseCombatDatas.keys.some(
-      (h) => this.props.gameClient.doesControlHouse(h)
+      (h) => this.props.gameClient.doesControlHouse(h),
     );
   }
 
@@ -224,14 +225,14 @@ export default class ChooseHouseCardComponent extends Component<
 
     this.props.gameState.chooseHouseCard(
       this.selectedHouseCard,
-      this.dontSkipVsbQuestion
+      this.dontSkipVsbQuestion,
     );
   }
 
   getChoosableHouseCards(): HouseCard[] {
     const commandedHouse =
       this.props.gameState.combatGameState.tryGetCommandedHouseInCombat(
-        this.props.gameClient.authenticatedPlayer
+        this.props.gameClient.authenticatedPlayer,
       );
     if (!commandedHouse) {
       return [];

@@ -64,27 +64,27 @@ export default class ClaimVassalsGameState extends GameState<
               [
                 h,
                 this.ingame.getControlledHouses(
-                  this.ingame.getControllerOfHouse(h)
+                  this.ingame.getControllerOfHouse(h),
                 ),
-              ] as [House, House[]]
-          )
+              ] as [House, House[]],
+          ),
       );
 
       const lowestVassalCount = Math.min(
-        ...housesAndTheirVassals.values.map((vassals) => vassals.length)
+        ...housesAndTheirVassals.values.map((vassals) => vassals.length),
       );
 
       const randomHouseWithLowestCount = popRandom(
         housesAndTheirVassals.entries
           .filter(([_h, vassals]) => vassals.length == lowestVassalCount)
-          .map(([h, _vassals]) => h)
+          .map(([h, _vassals]) => h),
       ) as House;
 
       const nextVassalToClaim = popRandom(vassalsToClaim) as House;
 
       this.game.vassalRelations.set(
         nextVassalToClaim,
-        randomHouseWithLowestCount
+        randomHouseWithLowestCount,
       );
       vassalRelationsChanged = true;
 
@@ -94,7 +94,7 @@ export default class ClaimVassalsGameState extends GameState<
           house: randomHouseWithLowestCount.id,
           vassals: [nextVassalToClaim.id],
         },
-        true
+        true,
       );
     }
 
@@ -137,14 +137,14 @@ export default class ClaimVassalsGameState extends GameState<
             // Assign the vassal to the previous house to claim
             vassalAssignments.set(
               h,
-              vassalAssignments.tryGet(h, [] as House[]).concat(v)
+              vassalAssignments.tryGet(h, [] as House[]).concat(v),
             );
             return;
           }
         } else {
           vassalAssignments.set(
             nextHouseToClaim,
-            vassalAssignments.tryGet(nextHouseToClaim, [] as House[]).concat(v)
+            vassalAssignments.tryGet(nextHouseToClaim, [] as House[]).concat(v),
           );
         }
       });
@@ -161,7 +161,7 @@ export default class ClaimVassalsGameState extends GameState<
       // Check if there are still vassals to claim after removing the forbidden ones
       _.without(
         vassalsToClaim,
-        this.forbiddenRelations.tryGet(nextHouseToClaim, null)
+        this.forbiddenRelations.tryGet(nextHouseToClaim, null),
       ).length == 0
     ) {
       this.proceedNextVassal(nextHouseToClaim);
@@ -183,13 +183,13 @@ export default class ClaimVassalsGameState extends GameState<
 
     this.setChildGameState(new ClaimVassalGameState(this)).firstStart(
       nextHouseToClaim,
-      count
+      count,
     );
   }
 
   private isRelationForbidden(commander: House, vassal: House): boolean {
     return this.forbiddenRelations.entries.some(
-      ([c, v]) => c == commander && v == vassal
+      ([c, v]) => c == commander && v == vassal,
     );
   }
 
@@ -200,7 +200,7 @@ export default class ClaimVassalsGameState extends GameState<
   assignVassals(
     house: House,
     vassals: House[],
-    resolvedAutomatically = false
+    resolvedAutomatically = false,
   ): void {
     vassals.forEach((v) => this.game.vassalRelations.set(v, house));
 
@@ -212,7 +212,7 @@ export default class ClaimVassalsGameState extends GameState<
         house: house.id,
         vassals: vassals.map((v) => v.id),
       },
-      resolvedAutomatically
+      resolvedAutomatically,
     );
   }
 
@@ -224,26 +224,26 @@ export default class ClaimVassalsGameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedClaimVassalsGameState {
     return {
       type: "claim-vassals",
       childGameState: this.childGameState.serializeToClient(admin, player),
       passedVassalsCount: this.passedVassalsCount,
       forbiddenRelations: this.forbiddenRelations.entries.map(
-        ([commander, vassal]) => [commander.id, vassal.id] as [string, string]
+        ([commander, vassal]) => [commander.id, vassal.id] as [string, string],
       ),
     };
   }
 
   static deserializeFromServer(
     parent: ParentGameState,
-    data: SerializedClaimVassalsGameState
+    data: SerializedClaimVassalsGameState,
   ): ClaimVassalsGameState {
     const claimVassals = new ClaimVassalsGameState(parent);
 
     claimVassals.childGameState = claimVassals.deserializeChildGameState(
-      data.childGameState
+      data.childGameState,
     );
     claimVassals.passedVassalsCount = data.passedVassalsCount;
     claimVassals.forbiddenRelations = new BetterMap(
@@ -252,14 +252,14 @@ export default class ClaimVassalsGameState extends GameState<
             claimVassals.game.houses.get(commander),
             claimVassals.game.houses.get(vassal),
           ])
-        : []
+        : [],
     );
 
     return claimVassals;
   }
 
   deserializeChildGameState(
-    data: SerializedClaimVassalsGameState["childGameState"]
+    data: SerializedClaimVassalsGameState["childGameState"],
   ): ClaimVassalsGameState["childGameState"] {
     switch (data.type) {
       case "claim-vassal":
