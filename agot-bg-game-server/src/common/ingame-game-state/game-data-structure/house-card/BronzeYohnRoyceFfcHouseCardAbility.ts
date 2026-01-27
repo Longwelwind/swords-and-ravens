@@ -9,11 +9,12 @@ export default class BronzeYohnRoyceFfcHouseCardAbility extends HouseCardAbility
     house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number
+    _baseValue: number,
   ): number {
     if (houseCard != affectedHouseCard) {
       return 0;
     }
+
     const enemy = combat.getEnemy(house);
     if (combat.ingameGameState.isVassalHouse(enemy)) {
       return house.powerTokens > 0 ? 1 : 0;

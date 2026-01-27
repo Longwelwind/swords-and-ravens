@@ -6,12 +6,28 @@ import AeronDamphairDwDAbilityGameState from "../../action-game-state/resolve-ma
 import CombatGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 export default class AeronDamphairDwDHouseCardAbility extends HouseCardAbility {
-    beforeCombatResolution(beforeCombat: BeforeCombatHouseCardAbilitiesGameState, house: House, houseCard: HouseCard): void {
-        beforeCombat.childGameState.setChildGameState(new AeronDamphairDwDAbilityGameState(beforeCombat.childGameState)).firstStart(house, houseCard.id.endsWith("-nerfed"));
-    }
+  beforeCombatResolution(
+    beforeCombat: BeforeCombatHouseCardAbilitiesGameState,
+    house: House,
+    houseCard: HouseCard,
+  ): void {
+    beforeCombat.childGameState
+      .setChildGameState(
+        new AeronDamphairDwDAbilityGameState(beforeCombat.childGameState),
+      )
+      .firstStart(house, houseCard.id.endsWith("-nerfed"));
+  }
 
-    modifyCombatStrength(combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
-        const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
-        return houseCardModifier && houseCard == affectedHouseCard ? houseCardModifier.combatStrength : 0;
-    }
+  modifyCombatStrength(
+    combat: CombatGameState,
+    _house: House,
+    houseCard: HouseCard,
+    affectedHouseCard: HouseCard,
+    _baseValue: number,
+  ): number {
+    const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
+    return houseCardModifier && houseCard == affectedHouseCard
+      ? houseCardModifier.combatStrength
+      : 0;
+  }
 }
