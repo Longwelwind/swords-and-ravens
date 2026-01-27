@@ -125,7 +125,22 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
       (c) => c.id == this.game.clientNextWildlingCardId,
     );
 
-    const isOwnTurn = this.gameClient.isOwnTurn();
+    let isOwnTurn = false;
+    try {
+      isOwnTurn = this.gameClient.isOwnTurn();
+    } catch (e) {
+      // Ignore getControllerOfHouse errors that can occur
+      // after vassal to player replacement
+      if (
+        e instanceof Error &&
+        e.message.includes("failed as there is no suzerainHouse")
+      ) {
+        console.warn(e.message);
+        isOwnTurn = false;
+      } else {
+        throw e;
+      }
+    }
     const border = isOwnTurn
       ? "warning"
       : this.ingame.childGameState instanceof CancelledGameState
