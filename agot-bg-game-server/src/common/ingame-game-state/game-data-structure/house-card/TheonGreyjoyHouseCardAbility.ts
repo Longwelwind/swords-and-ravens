@@ -9,7 +9,6 @@ export default class TheonGreyjoyHouseCardAbility extends HouseCardAbility {
     house: House,
     _houseCard: HouseCard,
     _affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     return this.doesTrigger(combat, house, _houseCard, _affectedHouseCard)
       ? 1

@@ -24,7 +24,6 @@ export default class ViserysTargaryenHouseCardAbility extends HouseCardAbility {
     _house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
     return houseCardModifier && houseCard == affectedHouseCard

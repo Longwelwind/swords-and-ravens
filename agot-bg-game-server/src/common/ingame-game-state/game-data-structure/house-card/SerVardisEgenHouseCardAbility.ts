@@ -20,7 +20,6 @@ export default class SerVardisEgenHouseCardAbility extends HouseCardAbility {
     house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     return this.doesTrigger(combat, houseCard, affectedHouseCard, house)
       ? 1

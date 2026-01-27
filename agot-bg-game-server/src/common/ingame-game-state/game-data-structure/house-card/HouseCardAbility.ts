@@ -66,7 +66,6 @@ export default class HouseCardAbility {
     _house: House,
     _houseCard: HouseCard,
     _affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     return 0;
   }

@@ -104,12 +104,6 @@ export default class CombatGameState extends GameState<
   houseCardModifiers: BetterMap<string, HouseCardModifier> = new BetterMap();
 
   @observable
-  specialHouseCardModifier: {
-    houseCard: HouseCard;
-    combatStrength: number;
-  } | null = null;
-
-  @observable
   rerender = 0;
 
   // The key is the supporting house and the value is the supported house.
@@ -692,11 +686,6 @@ export default class CombatGameState extends GameState<
       this.rerender++;
     } else if (message.type == "update-house-card-modifier") {
       this.houseCardModifiers.set(message.id, message.modifier);
-    } else if (message.type == "update-special-house-card-modifier") {
-      this.specialHouseCardModifier = {
-        houseCard: this.game.getHouseCardById(message.houseCardId),
-        combatStrength: message.combatStrength,
-      };
     } else if (message.type == "update-combat-stats") {
       this.stats = message.stats;
     } else if (message.type == "support-declared") {
@@ -814,20 +803,14 @@ export default class CombatGameState extends GameState<
   }
 
   getHouseCardCombatStrength(house: House): number {
-    const affectedHouseCard = this.houseCombatDatas.get(house).houseCard;
-    const specialModifier =
-      affectedHouseCard == null ||
-      this.specialHouseCardModifier == null ||
-      this.specialHouseCardModifier.houseCard != affectedHouseCard
-        ? 0
-        : this.specialHouseCardModifier.combatStrength;
-    // We need to make sure that the house card strength cannot be less than 0, because DwD Doran Martell against Balon could cause a negative house card strength.
+    // We need to make sure that the house card strength cannot be less than 0,
+    // because DwD Doran Martell against Balon could cause a negative house card strength.
     return Math.max(
       0,
       this.getStatOfHouseCard(
         house,
-        (hc) => Math.max(0, hc.combatStrength + specialModifier),
-        (h, hc, a, ahc, bv) => a.modifyCombatStrength(this, h, hc, ahc, bv),
+        (hc) => hc.combatStrength,
+        (h, hc, a, ahc) => a.modifyCombatStrength(this, h, hc, ahc),
       ),
     );
   }
@@ -836,7 +819,7 @@ export default class CombatGameState extends GameState<
     return this.getStatOfHouseCard(
       house,
       (hc) => hc.swordIcons,
-      (h, hc, a, ahc, _bv) => a.modifySwordIcons(this, h, hc, ahc),
+      (h, hc, a, ahc) => a.modifySwordIcons(this, h, hc, ahc),
     );
   }
 
@@ -844,7 +827,7 @@ export default class CombatGameState extends GameState<
     return this.getStatOfHouseCard(
       house,
       (hc) => hc.towerIcons,
-      (h, hc, a, ahc, _bv) => a.modifyTowerIcons(this, h, hc, ahc),
+      (h, hc, a, ahc) => a.modifyTowerIcons(this, h, hc, ahc),
     );
   }
 
@@ -877,7 +860,6 @@ export default class CombatGameState extends GameState<
       houseCard: HouseCard,
       ability: HouseCardAbility,
       affectedHouseCard: HouseCard,
-      baseValue: number,
     ) => number,
   ): number {
     const affectedHouseCard =
@@ -887,23 +869,31 @@ export default class CombatGameState extends GameState<
       return 0;
     }
 
-    return this.getOrderResolutionHouseCard().reduce((s, h) => {
-      const houseCard = this.houseCombatDatas.get(h).houseCard;
+    return this.getOrderResolutionHouseCard().reduce((strength, house) => {
+      const houseCard = this.houseCombatDatas.get(house).houseCard;
 
       if (houseCard == null) {
-        return s;
+        return strength;
       }
 
-      return houseCard.ability
-        ? s +
-            abilityModify(
-              h,
-              houseCard,
-              houseCard.ability,
-              affectedHouseCard,
-              baseAmount(affectedHouseCard),
-            )
-        : s;
+      let result = strength;
+      if (houseCard.ability) {
+        result += abilityModify(
+          house,
+          houseCard,
+          houseCard.ability,
+          affectedHouseCard,
+        );
+      }
+      if (houseCard.extraAbility) {
+        result += abilityModify(
+          house,
+          houseCard,
+          houseCard.extraAbility,
+          affectedHouseCard,
+        );
+      }
+      return result;
     }, baseAmount(affectedHouseCard));
   }
 
@@ -1021,12 +1011,6 @@ export default class CombatGameState extends GameState<
         supportedHouse ? supportedHouse.id : null,
       ]),
       houseCardModifiers: this.houseCardModifiers.entries,
-      specialHouseCardModifier: this.specialHouseCardModifier
-        ? {
-            houseCardId: this.specialHouseCardModifier.houseCard.id,
-            combatStrength: this.specialHouseCardModifier.combatStrength,
-          }
-        : null,
       valyrianSteelBladeUser:
         admin || playerIsVsbUser
           ? (this.valyrianSteelBladeUser?.id ?? null)
@@ -1089,14 +1073,6 @@ export default class CombatGameState extends GameState<
       ]),
     );
     combatGameState.houseCardModifiers = new BetterMap(data.houseCardModifiers);
-    combatGameState.specialHouseCardModifier = data.specialHouseCardModifier
-      ? {
-          houseCard: combatGameState.game.getHouseCardById(
-            data.specialHouseCardModifier.houseCardId,
-          ),
-          combatStrength: data.specialHouseCardModifier.combatStrength,
-        }
-      : null;
     combatGameState.valyrianSteelBladeUser = data.valyrianSteelBladeUser
       ? resolveMarchOrderGameState.game.houses.get(data.valyrianSteelBladeUser)
       : null;
@@ -1166,10 +1142,6 @@ export interface SerializedCombatGameState {
     },
   ][];
   houseCardModifiers: [string, HouseCardModifier][];
-  specialHouseCardModifier: {
-    houseCardId: string;
-    combatStrength: number;
-  } | null;
   valyrianSteelBladeUser: string | null;
   stats: CombatStats[];
   childGameState:

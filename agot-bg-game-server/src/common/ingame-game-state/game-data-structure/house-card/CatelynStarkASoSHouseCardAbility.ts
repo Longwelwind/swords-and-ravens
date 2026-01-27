@@ -9,7 +9,6 @@ export default class CatelynStarkASoSHouseCardAbility extends HouseCardAbility {
     house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     return this.doesTrigger(combat, house, houseCard, affectedHouseCard)
       ? 2

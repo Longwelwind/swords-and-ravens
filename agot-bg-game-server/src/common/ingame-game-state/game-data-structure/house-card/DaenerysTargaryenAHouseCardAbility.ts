@@ -10,7 +10,6 @@ export default class DaenerysTargaryenAHouseCardAbility extends HouseCardAbility
     _house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     return houseCard == affectedHouseCard &&
       combat.houseCombatDatas.values.some((hcd) =>

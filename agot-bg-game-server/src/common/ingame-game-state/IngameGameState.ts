@@ -1866,8 +1866,9 @@ export default class IngameGameState extends GameState<
         houseCard.disabledAbility = shc.disabledAbilityId
           ? houseCardAbilities.get(shc.disabledAbilityId)
           : null;
-        houseCard.combatStrength = shc.combatStrength;
-        houseCard.originalCombatStrength = shc.originalCombatStrength;
+        houseCard.extraAbility = shc.extraAbilityId
+          ? houseCardAbilities.get(shc.extraAbilityId)
+          : null;
       });
 
       if (this.hasChildGameState(CombatGameState)) {

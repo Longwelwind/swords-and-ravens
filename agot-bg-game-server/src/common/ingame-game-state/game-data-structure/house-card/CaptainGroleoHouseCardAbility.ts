@@ -12,7 +12,6 @@ export default class CaptainGroleoHouseCardAbility extends HouseCardAbility {
     house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     if (
       houseCard != affectedHouseCard ||

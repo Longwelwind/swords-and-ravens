@@ -9,13 +9,13 @@ export default class StannisBaratheonHouseCardAbility extends HouseCardAbility {
     house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
-    return combat.game.isAheadInTrack(
-      combat.game.ironThroneTrack,
-      combat.getEnemy(house),
-      house,
-    ) && houseCard == affectedHouseCard
+    return houseCard == affectedHouseCard &&
+      combat.game.isAheadInTrack(
+        combat.game.ironThroneTrack,
+        combat.getEnemy(house),
+        house,
+      )
       ? 1
       : 0;
   }

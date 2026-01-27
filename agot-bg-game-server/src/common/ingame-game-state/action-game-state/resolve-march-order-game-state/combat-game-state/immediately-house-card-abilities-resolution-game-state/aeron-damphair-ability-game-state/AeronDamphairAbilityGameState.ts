@@ -16,7 +16,10 @@ import HouseCard, {
   HouseCardState,
 } from "../../../../../game-data-structure/house-card/HouseCard";
 import IngameGameState from "../../../../../IngameGameState";
-import { aeronDamphair } from "../../../../../game-data-structure/house-card/houseCardAbilities";
+import {
+  aeronDamphair,
+  aeronDamphairASoS,
+} from "../../../../../game-data-structure/house-card/houseCardAbilities";
 
 export default class AeronDamphairAbilityGameState extends GameState<
   ImmediatelyHouseCardAbilitiesResolutionGameState["childGameState"],
@@ -116,15 +119,10 @@ export default class AeronDamphairAbilityGameState extends GameState<
     this.ingame.changePowerTokens(house, -2);
 
     if (this.reduceCombatStrengthOfNewHouseCard) {
-      this.combatGameState.specialHouseCardModifier = {
-        houseCard: houseCard,
-        combatStrength: -1,
-      };
+      houseCard.extraAbility = aeronDamphairASoS;
       this.entireGame.broadcastToClients({
-        type: "update-special-house-card-modifier",
-        houseCardId: this.combatGameState.specialHouseCardModifier.houseCard.id,
-        combatStrength:
-          this.combatGameState.specialHouseCardModifier.combatStrength,
+        type: "manipulate-combat-house-card",
+        manipulatedHouseCards: [[houseCard.id, houseCard.serializeToClient()]],
       });
     }
 

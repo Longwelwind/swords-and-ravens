@@ -84,6 +84,7 @@ import TyrionLannisterASoSHouseCardAbility from "./TyrionLannisterASoSHouseCardA
 import StannisBaratheonASoSHouseCardAbility from "./StannisBaratheonASoSHouseCardAbility";
 import VictarionGreyjoyASoSHouseCardAbility from "./VictarionGreyjoyASoSHouseCardAbility";
 import WillasTyrellHouseCardAbility from "./WillasTyrellHouseCardAbility";
+import AeronDamphairASoSHouseCardAbility from "./AeronDamphairASoSHouseCardAbility";
 
 export const theonGreyjoy = new TheonGreyjoyHouseCardAbility(
   "theon-greyjoy",
@@ -407,6 +408,12 @@ export const captainGroleo = new CaptainGroleoHouseCardAbility(
   "If you are attacking a land area by using ship transport, this card gains +1 combat strength" +
     " for each Targaryen Ship in areas adjacent to the embattled area.",
 );
+export const aeronDamphairASoS = new AeronDamphairASoSHouseCardAbility(
+  "aeron-damphair-asos",
+  "After revealing, you may spend two Power tokens and discard this card" +
+    " to choose a different House Card from your hand (if able)" +
+    " to use in this battle at -1 combat strength.",
+);
 export const ashaGreyjoyASoS = new AshaGreyjoyASoSHouseCardAbility(
   "asha-greyjoy-asos",
   "If you are being supported in this battle, gain two Sword Icons.",
@@ -545,6 +552,7 @@ const houseCardAbilities = new BetterMap<string, HouseCardAbility>([
   [rakharo.id, rakharo],
   [missandei.id, missandei],
   [captainGroleo.id, captainGroleo],
+  [aeronDamphairASoS.id, aeronDamphairASoS],
   [ashaGreyjoyASoS.id, ashaGreyjoyASoS],
   [balonGreyjoyASoS.id, balonGreyjoyASoS],
   [maceTyrellASoS.id, maceTyrellASoS],

@@ -11,11 +11,11 @@ export default class HouseCard {
   id: string;
   name: string;
   combatStrength: number;
-  originalCombatStrength?: number;
   swordIcons: number;
   towerIcons: number;
   ability: HouseCardAbility | null;
   disabledAbility: HouseCardAbility | null;
+  extraAbility: HouseCardAbility | null;
   disabled: boolean;
   houseId?: string;
   @observable state: HouseCardState = HouseCardState.AVAILABLE;
@@ -36,9 +36,9 @@ export default class HouseCard {
     this.towerIcons = towerIcons;
     this.ability = ability;
     this.disabledAbility = null;
+    this.extraAbility = null;
     this.disabled = false;
     this.houseId = houseId;
-    this.originalCombatStrength = undefined;
   }
 
   serializeToClient(): SerializedHouseCard {
@@ -46,11 +46,11 @@ export default class HouseCard {
       id: this.id,
       name: this.name,
       combatStrength: this.combatStrength,
-      originalCombatStrength: this.originalCombatStrength,
       swordIcons: this.swordIcons,
       towerIcons: this.towerIcons,
       abilityId: this.ability ? this.ability.id : null,
       disabledAbilityId: this.disabledAbility ? this.disabledAbility.id : null,
+      extraAbilityId: this.extraAbility ? this.extraAbility.id : null,
       disabled: this.disabled,
       state: this.state,
       houseId: this.houseId,
@@ -72,8 +72,10 @@ export default class HouseCard {
     houseCard.disabledAbility = data.disabledAbilityId
       ? houseCardAbilities.get(data.disabledAbilityId)
       : null;
+    houseCard.extraAbility = data.extraAbilityId
+      ? houseCardAbilities.get(data.extraAbilityId)
+      : null;
     houseCard.disabled = data.disabled;
-    houseCard.originalCombatStrength = data.originalCombatStrength;
 
     return houseCard;
   }
@@ -83,11 +85,11 @@ export interface SerializedHouseCard {
   id: string;
   name: string;
   combatStrength: number;
-  originalCombatStrength?: number;
   swordIcons: number;
   towerIcons: number;
   abilityId: string | null;
   disabledAbilityId: string | null;
+  extraAbilityId: string | null;
   disabled: boolean | false;
   state: HouseCardState;
   houseId?: string;

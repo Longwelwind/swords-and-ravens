@@ -7,30 +7,24 @@ import { sea } from "../regionTypes";
 export default class VictarionGreyjoyASoSHouseCardAbility extends HouseCardAbility {
   modifyCombatStrength(
     combat: CombatGameState,
-    house: House,
+    _house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
-    return this.doesTrigger(combat, house, houseCard, affectedHouseCard)
-      ? 1
-      : 0;
+    return this.doesTrigger(combat, houseCard, affectedHouseCard) ? 1 : 0;
   }
 
   modifyTowerIcons(
     combat: CombatGameState,
-    house: House,
+    _house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
   ): number {
-    return this.doesTrigger(combat, house, houseCard, affectedHouseCard)
-      ? 1
-      : 0;
+    return this.doesTrigger(combat, houseCard, affectedHouseCard) ? 1 : 0;
   }
 
   private doesTrigger(
     combat: CombatGameState,
-    house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
   ): boolean {

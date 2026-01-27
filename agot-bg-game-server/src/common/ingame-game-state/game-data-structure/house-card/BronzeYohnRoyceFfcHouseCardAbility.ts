@@ -9,7 +9,6 @@ export default class BronzeYohnRoyceFfcHouseCardAbility extends HouseCardAbility
     house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     if (houseCard != affectedHouseCard) {
       return 0;

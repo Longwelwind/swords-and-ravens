@@ -35,7 +35,6 @@ export default class DoranMartellDwDAbility extends HouseCardAbility {
     house: House,
     houseCard: HouseCard,
     affectedHouseCard: HouseCard,
-    _baseValue: number,
   ): number {
     return houseCard == affectedHouseCard
       ? Math.max(
