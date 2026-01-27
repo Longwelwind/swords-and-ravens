@@ -122,10 +122,25 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
       this.authenticatedPlayer != null &&
       this.authenticatedPlayer.house.knowsNextWildlingCard;
     const nextWildlingCard = this.game.wildlingDeck.find(
-      (c) => c.id == this.game.clientNextWildlingCardId
+      (c) => c.id == this.game.clientNextWildlingCardId,
     );
 
-    const isOwnTurn = this.gameClient.isOwnTurn();
+    let isOwnTurn = false;
+    try {
+      isOwnTurn = this.gameClient.isOwnTurn();
+    } catch (e) {
+      // Ignore getControllerOfHouse errors that can occur
+      // after vassal to player replacement
+      if (
+        e instanceof Error &&
+        e.message.includes("failed as there is no suzerainHouse")
+      ) {
+        console.warn(e.message);
+        isOwnTurn = false;
+      } else {
+        throw e;
+      }
+    }
     const border = isOwnTurn
       ? "warning"
       : this.ingame.childGameState instanceof CancelledGameState
@@ -171,7 +186,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               {
                                 "weak-box-outline": isPhaseActive(phases[0]),
                                 "text-muted": !isPhaseActive(phases[0]),
-                              }
+                              },
                             )}
                           >
                             <ConditionalWrap
@@ -221,7 +236,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                           [phase.gameState, phase.component] as [
                             any,
                             typeof Component,
-                          ]
+                          ],
                       ),
                       [[DraftGameState, DraftComponent]],
                       [[GameEndedGameState, GameEndedComponent]],
@@ -233,8 +248,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                           ChooseInitialObjectivesGameState,
                           ChooseInitialObjectivesComponent,
                         ],
-                      ]
-                    )
+                      ],
+                    ),
                   )}
                 </ListGroupItem>
               </ListGroup>
@@ -263,7 +278,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                       <img
                         className={classNames(
                           { "dye-warning": roundWarning },
-                          { "dye-critical": roundCritical }
+                          { "dye-critical": roundCritical },
                         )}
                         src={hourglassImage}
                         width={28}
@@ -287,7 +302,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     <OverlayTrigger
                       overlay={this.renderWildlingDeckPopover(
                         knowsWildlingCard,
-                        nextWildlingCard?.type
+                        nextWildlingCard?.type,
                       )}
                       trigger="click"
                       placement="auto"
@@ -296,7 +311,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                       <div
                         className={classNames(
                           "clickable btn btn-sm btn-secondary p-1",
-                          { "weak-box-outline": knowsWildlingCard }
+                          { "weak-box-outline": knowsWildlingCard },
                         )}
                       >
                         <img
@@ -304,7 +319,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                           width={28}
                           className={classNames(
                             { "dye-warning": wildlingsWarning },
-                            { "dye-critical": wildlingsCritical }
+                            { "dye-critical": wildlingsCritical },
                           )}
                         />
                       </div>
@@ -368,8 +383,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
       _.sortBy(
         deck.entries,
         (rwct) => -rwct[1],
-        (rwct) => rwct[0].name
-      )
+        (rwct) => rwct[0].name,
+      ),
     );
     const nextCards = this.game.nextWesterosCardTypes;
 
@@ -412,7 +427,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                         </div>
                       ) : (
                         <div />
-                      )
+                      ),
                     )}
                   </Col>
                 ))}
@@ -469,13 +484,13 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
 
   private renderWildlingDeckPopover(
     knowsWildlingCard: boolean,
-    nextWildlingCard: WildlingCardType | undefined
+    nextWildlingCard: WildlingCardType | undefined,
   ): OverlayChildren {
     const wildlingDeck = _.sortBy(
       this.game.wildlingDeck
         .map((wc) => wc.type)
         .filter((wc) => wc != nextWildlingCard),
-      (wc) => wc.name
+      (wc) => wc.name,
     );
     return (
       <Popover id="wildling-threat-tooltip">
@@ -519,7 +534,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
 
   highlightRegionsOfHouses(): void {
     const regions = new BetterMap(
-      this.ingame.world.getAllRegionsWithControllers()
+      this.ingame.world.getAllRegionsWithControllers(),
     );
     this.highlightedRegions.clear();
 
@@ -541,7 +556,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
   highlightRegionsWithDragons(): void {
     const regions = this.ingame.world.regions.values.filter(
       (r) =>
-        r.units.size > 0 && r.units.values.some((u) => u.type.id == "dragon")
+        r.units.size > 0 && r.units.values.some((u) => u.type.id == "dragon"),
     );
     const map = new BetterMap(regions.map((r) => [r, r.getController()]));
     this.highlightedRegions.clear();
@@ -563,7 +578,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
 
   renderDragonStrengthTooltip(): OverlayChildren {
     const roundsWhenIncreased = this.game.dragonStrengthTokens.filter(
-      (onRound) => onRound > this.game.turn
+      (onRound) => onRound > this.game.turn,
     );
     return (
       <Tooltip id="dragon-strength-tooltip">
@@ -587,14 +602,14 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
 
   componentDidMount(): void {
     this.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
+      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap()),
     );
   }
 
   componentWillUnmount(): void {
     _.pull(
       this.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
+      this.modifyRegionsOnMapCallback,
     );
   }
 }
