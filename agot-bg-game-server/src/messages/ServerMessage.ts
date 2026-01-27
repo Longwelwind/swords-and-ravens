@@ -95,7 +95,6 @@ export type ServerMessage =
   | HideOrRevealUserNames
   | ClearChatRoom
   | UpdateSelectableObjectives
-  | UpdateSpecialHouseCardModifier
   | UpdateUsurper
   | StartPlayerClock
   | StopPlayerClock
@@ -423,12 +422,6 @@ interface UpdateHouseCardModifier {
   type: "update-house-card-modifier";
   id: string;
   modifier: HouseCardModifier;
-}
-
-interface UpdateSpecialHouseCardModifier {
-  type: "update-special-house-card-modifier";
-  houseCardId: string;
-  combatStrength: number;
 }
 
 interface UpdateHouseCards {

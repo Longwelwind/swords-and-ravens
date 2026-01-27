@@ -659,12 +659,8 @@ export default class PostCombatGameState extends GameState<
       oldHouseCards.forEach((hc) => {
         // Mark card as available again
         hc.state = HouseCardState.AVAILABLE;
-        const hcStrength =
-          hc.originalCombatStrength !== undefined
-            ? hc.originalCombatStrength
-            : hc.combatStrength;
         const availableCards = this.game.draftPool.values.filter(
-          (poolCard) => poolCard.combatStrength == hcStrength,
+          (poolCard) => poolCard.combatStrength == hc.combatStrength,
         );
         const houseCard = popRandom(availableCards) as HouseCard;
         house.houseCards.set(houseCard.id, houseCard);

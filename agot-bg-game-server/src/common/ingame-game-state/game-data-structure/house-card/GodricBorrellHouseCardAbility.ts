@@ -5,9 +5,18 @@ import HouseCard from "./HouseCard";
 import { land, sea } from "../regionTypes";
 
 export default class GodricBorrellHouseCardAbility extends HouseCardAbility {
-    modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
-        return houseCard == affectedHouseCard && combat.defender == house && combat.defendingRegion.type == sea
-            ? combat.world.getNeighbouringRegions(combat.defendingRegion).filter(r => r.type == land && r.getController() == house).length
-            : 0;
-    }
+  modifyCombatStrength(
+    combat: CombatGameState,
+    house: House,
+    houseCard: HouseCard,
+    affectedHouseCard: HouseCard,
+  ): number {
+    return houseCard == affectedHouseCard &&
+      combat.defender == house &&
+      combat.defendingRegion.type == sea
+      ? combat.world
+          .getNeighbouringRegions(combat.defendingRegion)
+          .filter((r) => r.type == land && r.getController() == house).length
+      : 0;
+  }
 }

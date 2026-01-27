@@ -5,15 +5,34 @@ import House from "../House";
 import { sea } from "../regionTypes";
 
 export default class VictarionGreyjoyASoSHouseCardAbility extends HouseCardAbility {
-    modifyCombatStrength(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
-        return this.doesTrigger(combat, house, houseCard, affectedHouseCard) ? 1 : 0;
-    }
+  modifyCombatStrength(
+    combat: CombatGameState,
+    _house: House,
+    houseCard: HouseCard,
+    affectedHouseCard: HouseCard,
+  ): number {
+    return this.doesTrigger(combat, houseCard, affectedHouseCard) ? 1 : 0;
+  }
 
-    modifyTowerIcons(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): number {
-        return this.doesTrigger(combat, house, houseCard, affectedHouseCard) ? 1 : 0;
-    }
+  modifyTowerIcons(
+    combat: CombatGameState,
+    _house: House,
+    houseCard: HouseCard,
+    affectedHouseCard: HouseCard,
+  ): number {
+    return this.doesTrigger(combat, houseCard, affectedHouseCard) ? 1 : 0;
+  }
 
-    private doesTrigger(combat: CombatGameState, house: House, houseCard: HouseCard, affectedHouseCard: HouseCard): boolean {
-        return houseCard == affectedHouseCard && combat.world.getNeighbouringRegions(combat.defendingRegion).some(r => r.type == sea);
-    }
+  private doesTrigger(
+    combat: CombatGameState,
+    houseCard: HouseCard,
+    affectedHouseCard: HouseCard,
+  ): boolean {
+    return (
+      houseCard == affectedHouseCard &&
+      combat.world
+        .getNeighbouringRegions(combat.defendingRegion)
+        .some((r) => r.type == sea)
+    );
+  }
 }

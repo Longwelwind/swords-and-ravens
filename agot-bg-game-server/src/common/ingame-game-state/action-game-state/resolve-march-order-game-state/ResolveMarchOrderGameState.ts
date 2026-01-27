@@ -78,9 +78,7 @@ export default class ResolveMarchOrderGameState extends GameState<
     // Reset all card abilities (e.g. due to DWD Queen of Thorns)
     const manipulatedHouseCards = this.game
       .getAllHouseCardsInGame()
-      .values.filter(
-        (hc) => hc.disabled || hc.originalCombatStrength !== undefined,
-      );
+      .values.filter((hc) => hc.disabled || hc.extraAbility != null);
 
     manipulatedHouseCards.forEach((card) => {
       if (card.disabled) {
@@ -88,9 +86,8 @@ export default class ResolveMarchOrderGameState extends GameState<
         card.disabled = false;
         card.disabledAbility = null;
       }
-      if (card.originalCombatStrength !== undefined) {
-        card.combatStrength = card.originalCombatStrength;
-        card.originalCombatStrength = undefined;
+      if (card.extraAbility != null) {
+        card.extraAbility = null;
       }
     });
 

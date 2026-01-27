@@ -7,38 +7,65 @@ import AfterWinnerDeterminationGameState from "../../action-game-state/resolve-m
 import ViserysTargaryenAbilityGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/viserys-targaryen-ability-game-state/ViserysTargaryenAbilityGameState";
 
 export default class ViserysTargaryenHouseCardAbility extends HouseCardAbility {
-    beforeCombatResolution(beforeCombat: BeforeCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        beforeCombat.childGameState.setChildGameState(new ViserysTargaryenAbilityGameState(beforeCombat.childGameState)).firstStart(house);
+  beforeCombatResolution(
+    beforeCombat: BeforeCombatHouseCardAbilitiesGameState,
+    house: House,
+    _houseCard: HouseCard,
+  ): void {
+    beforeCombat.childGameState
+      .setChildGameState(
+        new ViserysTargaryenAbilityGameState(beforeCombat.childGameState),
+      )
+      .firstStart(house);
+  }
+
+  modifyCombatStrength(
+    combat: CombatGameState,
+    _house: House,
+    houseCard: HouseCard,
+    affectedHouseCard: HouseCard,
+  ): number {
+    const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
+    return houseCardModifier && houseCard == affectedHouseCard
+      ? houseCardModifier.combatStrength
+      : 0;
+  }
+
+  afterWinnerDetermination(
+    afterWinnerDetermination: AfterWinnerDeterminationGameState,
+    house: House,
+    houseCard: HouseCard,
+  ): void {
+    // Due to HC evo, Viserys may not be longer present in the players house card deck, so let's check this
+    if (
+      afterWinnerDetermination.postCombatGameState.loser == house &&
+      house.houseCards.has(houseCard.id)
+    ) {
+      afterWinnerDetermination.game.deletedHouseCards.set(
+        houseCard.id,
+        houseCard,
+      );
+      afterWinnerDetermination.entireGame.broadcastToClients({
+        type: "update-deleted-house-cards",
+        houseCards: afterWinnerDetermination.game.deletedHouseCards.values.map(
+          (hc) => hc.id,
+        ),
+      });
+
+      house.houseCards.delete(houseCard.id);
+      afterWinnerDetermination.entireGame.broadcastToClients({
+        type: "update-house-cards",
+        house: house.id,
+        houseCards: house.houseCards.values.map((hc) => hc.id),
+      });
+
+      afterWinnerDetermination.combatGameState.ingameGameState.log({
+        type: "house-card-removed-from-game",
+        house: house.id,
+        houseCard: houseCard.id,
+      });
     }
 
-    modifyCombatStrength(combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
-        const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
-        return houseCardModifier && houseCard == affectedHouseCard ? houseCardModifier.combatStrength : 0;
-    }
-
-    afterWinnerDetermination(afterWinnerDetermination: AfterWinnerDeterminationGameState, house: House, houseCard: HouseCard): void {
-        // Due to HC evo, Viserys may not be longer present in the players house card deck, so let's check this
-        if (afterWinnerDetermination.postCombatGameState.loser == house && house.houseCards.has(houseCard.id)) {
-            afterWinnerDetermination.game.deletedHouseCards.set(houseCard.id, houseCard);
-            afterWinnerDetermination.entireGame.broadcastToClients({
-                type: "update-deleted-house-cards",
-                houseCards: afterWinnerDetermination.game.deletedHouseCards.values.map(hc => hc.id)
-            });
-
-            house.houseCards.delete(houseCard.id);
-            afterWinnerDetermination.entireGame.broadcastToClients({
-                type: "update-house-cards",
-                house: house.id,
-                houseCards: house.houseCards.values.map(hc => hc.id)
-            });
-
-            afterWinnerDetermination.combatGameState.ingameGameState.log({
-                type: "house-card-removed-from-game",
-                house: house.id,
-                houseCard: houseCard.id
-            });
-        }
-
-        afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
-    }
+    afterWinnerDetermination.childGameState.onHouseCardResolutionFinish(house);
+  }
 }

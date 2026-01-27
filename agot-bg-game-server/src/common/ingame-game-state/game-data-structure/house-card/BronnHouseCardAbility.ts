@@ -6,12 +6,25 @@ import BronnAbilityGameState from "../../action-game-state/resolve-march-order-g
 import CombatGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
 
 export default class BronnHouseCardAbility extends HouseCardAbility {
-    beforeCombatResolution(beforeCombat: BeforeCombatHouseCardAbilitiesGameState, house: House, _houseCard: HouseCard): void {
-        beforeCombat.childGameState.setChildGameState(new BronnAbilityGameState(beforeCombat.childGameState)).firstStart(house);
-    }
+  beforeCombatResolution(
+    beforeCombat: BeforeCombatHouseCardAbilitiesGameState,
+    house: House,
+    _houseCard: HouseCard,
+  ): void {
+    beforeCombat.childGameState
+      .setChildGameState(new BronnAbilityGameState(beforeCombat.childGameState))
+      .firstStart(house);
+  }
 
-    modifyCombatStrength(combat: CombatGameState, _house: House, houseCard: HouseCard, affectedHouseCard: HouseCard, _baseValue: number): number {
-        const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
-        return houseCardModifier && houseCard == affectedHouseCard ? houseCardModifier.combatStrength : 0;
-    }
+  modifyCombatStrength(
+    combat: CombatGameState,
+    _house: House,
+    houseCard: HouseCard,
+    affectedHouseCard: HouseCard,
+  ): number {
+    const houseCardModifier = combat.houseCardModifiers.tryGet(this.id, null);
+    return houseCardModifier && houseCard == affectedHouseCard
+      ? houseCardModifier.combatStrength
+      : 0;
+  }
 }

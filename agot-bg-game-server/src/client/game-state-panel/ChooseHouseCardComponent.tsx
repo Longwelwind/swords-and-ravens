@@ -81,11 +81,9 @@ export default class ChooseHouseCardComponent extends Component<
 
   render(): JSX.Element {
     const waitingFor = this.props.gameState.getWaitingForHouses();
-    const supportingHouses = this.props.gameState.getSupportingHouses(
-      this.combat.tryGetCommandedHouseInCombat(
-        this.props.gameClient.authenticatedPlayer,
-      ),
-    );
+    const commandedHouse = this.tryGetCommandedHouseInCombat();
+    const supportingHouses =
+      this.props.gameState.getSupportingHouses(commandedHouse);
     return this.combat.stats.length > 0 ? (
       <></>
     ) : (
@@ -173,54 +171,55 @@ export default class ChooseHouseCardComponent extends Component<
                 </Col>
               </Row>
               {this.props.gameClient.authenticatedPlayer &&
-                this.props.gameState.canRefuseSupport(
-                  this.combat.tryGetCommandedHouseInCombat(
-                    this.props.gameClient.authenticatedPlayer,
-                  ),
-                ) && (
+                this.props.gameState.canRefuseSupport(commandedHouse) && (
                   <Row className="justify-content-center mt-2">
-                    <Col xs="auto">
-                      <Button
-                        type="button"
-                        variant="warning"
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              "Are you sure you want to refuse all the support you have received?",
-                            )
-                          ) {
-                            this.props.gameState.refuseSupport();
-                          }
-                        }}
-                      >
-                        Refuse ALL received support
-                      </Button>
-                    </Col>
-                    {supportingHouses.length > 1 &&
-                      supportingHouses.map((supportingHouse) => (
-                        <Col
-                          xs="auto"
-                          key={`refuse-support-from-${supportingHouse.id}`}
+                    {supportingHouses.length > 1 && (
+                      <Col xs="auto" key={`refuse-support-from-all`}>
+                        <Button
+                          type="button"
+                          variant="warning"
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to refuse all the support you have received?",
+                              )
+                            ) {
+                              this.props.gameState.refuseSupport();
+                            }
+                          }}
                         >
-                          <Button
-                            type="button"
-                            variant="warning"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  `Are you sure you want to refuse the support you have received from House ${supportingHouse.name}?`,
-                                )
-                              ) {
-                                this.props.gameState.refuseSupport(
-                                  supportingHouse,
-                                );
-                              }
-                            }}
-                          >
-                            Refuse support from {supportingHouse.name}
-                          </Button>
-                        </Col>
-                      ))}
+                          Refuse ALL received support
+                        </Button>
+                      </Col>
+                    )}
+                    {supportingHouses.map((supportingHouse) => (
+                      <Col
+                        xs="auto"
+                        key={`refuse-support-from-${supportingHouse.id}`}
+                      >
+                        <Button
+                          type="button"
+                          variant="warning"
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                commandedHouse == supportingHouse
+                                  ? "Are you sure you want to refuse your own support?"
+                                  : `Are you sure you want to refuse the support you have received from House ${supportingHouse.name}?`,
+                              )
+                            ) {
+                              this.props.gameState.refuseSupport(
+                                supportingHouse,
+                              );
+                            }
+                          }}
+                        >
+                          {commandedHouse == supportingHouse
+                            ? "Refuse own support"
+                            : `Refuse support from ${supportingHouse.name}`}
+                        </Button>
+                      </Col>
+                    ))}
                   </Row>
                 )}
             </Col>
@@ -262,10 +261,7 @@ export default class ChooseHouseCardComponent extends Component<
   }
 
   getChoosableHouseCards(): HouseCard[] {
-    const commandedHouse =
-      this.props.gameState.combatGameState.tryGetCommandedHouseInCombat(
-        this.props.gameClient.authenticatedPlayer,
-      );
+    const commandedHouse = this.tryGetCommandedHouseInCombat();
     if (!commandedHouse) {
       return [];
     }
