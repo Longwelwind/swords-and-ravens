@@ -291,7 +291,7 @@ export default class GlobalServer {
       }
     }
 
-    const user = this.clientToUser.get(client);
+    const user = this.clientToUser.tryGet(client, null);
     if (user) {
       user.entireGame.lastMessageReceivedAt = new Date();
     }
