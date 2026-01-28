@@ -740,14 +740,12 @@ export default class EntireGame extends GameState<
             v.type instanceof ReplacePlayerByVassal),
       ).length ?? -1) > 0 || undefined;
 
-    const oldPlayerIds =
-      this.entireGame.ingameGameState?.oldPlayerIds ?? undefined;
+    const oldPlayerIds = this.ingameGameState?.oldPlayerIds ?? undefined;
     const timeoutPlayerIds =
-      this.entireGame.ingameGameState?.timeoutPlayerIds ?? undefined;
-    const replacerIds =
-      this.entireGame.ingameGameState?.replacerIds ?? undefined;
-    const isPasswordProtected = this.entireGame.lobbyGameState?.password
-      ? this.entireGame.lobbyGameState.password.length > 0
+      this.ingameGameState?.timeoutPlayerIds ?? undefined;
+    const replacerIds = this.ingameGameState?.replacerIds ?? undefined;
+    const isPasswordProtected = this.lobbyGameState?.password
+      ? this.lobbyGameState.password.length > 0
       : undefined;
 
     const victoryTrack =
