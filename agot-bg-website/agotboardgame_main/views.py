@@ -215,7 +215,10 @@ def my_games(request):
     two_days_past = now - timedelta(days=2)
     eight_days_past = now - timedelta(days=8)
 
-    games_query_base = Game.objects.annotate(players_count=Count('players'))\
+    # Optimization: Defer large serialized_game field and exclude NULL view_of_game
+    games_query_base = Game.objects.defer('serialized_game')\
+        .exclude(view_of_game__isnull=True)\
+        .annotate(players_count=Count('players'))\
         .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=request.user), to_attr="player_in_game"), 'owner')
 
     open_live_games = games_query_base.annotate(pbem=Cast(KeyTextTransform('pbem', KeyTextTransform('settings', 'view_of_game')), BooleanField()))\
@@ -239,7 +242,10 @@ def my_games(request):
     #my_created_games = games_query.filter((Q(state=IN_LOBBY) | Q(state=ONGOING)) & Q(owner=request.user)).order_by("state", "-last_active_at")
     #enrich_games(request, my_created_games, False, False, False)
 
-    last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
+    try:
+        last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
+    except Game.DoesNotExist:
+        last_finished_game = None
     public_room_id = Room.objects.get(name='public').id
 
     return render(request, "agotboardgame_main/my_games.html", {
@@ -269,7 +275,11 @@ def games(request):
         else:
             games_query_base = Game.objects.prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user=0), to_attr="player_in_game"))
 
-        games_query_base = games_query_base.prefetch_related('owner').annotate(players_count=Count('players'))
+        # Optimization: Defer large serialized_game field and exclude NULL view_of_game
+        games_query_base = games_query_base.defer('serialized_game')\
+            .exclude(view_of_game__isnull=True)\
+            .prefetch_related('owner')\
+            .annotate(players_count=Count('players'))
 
         # QUERY ALL GAMES
         all_games = games_query_base.filter(Q(state=IN_LOBBY) | Q(state=ONGOING)).order_by("state", "-last_active_at")
@@ -345,7 +355,10 @@ def games(request):
         else:
             my_games = []
 
-        last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
+        try:
+            last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
+        except Game.DoesNotExist:
+            last_finished_game = None
 
         return render(request, "agotboardgame_main/games.html", {
             "my_games": my_games,
@@ -494,7 +507,10 @@ def user_profile(request, user_id):
             group_color = possible_group_color
             break
 
-    games_of_user = PlayerInGame.objects.prefetch_related('game').annotate(players_count=Count('game__players'),\
+    games_of_user = PlayerInGame.objects.select_related('game').prefetch_related('game__players')\
+        .defer('game__serialized_game')\
+        .exclude(game__view_of_game__isnull=True)\
+        .annotate(players_count=Count('game__players'),\
             game_variant=KeyTextTransform('setupId', KeyTextTransform('settings', 'game__view_of_game')),\
             has_won=Cast(KeyTextTransform('is_winner', 'data'), BooleanField()),\
             is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'game__view_of_game')), BooleanField())\
