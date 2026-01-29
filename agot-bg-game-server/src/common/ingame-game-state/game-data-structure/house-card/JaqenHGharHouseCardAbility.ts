@@ -49,4 +49,8 @@ export default class JaqenHGharHouseCardAbility extends HouseCardAbility {
   changesEnemyHouseCardImmediately(): boolean {
     return true;
   }
+
+  isCancelAbility(): boolean {
+    return true;
+  }
 }

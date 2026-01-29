@@ -25,4 +25,8 @@ export default class QueenOfThornsDwDHouseCardAbility extends HouseCardAbility {
 
     cancelResolutionState.childGameState.onHouseCardResolutionFinish(house);
   }
+
+  isCancelAbility(): boolean {
+    return true;
+  }
 }

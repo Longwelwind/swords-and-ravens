@@ -16,8 +16,15 @@ import _ from "lodash";
 export default class SelectHouseCardComponent extends Component<
   GameStateComponentProps<SelectHouseCardGameState<any>>
 > {
-  @observable selectedHouseCard: HouseCard | null;
   @observable nameFilter = "";
+
+  get selectedHouseCard(): HouseCard | null {
+    return this.props.gameState.selectedHouseCard;
+  }
+
+  set selectedHouseCard(value: HouseCard | null) {
+    this.props.gameState.selectedHouseCard = value;
+  }
 
   render(): ReactNode {
     return (
@@ -43,7 +50,7 @@ export default class SelectHouseCardComponent extends Component<
                 <Row className="justify-content-center">
                   {_.sortBy(
                     this.props.gameState.houseCards,
-                    (hc) => -hc.combatStrength,
+                    (hc) => hc.combatStrength,
                   ).map(
                     (hc) =>
                       // The house argument is used to decide which card-back is used

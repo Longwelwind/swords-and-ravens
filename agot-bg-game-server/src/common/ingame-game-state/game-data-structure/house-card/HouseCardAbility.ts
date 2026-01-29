@@ -182,4 +182,8 @@ export default class HouseCardAbility {
   changesEnemyHouseCardImmediately(): boolean {
     return false;
   }
+
+  isCancelAbility(): boolean {
+    return false;
+  }
 }

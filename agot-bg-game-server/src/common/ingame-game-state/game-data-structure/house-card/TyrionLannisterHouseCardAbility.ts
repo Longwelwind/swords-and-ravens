@@ -18,4 +18,8 @@ export default class TyrionLannisterHouseCardAbility extends HouseCardAbility {
       )
       .firstStart(house);
   }
+
+  isCancelAbility(): boolean {
+    return true;
+  }
 }

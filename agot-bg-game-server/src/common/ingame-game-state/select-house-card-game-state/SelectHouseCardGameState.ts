@@ -7,6 +7,7 @@ import Player from "../Player";
 import { ClientMessage } from "../../../messages/ClientMessage";
 import IngameGameState from "../IngameGameState";
 import User from "../../../server/User";
+import { observable } from "mobx";
 
 interface ParentGameState extends GameState<any, any> {
   game: Game;
@@ -24,6 +25,7 @@ export default class SelectHouseCardGameState<
 > extends GameState<P> {
   house: House;
   houseCards: HouseCard[];
+  @observable selectedHouseCard: HouseCard | null = null;
 
   firstStart(house: House, houseCards: HouseCard[]): void {
     this.house = house;
