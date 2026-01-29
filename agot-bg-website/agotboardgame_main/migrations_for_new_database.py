@@ -157,6 +157,47 @@ class Migration(migrations.Migration):
             name='last_won_tournament',
             field=models.CharField(blank=True, default=None, max_length=200, null=True),
         ),
+        # Add composite indexes for common query patterns (from migration 0021)
+        migrations.AddIndex(
+            model_name='game',
+            index=models.Index(fields=['state', '-last_active_at'], name='game_state_active_desc_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='game',
+            index=models.Index(fields=['state', 'last_active_at'], name='game_state_active_asc_idx'),
+        ),
+        # Add JSONB GIN indexes for nested field queries (from migration 0021)
+        # Note: CONCURRENTLY cannot be used in migrations.RunPython, so we omit it for fresh installs
+        migrations.RunSQL(
+            sql="CREATE INDEX IF NOT EXISTS game_view_settings_pbem_idx ON agotboardgame_main_game USING GIN ((view_of_game->'settings'->'pbem'));",
+            reverse_sql="DROP INDEX IF EXISTS game_view_settings_pbem_idx;",
+        ),
+        migrations.RunSQL(
+            sql="CREATE INDEX IF NOT EXISTS game_view_settings_private_idx ON agotboardgame_main_game USING GIN ((view_of_game->'settings'->'private'));",
+            reverse_sql="DROP INDEX IF EXISTS game_view_settings_private_idx;",
+        ),
+        migrations.RunSQL(
+            sql="CREATE INDEX IF NOT EXISTS game_view_settings_tournament_idx ON agotboardgame_main_game USING GIN ((view_of_game->'settings'->'tournamentMode'));",
+            reverse_sql="DROP INDEX IF EXISTS game_view_settings_tournament_idx;",
+        ),
+        migrations.RunSQL(
+            sql="CREATE INDEX IF NOT EXISTS game_view_settings_faceless_idx ON agotboardgame_main_game USING GIN ((view_of_game->'settings'->'faceless'));",
+            reverse_sql="DROP INDEX IF EXISTS game_view_settings_faceless_idx;",
+        ),
+        migrations.RunSQL(
+            sql="CREATE INDEX IF NOT EXISTS game_view_replace_vote_idx ON agotboardgame_main_game USING GIN ((view_of_game->'replacePlayerVoteOngoing'));",
+            reverse_sql="DROP INDEX IF EXISTS game_view_replace_vote_idx;",
+        ),
+        # Index for created_at (for user profile ordering)
+        migrations.AddIndex(
+            model_name='game',
+            index=models.Index(fields=['-created_at'], name='game_created_at_desc_idx'),
+        ),
+        # Index for PlayerInGame.data->'is_winner' (for user profile stats)
+        migrations.RunSQL(
+            sql="CREATE INDEX IF NOT EXISTS playeringame_data_winner_idx ON agotboardgame_main_playeringame USING GIN ((data->'is_winner'));",
+            reverse_sql="DROP INDEX IF EXISTS playeringame_data_winner_idx;",
+        ),
         migrations.RunPython(create_default_group, delete_default_group),
         migrations.RunPython(create_public_room, delete_public_room),
         migrations.RunPython(vanilla_forward, vanilla_reverse)

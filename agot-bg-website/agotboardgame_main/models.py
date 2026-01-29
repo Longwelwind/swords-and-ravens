@@ -120,6 +120,11 @@ class Game(models.Model):
         ]
         ordering = ("-last_active_at", )
         get_latest_by = "last_active_at"
+        indexes = [
+            models.Index(fields=['state', '-last_active_at'], name='game_state_active_desc_idx'),
+            models.Index(fields=['state', 'last_active_at'], name='game_state_active_asc_idx'),
+            models.Index(fields=['-created_at'], name='game_created_at_desc_idx'),
+        ]
 
 
 class PlayerInGame(models.Model):
