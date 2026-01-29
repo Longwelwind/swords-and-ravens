@@ -11,14 +11,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Add composite indexes for common query patterns
-        migrations.AddIndex(
-            model_name='game',
-            index=models.Index(fields=['state', '-last_active_at'], name='game_state_active_desc_idx'),
+        # Add composite indexes for common query patterns using RunSQL with IF NOT EXISTS
+        migrations.RunSQL(
+            sql="CREATE INDEX CONCURRENTLY IF NOT EXISTS game_state_active_desc_idx ON agotboardgame_main_game (state, last_active_at DESC);",
+            reverse_sql="DROP INDEX IF EXISTS game_state_active_desc_idx;",
         ),
-        migrations.AddIndex(
-            model_name='game',
-            index=models.Index(fields=['state', 'last_active_at'], name='game_state_active_asc_idx'),
+        migrations.RunSQL(
+            sql="CREATE INDEX CONCURRENTLY IF NOT EXISTS game_state_active_asc_idx ON agotboardgame_main_game (state, last_active_at);",
+            reverse_sql="DROP INDEX IF EXISTS game_state_active_asc_idx;",
         ),
         
         # Add B-tree indexes for JSONB text extraction (used by KeyTextTransform)
@@ -49,9 +49,9 @@ class Migration(migrations.Migration):
             reverse_sql="DROP INDEX IF EXISTS game_view_replace_vote_idx;",
         ),
         # Index for created_at (for user profile ordering)
-        migrations.AddIndex(
-            model_name='game',
-            index=models.Index(fields=['-created_at'], name='game_created_at_desc_idx'),
+        migrations.RunSQL(
+            sql="CREATE INDEX CONCURRENTLY IF NOT EXISTS game_created_at_desc_idx ON agotboardgame_main_game (created_at DESC);",
+            reverse_sql="DROP INDEX IF EXISTS game_created_at_desc_idx;",
         ),
         # Index for PlayerInGame.data->'is_winner' (for user profile stats)
         migrations.RunSQL(
