@@ -2,16 +2,16 @@
 
 ## Changes Applied
 
-### 1. JSONB GIN Indexes (Migration 0021)
-Added PostgreSQL GIN indexes on frequently queried JSONB paths:
-- `view_of_game->'settings'->'pbem'`
-- `view_of_game->'settings'->'private'`
-- `view_of_game->'settings'->'tournamentMode'`
-- `view_of_game->'settings'->'faceless'`
-- `view_of_game->'replacePlayerVoteOngoing'`
-- `playeringame.data->'is_winner'` (for user profile stats)
+### 1. JSONB B-tree Indexes (Migration 0021)
+Added PostgreSQL B-tree indexes on JSONB text extractions for frequently queried paths:
+- `view_of_game->'settings'->>'pbem'` (using `->>` for text extraction)
+- `view_of_game->'settings'->>'private'`
+- `view_of_game->'settings'->>'tournamentMode'`
+- `view_of_game->'settings'->>'faceless'`
+- `view_of_game->>'replacePlayerVoteOngoing'`
+- `playeringame.data->>'is_winner'` (for user profile stats)
 
-These indexes significantly speed up JSONB queries using `KeyTextTransform`.
+These indexes use the `->>` operator to extract JSONB values as text, which is compatible with `KeyTextTransform` queries and provides efficient B-tree indexing for equality comparisons.
 
 ### 2. Composite Indexes
 Added composite indexes for common query patterns:
