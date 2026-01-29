@@ -303,7 +303,7 @@ def games(request):
             .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
         replacement_needed_games = games_query.filter(\
-            Q(state=ONGOING) & ~Q(is_private=True) & Q(inactive_2=True) & Q(has_inactive_players__gt=0) & Q(replace_player_vote_ongoing=False)\
+            Q(state=ONGOING) & ~Q(is_private=True) & Q(inactive_2=True) & Q(has_inactive_players__gt=0) & ~Q(replace_player_vote_ongoing=True)\
         ).order_by("state", "-last_active_at")
         enrich_games(request, replacement_needed_games, True, True, False)
         replacement_needed_games = [game for game in replacement_needed_games if game.inactive_players is not None]
