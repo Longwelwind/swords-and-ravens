@@ -132,9 +132,9 @@ export default class Player {
     });
   }
 
-  serializeToClient(): SerializedPlayer {
+  serializeToClient(admin: boolean): SerializedPlayer {
     return {
-      userId: this.user.id,
+      userId: admin ? this.user._id : this.user.id,
       houseId: this.house.id,
       waitedForData: this.waitedForData
         ? {
