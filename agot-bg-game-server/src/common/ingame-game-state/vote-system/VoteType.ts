@@ -27,7 +27,7 @@ export type SerializedVoteType =
   | SerializedDeclareWinner;
 
 export default abstract class VoteType {
-  abstract serializeToClient(): SerializedVoteType;
+  abstract serializeToClient(admin: boolean): SerializedVoteType;
   abstract verb(): string;
   abstract executeAccepted(vote: Vote): void;
 
@@ -145,7 +145,7 @@ export class PauseGame extends VoteType {
     });
   }
 
-  serializeToClient(): SerializedPauseGame {
+  serializeToClient(_admin: boolean): SerializedPauseGame {
     return {
       type: "pause-game",
     };
@@ -184,7 +184,7 @@ export class ResumeGame extends VoteType {
     ingame.resumeGame(true);
   }
 
-  serializeToClient(): SerializedResumeGame {
+  serializeToClient(_admin: boolean): SerializedResumeGame {
     return {
       type: "resume-game",
     };
@@ -257,7 +257,7 @@ export class ExtendPlayerClocks extends VoteType {
     });
   }
 
-  serializeToClient(): SerializedExtendPlayerClocks {
+  serializeToClient(_admin: boolean): SerializedExtendPlayerClocks {
     return {
       type: "extend-all-player-clocks",
     };
@@ -315,7 +315,7 @@ export class CancelGame extends VoteType {
     ingame.setChildGameState(new CancelledGameState(vote.ingame)).firstStart();
   }
 
-  serializeToClient(): SerializedCancelGame {
+  serializeToClient(_admin: boolean): SerializedCancelGame {
     return {
       type: "cancel-game",
     };
@@ -350,7 +350,7 @@ export class EndGame extends VoteType {
     });
   }
 
-  serializeToClient(): SerializedEndGame {
+  serializeToClient(_admin: boolean): SerializedEndGame {
     return {
       type: "end-game",
     };
@@ -401,7 +401,7 @@ export class DeclareWinner extends VoteType {
     ingame.entireGame.saveGame(true);
   }
 
-  serializeToClient(): SerializedDeclareWinner {
+  serializeToClient(_admin: boolean): SerializedDeclareWinner {
     return {
       type: "declare-winner",
       winner: this.winner.id,
@@ -456,12 +456,12 @@ export class ReplacePlayer extends VoteType {
       vote.ingame.entireGame.hideOrRevealUserNames(false);
     }
 
-    if (!vote.ingame.oldPlayerIds.includes(oldPlayer.user.id)) {
-      vote.ingame.oldPlayerIds.push(oldPlayer.user.id);
+    if (!vote.ingame.oldPlayerIds.includes(oldPlayer.user._id)) {
+      vote.ingame.oldPlayerIds.push(oldPlayer.user._id);
     }
 
-    if (!vote.ingame.replacerIds.includes(newPlayer.user.id)) {
-      vote.ingame.replacerIds.push(newPlayer.user.id);
+    if (!vote.ingame.replacerIds.includes(newPlayer.user._id)) {
+      vote.ingame.replacerIds.push(newPlayer.user._id);
     }
 
     vote.ingame.players.delete(oldPlayer.user);
@@ -476,8 +476,8 @@ export class ReplacePlayer extends VoteType {
 
     vote.ingame.log({
       type: "player-replaced",
-      oldUser: this.replaced.id,
-      newUser: this.replacer.id,
+      oldUser: this.replaced._id,
+      newUser: this.replacer._id,
       house: this.forHouse.id,
     });
 
@@ -497,11 +497,11 @@ export class ReplacePlayer extends VoteType {
     vote.ingame.entireGame.saveGame(true);
   }
 
-  serializeToClient(): SerializedReplacePlayer {
+  serializeToClient(admin: boolean): SerializedReplacePlayer {
     return {
       type: "replace-player",
-      replacer: this.replacer.id,
-      replaced: this.replaced.id,
+      replacer: admin ? this.replacer._id : this.replacer.id,
+      replaced: admin ? this.replaced._id : this.replaced.id,
       forHouse: this.forHouse.id,
     };
   }
@@ -563,10 +563,10 @@ export class ReplacePlayerByVassal extends VoteType {
     vote.ingame.entireGame.saveGame(true);
   }
 
-  serializeToClient(): SerializedReplacePlayerByVassal {
+  serializeToClient(admin: boolean): SerializedReplacePlayerByVassal {
     return {
       type: "replace-player-by-vassal",
-      replaced: this.replaced.id,
+      replaced: admin ? this.replaced._id : this.replaced.id,
       forHouse: this.forHouse.id,
     };
   }
@@ -645,7 +645,7 @@ export class ReplaceVassalByPlayer extends VoteType {
     vote.ingame.log({
       type: "vassal-replaced",
       house: this.forHouse.id,
-      user: this.replacer.id,
+      user: this.replacer._id,
     });
 
     // Reset original house cards
@@ -699,10 +699,10 @@ export class ReplaceVassalByPlayer extends VoteType {
     vote.ingame.entireGame.saveGame(true);
   }
 
-  serializeToClient(): SerializedReplaceVassalByPlayer {
+  serializeToClient(admin: boolean): SerializedReplaceVassalByPlayer {
     return {
       type: "replace-vassal-by-player",
-      replacer: this.replacer.id,
+      replacer: admin ? this.replacer._id : this.replacer.id,
       forHouse: this.forHouse.id,
     };
   }
@@ -801,18 +801,18 @@ export class SwapHouses extends VoteType {
 
     vote.ingame.log({
       type: "houses-swapped",
-      initiator: this.initiator.id,
-      swappingUser: this.swappingUser.id,
+      initiator: this.initiator._id,
+      swappingUser: this.swappingUser._id,
       initiatorHouse: this.initiatorHouse.id,
       swappingHouse: this.swappingHouse.id,
     });
   }
 
-  serializeToClient(): SerializedSwapHouses {
+  serializeToClient(admin: boolean): SerializedSwapHouses {
     return {
       type: "swap-houses",
-      initiator: this.initiator.id,
-      swappingUser: this.swappingUser.id,
+      initiator: admin ? this.initiator._id : this.initiator.id,
+      swappingUser: admin ? this.swappingUser._id : this.swappingUser.id,
       initiatorHouse: this.initiatorHouse.id,
       swappingHouse: this.swappingHouse.id,
     };

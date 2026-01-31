@@ -195,7 +195,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
   ): Promise<void> {
     try {
       await post(
-        `${this.masterApiBaseUrl}/addPbemResponseTime/${user.id}/${responseTimeInSeconds}`,
+        `${this.masterApiBaseUrl}/addPbemResponseTime/${user._id}/${responseTimeInSeconds}`,
       ).auth(this.masterApiUsername, this.masterApiPassword, true);
     } catch (e) {
       Sentry.captureException(e);
@@ -207,7 +207,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
       body: {
         name,
         public: false,
-        users: users.map((u) => ({ user: u.id })),
+        users: users.map((u) => ({ user: u._id })),
         max_retrieve_count: null,
       },
     });
