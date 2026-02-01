@@ -91,7 +91,7 @@ export default class GameClient {
     if (value == true) {
       sessionStorage.setItem(
         "oldVolumes",
-        JSON.stringify(this.currentVolumeSettings)
+        JSON.stringify(this.currentVolumeSettings),
       );
 
       this.currentVolumeSettings = { notifications: 0, music: 0, sfx: 0 };
@@ -99,7 +99,7 @@ export default class GameClient {
       this.sfxManager.muteAll();
     } else {
       const oldVolumesFromStorage = JSON.parse(
-        sessionStorage.getItem("oldVolumes") || "{}"
+        sessionStorage.getItem("oldVolumes") || "{}",
       );
       this.currentVolumeSettings = oldVolumesFromStorage;
 
@@ -111,7 +111,7 @@ export default class GameClient {
 
     localStorage.setItem(
       "volumeSettings",
-      JSON.stringify(this.currentVolumeSettings)
+      JSON.stringify(this.currentVolumeSettings),
     );
     this.authenticatedUser.syncSettings();
   }
@@ -213,7 +213,7 @@ export default class GameClient {
 
     localStorage.setItem(
       "volumeSettings",
-      JSON.stringify(this.currentVolumeSettings)
+      JSON.stringify(this.currentVolumeSettings),
     );
   }
 
@@ -237,7 +237,7 @@ export default class GameClient {
       // To prevent this, the client sends a ping regurarly
       this.pingInterval = window.setInterval(
         () => this.send({ type: "ping" }),
-        30 * 1000
+        30 * 1000,
       );
       this.onOpen();
     };
@@ -343,11 +343,15 @@ export default class GameClient {
       return;
     }
 
-    //console.debug("Receiving:");
+    //console.debug(`Received ${message.type}`);
     //console.debug(message);
 
     if (message.type == "authenticate-response") {
+      const previousVersion = this.entireGame?.stateVersion ?? -1;
       this.entireGame = EntireGame.deserializeFromServer(message.game);
+      // Increment version to force components to re-render with new user references
+      this.entireGame.stateVersion = previousVersion + 1;
+
       this.entireGame.onSendClientMessage = (message: ClientMessage) => {
         this.send(message);
       };
@@ -366,8 +370,6 @@ export default class GameClient {
       this.connectionState = ConnectionState.SYNCED;
       this.isReconnecting = false;
       this.loadVolumeSettingsFromLocalStorage();
-    } else if (message.type == "reload") {
-      window.location.reload();
     } else if (message.type == "new-private-chat-room") {
       if (this.entireGame == null) {
         return;
@@ -401,7 +403,7 @@ export default class GameClient {
     } else {
       if (!this.entireGame) {
         console.error(
-          'Message other than "authenticate-response" received but entireGame == null'
+          'Message other than "authenticate-response" received but entireGame == null',
         );
         return;
       }

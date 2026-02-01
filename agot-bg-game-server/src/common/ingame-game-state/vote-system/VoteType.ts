@@ -481,9 +481,11 @@ export class ReplacePlayer extends VoteType {
       house: this.forHouse.id,
     });
 
-    // Force reload, so newPlayer receives possible secrets like objectives in FFC
+    // Resend the entire game so new player receives possible new secret data (like objectives in FFC)
     newPlayer.user.send({
-      type: "reload",
+      type: "authenticate-response",
+      game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
+      userId: newPlayer.user.id,
     });
 
     // If we are waiting for newPlayer, notify him about his turn
@@ -687,9 +689,11 @@ export class ReplaceVassalByPlayer extends VoteType {
     // Force a new claim-vassals game-state, as undoing a vassal may steal a vassal from an earlier house on IT
     vote.ingame.proceedWithClaimVassals();
 
-    // Force reload, so newPlayer receives possible secrets like objectives in FFC
+    // Resend the entire game so new player receives possible new secret data (like objectives in FFC)
     newPlayer.user.send({
-      type: "reload",
+      type: "authenticate-response",
+      game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
+      userId: newPlayer.user.id,
     });
 
     vote.ingame.entireGame.saveGame(true);
@@ -772,14 +776,18 @@ export class SwapHouses extends VoteType {
       swappingUser: this.swappingUser.id,
     });
 
-    // Force reload, so swappingPlayer receives possible secrets like objectives in FFC
+    // Resend the entire game so new player receives possible new secret data (like objectives in FFC)
     swappingPlayer.user.send({
-      type: "reload",
+      type: "authenticate-response",
+      game: vote.ingame.entireGame.serializeToClient(swappingPlayer.user),
+      userId: swappingPlayer.user.id,
     });
 
-    // Force reload for initiator as well
+    // Resend the entire game so initiator receives possible new secret data (like objectives in FFC)
     initiator.user.send({
-      type: "reload",
+      type: "authenticate-response",
+      game: vote.ingame.entireGame.serializeToClient(initiator.user),
+      userId: initiator.user.id,
     });
 
     if (vote.ingame.hasChildGameState(ChooseInitialObjectivesGameState)) {

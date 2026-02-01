@@ -27,7 +27,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
     // The other may be null here, e.g. due to Tyrion Lannister's ability.
     const houseCardsAreRevealed =
       this.gameState.combatGameState.houseCombatDatas.entries.some(
-        ([_, hcd]) => hcd.houseCard != null
+        ([_, hcd]) => hcd.houseCard != null,
       );
     return this.gameState.combatGameState.stats.length > 0 ? (
       <></>
@@ -52,12 +52,14 @@ export default class UseValyrianSteelBladeComponent extends Component<
                   this.gameState.canBeSkipped(this.house) && (
                     <Row className="justify-content-center">
                       <Col xs="auto">
-                        <Alert variant="danger" className="text-center">
-                          <Alert.Heading>Warning</Alert.Heading>
-                          <p>
-                            Using the Valyrian Steel Blade won&apos;t change the
-                            outcome of the battle.
-                          </p>
+                        <Alert
+                          variant="danger"
+                          className="text-center pl-2 pt-1 pr-2 pb-2"
+                        >
+                          <small>
+                            <b>Warning:</b> Using the Valyrian Steel Blade
+                            won&apos;t change the outcome of the battle.
+                          </small>
                         </Alert>
                       </Col>
                     </Row>

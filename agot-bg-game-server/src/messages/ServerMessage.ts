@@ -113,8 +113,7 @@ export type ServerMessage =
   | UserBanned
   | UserUnbanned
   | UpdateVisibleRegions
-  | UpdatePublicVisibleRegionsForSpectators
-  | Reload;
+  | UpdatePublicVisibleRegionsForSpectators;
 
 interface AuthenticationResponse {
   type: "authenticate-response";
@@ -659,8 +658,4 @@ interface UpdatePublicVisibleRegionsForSpectators {
 interface NextHouse {
   type: "next-house";
   house: string;
-}
-
-interface Reload {
-  type: "reload";
 }
