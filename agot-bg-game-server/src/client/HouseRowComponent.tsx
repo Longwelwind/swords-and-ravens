@@ -163,7 +163,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
         clock = controllerOfHouse.liveClockData
           ? controllerOfHouse.clientGetTotalRemainingSeconds(
-              this.ingame.entireGame.now
+              this.ingame.entireGame.now,
             )
           : null;
 
@@ -180,7 +180,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
       }
     } catch {
       console.warn(
-        "getControllerOfHouse has thrown an error but we should never see this error anymore!"
+        "getControllerOfHouse has thrown an error but we should never see this error anymore!",
       );
     }
 
@@ -292,7 +292,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                               <Col xs="auto">
                                 {this.game.getAvailableUnitsOfType(
                                   this.house,
-                                  type
+                                  type,
                                 )}
                               </Col>
                               <Col xs="auto" style={{ marginLeft: 4 }}>
@@ -317,7 +317,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                               </Col>
                             </Row>
                           </Col>
-                        )
+                        ),
                     )}
                   </Row>
                 </Col>
@@ -334,7 +334,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         this.setHighlightedRegions(
                           this.house == this.game.targaryen
                             ? "with-loyalty-tokens-only"
-                            : "with-castles-only"
+                            : "with-castles-only",
                         )
                       }
                       onMouseLeave={() => this.highlightedRegions.clear()}
@@ -355,7 +355,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         className={classNames(
                           "ml-1",
                           { "dye-warning": victoryPointsWarning },
-                          { "dye-critical": victoryPointsCritical }
+                          { "dye-critical": victoryPointsCritical },
                         )}
                         src={victoryImage}
                         width={40}
@@ -377,7 +377,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     overlay={this.renderPowerTooltip(
                       availablePower,
                       powerTokensOnBoard,
-                      powerInPool
+                      powerInPool,
                     )}
                     delay={{ show: 250, hide: 100 }}
                     placement="auto"
@@ -396,7 +396,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     overlay={this.renderPowerPopover(
                       availablePower,
                       powerTokensOnBoard,
-                      powerInPool
+                      powerInPool,
                     )}
                     placement="auto"
                     trigger="click"
@@ -420,7 +420,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     width={24}
                     className={classNames(
                       { "dye-warning": clockWarning },
-                      { "dye-critical": clockCritical }
+                      { "dye-critical": clockCritical },
                     )}
                   />
                   <div
@@ -469,7 +469,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                       ? this.renderPlayerHouseCards()
                       : _.sortBy(
                           this.game.vassalHouseCards.values,
-                          (hc) => hc.combatStrength
+                          (hc) => hc.combatStrength,
                         ).map((hc) => (
                           <Col
                             xs="auto"
@@ -483,7 +483,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <Row className="justify-content-center">
                       {_.sortBy(
                         this.house.laterHouseCards.values,
-                        (hc) => hc.combatStrength
+                        (hc) => hc.combatStrength,
                       ).map((hc) => (
                         <Col
                           xs="auto"
@@ -527,7 +527,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               {getUserLinkOrLabel(
                 this.props.ingame.entireGame,
                 controllerOfHouse.user,
-                controllerOfHouse
+                controllerOfHouse,
               )}{" "}
               is runnig out of time!
             </h4>
@@ -538,7 +538,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         autoClose: 3000,
         toastId: `${controllerOfHouse.user.id}-timeout-warning`,
         theme: "light",
-      }
+      },
     );
   }
 
@@ -548,19 +548,19 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
       (this.ingame.entireGame.gameSettings.blindDraft &&
         !this.ingame.isEndedOrCancelled);
     const doesControlCurrentHouse = this.props.gameClient.doesControlHouse(
-      this.house
+      this.house,
     );
 
     const chooseHouseCards = this.ingame.hasChildGameState(
-      ChooseHouseCardGameState
+      ChooseHouseCardGameState,
     )
       ? (this.ingame.getChildGameState(
-          ChooseHouseCardGameState
+          ChooseHouseCardGameState,
         ) as ChooseHouseCardGameState)
       : null;
     const isCommandingVassalInCombat =
       chooseHouseCards?.combatGameState.isCommandingVassalInCombat(
-        this.house
+        this.house,
       ) ?? false;
 
     if (isCommandingVassalInCombat) {
@@ -579,7 +579,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     if (!showOnlyCardBacksForOtherHouses || doesControlCurrentHouse) {
       return _.sortBy(
         this.house.houseCards.values,
-        (hc) => hc.combatStrength
+        (hc) => hc.combatStrength,
       ).map((hc) => (
         <Col xs="auto" key={`house-card_${this.house.id}_${hc.id}`}>
           {hc.state == HouseCardState.AVAILABLE ? (
@@ -611,7 +611,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     const ingame = this.props.ingame;
     const { result, reason } = ingame.canLaunchReplaceVassalVote(
       this.props.gameClient.authenticatedUser,
-      this.house
+      this.house,
     );
     return (
       <>
@@ -663,7 +663,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
   onLaunchReplaceVassalVoteClick(): void {
     if (
       window.confirm(
-        `Do you want to launch a vote to replace Vassal house ${this.house.name}?`
+        `Do you want to launch a vote to replace Vassal house ${this.house.name}?`,
       )
     ) {
       this.props.ingame.launchReplaceVassalByPlayerVote(this.house);
@@ -674,7 +674,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     const regions = new BetterMap(
       this.ingame.world
         .getControlledRegions(this.house)
-        .map((r) => [r, undefined] as [Region, string | undefined])
+        .map((r) => [r, undefined] as [Region, string | undefined]),
     );
     if (filter == "with-castles-only") {
       if (!this.props.ingame.entireGame.isFeastForCrows) {
@@ -763,7 +763,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               <b>
                 {
                   regions.filter(
-                    (r) => r.castleLevel == 1 && r.getController() == house
+                    (r) => r.castleLevel == 1 && r.getController() == house,
                   ).length
                 }
               </b>
@@ -773,7 +773,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               <b>
                 {
                   regions.filter(
-                    (r) => r.castleLevel == 2 && r.getController() == house
+                    (r) => r.castleLevel == 2 && r.getController() == house,
                   ).length
                 }
               </b>
@@ -783,7 +783,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               <b>
                 {
                   regions.filter(
-                    (r) => r.type == sea && r.getController() == house
+                    (r) => r.type == sea && r.getController() == house,
                   ).length
                 }
               </b>
@@ -793,7 +793,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               <b>
                 {
                   regions.filter(
-                    (r) => r.type == port && r.getController() == house
+                    (r) => r.type == port && r.getController() == house,
                   ).length
                 }
               </b>
@@ -820,7 +820,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
   private renderPowerPopover(
     availablePower: number,
     powerTokensOnBoard: number,
-    powerInPool: number
+    powerInPool: number,
   ): OverlayChildren {
     return (
       <Popover id={this.house.id + "-power-popover"} className="px-3 pt-2">
@@ -844,7 +844,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
           {this.props.gameClient.authenticatedPlayer &&
             this.props.gameClient.authenticatedPlayer.house != this.house &&
             this.ingame.canGiftPowerTokens(
-              this.props.gameClient.authenticatedPlayer.house
+              this.props.gameClient.authenticatedPlayer.house,
             ) && (
               <Row className="mt-3">
                 <GiftPowerTokensComponent
@@ -864,7 +864,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
   private renderPowerTooltip(
     availablePower: number,
     powerTokensOnBoard: number,
-    powerInPool: number
+    powerInPool: number,
   ): OverlayChildren {
     return (
       <Tooltip id={this.house.id + "-power-tooltip"} className="tooltip-w-100">
@@ -890,14 +890,14 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
   componentDidMount(): void {
     this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
+      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap()),
     );
   }
 
   componentWillUnmount(): void {
     _.pull(
       this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
+      this.modifyRegionsOnMapCallback,
     );
   }
 }
