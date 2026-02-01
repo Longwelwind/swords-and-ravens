@@ -107,7 +107,10 @@ export default class GlobalServer {
       return;
     }
 
-    if (message.type == "authenticate") {
+    if (message.type == "ping") {
+      // The client may send ping to keep the connection alive.
+      // Do nothing.
+    } else if (message.type == "authenticate") {
       const { userId, requestUserId, gameId, authToken } = message.authData;
 
       // Check that the user exists
@@ -201,9 +204,6 @@ export default class GlobalServer {
 
       // Update the connection status for all other users
       user.updateConnectionStatus();
-    } else if (message.type == "ping") {
-      // The client may send ping to keep the connection alive.
-      // Do nothing.
     } else {
       const user = this.clientToUser.get(client);
 

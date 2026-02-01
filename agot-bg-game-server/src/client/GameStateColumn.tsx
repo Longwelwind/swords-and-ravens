@@ -153,6 +153,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     return (
       <div className="flex-ratio-container">
         <Card
+          key={`ingame-${this.props.ingame.entireGame.leafStateId}-${this.props.ingame.stateVersion}`}
           id="game-state-panel"
           className="flex-sized-to-content mb-2"
           border={border}
@@ -334,24 +335,23 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     </div>
                   </div>
                 </Row>
-                {this.ingame.rerender >= 0 &&
-                  this.game.dragonStrengthTokens.length > 0 && (
-                    <Row
-                      className="mx-0 mt-3"
-                      onMouseEnter={() => this.highlightRegionsWithDragons()}
-                      onMouseLeave={() => this.highlightedRegions.clear()}
+                {this.game.dragonStrengthTokens.length > 0 && (
+                  <Row
+                    className="mx-0 mt-3"
+                    onMouseEnter={() => this.highlightRegionsWithDragons()}
+                    onMouseLeave={() => this.highlightedRegions.clear()}
+                  >
+                    <OverlayTrigger
+                      overlay={this.renderDragonStrengthTooltip()}
+                      placement="auto"
                     >
-                      <OverlayTrigger
-                        overlay={this.renderDragonStrengthTooltip()}
-                        placement="auto"
-                      >
-                        <div>
-                          <img src={spikedDragonHeadImage} width={28} />
-                          <div>{this.game.currentDragonStrength}</div>
-                        </div>
-                      </OverlayTrigger>
-                    </Row>
-                  )}
+                      <div>
+                        <img src={spikedDragonHeadImage} width={28} />
+                        <div>{this.game.currentDragonStrength}</div>
+                      </div>
+                    </OverlayTrigger>
+                  </Row>
+                )}
               </Col>
             </Col>
           </Row>

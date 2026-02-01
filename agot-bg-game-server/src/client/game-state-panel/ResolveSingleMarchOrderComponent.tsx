@@ -126,7 +126,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
           <>
             <Col xs={12}>
               <Row className="d-flex justify-content-center align-items-center">
-                <Col xs="auto" className="text-center">
+                <Col xs="10" className="text-center">
                   {this.selectedMarchOrderRegion == null ? (
                     <>
                       Click on one of your March Orders.
@@ -179,7 +179,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                       placement="auto"
                     >
                       <div
-                        style={{ width: 32, height: 32 }}
+                        style={{ width: 24, height: 24 }}
                         className="circle-border d-flex justify-content-center align-items-center"
                       >
                         <FontAwesomeIcon icon={faInfo} />

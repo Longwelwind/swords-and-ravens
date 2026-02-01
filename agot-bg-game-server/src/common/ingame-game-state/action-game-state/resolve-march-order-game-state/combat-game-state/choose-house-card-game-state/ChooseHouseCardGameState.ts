@@ -123,7 +123,6 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
 
       this.combatGameState.houseCombatDatas.get(house).houseCardChosen = true;
       this.combatGameState.dontSkipVsbQuestion = message.dontSkipVsbQuestion;
-      this.combatGameState.rerender++;
     } else if (message.type == "support-refused") {
       const house = this.combatGameState.game.houses.get(message.houseId);
       if (message.fromId === undefined) {
@@ -138,14 +137,12 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
         hcd.houseCardChosen = false;
         hcd.houseCard = null;
       });
-      this.combatGameState.rerender++;
     } else if (message.type == "replaced-by-vassal") {
       this.combatGameState.houseCombatDatas.keys.forEach((h) => {
         const hcd = this.combatGameState.houseCombatDatas.get(h);
         hcd.houseCardChosen = false;
         hcd.houseCard = null;
       });
-      this.combatGameState.rerender++;
     }
   }
 

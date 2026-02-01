@@ -51,7 +51,6 @@ const yourTurnToastAnimation = cssTransition({
 });
 
 interface EntireGameComponentProps {
-  entireGame: EntireGame;
   gameClient: GameClient;
 }
 
@@ -60,7 +59,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
   setIntervalId = -1;
 
   get entireGame(): EntireGame {
-    return this.props.entireGame;
+    if (!this.props.gameClient.entireGame) {
+      throw new Error("EntireGame is null");
+    }
+    return this.props.gameClient.entireGame;
   }
 
   get ingame(): IngameGameState | null {
@@ -140,8 +142,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
               "flex-nowrap": !isMobile && this.entireGame.name.length > 90,
             })}
           >
-            {this.props.entireGame.ingameGameState?.replayManager
-              .isReplayMode ? (
+            {this.entireGame.ingameGameState?.replayManager.isReplayMode ? (
               <>
                 {this.renderReplaySwitch()}
                 {this.renderGameName()}
@@ -635,7 +636,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             pauseOnHover: false,
             theme: "light",
             transition: yourTurnToastAnimation,
-          }
+          },
         );
       }
     } else {

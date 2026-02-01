@@ -347,7 +347,11 @@ export default class GameClient {
     //console.debug(message);
 
     if (message.type == "authenticate-response") {
+      const previousVersion = this.entireGame?.stateVersion ?? -1;
       this.entireGame = EntireGame.deserializeFromServer(message.game);
+      // Increment version to force components to re-render with new user references
+      this.entireGame.stateVersion = previousVersion + 1;
+
       this.entireGame.onSendClientMessage = (message: ClientMessage) => {
         this.send(message);
       };
@@ -366,8 +370,6 @@ export default class GameClient {
       this.connectionState = ConnectionState.SYNCED;
       this.isReconnecting = false;
       this.loadVolumeSettingsFromLocalStorage();
-    } else if (message.type == "reload") {
-      window.location.reload();
     } else if (message.type == "new-private-chat-room") {
       if (this.entireGame == null) {
         return;

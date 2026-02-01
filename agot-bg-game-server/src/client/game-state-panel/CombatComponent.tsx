@@ -139,21 +139,17 @@ export default class CombatComponent extends Component<
             },
           ];
     return (
-      <>
+      <div key={`combat-component-${this.props.gameState.stateVersion}`}>
         <Col xs={12}>
-          {this.combat.rerender >= 0 && (
-            <>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <h5>
-                  Battle {this.combatStats.length > 0 && "results "} for{" "}
-                  <b>{this.combat.defendingRegion.name}</b>
-                </h5>
-              </div>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <CombatInfoComponent housesCombatData={houseCombatDatas} />
-              </div>
-            </>
-          )}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <h5>
+              Battle {this.combatStats.length > 0 && "results "} for{" "}
+              <b>{this.combat.defendingRegion.name}</b>
+            </h5>
+          </div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <CombatInfoComponent housesCombatData={houseCombatDatas} />
+          </div>
         </Col>
         {winner && (
           <Col xs={12} className="text-center">
@@ -178,7 +174,7 @@ export default class CombatComponent extends Component<
             BeforeCombatHouseCardAbilitiesComponent,
           ],
         ])}
-      </>
+      </div>
     );
   }
 

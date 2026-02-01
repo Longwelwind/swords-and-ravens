@@ -76,7 +76,6 @@ import {
   OrderOnMapProperties,
   UnitOnMapProperties,
 } from "../../client/MapControls";
-import houseCardAbilities from "./game-data-structure/house-card/houseCardAbilities";
 import {
   TakeOverPort,
   findOrphanedShipsAndDestroyThem,
@@ -156,7 +155,7 @@ export default class IngameGameState extends GameState<
   autoResumeTimeout: NodeJS.Timeout | null = null;
 
   // Client-side only
-  @observable rerender = 0;
+  @observable stateVersion = 0;
   @observable marchMarkers: BetterMap<Unit, Region> = new BetterMap();
   @observable unitsToBeAnimated: BetterMap<Unit, UnitOnMapProperties> =
     new BetterMap();
@@ -1856,27 +1855,6 @@ export default class IngameGameState extends GameState<
         .forEach((r) => {
           if (this.ordersOnBoard.has(r)) this.ordersOnBoard.delete(r);
         });
-    } else if (message.type == "manipulate-combat-house-card") {
-      message.manipulatedHouseCards.forEach(([hcid, shc]) => {
-        const houseCard = this.game.getHouseCardById(hcid);
-        houseCard.ability = shc.abilityId
-          ? houseCardAbilities.get(shc.abilityId)
-          : null;
-        houseCard.disabled = shc.disabled;
-        houseCard.disabledAbility = shc.disabledAbilityId
-          ? houseCardAbilities.get(shc.disabledAbilityId)
-          : null;
-        houseCard.extraAbility = shc.extraAbilityId
-          ? houseCardAbilities.get(shc.extraAbilityId)
-          : null;
-      });
-
-      if (this.hasChildGameState(CombatGameState)) {
-        const combat = this.getChildGameState(
-          CombatGameState,
-        ) as CombatGameState;
-        combat.rerender++;
-      }
     } else if (message.type == "update-waited-for-data") {
       const player = this.players.get(
         this.entireGame.users.get(message.userId),
@@ -2238,11 +2216,7 @@ export default class IngameGameState extends GameState<
   }
 
   forceRerender(): void {
-    if (this.rerender > 0) {
-      this.rerender--;
-    } else {
-      this.rerender++;
-    }
+    this.stateVersion++;
   }
 
   launchCancelGameVote(): void {

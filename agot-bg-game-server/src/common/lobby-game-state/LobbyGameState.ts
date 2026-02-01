@@ -184,7 +184,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
           this.entireGame.gameSettings.private = true;
           this.entireGame.broadcastToClients({
             type: "game-settings-changed",
-            settings: this.entireGame.gameSettings,
+            settings: this.entireGame.gameSettings.serializeToClient(),
           });
         }
       } else {

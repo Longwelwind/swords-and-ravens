@@ -25,7 +25,7 @@ export default class User {
       });
     },
     500,
-    { trailing: true }
+    { trailing: true },
   );
 
   constructor(
@@ -35,7 +35,7 @@ export default class User {
     game: EntireGame,
     settings: UserSettings,
     connected = false,
-    otherUsersFromSameNetwork: string[] = []
+    otherUsersFromSameNetwork: string[] = [],
   ) {
     this.id = id;
     this.name = name;
@@ -72,11 +72,8 @@ export default class User {
     }
   }
 
-  serializeToClient(
-    admin: boolean,
-    user: User | null,
-    hideUserName: boolean
-  ): SerializedUser {
+  serializeToClient(admin: boolean, user: User | null): SerializedUser {
+    const hideUserName = this.entireGame.gameSettings.faceless;
     return {
       id: this.id,
       name: admin ? this.name : hideUserName ? this.facelessName : this.name,
@@ -106,7 +103,7 @@ export default class User {
       game,
       data.settings ?? emptySettings,
       data.connected,
-      data.otherUsersFromSameNetwork
+      data.otherUsersFromSameNetwork,
     );
     user.note = data.note;
     return user;

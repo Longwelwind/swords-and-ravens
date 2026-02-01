@@ -64,8 +64,7 @@ export default class EntireGame extends GameState<
   // A pair of user is sorted alphabetically by their id when used as a key.
   @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> =
     new BetterMap();
-  // Client-side callback fired whenever a new private chat-window was created
-  leafStateId = v4();
+  @observable leafStateId = v4();
   lastMessageReceivedAt: Date | null = null;
   multiAccountProtectionMap: BetterMap<string, Set<string>> = new BetterMap();
 
@@ -110,6 +109,7 @@ export default class EntireGame extends GameState<
 
   @observable
   now = new Date();
+  @observable stateVersion = 0; // Incremented when entire game is re-sent to force re-renders
 
   get lobbyGameState(): LobbyGameState | null {
     return this.childGameState instanceof LobbyGameState
@@ -385,7 +385,7 @@ export default class EntireGame extends GameState<
 
     this.broadcastToClients({
       type: "new-user",
-      user: user.serializeToClient(false, null, this.gameSettings.faceless),
+      user: user.serializeToClient(false, null),
     });
 
     // Save the new user to the database
@@ -467,7 +467,7 @@ export default class EntireGame extends GameState<
 
       this.broadcastToClients({
         type: "game-settings-changed",
-        settings: this.gameSettings,
+        settings: this.gameSettings.serializeToClient(),
       });
     } else {
       updateLastActive = this.childGameState.onClientMessage(user, message);
@@ -597,7 +597,7 @@ export default class EntireGame extends GameState<
 
       user.settings = message.settings;
     } else if (message.type == "game-settings-changed") {
-      this.gameSettings = message.settings;
+      this.gameSettings = GameSettings.deserializeFromServer(message.settings);
     } else if (message.type == "update-connection-status") {
       const user = this.users.get(message.user);
       user.connected = message.status;
@@ -841,7 +841,7 @@ export default class EntireGame extends GameState<
   updateGameSettings(settings: GameSettings): void {
     this.sendMessageToServer({
       type: "change-game-settings",
-      settings,
+      settings: settings.serializeToClient(),
     });
   }
 
@@ -868,9 +868,7 @@ export default class EntireGame extends GameState<
     this.broadcastToClients({
       type: "hide-or-reveal-user-names",
       names: this.users.values
-        .map((u) =>
-          u.serializeToClient(false, null, this.gameSettings.faceless),
-        )
+        .map((u) => u.serializeToClient(false, null))
         .map((su) => [su.id, su.name]),
     });
   }
@@ -887,9 +885,7 @@ export default class EntireGame extends GameState<
     return {
       id: this.id,
       name: this.name,
-      users: this.users.values.map((u) =>
-        u.serializeToClient(admin, user, this.gameSettings.faceless),
-      ),
+      users: this.users.values.map((u) => u.serializeToClient(admin, user)),
       ownerUserId: this.ownerUserId,
       publicChatRoomId: this.publicChatRoomId,
       gameSettings: this.gameSettings.serializeToClient(),
@@ -960,15 +956,15 @@ export default class EntireGame extends GameState<
 export interface SerializedEntireGame {
   id: string;
   name: string;
+  gameSettings: SerializedGameSettings;
   users: SerializedUser[];
   ownerUserId: string;
+  publicChatRoomId: string;
+  privateChatRoomIds: [string, [string, string][]][];
+  leafStateId: string;
+  multiAccountProtectionMap: [string, string[]][];
   childGameState:
     | SerializedLobbyGameState
     | SerializedIngameGameState
     | SerializedCancelledGameState;
-  publicChatRoomId: string;
-  privateChatRoomIds: [string, [string, string][]][];
-  gameSettings: SerializedGameSettings;
-  leafStateId: string;
-  multiAccountProtectionMap: [string, string[]][];
 }

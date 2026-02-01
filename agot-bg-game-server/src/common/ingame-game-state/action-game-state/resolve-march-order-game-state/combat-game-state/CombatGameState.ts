@@ -104,7 +104,7 @@ export default class CombatGameState extends GameState<
   houseCardModifiers: BetterMap<string, HouseCardModifier> = new BetterMap();
 
   @observable
-  rerender = 0;
+  stateVersion = 0;
 
   // The key is the supporting house and the value is the supported house.
   // The value is always either attacker or defender or null if the supporter
@@ -649,7 +649,7 @@ export default class CombatGameState extends GameState<
             this.houseCombatDatas.get(house).houseCardChosen = false;
           }
         });
-        this.rerender++;
+        this.stateVersion++;
       };
 
       if (message.animate) {
@@ -658,7 +658,7 @@ export default class CombatGameState extends GameState<
           hcd.houseCard = null;
           hcd.houseCardChosen = true;
         });
-        this.rerender++;
+        this.stateVersion++;
         window.setTimeout(action, 1500);
       } else {
         action();
@@ -674,7 +674,6 @@ export default class CombatGameState extends GameState<
         ([house, tob]) =>
           (this.houseCombatDatas.get(house).tidesOfBattleCard = tob),
       );
-      this.rerender++;
     } else if (message.type == "combat-change-army") {
       const house = this.game.houses.get(message.house);
       const region = this.game.world.regions.get(message.region);
@@ -683,7 +682,6 @@ export default class CombatGameState extends GameState<
       this.houseCombatDatas.get(house).army = units;
     } else if (message.type == "change-valyrian-steel-blade-use") {
       this.game.valyrianSteelBladeUsed = message.used;
-      this.rerender++;
     } else if (message.type == "update-house-card-modifier") {
       this.houseCardModifiers.set(message.id, message.modifier);
     } else if (message.type == "update-combat-stats") {
@@ -697,6 +695,7 @@ export default class CombatGameState extends GameState<
     } else {
       this.childGameState.onServerMessage(message);
     }
+    this.stateVersion++;
   }
 
   isCommandingVassalInCombat(commanderHouse: House): boolean {

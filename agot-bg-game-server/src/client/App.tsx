@@ -107,10 +107,10 @@ export default class App extends Component<AppProps> {
                 <span className="loader">Authenticating</span>
               </h4>
             </Col>
-          ) : this.isConnected && this.props.gameClient.entireGame ? (
+          ) : this.isConnected ? (
             <EntireGameComponent
+              key={`game-${this.props.gameClient.entireGame?.id}-v${this.props.gameClient.entireGame?.stateVersion}`}
               gameClient={this.props.gameClient}
-              entireGame={this.props.gameClient.entireGame as EntireGame}
             />
           ) : this.props.gameClient.connectionState ==
             ConnectionState.CLOSED ? (

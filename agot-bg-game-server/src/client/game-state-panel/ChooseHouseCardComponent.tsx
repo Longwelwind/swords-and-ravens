@@ -91,7 +91,7 @@ export default class ChooseHouseCardComponent extends Component<
         <Col xs={12} className="text-center">
           The attacker and the defender must choose a House&nbsp;card
         </Col>
-        {this.shouldChooseHouseCard() && this.combat.rerender >= 0 && (
+        {this.shouldChooseHouseCard() && (
           <>
             <Col xs={12}>
               <Row className="justify-content-center">

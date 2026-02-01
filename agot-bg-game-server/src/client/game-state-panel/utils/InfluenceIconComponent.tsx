@@ -51,29 +51,28 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
       // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. isTokenHolder simply stays false then.
     }
     return (
-      this.props.ingame.rerender >= 0 && (
-        <OverlayTrigger
-          overlay={
-            <Tooltip id="influence-icon">
-              <b>{this.house?.name ?? "Unknown"}</b>
-            </Tooltip>
-          }
-          placement="bottom"
-        >
-          <div
-            className={classNames(
-              "influence-icon",
-              { "smedium-outline": isTokenHolder },
-              { invisible: this.house == null },
-            )}
-            style={{
-              backgroundImage: this.house
-                ? `url(${houseInfluenceImages.get(this.house.id)})`
-                : "none",
-            }}
-          ></div>
-        </OverlayTrigger>
-      )
+      <OverlayTrigger
+        key={`influence-icon-${this.house?.id ?? "unknown"}-${this.props.ingame.stateVersion}`}
+        overlay={
+          <Tooltip id="influence-icon">
+            <b>{this.house?.name ?? "Unknown"}</b>
+          </Tooltip>
+        }
+        placement="bottom"
+      >
+        <div
+          className={classNames(
+            "influence-icon",
+            { "smedium-outline": isTokenHolder },
+            { invisible: this.house == null },
+          )}
+          style={{
+            backgroundImage: this.house
+              ? `url(${houseInfluenceImages.get(this.house.id)})`
+              : "none",
+          }}
+        ></div>
+      </OverlayTrigger>
     );
   }
 }

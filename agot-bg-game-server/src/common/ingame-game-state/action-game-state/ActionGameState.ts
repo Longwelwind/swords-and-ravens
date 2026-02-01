@@ -44,6 +44,7 @@ import popRandom from "../../../utils/popRandom";
 import ScoreObjectivesGameState, {
   SerializedScoreObjectivesGameState,
 } from "./score-objectives-game-state/ScoreObjectivesGameState";
+import houseCardAbilities from "../game-data-structure/house-card/houseCardAbilities";
 
 export default class ActionGameState extends GameState<
   IngameGameState,
@@ -226,7 +227,24 @@ export default class ActionGameState extends GameState<
   }
 
   onServerMessage(message: ServerMessage): void {
-    if (message.type == "action-phase-change-order") {
+    if (message.type == "manipulate-combat-house-card") {
+      message.manipulatedHouseCards.forEach(([hcid, shc]) => {
+        const houseCard = this.game.getHouseCardById(hcid);
+        houseCard.ability = shc.abilityId
+          ? houseCardAbilities.get(shc.abilityId)
+          : null;
+        houseCard.disabled = shc.disabled;
+        houseCard.disabledAbility = shc.disabledAbilityId
+          ? houseCardAbilities.get(shc.disabledAbilityId)
+          : null;
+        houseCard.extraAbility = shc.extraAbilityId
+          ? houseCardAbilities.get(shc.extraAbilityId)
+          : null;
+      });
+
+      // Pass this message to combat game state to force rerender of combat UI
+      this.childGameState.onServerMessage(message);
+    } else if (message.type == "action-phase-change-order") {
       const region = this.game.world.regions.get(message.region);
       const order = message.order ? orders.get(message.order) : null;
 
