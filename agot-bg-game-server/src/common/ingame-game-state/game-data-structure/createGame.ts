@@ -1047,6 +1047,12 @@ function nerfHouseCard(game: Game, hcId: string, newAbilityId: string): void {
     if (house) {
       house.houseCards.delete(hcId);
       house.houseCards.set(houseCard.id, houseCard);
+
+      const sorted = _.sortBy(
+        house.houseCards.values,
+        (hc) => hc.combatStrength,
+      );
+      house.houseCards = new BetterMap(sorted.map((hc) => [hc.id, hc]));
     }
 
     if (game.draftPool.has(hcId)) {

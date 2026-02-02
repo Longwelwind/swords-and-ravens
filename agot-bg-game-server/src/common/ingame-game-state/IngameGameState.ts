@@ -303,6 +303,20 @@ export default class IngameGameState extends GameState<
   }
 
   onDraftGameStateEnd(): void {
+    // Sort house cards into players' hands
+    this.players.values.forEach((p) => {
+      const sortedCards = _.sortBy(
+        p.house.houseCards.values,
+        (hc) => hc.combatStrength,
+      );
+      p.house.houseCards = new BetterMap(sortedCards.map((hc) => [hc.id, hc]));
+      this.entireGame.broadcastToClients({
+        type: "update-house-cards",
+        house: p.house.id,
+        houseCards: p.house.houseCards.keys,
+      });
+    });
+
     if (!this.entireGame.gameSettings.perpetuumRandom) {
       this.game.draftPool.clear();
 
