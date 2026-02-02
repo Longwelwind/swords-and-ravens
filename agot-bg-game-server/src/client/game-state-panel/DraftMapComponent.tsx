@@ -39,7 +39,7 @@ export default class DraftMapComponent extends Component<
     return (
       this.player != null &&
       this.props.gameState.parentGameState.participatingHouses.includes(
-        this.player.house
+        this.player.house,
       )
     );
   }
@@ -63,7 +63,7 @@ export default class DraftMapComponent extends Component<
               <Button
                 type="button"
                 disabled={this.props.gameState.readyHouses.includes(
-                  this.player.house
+                  this.player.house,
                 )}
                 onClick={() => this.props.gameState.setReady()}
                 variant="success"
@@ -144,7 +144,7 @@ export default class DraftMapComponent extends Component<
     return unitTypes.values.filter(
       (ut) =>
         ut.walksOn == region.type.kind &&
-        gameState.getAvailableUnitsOfType(house, ut) > 0
+        gameState.getAvailableUnitsOfType(house, ut) > 0,
     );
   }
 
@@ -152,8 +152,8 @@ export default class DraftMapComponent extends Component<
     return (
       <Popover id={"region-mustering-popover-" + region.id} className="p-3">
         <Row className="justify-content-center align-items-center mb-2">
-          <Col xs="auto">
-            <h5 className="my-0">
+          <Col xs={10}>
+            <h5 className="my-0 text-center">
               <b>{region.name}</b>
             </h5>
           </Col>
@@ -164,10 +164,10 @@ export default class DraftMapComponent extends Component<
               placement="auto"
             >
               <div
-                style={{ width: 28, height: 28 }}
+                style={{ width: 24, height: 24 }}
                 className="circle-border d-flex justify-content-center align-items-center"
               >
-                <FontAwesomeIcon icon={faInfo} fontSize="16px" />
+                <FontAwesomeIcon icon={faInfo} />
               </div>
             </OverlayTrigger>
           </Col>
@@ -182,8 +182,8 @@ export default class DraftMapComponent extends Component<
                       this.props.gameState.isLegalUnitAdd(
                         this.player!.house,
                         ut,
-                        region
-                      )
+                        region,
+                      ),
                     )
                     .map((ut) => (
                       <Col xs="auto" key={region.id + "_add_" + ut.id}>
@@ -205,7 +205,7 @@ export default class DraftMapComponent extends Component<
             {this.player &&
               this.props.gameState.isLegalPowerTokenAdd(
                 this.player.house,
-                region
+                region,
               ) && (
                 <Col xs="auto">
                   <Button
@@ -240,7 +240,7 @@ export default class DraftMapComponent extends Component<
                 !this.props.gameState.isLegalGarrisonAdd(
                   this.player!.house,
                   garrison,
-                  region
+                  region,
                 )
               ) {
                 return null;
@@ -303,21 +303,21 @@ export default class DraftMapComponent extends Component<
 
   componentDidMount(): void {
     this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
+      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap()),
     );
     this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
+      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap()),
     );
   }
 
   componentWillUnmount(): void {
     _.pull(
       this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
+      this.modifyRegionsOnMapCallback,
     );
     _.pull(
       this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
+      this.modifyUnitsOnMapCallback,
     );
   }
 }

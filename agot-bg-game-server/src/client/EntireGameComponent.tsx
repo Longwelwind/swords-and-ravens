@@ -290,14 +290,14 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             placement="auto"
             overlay={
               <Tooltip id="perpetuum-random-tooltip" className="tooltip-w-100">
-                <p className="text-center">
+                <div className="p-2 text-center">
                   <h6>Perpetuum Random</h6>
                   <small>
                     Every time a player&apos;s last House card has been played,
                     <br />
                     they will receive a new set of random House cards.
                   </small>
-                </p>
+                </div>
               </Tooltip>
             }
             popperConfig={{ modifiers: [preventOverflow] }}
@@ -410,39 +410,39 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   id="vp-counts-modified-tooltip"
                   className="tooltip-w-100"
                 >
-                  <div className="text-center">
+                  <div className="text-center p-2">
                     {(this.settings.victoryPointsCountNeededToWin != 7 ||
                       this.settings.loyaltyTokenCountNeededToWin != 7) && (
-                      <p>
+                      <div>
                         <h6>
                           The victory conditions
                           <br />
                           have been modified!
                         </h6>
-                      </p>
+                      </div>
                     )}
-                    <>
+                    <div className="text-small">
                       Required victory points:{" "}
                       <b className="text-large">
                         {this.settings.victoryPointsCountNeededToWin}
                       </b>
-                    </>
+                    </div>
                     {this.settings.playerCount >= 8 && (
-                      <>
-                        <br />
+                      <div className="text-small">
                         Required loyalty tokens:{" "}
                         <b className="text-large">
                           {this.settings.loyaltyTokenCountNeededToWin}
                         </b>
-                      </>
+                      </div>
                     )}
                     {this.settings.holdVictoryPointsUntilEndOfRound && (
-                      <>
-                        <br />
+                      <div className="text-small mt-3">
                         Players have to hold{" "}
                         {this.settings.victoryPointsCountNeededToWin} victory
-                        points until the end of the round to win the game!
-                      </>
+                        points
+                        <br />
+                        until the end of the round to win the game!
+                      </div>
                     )}
                   </div>
                 </Tooltip>
@@ -478,26 +478,22 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <Tooltip id="dragon-mode-tooltip" className="tooltip-w-100">
                   <div className="text-center">
                     {this.settings.dragonWar && (
-                      <>
-                        <p>
-                          <h6>Dragon War</h6>
-                          <small>
-                            Balon Greyjoy and Aeron Damphair (DwD) have been
-                            nerfed!
-                          </small>
-                        </p>
-                      </>
+                      <div className="p-2">
+                        <h6>Dragon War</h6>
+                        <small>
+                          Balon Greyjoy and Aeron Damphair (DwD) have been
+                          nerfed!
+                        </small>
+                      </div>
                     )}
                     {this.settings.dragonRevenge && (
-                      <>
-                        <p>
-                          <h6>Dragon Revenge</h6>
-                          <small>
-                            The last remaining non-dragon land unit of defeated
-                            houses will transform into a dragon!
-                          </small>
-                        </p>
-                      </>
+                      <div className="p-2">
+                        <h6>Dragon Revenge</h6>
+                        <small>
+                          The last remaining non-dragon land unit of defeated
+                          houses will transform into a dragon!
+                        </small>
+                      </div>
                     )}
                   </div>
                 </Tooltip>

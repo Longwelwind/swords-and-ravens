@@ -126,7 +126,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
           <>
             <Col xs={12}>
               <Row className="d-flex justify-content-center align-items-center">
-                <Col xs="10" className="text-center">
+                <Col xs={10} className="text-center">
                   {this.selectedMarchOrderRegion == null ? (
                     <>
                       Click on one of your March Orders.

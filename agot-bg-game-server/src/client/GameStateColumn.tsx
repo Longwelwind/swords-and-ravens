@@ -153,7 +153,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     return (
       <div className="flex-ratio-container">
         <Card
-          key={`ingame-${this.props.ingame.entireGame.leafStateId}-${this.props.ingame.stateVersion}`}
+          key={`leaf-state-${this.props.ingame.entireGame.leafStateId}`}
           id="game-state-panel"
           className="flex-sized-to-content mb-2"
           border={border}
