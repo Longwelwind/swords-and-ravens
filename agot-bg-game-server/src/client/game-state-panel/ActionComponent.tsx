@@ -24,7 +24,7 @@ export default class ActionComponent extends Component<
 > {
   render(): ReactNode {
     return (
-      <Row>
+      <Row className="justify-content-center">
         {renderChildGameState(this.props, [
           [UseRavenGameState, UseRavenGameStatePanelComponent],
           [ResolveMarchOrderGameState, ResolveMarchOrderComponent],

@@ -353,8 +353,8 @@ export default class PlayerMusteringComponent extends Component<
         className="p-3"
       >
         <Row className="justify-content-center align-items-center mb-2">
-          <Col xs="auto">
-            <h5 className="my-0">
+          <Col xs={10}>
+            <h5 className="my-0 text-center">
               <b>{modifiedRegion.name}</b>{" "}
               <small>
                 (
@@ -373,10 +373,10 @@ export default class PlayerMusteringComponent extends Component<
               placement="auto"
             >
               <div
-                style={{ width: 28, height: 28 }}
+                style={{ width: 24, height: 24 }}
                 className="circle-border d-flex justify-content-center align-items-center"
               >
-                <FontAwesomeIcon icon={faInfo} fontSize="16px" />
+                <FontAwesomeIcon icon={faInfo} />
               </div>
             </OverlayTrigger>
           </Col>
