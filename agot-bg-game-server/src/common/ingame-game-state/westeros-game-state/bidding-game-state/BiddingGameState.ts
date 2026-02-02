@@ -115,9 +115,6 @@ export default class BiddingGameState<
     if (message.type == "bid-done") {
       const house = this.game.houses.get(message.houseId);
       this.bids.set(house, message.value);
-    } else if (message.type == "bidding-begin") {
-      this.bids = new BetterMap();
-      this.powerTokensToBid = 0;
     }
   }
 
@@ -164,11 +161,7 @@ export default class BiddingGameState<
     });
 
     // All houses might have been fast-tracked, check if the bidding is over
-    if (!this.checkAndProceedEndOfBidding()) {
-      this.entireGame.broadcastToClients({
-        type: "bidding-begin",
-      });
-    }
+    this.checkAndProceedEndOfBidding();
   }
 
   serializeToClient(

@@ -1546,10 +1546,6 @@ export default class IngameGameState extends GameState<
       if (this.onLogReceived) {
         this.onLogReceived(message.data);
       }
-
-      if (message.data.type == "last-land-unit-transformed-to-dragon") {
-        this.forceRerender();
-      }
     } else if (message.type == "change-tracker") {
       const newOrder = message.tracker.map((hid) => this.game.houses.get(hid));
 

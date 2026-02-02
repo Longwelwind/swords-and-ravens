@@ -41,7 +41,6 @@ export type ServerMessage =
   | HideTopWildlingCard
   | ProceedWesterosCard
   | ChangeGarrison
-  | BiddingBegin
   | BidDone
   | BiddingNextTrack
   | GameStateChange
@@ -238,10 +237,6 @@ interface HideTopWildlingCard {
 interface ProceedWesterosCard {
   type: "proceed-westeros-card";
   currentCardI: number;
-}
-
-interface BiddingBegin {
-  type: "bidding-begin";
 }
 
 interface BidDone {

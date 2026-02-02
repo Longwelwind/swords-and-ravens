@@ -15,6 +15,7 @@ import IngameGameState from "../../IngameGameState";
 import DistributePowerTokensGameState, {
   SerializedDistributePowerTokensGameState,
 } from "./distribute-power-tokens-game-state/DistributePowerTokensGameState";
+import { observable } from "mobx";
 
 export default class ClashOfKingsGameState extends GameState<
   WesterosGameState,
@@ -22,7 +23,7 @@ export default class ClashOfKingsGameState extends GameState<
   | ResolveTiesGameState
   | DistributePowerTokensGameState
 > {
-  currentTrackI = -1;
+  @observable currentTrackI = -1;
 
   get game(): Game {
     return this.parentGameState.game;
