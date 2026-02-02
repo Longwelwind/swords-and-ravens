@@ -1,7 +1,6 @@
 import { Component, ReactNode } from "react";
 import ActionGameState from "../../common/ingame-game-state/action-game-state/ActionGameState";
-import ResolveMarchOrderGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/ResolveMarchOrderGameState";
+import ResolveMarchOrderGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/ResolveMarchOrderGameState";
 import * as React from "react";
 import { observer } from "mobx-react";
 import ResolveMarchOrderComponent from "./ResolveMarchOrderComponent";
@@ -9,11 +8,9 @@ import UseRavenGameState from "../../common/ingame-game-state/action-game-state/
 import UseRavenGameStatePanelComponent from "./UseRavenGameStatePanelComponent";
 import renderChildGameState from "../utils/renderChildGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
-import ResolveConsolidatePowerGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/ResolveConsolidatePowerGameState";
+import ResolveConsolidatePowerGameState from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/ResolveConsolidatePowerGameState";
 import ResolveConsolidatePowerComponent from "./ResolveConsolidatePowerComponent";
-import ResolveRaidOrderGameState
-    from "../../common/ingame-game-state/action-game-state/resolve-raid-order-game-state/ResolveRaidOrderGameState";
+import ResolveRaidOrderGameState from "../../common/ingame-game-state/action-game-state/resolve-raid-order-game-state/ResolveRaidOrderGameState";
 import ResolveRaidOrderComponent from "./ResolveRaidOrderComponent";
 import Row from "react-bootstrap/Row";
 import ReconcileArmiesGameState from "../../common/ingame-game-state/westeros-game-state/reconcile-armies-game-state/ReconcileArmiesGameState";
@@ -22,19 +19,21 @@ import ScoreObjectivesGameState from "../../common/ingame-game-state/action-game
 import ScoreObjectivesComponent from "./ScoreObjectivesComponent";
 
 @observer
-export default class ActionComponent extends Component<GameStateComponentProps<ActionGameState>> {
-    render(): ReactNode {
-        return (
-            <Row>
-                {renderChildGameState(this.props, [
-                    [UseRavenGameState, UseRavenGameStatePanelComponent],
-                    [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
-                    [ResolveConsolidatePowerGameState, ResolveConsolidatePowerComponent],
-                    [ResolveRaidOrderGameState, ResolveRaidOrderComponent],
-                    [ReconcileArmiesGameState, ReconcileArmiesComponent],
-                    [ScoreObjectivesGameState, ScoreObjectivesComponent]
-                ])}
-            </Row>
-        );
-    }
+export default class ActionComponent extends Component<
+  GameStateComponentProps<ActionGameState>
+> {
+  render(): ReactNode {
+    return (
+      <Row>
+        {renderChildGameState(this.props, [
+          [UseRavenGameState, UseRavenGameStatePanelComponent],
+          [ResolveMarchOrderGameState, ResolveMarchOrderComponent],
+          [ResolveConsolidatePowerGameState, ResolveConsolidatePowerComponent],
+          [ResolveRaidOrderGameState, ResolveRaidOrderComponent],
+          [ReconcileArmiesGameState, ReconcileArmiesComponent],
+          [ScoreObjectivesGameState, ScoreObjectivesComponent],
+        ])}
+      </Row>
+    );
+  }
 }
