@@ -13,7 +13,7 @@ module.exports = (env, argv) => {
         },
         entry: "./src/client/client.tsx",
         target: "web",
-        devtool: "inline-source-map",
+        devtool: "source-map",
         module: {
             rules: [
                 {
