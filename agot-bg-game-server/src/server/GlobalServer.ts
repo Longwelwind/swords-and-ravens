@@ -178,7 +178,7 @@ export default class GlobalServer {
 
       // Check that a user cannot be connected to more than 2 games simultaneously
       const allConnectedGamesOfUser = this.clientToUser.values.filter(
-        (u) => u.id == user.id,
+        (u) => u._id == user._id,
       );
 
       if (
@@ -237,7 +237,7 @@ export default class GlobalServer {
           }
           const otherUser = user.entireGame.users.get(message.otherUser);
           // Check if a chat room has not already been started between these 2 users
-          const users = _.sortBy([user, otherUser], (u) => u.id);
+          const users = _.sortBy([user, otherUser], (u) => u._id);
 
           if (
             entireGame.privateChatRoomsIds.has(users[0]) &&
@@ -274,7 +274,7 @@ export default class GlobalServer {
       } catch (e) {
         Sentry.withScope((scope) => {
           scope.setUser({
-            id: user.id,
+            id: user._id,
             username: user.name,
             ip_address: clientIp,
           });
@@ -600,7 +600,7 @@ export default class GlobalServer {
   onReadyToStart(game: EntireGame, users: User[]): void {
     this.websiteClient.notifyReadyToStart(
       game.id,
-      users.map((u) => u.id),
+      users.map((u) => u._id),
     );
   }
 
@@ -612,7 +612,7 @@ export default class GlobalServer {
 
     this.websiteClient.notifyYourTurn(
       game.id,
-      offlineUsers.map((u) => u.id),
+      offlineUsers.map((u) => u._id),
     );
   }
 
@@ -624,7 +624,7 @@ export default class GlobalServer {
 
     this.websiteClient.notifyBribeForSupport(
       game.id,
-      offlineUsers.map((u) => u.id),
+      offlineUsers.map((u) => u._id),
     );
   }
 
@@ -636,7 +636,7 @@ export default class GlobalServer {
 
     this.websiteClient.notifyBattleResults(
       game.id,
-      offlineUsers.map((u) => u.id),
+      offlineUsers.map((u) => u._id),
     );
   }
 
@@ -648,14 +648,14 @@ export default class GlobalServer {
 
     this.websiteClient.notifyNewVote(
       game.id,
-      offlineUsers.map((u) => u.id),
+      offlineUsers.map((u) => u._id),
     );
   }
 
   onGameEnded(game: EntireGame, users: User[]): any {
     this.websiteClient.notifyGameEnded(
       game.id,
-      users.map((u) => u.id),
+      users.map((u) => u._id),
     );
   }
 
