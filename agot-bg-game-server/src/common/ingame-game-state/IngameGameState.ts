@@ -1028,54 +1028,36 @@ export default class IngameGameState extends GameState<
     // Use a try catch here as an exception in a timer callback seems to crash the server
     let updateLastActive = false;
 
-    try {
-      if (!player.liveClockData) {
-        throw new Error(
-          "LiveClockData must be present in onPlayerClockTimeout",
-        );
-      }
-
-      this.endPlayerClock(player, false);
-
-      if (this.players.size == 2) {
-        // Replacing a vassal now could lead to an invalid state.
-        // E.G. PayDebtsGameState will fail because there is no-one left to do the destroy units choice
-        // When we are in combat, replacing vassal will fail, as there is no house left to assign the new vassal
-        // Therefore we end the game now, keeping the last two houses in game.
-        const winner = _.without(this.players.values, player)[0].house;
-        this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
-        updateLastActive = true;
-        return;
-      }
-
-      // Vassal replacement during drafting would crash the game!
-      // It's unlikely to happen, but if it does, let's handle it gracefully by cancelling the game
-      if (this.childGameState instanceof DraftGameState) {
-        this.setChildGameState(new CancelledGameState(this)).firstStart();
-        updateLastActive = true;
-        return;
-      }
-
-      this.replacePlayerByVassal(player, ReplacementReason.CLOCK_TIMEOUT);
-    } catch (e) {
-      const message =
-        typeof e === "string"
-          ? e
-          : e instanceof Error
-            ? e.message
-            : "Unknown error in onPlayerClockTimeout";
-      console.error(message);
-      if (this.entireGame.onCaptureSentryMessage) {
-        this.entireGame.onCaptureSentryMessage(
-          `onPlayerClockTimeout failed for user ${player.user.name} (${player.user.id}): ${message}`,
-          "fatal",
-        );
-      }
-    } finally {
-      this.entireGame.checkGameStateChanged();
-      this.entireGame.doPlayerClocksHandling();
-      this.entireGame.saveGame(updateLastActive);
+    if (!player.liveClockData) {
+      throw new Error("LiveClockData must be present in onPlayerClockTimeout");
     }
+
+    this.endPlayerClock(player, false);
+
+    if (this.players.size == 2) {
+      // Replacing a vassal now could lead to an invalid state.
+      // E.G. PayDebtsGameState will fail because there is no-one left to do the destroy units choice
+      // When we are in combat, replacing vassal will fail, as there is no house left to assign the new vassal
+      // Therefore we end the game now, keeping the last two houses in game.
+      const winner = _.without(this.players.values, player)[0].house;
+      this.setChildGameState(new GameEndedGameState(this)).firstStart(winner);
+      updateLastActive = true;
+      return;
+    }
+
+    // Vassal replacement during drafting would crash the game!
+    // It's unlikely to happen, but if it does, let's handle it gracefully by cancelling the game
+    if (this.childGameState instanceof DraftGameState) {
+      this.setChildGameState(new CancelledGameState(this)).firstStart();
+      updateLastActive = true;
+      return;
+    }
+
+    this.replacePlayerByVassal(player, ReplacementReason.CLOCK_TIMEOUT);
+
+    this.entireGame.checkGameStateChanged();
+    this.entireGame.doPlayerClocksHandling();
+    this.entireGame.saveGame(updateLastActive);
   }
 
   endPlayerClock(player: Player, clearTimer = true): void {
@@ -1099,51 +1081,35 @@ export default class IngameGameState extends GameState<
   }
 
   resumeGame(byVote = false): void {
-    try {
-      if (!this.paused) {
-        throw new Error("Game must be paused here");
-      }
-
-      const pauseTimeInSeconds = getElapsedSeconds(this.paused);
-      this.paused = null;
-      this.willBeAutoResumedAt = null;
-      this.autoResumeTimeout = null;
-
-      // Cancel possible ResumeGame votes
-      this.votes.values
-        .filter(
-          (v) => v.type instanceof ResumeGame && v.state == VoteState.ONGOING,
-        )
-        .forEach((v) => {
-          v.cancelVote();
-        });
-
-      this.log({
-        type: "game-resumed",
-        pauseTimeInSeconds: pauseTimeInSeconds,
-        autoResumed: !byVote,
-      });
-      this.entireGame.broadcastToClients({
-        type: "game-resumed",
-      });
-
-      this.entireGame.doPlayerClocksHandling();
-      this.entireGame.saveGame(false);
-    } catch (e) {
-      const message =
-        typeof e === "string"
-          ? e
-          : e instanceof Error
-            ? e.message
-            : "Unknown error in resumeGame";
-      console.error(message);
-      if (this.entireGame.onCaptureSentryMessage) {
-        this.entireGame.onCaptureSentryMessage(
-          `resumeGame failed: ${message}`,
-          "fatal",
-        );
-      }
+    if (!this.paused) {
+      throw new Error("Game must be paused here");
     }
+
+    const pauseTimeInSeconds = getElapsedSeconds(this.paused);
+    this.paused = null;
+    this.willBeAutoResumedAt = null;
+    this.autoResumeTimeout = null;
+
+    // Cancel possible ResumeGame votes
+    this.votes.values
+      .filter(
+        (v) => v.type instanceof ResumeGame && v.state == VoteState.ONGOING,
+      )
+      .forEach((v) => {
+        v.cancelVote();
+      });
+
+    this.log({
+      type: "game-resumed",
+      pauseTimeInSeconds: pauseTimeInSeconds,
+      autoResumed: !byVote,
+    });
+    this.entireGame.broadcastToClients({
+      type: "game-resumed",
+    });
+
+    this.entireGame.doPlayerClocksHandling();
+    this.entireGame.saveGame(false);
   }
 
   applyAverageOfRemainingClocksToNewPlayer(

@@ -281,13 +281,13 @@ export default class GlobalServer {
           scope.setContext("game", {
             id: entireGame.id,
             name: entireGame.name,
-            settings: entireGame.gameSettings,
+            settings: entireGame.gameSettings.serializeToClient(),
             message: message,
             leafState: entireGame.leafState?.constructor?.name,
           });
           Sentry.captureException(e);
         });
-        throw e;
+        return;
       }
     }
 
