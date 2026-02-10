@@ -52,7 +52,7 @@ export default class DraftHouseCardsComponent extends Component<
       ? _.sortBy(
           this.props.gameState.ingame.game.draftPool.values,
           (hc) => -hc.combatStrength,
-          (hc) => hc.houseId
+          (hc) => hc.houseId,
         )
       : [];
     return (
@@ -98,7 +98,7 @@ export default class DraftHouseCardsComponent extends Component<
                     {h.name}
                   </b>
                 )),
-                ", "
+                ", ",
               )}
             </p>
           </Row>
@@ -144,7 +144,7 @@ export default class DraftHouseCardsComponent extends Component<
                             unavailable={!availableCards.includes(hc)}
                           />
                         </Col>
-                      )
+                      ),
                   )}
                 </Row>
               </Col>
@@ -179,7 +179,7 @@ export default class DraftHouseCardsComponent extends Component<
                         <Col xs="auto" key={`draft-spectator_${hc.id}`}>
                           <HouseCardComponent houseCard={hc} size="small" />
                         </Col>
-                      )
+                      ),
                   )}
                 </Row>
               </Col>

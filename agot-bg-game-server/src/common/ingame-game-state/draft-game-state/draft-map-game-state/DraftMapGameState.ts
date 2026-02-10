@@ -52,7 +52,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
   getNotReadyPlayers(): Player[] {
     return _.without(
       this.parentGameState.participatingHouses,
-      ...this.readyHouses
+      ...this.readyHouses,
     ).map((h) => this.ingame.getControllerOfHouse(h));
   }
 
@@ -123,7 +123,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
       if (this.getNotReadyPlayers().length == 0) {
         this.parentGameState
           .setChildGameState(
-            new AgreeOnGameStartGameState(this.parentGameState)
+            new AgreeOnGameStartGameState(this.parentGameState),
           )
           .firstStart();
       }
@@ -161,7 +161,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
           regionId: region.id,
           houseId: house.id,
         },
-        region
+        region,
       );
     } else if (message.type == "remove-power-token") {
       const region = this.world.regions.get(message.region);
@@ -177,7 +177,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
           regionId: region.id,
           houseId: null,
         },
-        region
+        region,
       );
     } else if (message.type == "add-garrison") {
       const region = this.world.regions.get(message.region);
@@ -192,7 +192,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
           newGarrison: message.garrison,
           region: region.id,
         },
-        region
+        region,
       );
     } else if (message.type == "remove-garrison") {
       const region = this.world.regions.get(message.region);
@@ -210,7 +210,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
           newGarrison: 0,
           region: region.id,
         },
-        region
+        region,
       );
     } else if (message.type == "muster") {
       const house = player.house;
@@ -233,7 +233,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
             Region,
             { from: UnitType | null; to: UnitType; region: Region }[],
           ];
-        })
+        }),
       );
 
       if (musterings.size != 1 || musterings.values[0].length != 1) return;
@@ -251,7 +251,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
       const newUnit = this.game.createUnit(
         newUnitType.region,
         newUnitType.to,
-        house
+        house,
       );
       newUnit.region.units.set(newUnit.id, newUnit);
 
@@ -318,14 +318,14 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
   onServerMessage(message: ServerMessage): void {
     if (message.type == "player-ready") {
       const player = this.ingame.players.get(
-        this.entireGame.users.get(message.userId)
+        this.entireGame.users.get(message.userId),
       );
       if (!this.readyHouses.includes(player.house)) {
         this.readyHouses.push(player.house);
       }
     } else if (message.type == "player-unready") {
       const player = this.ingame.players.get(
-        this.entireGame.users.get(message.userId)
+        this.entireGame.users.get(message.userId),
       );
       _.pull(this.readyHouses, player.house);
     }
@@ -333,7 +333,7 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
 
   serializeToClient(
     _admin: boolean,
-    _player: Player | null
+    _player: Player | null,
   ): SerializedDraftMapGameState {
     return {
       type: "draft-map",
@@ -343,11 +343,11 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
 
   static deserializeFromServer(
     draft: DraftGameState,
-    data: SerializedDraftMapGameState
+    data: SerializedDraftMapGameState,
   ): DraftMapGameState {
     const draftMapGameState = new DraftMapGameState(draft);
     draftMapGameState.readyHouses = data.readyHouses.map((hid) =>
-      draft.ingame.game.houses.get(hid)
+      draft.ingame.game.houses.get(hid),
     );
     return draftMapGameState;
   }

@@ -85,7 +85,7 @@ export const houseCardCombatStrengthAllocations = new BetterMap<number, number>(
     [2, 2],
     [3, 1],
     [4, 1],
-  ]
+  ],
 );
 
 const influenceTrackIndices: number[][][] = [
@@ -184,13 +184,13 @@ export default class DraftGameState extends GameState<
       // allowing to draft the tracks as well
       const playerHouses = this.ingame.players.values.map((p) => p.house.id);
       this.game.ironThroneTrack = this.game.ironThroneTrack.filter(
-        (h) => !playerHouses.includes(h.id) || h.id == "targaryen"
+        (h) => !playerHouses.includes(h.id) || h.id == "targaryen",
       );
       this.game.fiefdomsTrack = this.game.fiefdomsTrack.filter(
-        (h) => !playerHouses.includes(h.id) || h.id == "targaryen"
+        (h) => !playerHouses.includes(h.id) || h.id == "targaryen",
       );
       this.game.kingsCourtTrack = this.game.kingsCourtTrack.filter(
-        (h) => !playerHouses.includes(h.id) || h.id == "targaryen"
+        (h) => !playerHouses.includes(h.id) || h.id == "targaryen",
       );
     }
     if (this.entireGame.gameSettings.draftMap) {
@@ -212,7 +212,7 @@ export default class DraftGameState extends GameState<
 
     if (this.entireGame.gameSettings.thematicDraft) {
       this.setChildGameState(
-        new ThematicDraftHouseCardsGameState(this)
+        new ThematicDraftHouseCardsGameState(this),
       ).firstStart();
     } else if (this.entireGame.gameSettings.draftHouseCards) {
       this.setChildGameState(new DraftHouseCardsGameState(this)).firstStart();
@@ -251,20 +251,20 @@ export default class DraftGameState extends GameState<
           this.ingame.players.values.forEach((p) => {
             const house = p.house;
             const availableCards = this.game.draftPool.values.filter(
-              (hc) => hc.combatStrength == hcStrength
+              (hc) => hc.combatStrength == hcStrength,
             );
             const houseCard = popRandom(availableCards) as HouseCard;
             house.houseCards.set(houseCard.id, houseCard);
             this.game.draftPool.delete(houseCard.id);
           });
         }
-      }
+      },
     );
 
     // Use the current Iron Throne track as the baseline order to shuffle
     // Filter out Targaryen if present since they're handled separately
     const baseIronThroneOrder = this.game.ironThroneTrack.filter(
-      (h) => h != this.game.targaryen
+      (h) => h != this.game.targaryen,
     );
 
     const influenceIndices =
@@ -318,7 +318,7 @@ export default class DraftGameState extends GameState<
 
     tracks.forEach((track) => {
       const areVassalsInTopThreeSpaces = _.take(track, 3).some(
-        (h) => !playerHouses.includes(h)
+        (h) => !playerHouses.includes(h),
       );
 
       if (areVassalsInTopThreeSpaces) {
@@ -352,7 +352,7 @@ export default class DraftGameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedDraftGameState {
     return {
       type: "draft",
@@ -361,7 +361,7 @@ export default class DraftGameState extends GameState<
   }
 
   deserializeChildGameState(
-    data: SerializedDraftGameState["childGameState"]
+    data: SerializedDraftGameState["childGameState"],
   ): DraftGameState["childGameState"] {
     switch (data.type) {
       case "draft-house-cards":
@@ -369,7 +369,7 @@ export default class DraftGameState extends GameState<
       case "thematic-draft-house-cards":
         return ThematicDraftHouseCardsGameState.deserializeFromServer(
           this,
-          data
+          data,
         );
       case "draft-map":
         return DraftMapGameState.deserializeFromServer(this, data);
@@ -382,7 +382,7 @@ export default class DraftGameState extends GameState<
 
   static deserializeFromServer(
     ingame: IngameGameState,
-    data: SerializedDraftGameState
+    data: SerializedDraftGameState,
   ): DraftGameState {
     const draft = new DraftGameState(ingame);
     draft.childGameState = draft.deserializeChildGameState(data.childGameState);
