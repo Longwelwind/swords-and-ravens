@@ -210,7 +210,7 @@ export class SerializedGameSettings {
   blindDraft?: boolean;
   perpetuumRandom?: boolean;
   draftMap?: boolean;
-  selectedDraftDecks?: HouseCardDecks;
+  selectedDraftDecks?: number;
   endless?: boolean;
   useVassalPositions?: boolean;
   precedingMustering?: boolean;
