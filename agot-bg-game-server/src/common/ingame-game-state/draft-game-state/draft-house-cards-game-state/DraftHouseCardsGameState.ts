@@ -35,7 +35,7 @@ export default class DraftHouseCardsGameState extends GameState<
   houses: House[];
   draftOrder: number[][];
   @observable draftStep: DraftStep;
-  vassalsOnInfluenceTracks: House[][];
+  vassalsOnInfluenceTracks: House[][] = [];
   @observable currentRowIndex: number;
   @observable currentColumnIndex: number;
 
@@ -61,18 +61,32 @@ export default class DraftHouseCardsGameState extends GameState<
     });
 
     this.houses = shuffleInPlace(
-      this.ingame.players.values.map((p) => p.house)
+      this.ingame.players.values.map((p) => p.house),
     );
     this.draftOrder = draftOrders[this.houses.length - 1];
     this.currentRowIndex = 0;
     this.currentColumnIndex = -1;
-    this.vassalsOnInfluenceTracks = this.game.influenceTracks.map((track) => [
-      ...track,
-    ]);
 
-    // Clear the influence tracks:
-    for (let i = 0; i < this.game.influenceTracks.length; i++) {
-      this.game.influenceTracks[i].length = 0;
+    if (this.entireGame.gameSettings.draftTracks) {
+      const playerHouses = this.ingame.players.values.map((p) => p.house.id);
+      this.game.ironThroneTrack = this.game.ironThroneTrack.filter(
+        (h) => !playerHouses.includes(h.id),
+      );
+      this.game.fiefdomsTrack = this.game.fiefdomsTrack.filter(
+        (h) => !playerHouses.includes(h.id),
+      );
+      this.game.kingsCourtTrack = this.game.kingsCourtTrack.filter(
+        (h) => !playerHouses.includes(h.id),
+      );
+
+      this.vassalsOnInfluenceTracks = this.game.influenceTracks.map((track) => [
+        ...track,
+      ]);
+
+      // Clear the influence tracks
+      for (let i = 0; i < this.game.influenceTracks.length; i++) {
+        this.game.influenceTracks[i].length = 0;
+      }
     }
 
     this.proceedNextHouse();
@@ -86,7 +100,7 @@ export default class DraftHouseCardsGameState extends GameState<
       for (let i = 0; i < this.vassalsOnInfluenceTracks.length; i++) {
         const newInfluenceTrack = _.concat(
           this.game.influenceTracks[i],
-          this.vassalsOnInfluenceTracks[i]
+          this.vassalsOnInfluenceTracks[i],
         );
         this.ingame.setInfluenceTrack(i, newInfluenceTrack);
       }
@@ -98,7 +112,7 @@ export default class DraftHouseCardsGameState extends GameState<
     const houseHasFullHand = houseToResolve.houseCards.size == 7;
     const houseHasPositionOnAllInfluenceTracks =
       this.game.influenceTracks.every((track) =>
-        track.includes(houseToResolve)
+        track.includes(houseToResolve),
       );
 
     if (houseHasFullHand && houseHasPositionOnAllInfluenceTracks) {
@@ -130,7 +144,7 @@ export default class DraftHouseCardsGameState extends GameState<
     this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
       houseToResolve,
       "Decide whether to choose an Influence track position or to select a House card.",
-      ["House card", "Influence track"]
+      ["House card", "Influence track"],
     );
   }
 
@@ -139,7 +153,7 @@ export default class DraftHouseCardsGameState extends GameState<
     this.updateDraftState();
     this.setChildGameState(new SelectHouseCardGameState(this)).firstStart(
       house,
-      this.getFilteredHouseCardsForHouse(house)
+      this.getFilteredHouseCardsForHouse(house),
     );
   }
 
@@ -149,7 +163,7 @@ export default class DraftHouseCardsGameState extends GameState<
     this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
       house,
       "Choose an influence track.",
-      this.getInfluenceChoicesForHouse(house).values
+      this.getInfluenceChoicesForHouse(house).values,
     );
   }
 
@@ -175,10 +189,10 @@ export default class DraftHouseCardsGameState extends GameState<
       _.unionBy(
         this.game.draftPool.values,
         _.flatMap(this.game.houses.values.map((h) => h.houseCards.values)),
-        (hc) => hc.id
+        (hc) => hc.id,
       ),
       (hc) => -hc.combatStrength,
-      (hc) => hc.houseId
+      (hc) => hc.houseId,
     );
   }
 
@@ -186,18 +200,18 @@ export default class DraftHouseCardsGameState extends GameState<
     let availableCards = _.sortBy(
       this.game.draftPool.values,
       (hc) => -hc.combatStrength,
-      (hc) => hc.houseId
+      (hc) => hc.houseId,
     );
     house.houseCards.forEach((card) => {
       const countOfCardsWithThisCombatStrength = house.houseCards.values.filter(
-        (hc) => hc.combatStrength == card.combatStrength
+        (hc) => hc.combatStrength == card.combatStrength,
       ).length;
       if (
         houseCardCombatStrengthAllocations.get(card.combatStrength) ==
         countOfCardsWithThisCombatStrength
       ) {
         availableCards = availableCards.filter(
-          (hc) => hc.combatStrength != card.combatStrength
+          (hc) => hc.combatStrength != card.combatStrength,
         );
       }
     });
@@ -215,7 +229,7 @@ export default class DraftHouseCardsGameState extends GameState<
       this.game.influenceTracks.every(
         (track) =>
           _.intersection(track, housesWithoutTargaryen).length ==
-          housesWithoutTargaryen.length
+          housesWithoutTargaryen.length,
       )
     ) {
       return null;
@@ -249,7 +263,7 @@ export default class DraftHouseCardsGameState extends GameState<
 
   onSimpleChoiceGameStateEnd(
     choice: number,
-    resolvedAutomatically: boolean
+    resolvedAutomatically: boolean,
   ): void {
     const house = this.childGameState.house;
 
@@ -265,7 +279,7 @@ export default class DraftHouseCardsGameState extends GameState<
       const trackIndex = this.getInfluenceChoicesForHouse(house).keys[choice];
       let newTrack = _.concat(
         this.game.getInfluenceTrackByI(trackIndex),
-        house
+        house,
       );
       newTrack = this.ingame.setInfluenceTrack(trackIndex, newTrack);
       const position = newTrack.findIndex((h) => h == house);
@@ -277,7 +291,7 @@ export default class DraftHouseCardsGameState extends GameState<
           trackerI: trackIndex,
           position: position + 1,
         },
-        resolvedAutomatically
+        resolvedAutomatically,
       );
 
       this.proceedNextHouse();
@@ -289,7 +303,7 @@ export default class DraftHouseCardsGameState extends GameState<
   onSelectHouseCardFinish(
     house: House,
     houseCard: HouseCard,
-    resolvedAutomatically: boolean
+    resolvedAutomatically: boolean,
   ): void {
     house.houseCards.set(houseCard.id, houseCard);
     this.entireGame.broadcastToClients({
@@ -310,7 +324,7 @@ export default class DraftHouseCardsGameState extends GameState<
         house: house.id,
         houseCard: houseCard.id,
       },
-      resolvedAutomatically
+      resolvedAutomatically,
     );
 
     this.proceedNextHouse();
@@ -332,7 +346,7 @@ export default class DraftHouseCardsGameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null
+    player: Player | null,
   ): SerializedDraftHouseCardsGameState {
     return {
       type: "draft-house-cards",
@@ -340,7 +354,7 @@ export default class DraftHouseCardsGameState extends GameState<
       draftOrder: this.draftOrder,
       draftStep: this.draftStep,
       vassalsOnInfluenceTracks: this.vassalsOnInfluenceTracks.map((track) =>
-        track.map((h) => h.id)
+        track.map((h) => h.id),
       ),
       currentRowIndex: this.currentRowIndex,
       currentColumnIndex: this.currentColumnIndex,
@@ -350,18 +364,18 @@ export default class DraftHouseCardsGameState extends GameState<
 
   static deserializeFromServer(
     draft: DraftGameState,
-    data: SerializedDraftHouseCardsGameState
+    data: SerializedDraftHouseCardsGameState,
   ): DraftHouseCardsGameState {
     const draftHouseCardsGameState = new DraftHouseCardsGameState(draft);
 
     draftHouseCardsGameState.houses = data.houses.map((hid) =>
-      draft.game.houses.get(hid)
+      draft.game.houses.get(hid),
     );
     draftHouseCardsGameState.draftOrder = data.draftOrder;
     draftHouseCardsGameState.draftStep = data.draftStep;
     draftHouseCardsGameState.vassalsOnInfluenceTracks =
       data.vassalsOnInfluenceTracks.map((track) =>
-        track.map((hid) => draft.game.houses.get(hid))
+        track.map((hid) => draft.game.houses.get(hid)),
       );
     draftHouseCardsGameState.currentRowIndex = data.currentRowIndex;
     draftHouseCardsGameState.currentColumnIndex = data.currentColumnIndex;
@@ -372,7 +386,7 @@ export default class DraftHouseCardsGameState extends GameState<
   }
 
   deserializeChildGameState(
-    data: SerializedDraftHouseCardsGameState["childGameState"]
+    data: SerializedDraftHouseCardsGameState["childGameState"],
   ): DraftHouseCardsGameState["childGameState"] {
     if (data.type == "select-house-card") {
       return SelectHouseCardGameState.deserializeFromServer(this, data);
@@ -392,7 +406,7 @@ export default class DraftHouseCardsGameState extends GameState<
     for (let i = 0; i < this.houses.length * 2; i++) {
       const nextIndices = this.getNextIndices(currentCol, currentRow);
       houses.push(
-        this.houses[this.draftOrder[nextIndices.row][nextIndices.col]]
+        this.houses[this.draftOrder[nextIndices.row][nextIndices.col]],
       );
       currentCol = nextIndices.col;
       currentRow = nextIndices.row;
@@ -402,7 +416,7 @@ export default class DraftHouseCardsGameState extends GameState<
 
   getNextIndices(
     colIndex: number,
-    rowIndex: number
+    rowIndex: number,
   ): { row: number; col: number } {
     colIndex++;
 
