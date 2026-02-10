@@ -61,6 +61,13 @@ export default class House {
     this.specialObjective = null;
   }
 
+  getHighlightColor(): string {
+    if (this.id == "greyjoy") {
+      return "#000000";
+    }
+    return this.color;
+  }
+
   serializeToClient(
     admin: boolean,
     player: Player | null,

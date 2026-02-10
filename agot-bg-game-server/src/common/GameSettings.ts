@@ -18,12 +18,13 @@ export class GameSettings {
   adwdHouseCards = false;
   asosHouseCards = false;
   cokWesterosPhase = false;
-  vassals = false;
-  seaOrderTokens = false;
-  allowGiftingPowerTokens = false;
-  ironBank = false;
+  vassals = true;
+  seaOrderTokens = true;
+  allowGiftingPowerTokens = true;
+  ironBank = true;
   tidesOfBattle = false;
   draftHouseCards = false;
+  draftTracks = false;
   thematicDraft = false;
   limitedDraft = false;
   randomDraft = false;
@@ -61,70 +62,60 @@ export class GameSettings {
     settings.setupId = data.setupId;
     settings.playerCount = data.playerCount;
     settings.pbem = data.pbem;
-    settings.onlyLive = data.onlyLive ?? settings.onlyLive;
-    settings.startWhenFull = data.startWhenFull ?? settings.startWhenFull;
-    settings.private = data.private ?? settings.private;
-    settings.randomHouses = data.randomHouses ?? settings.randomHouses;
-    settings.randomChosenHouses =
-      data.randomChosenHouses ?? settings.randomChosenHouses;
-    settings.adwdHouseCards = data.adwdHouseCards ?? settings.adwdHouseCards;
-    settings.asosHouseCards = data.asosHouseCards ?? settings.asosHouseCards;
-    settings.cokWesterosPhase =
-      data.cokWesterosPhase ?? settings.cokWesterosPhase;
-    settings.vassals = data.vassals ?? settings.vassals;
-    settings.seaOrderTokens = data.seaOrderTokens ?? settings.seaOrderTokens;
-    settings.allowGiftingPowerTokens =
-      data.allowGiftingPowerTokens ?? settings.allowGiftingPowerTokens;
-    settings.ironBank = data.ironBank ?? settings.ironBank;
-    settings.tidesOfBattle = data.tidesOfBattle ?? settings.tidesOfBattle;
-    settings.draftHouseCards = data.draftHouseCards ?? settings.draftHouseCards;
-    settings.thematicDraft = data.thematicDraft ?? settings.thematicDraft;
-    settings.limitedDraft = data.limitedDraft ?? settings.limitedDraft;
-    settings.randomDraft = data.randomDraft ?? settings.randomDraft;
-    settings.perpetuumRandom = data.perpetuumRandom ?? settings.perpetuumRandom;
-    settings.blindDraft = data.blindDraft ?? settings.blindDraft;
-    settings.draftMap = data.draftMap ?? settings.draftMap;
+    settings.onlyLive = data.onlyLive ?? false;
+    settings.startWhenFull = data.startWhenFull ?? false;
+    settings.private = data.private ?? false;
+    settings.randomHouses = data.randomHouses ?? false;
+    settings.randomChosenHouses = data.randomChosenHouses ?? false;
+    settings.adwdHouseCards = data.adwdHouseCards ?? false;
+    settings.asosHouseCards = data.asosHouseCards ?? false;
+    settings.cokWesterosPhase = data.cokWesterosPhase ?? false;
+    settings.vassals = data.vassals ?? false;
+    settings.seaOrderTokens = data.seaOrderTokens ?? false;
+    settings.allowGiftingPowerTokens = data.allowGiftingPowerTokens ?? false;
+    settings.ironBank = data.ironBank ?? false;
+    settings.tidesOfBattle = data.tidesOfBattle ?? false;
+    settings.draftHouseCards = data.draftHouseCards ?? false;
+    settings.draftTracks = data.draftTracks ?? false;
+    settings.thematicDraft = data.thematicDraft ?? false;
+    settings.limitedDraft = data.limitedDraft ?? false;
+    settings.randomDraft = data.randomDraft ?? false;
+    settings.perpetuumRandom = data.perpetuumRandom ?? false;
+    settings.blindDraft = data.blindDraft ?? false;
+    settings.draftMap = data.draftMap ?? false;
     settings.selectedDraftDecks =
       data.selectedDraftDecks ?? settings.selectedDraftDecks;
-    settings.endless = data.endless ?? settings.endless;
-    settings.useVassalPositions =
-      data.useVassalPositions ?? settings.useVassalPositions;
-    settings.precedingMustering =
-      data.precedingMustering ?? settings.precedingMustering;
-    settings.mixedWesterosDeck1 =
-      data.mixedWesterosDeck1 ?? settings.mixedWesterosDeck1;
-    settings.removeTob3 = data.removeTob3 ?? settings.removeTob3;
-    settings.removeTobSkulls = data.removeTobSkulls ?? settings.removeTobSkulls;
-    settings.limitTob2 = data.limitTob2 ?? settings.limitTob2;
-    settings.faceless = data.faceless ?? settings.faceless;
-    settings.randomStartPositions =
-      data.randomStartPositions ?? settings.randomStartPositions;
-    settings.addPortToTheEyrie =
-      data.addPortToTheEyrie ?? settings.addPortToTheEyrie;
+    settings.endless = data.endless ?? false;
+    settings.useVassalPositions = data.useVassalPositions ?? false;
+    settings.precedingMustering = data.precedingMustering ?? false;
+    settings.mixedWesterosDeck1 = data.mixedWesterosDeck1 ?? false;
+    settings.removeTob3 = data.removeTob3 ?? false;
+    settings.removeTobSkulls = data.removeTobSkulls ?? false;
+    settings.limitTob2 = data.limitTob2 ?? false;
+    settings.faceless = data.faceless ?? false;
+    settings.randomStartPositions = data.randomStartPositions ?? false;
+    settings.addPortToTheEyrie = data.addPortToTheEyrie ?? false;
     settings.victoryPointsCountNeededToWin =
       data.victoryPointsCountNeededToWin ??
       settings.victoryPointsCountNeededToWin;
     settings.loyaltyTokenCountNeededToWin =
       data.loyaltyTokenCountNeededToWin ??
       settings.loyaltyTokenCountNeededToWin;
-    settings.randomVassalAssignment =
-      data.randomVassalAssignment ?? settings.randomVassalAssignment;
-    settings.customBalancing = data.customBalancing ?? settings.customBalancing;
-    settings.houseCardsEvolution =
-      data.houseCardsEvolution ?? settings.houseCardsEvolution;
+    settings.randomVassalAssignment = data.randomVassalAssignment ?? false;
+    settings.customBalancing = data.customBalancing ?? false;
+    settings.houseCardsEvolution = data.houseCardsEvolution ?? false;
     settings.houseCardsEvolutionRound =
       data.houseCardsEvolutionRound ?? settings.houseCardsEvolutionRound;
     settings.initialLiveClock =
       data.initialLiveClock ?? settings.initialLiveClock;
-    settings.noPrivateChats = data.noPrivateChats ?? settings.noPrivateChats;
-    settings.tournamentMode = data.tournamentMode ?? settings.tournamentMode;
-    settings.fixedClock = data.fixedClock ?? settings.fixedClock;
+    settings.noPrivateChats = data.noPrivateChats ?? false;
+    settings.tournamentMode = data.tournamentMode ?? false;
+    settings.fixedClock = data.fixedClock ?? false;
     settings.holdVictoryPointsUntilEndOfRound =
-      data.holdVictoryPointsUntilEndOfRound ??
-      settings.holdVictoryPointsUntilEndOfRound;
-    settings.fogOfWar = data.fogOfWar ?? settings.fogOfWar;
-    settings.dragonWar = data.dragonWar ?? settings.dragonWar;
-    settings.dragonRevenge = data.dragonRevenge ?? settings.dragonRevenge;
+      data.holdVictoryPointsUntilEndOfRound ?? false;
+    settings.fogOfWar = data.fogOfWar ?? false;
+    settings.dragonWar = data.dragonWar ?? false;
+    settings.dragonRevenge = data.dragonRevenge ?? false;
     return settings;
   }
 
@@ -147,6 +138,7 @@ export class GameSettings {
       ironBank: this.ironBank || undefined,
       tidesOfBattle: this.tidesOfBattle || undefined,
       draftHouseCards: this.draftHouseCards || undefined,
+      draftTracks: this.draftTracks || undefined,
       thematicDraft: this.thematicDraft || undefined,
       limitedDraft: this.limitedDraft || undefined,
       randomDraft: this.randomDraft || undefined,
@@ -211,6 +203,7 @@ export class SerializedGameSettings {
   ironBank?: boolean;
   tidesOfBattle?: boolean;
   draftHouseCards?: boolean;
+  draftTracks?: boolean;
   thematicDraft?: boolean;
   limitedDraft?: boolean;
   randomDraft?: boolean;

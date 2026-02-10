@@ -2998,6 +2998,18 @@ const serializedGameMigrations: {
       return serializedGame;
     },
   },
+  {
+    version: "131",
+    migrate: (serializedGame: any) => {
+      if (
+        serializedGame.gameSettings.draftHouseCards &&
+        !serializedGame.gameSettings.thematicDraft
+      ) {
+        serializedGame.gameSettings.draftTracks = true;
+      }
+      return serializedGame;
+    },
+  },
 ];
 
 export default serializedGameMigrations;

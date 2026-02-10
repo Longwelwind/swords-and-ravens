@@ -290,6 +290,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
       if (settings.thematicDraft) {
         settings.draftHouseCards = true;
+        settings.draftTracks = false;
         settings.limitedDraft = false;
         settings.blindDraft = false;
         settings.randomDraft = false;
@@ -301,9 +302,36 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.thematicDraft = false;
       }
 
+      if (settings.randomDraft && !this.settings.randomDraft) {
+        settings.draftHouseCards = true;
+        settings.randomDraft = true;
+        settings.thematicDraft = false;
+        settings.adwdHouseCards = false;
+        settings.asosHouseCards = false;
+      }
+
+      if (!settings.randomDraft && this.settings.randomDraft) {
+        settings.blindDraft = false;
+        settings.perpetuumRandom = false;
+      }
+
+      if (!settings.draftHouseCards) {
+        settings.draftTracks = false;
+        settings.thematicDraft = false;
+        settings.randomDraft = false;
+        settings.blindDraft = false;
+        settings.perpetuumRandom = false;
+        settings.limitedDraft = false;
+        settings.selectedDraftDecks = HouseCardDecks.All;
+      }
+
       if (settings.draftHouseCards) {
         settings.adwdHouseCards = false;
         settings.asosHouseCards = false;
+      }
+
+      if (!this.settings.draftHouseCards && settings.draftHouseCards) {
+        settings.draftTracks = true;
       }
 
       // Allow disabling MoD options but enable them when switching to this setup
@@ -312,6 +340,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.setupId == "mother-of-dragons"
       ) {
         settings.vassals = true;
+        settings.ironBank = true;
         settings.seaOrderTokens = true;
         settings.allowGiftingPowerTokens = true;
       }
@@ -324,17 +353,13 @@ export default class LobbyGameState extends GameState<EntireGame> {
       ) {
         settings.ironBank = false;
       }
-
-      // Lock MoD settings for 8p
+      // Lock IronBank for 8p
       if (
         (settings.setupId == "mother-of-dragons" ||
           settings.setupId == "a-dance-with-mother-of-dragons") &&
         settings.playerCount >= 8
       ) {
-        settings.vassals = true;
         settings.ironBank = true;
-        settings.seaOrderTokens = true;
-        settings.allowGiftingPowerTokens = true;
       }
 
       // Reset the MoD settings
@@ -345,9 +370,9 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.setupId != "a-dance-with-mother-of-dragons"
       ) {
         settings.vassals = false;
+        settings.ironBank = false;
         settings.seaOrderTokens = false;
         settings.allowGiftingPowerTokens = false;
-        settings.ironBank = false;
       }
 
       if (!this.entireGame.isCustomBalancingOptionAvailable(settings)) {
@@ -366,18 +391,6 @@ export default class LobbyGameState extends GameState<EntireGame> {
           settings.setupId == "a-dance-with-mother-of-dragons")
       ) {
         settings.adwdHouseCards = true;
-        settings.asosHouseCards = false;
-      }
-
-      if (
-        settings.blindDraft ||
-        settings.randomDraft ||
-        settings.perpetuumRandom
-      ) {
-        settings.draftHouseCards = true;
-        settings.randomDraft = true;
-        settings.thematicDraft = false;
-        settings.adwdHouseCards = false;
         settings.asosHouseCards = false;
       }
 

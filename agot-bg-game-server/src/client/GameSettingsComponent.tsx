@@ -1548,33 +1548,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
           </Col>
           <Col xs="12">
             <FormCheck
-              id="blind-draft-setting"
-              type="switch"
-              label={
-                <OverlayTrigger
-                  overlay={
-                    <Tooltip id="blind-draft-tooltip">
-                      Players receive random House cards and Influence
-                      positions. House cards remain hidden throughout the game.
-                      Can be combined with <i>Limited Draft</i>.
-                    </Tooltip>
-                  }
-                >
-                  <label htmlFor="blind-draft-setting">Blind Draft</label>
-                </OverlayTrigger>
-              }
-              checked={this.gameSettings.blindDraft}
-              onChange={() =>
-                this.changeGameSettings(
-                  () =>
-                    (this.gameSettings.blindDraft =
-                      !this.gameSettings.blindDraft),
-                )
-              }
-            />
-          </Col>
-          <Col xs="12">
-            <FormCheck
               id="limited-draft-setting"
               type="switch"
               label={
@@ -1740,32 +1713,94 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             </Col>
             <Col xs="12">
               <FormCheck
-                id="perpetuum-draft-setting"
+                id="draft-tracks-settings"
                 type="switch"
                 label={
                   <OverlayTrigger
                     overlay={
-                      <Tooltip id="perpetuum-draft-tooltip">
-                        Players will receive a new deck every time after last
-                        House card has been played.
+                      <Tooltip id="draft-tracks-tooltip">
+                        Influence tracks will be drafted together with House
+                        cards. If this option is enabled, players can choose to
+                        draft a position on one of the three Influence tracks
+                        instead of drafting a House card during their draft
+                        turn.
                       </Tooltip>
                     }
                   >
-                    <label htmlFor="perpetuum-draft-setting">
-                      Perpetuum Random
+                    <label htmlFor="draft-tracks-settings">
+                      Draft Influence tracks
                     </label>
                   </OverlayTrigger>
                 }
-                checked={this.gameSettings.perpetuumRandom}
+                checked={this.gameSettings.draftTracks}
                 onChange={() =>
                   this.changeGameSettings(
                     () =>
-                      (this.gameSettings.perpetuumRandom =
-                        !this.gameSettings.perpetuumRandom),
+                      (this.gameSettings.draftTracks =
+                        !this.gameSettings.draftTracks),
                   )
                 }
               />
             </Col>
+            {this.gameSettings.randomDraft && (
+              <>
+                <Col xs="12">
+                  <FormCheck
+                    id="blind-draft-setting"
+                    type="switch"
+                    label={
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="blind-draft-tooltip">
+                            Players receive random House cards and Influence
+                            positions. House cards remain hidden throughout the
+                            game. Can be combined with <i>Limited Draft</i>.
+                          </Tooltip>
+                        }
+                      >
+                        <label htmlFor="blind-draft-setting">Blind Draft</label>
+                      </OverlayTrigger>
+                    }
+                    checked={this.gameSettings.blindDraft}
+                    onChange={() =>
+                      this.changeGameSettings(
+                        () =>
+                          (this.gameSettings.blindDraft =
+                            !this.gameSettings.blindDraft),
+                      )
+                    }
+                  />
+                </Col>
+                <Col xs="12">
+                  <FormCheck
+                    id="perpetuum-draft-setting"
+                    type="switch"
+                    label={
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="perpetuum-draft-tooltip">
+                            Players will receive a new deck every time after
+                            last House card has been played.
+                          </Tooltip>
+                        }
+                      >
+                        <label htmlFor="perpetuum-draft-setting">
+                          Perpetuum Random
+                        </label>
+                      </OverlayTrigger>
+                    }
+                    checked={this.gameSettings.perpetuumRandom}
+                    onChange={() =>
+                      this.changeGameSettings(
+                        () =>
+                          (this.gameSettings.perpetuumRandom =
+                            !this.gameSettings.perpetuumRandom),
+                      )
+                    }
+                  />
+                </Col>
+              </>
+            )}
           </Col>
         )}
       </Row>
@@ -1904,17 +1939,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
         (this.entireGame.gameSettings.randomHouses =
           !this.entireGame.gameSettings.randomHouses),
     );
-  }
-
-  componentDidMount(): void {
-    // Fake a dummy initial settings change, to properly update the Stark / Bolton house name the first time
-    if (
-      this.props.gameClient.isRealOwner() &&
-      this.props.entireGame.childGameState instanceof LobbyGameState &&
-      this.props.entireGame.childGameState.players.size == 0
-    ) {
-      this.changeGameSettings(() => {});
-    }
   }
 
   /**

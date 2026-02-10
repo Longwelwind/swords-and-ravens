@@ -292,9 +292,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         key={`arrow-${unit.id}-${to.id}`}
         start={`centered-unit-div-for-march-markers-${unit.id}`}
         end={`centered-units-container-div-for-march-markers-${to.id}`}
-        color={
-          unit.allegiance.id != "greyjoy" ? unit.allegiance.color : "black"
-        }
+        color={unit.allegiance.getHighlightColor()}
         strokeWidth={5}
         curveness={0.3}
         dashness={{ animation: 2 }}
@@ -903,11 +901,7 @@ export default class MapComponent extends Component<MapComponentProps> {
     const controller =
       drawBorder || hasPlaceOrders ? region.getController() : null;
     const color =
-      drawBorder && controller
-        ? controller.id != "greyjoy"
-          ? controller.color
-          : "black"
-        : undefined;
+      drawBorder && controller ? controller.getHighlightColor() : undefined;
 
     const wrap = properties.wrap;
     const clickable = properties.onClick != undefined || wrap != undefined;

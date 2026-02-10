@@ -62,16 +62,22 @@ export default class DraftHouseCardsComponent extends Component<
           <Row className="mt-1 mb-3 justify-content-center">
             {this.draftStep == DraftStep.DECIDE ? (
               <div className="text-center">
-                House <b>{this.house.name}</b> must decide whether to select a
-                House card or an Influence track position.
+                House{" "}
+                <b style={{ color: this.house.color }}>{this.house.name}</b>{" "}
+                must decide whether to select a House card or an Influence track
+                position.
               </div>
             ) : this.draftStep == DraftStep.HOUSE_CARD ? (
               <div className="text-center">
-                House <b>{this.house.name}</b> must select a House card.
+                House{" "}
+                <b style={{ color: this.house.color }}>{this.house.name}</b>{" "}
+                must select a House card.
               </div>
             ) : this.draftStep == DraftStep.INFLUENCE_TRACK ? (
               <div className="text-center">
-                House <b>{this.house.name}</b> must choose an Influence track.
+                House{" "}
+                <b style={{ color: this.house.color }}>{this.house.name}</b>{" "}
+                must choose an Influence track.
               </div>
             ) : (
               <></>

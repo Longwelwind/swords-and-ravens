@@ -35,7 +35,7 @@ export default class DraftHouseCardsGameState extends GameState<
   houses: House[];
   draftOrder: number[][];
   @observable draftStep: DraftStep;
-  vassalsOnInfluenceTracks: House[][];
+  vassalsOnInfluenceTracks: House[][] = [];
   @observable currentRowIndex: number;
   @observable currentColumnIndex: number;
 
@@ -66,13 +66,27 @@ export default class DraftHouseCardsGameState extends GameState<
     this.draftOrder = draftOrders[this.houses.length - 1];
     this.currentRowIndex = 0;
     this.currentColumnIndex = -1;
-    this.vassalsOnInfluenceTracks = this.game.influenceTracks.map((track) => [
-      ...track,
-    ]);
 
-    // Clear the influence tracks:
-    for (let i = 0; i < this.game.influenceTracks.length; i++) {
-      this.game.influenceTracks[i].length = 0;
+    if (this.entireGame.gameSettings.draftTracks) {
+      const playerHouses = this.ingame.players.values.map((p) => p.house.id);
+      this.game.ironThroneTrack = this.game.ironThroneTrack.filter(
+        (h) => !playerHouses.includes(h.id),
+      );
+      this.game.fiefdomsTrack = this.game.fiefdomsTrack.filter(
+        (h) => !playerHouses.includes(h.id),
+      );
+      this.game.kingsCourtTrack = this.game.kingsCourtTrack.filter(
+        (h) => !playerHouses.includes(h.id),
+      );
+
+      this.vassalsOnInfluenceTracks = this.game.influenceTracks.map((track) => [
+        ...track,
+      ]);
+
+      // Clear the influence tracks
+      for (let i = 0; i < this.game.influenceTracks.length; i++) {
+        this.game.influenceTracks[i].length = 0;
+      }
     }
 
     this.proceedNextHouse();

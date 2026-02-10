@@ -700,7 +700,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
       this.highlightedRegions.set(r, {
         highlight: {
           active: true,
-          color: this.house.id != "greyjoy" ? this.house.color : "#000000",
+          color: this.house.getHighlightColor(),
           light: r.type.id == "sea",
           strong: r.type.id == "land",
           text: text,

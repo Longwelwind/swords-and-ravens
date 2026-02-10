@@ -542,10 +542,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
       this.highlightedRegions.set(r, {
         highlight: {
           active: controller != null ? true : false,
-          color:
-            controller?.id != "greyjoy"
-              ? (controller?.color ?? "#000000")
-              : "#000000",
+          color: controller?.getHighlightColor() ?? "#ffffff",
           light: r.type.id == "sea",
           strong: r.type.id == "land",
         },
@@ -565,10 +562,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
       this.highlightedRegions.set(r, {
         highlight: {
           active: controller != null ? true : false,
-          color:
-            controller?.id != "greyjoy"
-              ? (controller?.color ?? "#000000")
-              : "#000000",
+          color: controller?.getHighlightColor() ?? "#ffffff",
           light: r.type.id == "sea",
           strong: r.type.id == "land",
         },
