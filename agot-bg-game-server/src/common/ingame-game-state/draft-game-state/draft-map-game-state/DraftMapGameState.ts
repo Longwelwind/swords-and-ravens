@@ -20,6 +20,7 @@ import AgreeOnGameStartGameState from "../agree-on-game-start-game-state/AgreeOn
 
 export default class DraftMapGameState extends GameState<DraftGameState> {
   @observable readyHouses: House[];
+  initialSupplies: BetterMap<House, number> = new BetterMap();
 
   get ingame(): IngameGameState {
     return this.parentGameState.parentGameState;
@@ -47,6 +48,9 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
 
   firstStart(): void {
     this.readyHouses = [];
+    this.ingame.game.nonVassalHouses.forEach((house) => {
+      this.initialSupplies.set(house, house.supplyLevel);
+    });
   }
 
   getNotReadyPlayers(): Player[] {
@@ -86,13 +90,76 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
     );
   }
 
+  canRemoveUnit(house: House, unit: Unit): boolean {
+    const region = unit.region;
+    if (unit.allegiance != house) return false;
+    if (region.supplyIcons == 0) return true;
+    if (region.units.size > 1) return true;
+    if (
+      region.controlPowerToken == house ||
+      region.superControlPowerToken == house
+    )
+      return true;
+
+    const newSupply = Math.min(
+      this.ingame.game.supplyRestrictions.length - 1,
+      this.ingame.game.getControlledSupplyIcons(house) - region.supplyIcons,
+    );
+
+    const allowedArmySizes = this.ingame.game.supplyRestrictions[newSupply];
+    const armySizes = this.ingame.game
+      .getArmySizes(house, new BetterMap(), new BetterMap([[region, [unit]]]))
+      .filter((a) => a > 1);
+
+    if (armySizes.length > allowedArmySizes.length) {
+      return false;
+    }
+
+    for (let i = 0; i < armySizes.length; i++) {
+      if (armySizes[i] > allowedArmySizes[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   isLegalPowerTokenAdd(house: House, region: Region): boolean {
     return (
       region.type.kind == "land" &&
       this.hasEnoughPowerTokens(house) &&
       region.controlPowerToken == null &&
+      region.superControlPowerToken != house &&
       this.getAvailableRegionsForHouse(house).includes(region)
     );
+  }
+
+  canRemovePowerToken(house: House, region: Region): boolean {
+    if (region.controlPowerToken != house) return false;
+    if (region.superControlPowerToken == house) return true;
+    if (region.supplyIcons == 0) return true;
+    if (region.units.values.filter((u) => u.allegiance == house).length > 0)
+      return true;
+
+    const newSupply = Math.min(
+      this.ingame.game.supplyRestrictions.length - 1,
+      this.ingame.game.getControlledSupplyIcons(house) - region.supplyIcons,
+    );
+
+    const allowedArmySizes = this.ingame.game.supplyRestrictions[newSupply];
+    const armySizes = this.ingame.game.getArmySizes(house).filter((a) => a > 1);
+
+    if (armySizes.length > allowedArmySizes.length) {
+      return false;
+    }
+
+    for (let i = 0; i < armySizes.length; i++) {
+      if (armySizes[i] > allowedArmySizes[i]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   isLegalGarrisonAdd(house: House, strength: number, region: Region): boolean {
@@ -109,6 +176,18 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
     return house.maxPowerTokens - availablePower - powerTokensOnBoard > 0;
   }
 
+  updateSupply(house: House): void {
+    house.supplyLevel = Math.min(
+      this.ingame.game.supplyRestrictions.length - 1,
+      this.ingame.game.getControlledSupplyIcons(house),
+    );
+
+    this.ingame.entireGame.broadcastToClients({
+      type: "supply-adjusted",
+      supplies: [[house.id, house.supplyLevel]],
+    });
+  }
+
   onPlayerMessage(player: Player, message: ClientMessage): void {
     if (message.type == "ready") {
       if (!this.readyHouses.includes(player.house)) {
@@ -121,6 +200,17 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
       });
 
       if (this.getNotReadyPlayers().length == 0) {
+        // All players are ready
+        // Check if we have to update supplies
+        const shouldUpdateSupplies = this.initialSupplies.entries.some(
+          ([house, initialSupply]) => house.supplyLevel != initialSupply,
+        );
+
+        if (shouldUpdateSupplies) {
+          this.ingame.game.updateSupplies();
+        }
+
+        // Then proceed to the next game state
         this.parentGameState
           .setChildGameState(
             new AgreeOnGameStartGameState(this.parentGameState),
@@ -134,25 +224,43 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
         userId: player.user.id,
       });
     } else if (message.type == "select-units") {
-      if (!this.parentGameState.participatingHouses.includes(player.house))
-        return;
+      const house = player.house;
+      if (!this.parentGameState.participatingHouses.includes(house)) return;
 
       const unitIds = _.flatMap(message.units.map(([_rid, units]) => units));
       if (unitIds.length != 1) return;
+
+      _.pull(this.readyHouses, house);
+      this.entireGame.broadcastToClients({
+        type: "player-unready",
+        userId: player.user.id,
+      });
 
       const unitId = unitIds[0];
       const region = this.world.regions.values.find((r) => r.units.has(unitId));
 
       if (region) {
         const unit = region.units.get(unitId);
+        if (!this.canRemoveUnit(house, unit)) return;
         this.ingame.broadcastRemoveUnits(unit.region, [unit], true);
         unit.region.units.delete(unit.id);
+        const newController = region.getController();
+        if (region.supplyIcons > 0 && newController != house) {
+          this.updateSupply(house);
+        }
       }
     } else if (message.type == "add-power-token") {
       const region = this.world.regions.get(message.region);
+      const oldController = region.getController();
       const house = player.house;
       if (!this.parentGameState.participatingHouses.includes(house)) return;
       if (!this.isLegalPowerTokenAdd(house, region)) return;
+
+      _.pull(this.readyHouses, house);
+      this.entireGame.broadcastToClients({
+        type: "player-unready",
+        userId: player.user.id,
+      });
 
       region.controlPowerToken = house;
       this.ingame.sendMessageToUsersWhoCanSeeRegion(
@@ -163,12 +271,16 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
         },
         region,
       );
+
+      if (region.supplyIcons > 0 && oldController != house) {
+        this.updateSupply(house);
+      }
     } else if (message.type == "remove-power-token") {
       const region = this.world.regions.get(message.region);
       const house = player.house;
       if (!this.parentGameState.participatingHouses.includes(house)) return;
 
-      if (region.controlPowerToken != house) return;
+      if (!this.canRemovePowerToken(house, region)) return;
 
       region.controlPowerToken = null;
       this.ingame.sendMessageToUsersWhoCanSeeRegion(
@@ -179,6 +291,11 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
         },
         region,
       );
+
+      const newController = region.getController();
+      if (region.supplyIcons > 0 && newController != house) {
+        this.updateSupply(house);
+      }
     } else if (message.type == "add-garrison") {
       const region = this.world.regions.get(message.region);
       const house = player.house;
@@ -186,6 +303,13 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
       if (!this.isLegalGarrisonAdd(house, message.garrison, region)) return;
 
       region.garrison = message.garrison;
+
+      _.pull(this.readyHouses, house);
+      this.entireGame.broadcastToClients({
+        type: "player-unready",
+        userId: player.user.id,
+      });
+
       this.ingame.sendMessageToUsersWhoCanSeeRegion(
         {
           type: "change-garrison",
@@ -203,6 +327,13 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
         region.garrison == 0
       )
         return;
+
+      _.pull(this.readyHouses, house);
+      this.entireGame.broadcastToClients({
+        type: "player-unready",
+        userId: player.user.id,
+      });
+
       region.garrison = 0;
       this.ingame.sendMessageToUsersWhoCanSeeRegion(
         {
@@ -248,6 +379,8 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
         userId: player.user.id,
       });
 
+      const oldController = newUnitType.region.getController();
+
       const newUnit = this.game.createUnit(
         newUnitType.region,
         newUnitType.to,
@@ -256,6 +389,10 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
       newUnit.region.units.set(newUnit.id, newUnit);
 
       this.ingame.broadcastAddUnits(newUnit.region, [newUnit]);
+
+      if (newUnitType.region.supplyIcons > 0 && oldController != house) {
+        this.updateSupply(house);
+      }
     }
   }
 
@@ -338,6 +475,10 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
     return {
       type: "draft-map",
       readyHouses: this.readyHouses.map((h) => h.id),
+      initialSupplies: this.initialSupplies.entries.map(([h, supply]) => [
+        h.id,
+        supply,
+      ]),
     };
   }
 
@@ -349,6 +490,12 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
     draftMapGameState.readyHouses = data.readyHouses.map((hid) =>
       draft.ingame.game.houses.get(hid),
     );
+    draftMapGameState.initialSupplies = new BetterMap(
+      data.initialSupplies.map(([hid, supply]) => [
+        draft.ingame.game.houses.get(hid),
+        supply,
+      ]),
+    );
     return draftMapGameState;
   }
 }
@@ -356,4 +503,5 @@ export default class DraftMapGameState extends GameState<DraftGameState> {
 export interface SerializedDraftMapGameState {
   type: "draft-map";
   readyHouses: string[];
+  initialSupplies: [string, number][];
 }

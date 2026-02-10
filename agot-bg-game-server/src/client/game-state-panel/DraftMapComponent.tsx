@@ -149,9 +149,10 @@ export default class DraftMapComponent extends Component<
   }
 
   private renderMusteringPopover(region: Region): OverlayChildren {
+    const validUnits = this.getValidUnitsForRegion(region);
     return (
       <Popover id={"region-mustering-popover-" + region.id} className="p-3">
-        <Row className="justify-content-center align-items-center mb-2">
+        <Row className="justify-content-center align-items-center mb-3">
           <Col xs={10}>
             <h5 className="my-0 text-center">
               <b>{region.name}</b>
@@ -174,34 +175,31 @@ export default class DraftMapComponent extends Component<
         </Row>
         <Row className="justify-content-center">
           <>
-            {this.getValidUnitsForRegion(region).length > 0 &&
-              this.player != null && (
-                <>
-                  {this.getValidUnitsForRegion(region)
-                    .filter((ut) =>
-                      this.props.gameState.isLegalUnitAdd(
-                        this.player!.house,
-                        ut,
-                        region,
-                      ),
-                    )
-                    .map((ut) => (
-                      <Col xs="auto" key={region.id + "_add_" + ut.id}>
-                        <Button
-                          type="button"
-                          onClick={() =>
-                            this.props.gameState.addUnit(ut, region)
-                          }
-                        >
-                          <UnitIconComponent
-                            house={this.player!.house}
-                            unitType={ut}
-                          />
-                        </Button>
-                      </Col>
-                    ))}
-                </>
-              )}
+            {validUnits.length > 0 && this.player != null && (
+              <>
+                {validUnits
+                  .filter((ut) =>
+                    this.props.gameState.isLegalUnitAdd(
+                      this.player!.house,
+                      ut,
+                      region,
+                    ),
+                  )
+                  .map((ut) => (
+                    <Col xs="auto" key={region.id + "_add_" + ut.id}>
+                      <Button
+                        type="button"
+                        onClick={() => this.props.gameState.addUnit(ut, region)}
+                      >
+                        <UnitIconComponent
+                          house={this.player!.house}
+                          unitType={ut}
+                        />
+                      </Button>
+                    </Col>
+                  ))}
+              </>
+            )}
             {this.player &&
               this.props.gameState.isLegalPowerTokenAdd(
                 this.player.house,
@@ -221,18 +219,22 @@ export default class DraftMapComponent extends Component<
               )}
           </>
         </Row>
-        {this.player && this.player.house == region.controlPowerToken && (
-          <Row className="justify-content-center">
-            <Col xs="auto">
-              <Button
-                type="button"
-                onClick={() => this.props.gameState.removePowerToken(region)}
-              >
-                Remove Power token
-              </Button>
-            </Col>
-          </Row>
-        )}
+        {this.player &&
+          this.props.gameState.canRemovePowerToken(
+            this.player.house,
+            region,
+          ) && (
+            <Row className="justify-content-center">
+              <Col xs="auto">
+                <Button
+                  type="button"
+                  onClick={() => this.props.gameState.removePowerToken(region)}
+                >
+                  Remove Power token
+                </Button>
+              </Col>
+            </Row>
+          )}
         {this.player && region.garrison == 0 && (
           <Row className="justify-content-center">
             {this.props.gameState.allowedGarrisonStrengths.map((garrison) => {
@@ -287,6 +289,9 @@ export default class DraftMapComponent extends Component<
     if (this.isParticipatingInDraft && this.player != null) {
       return this.props.gameState.world
         .getUnitsOfHouse(this.player.house)
+        .filter((u) =>
+          this.props.gameState.canRemoveUnit(this.player!.house, u),
+        )
         .map((u) => [
           u,
           {

@@ -3007,6 +3007,27 @@ const serializedGameMigrations: {
       ) {
         serializedGame.gameSettings.draftTracks = true;
       }
+
+      if (serializedGame.childGameState.type == "ingame") {
+        const ingame = serializedGame.childGameState;
+        if (
+          ingame.childGameState.type == "draft" &&
+          ingame.childGameState.childGameState.type == "draft-map"
+        ) {
+          const draftMap = ingame.childGameState.childGameState;
+          const houses = ingame.players.map((p: any) => p.houseId);
+          draftMap.initialSupplies = houses.map((hid: any) => {
+            const house = ingame.game.houses.find((h: any) => h.id == hid);
+            if (!house) {
+              throw new Error(
+                `House with id ${hid} not found for draft map migration`,
+              );
+            }
+            return [house.id, house.supplyLevel];
+          });
+        }
+      }
+
       return serializedGame;
     },
   },
