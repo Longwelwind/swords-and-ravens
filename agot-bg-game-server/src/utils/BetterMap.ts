@@ -5,6 +5,24 @@
  */
 import { observable } from "mobx";
 
+function safeKeyString<K>(key: K): string {
+  if (key === null || key === undefined) {
+    return String(key); // "null" or "undefined"
+  }
+  if (typeof key === "object") {
+    try {
+      const json = JSON.stringify(key);
+      // Truncate very long strings to keep error messages readable
+      return json.length > 200 ? json.substring(0, 200) + "..." : json;
+    } catch (e) {
+      // Fallback for circular references
+      return String(key);
+    }
+  }
+  // For primitives (string, number, boolean, symbol, bigint)
+  return String(key);
+}
+
 export default class BetterMap<K, V> {
   @observable _map: Map<K, V>;
 
@@ -30,7 +48,7 @@ export default class BetterMap<K, V> {
 
   get(key: K): V {
     if (!this._map.has(key)) {
-      throw new Error("Map doesn't have key \"" + key + '"');
+      throw new Error(`Map doesn't have key "${safeKeyString(key)}"`);
     }
 
     return this._map.get(key) as V;
@@ -74,7 +92,7 @@ export default class BetterMap<K, V> {
 
   replace(key: K, value: V): void {
     if (!this._map.has(key)) {
-      throw new Error("Map doesn't have key \"" + key + '"');
+      throw new Error(`Map doesn't have key "${safeKeyString(key)}"`);
     }
 
     this._map.set(key, value);
@@ -82,7 +100,7 @@ export default class BetterMap<K, V> {
 
   delete(key: K): void {
     if (!this._map.has(key)) {
-      throw new Error("Map doesn't have key \"" + key + '"');
+      throw new Error(`Map doesn't have key "${safeKeyString(key)}"`);
     }
 
     this._map.delete(key);
