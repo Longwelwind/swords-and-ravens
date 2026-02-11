@@ -629,6 +629,9 @@ export default class IngameGameState extends GameState<
             type: "user-banned",
             userId: message.userId,
           });
+
+          // Save game after async game-state update completes
+          this.entireGame.saveGame(false);
         });
       }
     } else if (message.type == "unban-user") {

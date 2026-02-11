@@ -19,14 +19,7 @@ import trophyCupImage from "../../public/images/icons/trophy-cup.svg";
 import crownedSkullImage from "../../public/images/icons/crowned-skull.svg";
 import perpetuumRandomImage from "../../public/images/icons/perpetuum-random.svg";
 import { Helmet } from "react-helmet";
-import {
-  Alert,
-  Card,
-  FormCheck,
-  OverlayTrigger,
-  Row,
-  Tooltip,
-} from "react-bootstrap";
+import { Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
@@ -106,18 +99,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
   }
 
   render(): ReactNode {
-    if (
-      this.props.gameClient.authenticatedUser &&
-      this.ingame?.bannedUsers.has(this.props.gameClient.authenticatedUser?.id)
-    ) {
-      return (
-        <Col xs="auto" className="m-4 p-3 text-center">
-          <Alert variant="danger">
-            <h4>You have been banned from the game.</h4>
-          </Alert>
-        </Col>
-      );
-    }
     return (
       <>
         <Helmet>

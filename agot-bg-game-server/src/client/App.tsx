@@ -76,18 +76,8 @@ export default class App extends Component<AppProps> {
         }}
       >
         <Row className="justify-content-center">
-          {this.props.gameClient.isReconnecting ? (
-            <Col xs="auto" className="m-4 p-3 text-center">
-              <Alert variant="warning">
-                <h4>
-                  The connection to the server is interrupted.
-                  <br />
-                  <span className="loader">Trying to reconnect</span>
-                </h4>
-              </Alert>
-            </Col>
-          ) : this.props.gameClient.connectionState ==
-            ConnectionState.INITIALIZING ? (
+          {this.props.gameClient.connectionState ==
+          ConnectionState.INITIALIZING ? (
             <Col xs="auto" className="m-4 p-3 text-center">
               <h4>
                 <span className="loader">Initializing</span>
@@ -135,6 +125,13 @@ export default class App extends Component<AppProps> {
                 </Alert>
               </Col>
             </>
+          ) : this.props.gameClient.connectionState ==
+            ConnectionState.BANNED ? (
+            <Col xs="auto" className="m-4 p-3 text-center">
+              <Alert variant="danger">
+                <h4>The game host has banned you from this game.</h4>
+              </Alert>
+            </Col>
           ) : (
             <Col xs="auto" className="m-4 p-3 text-center">
               <span className="loader">Error</span>

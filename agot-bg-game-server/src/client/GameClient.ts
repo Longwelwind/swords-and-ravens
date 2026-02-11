@@ -25,6 +25,7 @@ export enum ConnectionState {
   AUTHENTICATING,
   SYNCED,
   CLOSED,
+  BANNED,
 }
 
 export default class GameClient {
@@ -38,7 +39,6 @@ export default class GameClient {
   @observable authenticated = false;
   @observable authenticatedUser: User | null = null;
 
-  @observable isReconnecting = false;
   @observable showMapWhileDrafting = false;
   @observable logChatFullScreen = false;
 
@@ -244,7 +244,6 @@ export default class GameClient {
     this.socket.onerror = () => {
       this.clearPingInterval();
       this.onError();
-      this.isReconnecting = false;
     };
     this.socket.onmessage = (data: MessageEvent) => {
       this.onMessage(data.data as string);
@@ -252,15 +251,7 @@ export default class GameClient {
     this.socket.onclose = () => {
       this.clearPingInterval();
       this.onClose();
-      this.isReconnecting = false;
     };
-  }
-
-  reconnect(): void {
-    if (this.connectionState == ConnectionState.CLOSED) {
-      this.isReconnecting = true;
-      this.start();
-    }
   }
 
   clearPingInterval(): void {
@@ -346,6 +337,17 @@ export default class GameClient {
     //console.debug(`Received ${message.type}`);
     //console.debug(message);
 
+    // Special handling for user-banned message. If the authenticated user is banned
+    // we want to immediately set the connection state to BANNED and disconnect the user,
+    // without processing any further messages.
+    if (message.type == "user-banned") {
+      if (this.authenticatedUser?.id == message.userId) {
+        this.connectionState = ConnectionState.BANNED;
+        this.socket?.close();
+        return;
+      }
+    }
+
     if (message.type == "authenticate-response") {
       const previousVersion = this.entireGame?.stateVersion ?? -1;
       this.entireGame = EntireGame.deserializeFromServer(message.game);
@@ -368,8 +370,9 @@ export default class GameClient {
         .forEach(({ roomId }) => this.chatClient.addChannel(roomId));
 
       this.connectionState = ConnectionState.SYNCED;
-      this.isReconnecting = false;
       this.loadVolumeSettingsFromLocalStorage();
+    } else if (message.type == "banned-response") {
+      this.connectionState = ConnectionState.BANNED;
     } else if (message.type == "new-private-chat-room") {
       if (this.entireGame == null) {
         return;
@@ -441,11 +444,12 @@ export default class GameClient {
   }
 
   setDisconnectedState(): void {
-    this.connectionState = ConnectionState.CLOSED;
+    if (this.connectionState != ConnectionState.BANNED) {
+      this.connectionState = ConnectionState.CLOSED;
+    }
     this.entireGame = null;
     this.authenticated = false;
     this.authenticatedUser = null;
-    this.isReconnecting = false;
   }
 
   private loadVolumeSettingsFromLocalStorage(): void {
