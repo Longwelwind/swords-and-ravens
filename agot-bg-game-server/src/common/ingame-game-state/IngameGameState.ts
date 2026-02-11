@@ -606,7 +606,13 @@ export default class IngameGameState extends GameState<
       if (
         this.entireGame.onGetUser != null &&
         this.entireGame.canActAsOwner(user) &&
-        !this.players.keys.map((u) => u.id).includes(message.userId)
+        !this.players.keys.map((u) => u.id).includes(message.userId) &&
+        !this.votes.values.some(
+          (v) =>
+            v.type instanceof ReplacePlayer &&
+            v.state == VoteState.ONGOING &&
+            v.initiator.id == message.userId,
+        )
       ) {
         this.entireGame.onGetUser(message.userId).then((storedData) => {
           if (

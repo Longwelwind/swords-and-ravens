@@ -166,9 +166,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                       >
                         {connectedSpectators.map((u) => (
                           <div key={`specatator_${u.id}`}>
-                            <b>
-                              {getUserLinkOrLabel(this.entireGame, u, null)}
-                            </b>
+                            <b>{getUserLinkOrLabel(u)}</b>
                           </div>
                         ))}
                       </ScrollToBottom>
@@ -441,7 +439,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     ) {
       return (
         <Col xs="auto" className={invisible ? "invisible" : ""}>
-          <FontAwesomeIcon icon={faLock} size="2x" />
+          <FontAwesomeIcon icon={faLock} size="sm" />
         </Col>
       );
     }
