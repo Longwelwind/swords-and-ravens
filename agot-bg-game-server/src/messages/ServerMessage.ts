@@ -111,6 +111,7 @@ export type ServerMessage =
   | UpdateWaitedForData
   | UserBanned
   | UserUnbanned
+  | BannedResponse
   | UpdateVisibleRegions
   | UpdatePublicVisibleRegionsForSpectators;
 
@@ -632,6 +633,10 @@ interface UserBanned {
 interface UserUnbanned {
   type: "user-unbanned";
   userId: string;
+}
+
+interface BannedResponse {
+  type: "banned-response";
 }
 
 interface UpdateVisibleRegions {

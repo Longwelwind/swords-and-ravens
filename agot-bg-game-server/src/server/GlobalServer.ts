@@ -136,6 +136,11 @@ export default class GlobalServer {
       }
 
       if (entireGame.ingameGameState?.bannedUsers.has(userData.id)) {
+        if (client.readyState == WebSocket.OPEN) {
+          this.send(client, {
+            type: "banned-response",
+          });
+        }
         return;
       }
 
