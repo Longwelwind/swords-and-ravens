@@ -19,7 +19,6 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import { Badge, OverlayTrigger, Popover, Spinner } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
 import UserLabel from "./UserLabel";
 import EntireGame from "../common/EntireGame";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
@@ -180,7 +179,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             )}
           </Row>
         </Col>
-        <Col xs={11}>
+        <Col xs={12}>
           <Row className="justify-content-center no-space-around">
             <Card>
               <Card.Body className="py-2">
@@ -261,7 +260,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                           </OverlayTrigger>
                         )}
                       >
-                        <FontAwesomeIcon icon={faTimes} />
+                        <>Cancel</>
                       </ConditionalWrap>
                     </Button>
                   </Col>
@@ -325,7 +324,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             name="Notifications"
             onVolumeChange={(val) =>
               this.props.gameClient.sfxManager.notificationVolumeChanged(
-                val / 100
+                val / 100,
               )
             }
           />
@@ -384,7 +383,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
   getConnectedSpectators(): User[] {
     return _.difference(
       this.entireGame.users.values.filter((u) => u.connected),
-      this.lobby.players.values
+      this.lobby.players.values,
     );
   }
 
