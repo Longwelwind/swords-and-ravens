@@ -53,23 +53,9 @@ export default class UserLabel extends Component<UserLabelProps> {
     const isRealOwner = this.props.gameState.entireGame.isRealOwner(this.user);
 
     return (
-      <Navbar variant="dark" className="no-space-around pr-0">
+      <Navbar variant="dark" className="no-space-around">
         <Navbar.Brand className="no-space-around">
           <small>
-            {canActAsOwner && (
-              <>
-                <OverlayTrigger
-                  overlay={
-                    <Tooltip id={`${this.user.id}-owner-tooltip`}>
-                      Game host{!isRealOwner ? " deputy" : ""}
-                    </Tooltip>
-                  }
-                >
-                  <FontAwesomeIcon icon={faUserGear} />
-                </OverlayTrigger>
-                &nbsp;&nbsp;
-              </>
-            )}
             <OverlayTrigger
               overlay={
                 <Tooltip id={`${this.user.id}-connection-tooltip`}>
@@ -85,6 +71,22 @@ export default class UserLabel extends Component<UserLabelProps> {
             {!this.props.gameState.entireGame.gameSettings.private &&
               this.user.otherUsersFromSameNetwork.size > 0 &&
               this.renderOtherUsersFromSameNetworkTooltip()}
+            {canActAsOwner && (
+              <>
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip id={`${this.user.id}-owner-tooltip`}>
+                      Game host{!isRealOwner ? " deputy" : ""}
+                    </Tooltip>
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={faUserGear}
+                    style={{ marginLeft: 5 }}
+                  />
+                </OverlayTrigger>
+              </>
+            )}
           </small>
         </Navbar.Brand>
         <Navbar.Collapse
@@ -107,12 +109,12 @@ export default class UserLabel extends Component<UserLabelProps> {
               }
             >
               {this.props.gameState.entireGame.gameSettings.faceless ? (
-                <NavDropdown.Item className="text-center px-2 enabled" disabled>
+                <NavDropdown.Item className="text-center px-1 enabled" disabled>
                   {this.renderNameAndTimeElapsedDropDownItem()}
                 </NavDropdown.Item>
               ) : (
                 <NavDropdown.Item
-                  className="text-center px-2"
+                  className="text-center px-1"
                   href={`/user/${this.user.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
