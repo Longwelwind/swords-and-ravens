@@ -281,7 +281,9 @@ export default class GlobalServer {
           scope.setContext("game", {
             id: entireGame.id,
             name: entireGame.name,
+            round: entireGame.ingameGameState?.game.turn ?? null,
             settings: entireGame.gameSettings.serializeToClient(),
+            house: entireGame.ingameGameState?.players.get(user)?.house ?? null,
             message: message,
             leafState: entireGame.leafState?.constructor?.name,
           });

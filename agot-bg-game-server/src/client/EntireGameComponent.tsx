@@ -293,7 +293,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <div className="p-2 text-center">
                   <h6>Perpetuum Random</h6>
                   <small>
-                    Every time a player&apos;s last House card has been played,
+                    When a player plays their last House card,
                     <br />
                     they will receive a new set of random House cards.
                   </small>
@@ -318,7 +318,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             overlay={
               <Tooltip id="evolution-active-tooltip">
                 From round <b>{this.settings.houseCardsEvolutionRound}</b>{" "}
-                onwards, each house returns its alternative deck when the last
+                onwards, each house receives its alternative deck when the last
                 house card has been played.
               </Tooltip>
             }
@@ -350,7 +350,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
           <OverlayTrigger
             overlay={
               <Tooltip id="locked-badge-tooltip">
-                Game is locked by password
+                This game is password-protected
               </Tooltip>
             }
             placement="bottom"
@@ -437,7 +437,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     )}
                     {this.settings.holdVictoryPointsUntilEndOfRound && (
                       <div className="text-small mt-3">
-                        Players have to hold{" "}
+                        Players must hold{" "}
                         {this.settings.victoryPointsCountNeededToWin} victory
                         points
                         <br />
@@ -490,8 +490,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                       <div className="p-2">
                         <h6>Dragon Revenge</h6>
                         <small>
-                          The last remaining non-dragon land unit of defeated
-                          houses will transform into a dragon!
+                          The last remaining non-dragon land unit of a defeated
+                          house will transform into a dragon!
                         </small>
                       </div>
                     )}

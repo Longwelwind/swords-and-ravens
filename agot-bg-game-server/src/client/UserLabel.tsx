@@ -53,23 +53,9 @@ export default class UserLabel extends Component<UserLabelProps> {
     const isRealOwner = this.props.gameState.entireGame.isRealOwner(this.user);
 
     return (
-      <Navbar variant="dark" className="no-space-around pr-0">
+      <Navbar variant="dark" className="no-space-around">
         <Navbar.Brand className="no-space-around">
           <small>
-            {canActAsOwner && (
-              <>
-                <OverlayTrigger
-                  overlay={
-                    <Tooltip id={`${this.user.id}-owner-tooltip`}>
-                      Game host{!isRealOwner ? " deputy" : ""}
-                    </Tooltip>
-                  }
-                >
-                  <FontAwesomeIcon icon={faUserGear} />
-                </OverlayTrigger>
-                &nbsp;&nbsp;
-              </>
-            )}
             <OverlayTrigger
               overlay={
                 <Tooltip id={`${this.user.id}-connection-tooltip`}>
@@ -85,6 +71,22 @@ export default class UserLabel extends Component<UserLabelProps> {
             {!this.props.gameState.entireGame.gameSettings.private &&
               this.user.otherUsersFromSameNetwork.size > 0 &&
               this.renderOtherUsersFromSameNetworkTooltip()}
+            {canActAsOwner && (
+              <>
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip id={`${this.user.id}-owner-tooltip`}>
+                      Game host{!isRealOwner ? " deputy" : ""}
+                    </Tooltip>
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={faUserGear}
+                    style={{ marginLeft: 5 }}
+                  />
+                </OverlayTrigger>
+              </>
+            )}
           </small>
         </Navbar.Brand>
         <Navbar.Collapse
@@ -107,12 +109,12 @@ export default class UserLabel extends Component<UserLabelProps> {
               }
             >
               {this.props.gameState.entireGame.gameSettings.faceless ? (
-                <NavDropdown.Item className="text-center px-2 enabled" disabled>
+                <NavDropdown.Item className="text-center px-1 enabled" disabled>
                   {this.renderNameAndTimeElapsedDropDownItem()}
                 </NavDropdown.Item>
               ) : (
                 <NavDropdown.Item
-                  className="text-center px-2"
+                  className="text-center px-1"
                   href={`/user/${this.user.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -149,7 +151,7 @@ export default class UserLabel extends Component<UserLabelProps> {
             >
               <small>
                 {secondsToString(
-                  getElapsedSeconds(this.player.waitedForData.date)
+                  getElapsedSeconds(this.player.waitedForData.date),
                 )}
               </small>
             </OverlayTrigger>
@@ -198,7 +200,7 @@ export default class UserLabel extends Component<UserLabelProps> {
       result: canLaunchReplacePlayerVote,
       reason: canLaunchReplacePlayerVoteReason,
     } = ingame.canLaunchReplacePlayerVote(
-      this.props.gameClient.authenticatedUser
+      this.props.gameClient.authenticatedUser,
     );
     const {
       result: canLaunchReplacePlayerByVassalVote,
@@ -206,20 +208,20 @@ export default class UserLabel extends Component<UserLabelProps> {
     } = ingame.canLaunchReplacePlayerVote(
       this.props.gameClient.authenticatedUser,
       true,
-      this.player!.house
+      this.player!.house,
     );
     const {
       result: canLaunchSwapHousesVote,
       reason: canLaunchSwapHousesVoteReason,
     } = ingame.canLaunchSwapHousesVote(
       this.props.gameClient.authenticatedUser,
-      this.player!
+      this.player!,
     );
     const {
       result: canLaunchDeclareWinnerVote,
       reason: canLaunchDeclareWinnerVoteReason,
     } = ingame.canLaunchDeclareWinnerVote(
-      this.props.gameClient.authenticatedUser
+      this.props.gameClient.authenticatedUser,
     );
     return (
       <>
@@ -402,13 +404,13 @@ export default class UserLabel extends Component<UserLabelProps> {
   onLaunchReplacePlayerVoteClick(): void {
     if (!this.ingame) {
       throw new Error(
-        "`launchReplacePlayerVote` called when the game was not in IngameGameState"
+        "`launchReplacePlayerVote` called when the game was not in IngameGameState",
       );
     }
 
     if (
       window.confirm(
-        `Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name}?`
+        `Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name}?`,
       )
     ) {
       this.ingame.launchReplacePlayerVote(this.player!);
@@ -418,13 +420,13 @@ export default class UserLabel extends Component<UserLabelProps> {
   onLaunchReplacePlayerByVassalVoteClick(): void {
     if (!this.ingame) {
       throw new Error(
-        "`launchReplacePlayerVote` called when the game was not in IngameGameState"
+        "`launchReplacePlayerVote` called when the game was not in IngameGameState",
       );
     }
 
     if (
       window.confirm(
-        `Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name} by a vassal?`
+        `Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name} by a vassal?`,
       )
     ) {
       this.ingame.launchReplacePlayerByVassalVote(this.player!);
@@ -434,13 +436,13 @@ export default class UserLabel extends Component<UserLabelProps> {
   onLaunchSwapHousesVoteClick(): void {
     if (!this.ingame) {
       throw new Error(
-        "`onLaunchSwapHousesVoteClick` called when the game was not in IngameGameState"
+        "`onLaunchSwapHousesVoteClick` called when the game was not in IngameGameState",
       );
     }
 
     if (
       window.confirm(
-        `Do you want to launch a vote to swap houses with ${this.player!.user.name} who controls house ${this.player!.house.name}?`
+        `Do you want to launch a vote to swap houses with ${this.player!.user.name} who controls house ${this.player!.house.name}?`,
       )
     ) {
       this.ingame.launchSwapHousesVote(this.player!);
@@ -450,13 +452,13 @@ export default class UserLabel extends Component<UserLabelProps> {
   onLaunchDeclareWinnerClick(): void {
     if (!this.ingame) {
       throw new Error(
-        "`onLaunchDeclareWinnerClick` called when the game was not in IngameGameState"
+        "`onLaunchDeclareWinnerClick` called when the game was not in IngameGameState",
       );
     }
 
     if (
       window.confirm(
-        `Do you want to launch a vote to declare House ${this.player!.house.name} the winner?`
+        `Do you want to launch a vote to declare House ${this.player!.house.name} the winner?`,
       )
     ) {
       this.ingame.launchDeclareWinnerVote(this.player!.house);

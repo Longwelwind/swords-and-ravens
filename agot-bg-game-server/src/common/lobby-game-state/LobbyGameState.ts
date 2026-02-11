@@ -288,20 +288,6 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.asosHouseCards = false;
       }
 
-      if (settings.thematicDraft) {
-        settings.draftHouseCards = true;
-        settings.draftTracks = false;
-        settings.limitedDraft = false;
-        settings.blindDraft = false;
-        settings.randomDraft = false;
-        settings.perpetuumRandom = false;
-      }
-
-      if (settings.limitedDraft) {
-        settings.draftHouseCards = true;
-        settings.thematicDraft = false;
-      }
-
       if (settings.randomDraft && !this.settings.randomDraft) {
         settings.draftHouseCards = true;
         settings.randomDraft = true;
@@ -315,7 +301,7 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.perpetuumRandom = false;
       }
 
-      if (!settings.draftHouseCards) {
+      if (!settings.draftHouseCards && this.settings.draftHouseCards) {
         settings.draftTracks = false;
         settings.thematicDraft = false;
         settings.randomDraft = false;
@@ -323,6 +309,20 @@ export default class LobbyGameState extends GameState<EntireGame> {
         settings.perpetuumRandom = false;
         settings.limitedDraft = false;
         settings.selectedDraftDecks = HouseCardDecks.All;
+      }
+
+      if (settings.limitedDraft && !this.settings.limitedDraft) {
+        settings.draftHouseCards = true;
+        settings.thematicDraft = false;
+      }
+
+      if (settings.thematicDraft) {
+        settings.draftHouseCards = true;
+        settings.draftTracks = false;
+        settings.limitedDraft = false;
+        settings.blindDraft = false;
+        settings.randomDraft = false;
+        settings.perpetuumRandom = false;
       }
 
       if (settings.draftHouseCards) {

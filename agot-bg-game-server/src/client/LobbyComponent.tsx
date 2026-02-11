@@ -19,7 +19,6 @@ import ConditionalWrap from "./utils/ConditionalWrap";
 import { Badge, OverlayTrigger, Popover, Spinner } from "react-bootstrap";
 import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
 import UserLabel from "./UserLabel";
 import EntireGame from "../common/EntireGame";
 import HouseIconComponent from "./game-state-panel/utils/HouseIconComponent";
@@ -80,43 +79,43 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     return (
       <>
-        <Col xs={10} lg={4} className="mb-2">
+        <Col xs={10} lg={"auto"} className="mb-2">
           <Card>
             <Card.Body id="lobby-houses-list" className="no-space-around">
               <ListGroup variant="flush">
                 {this.lobby.lobbyHouses.values.map((h, i) => (
                   <ListGroupItem
                     key={`lobby-house_${h.id}`}
-                    style={{ minHeight: "62px" }}
+                    style={{
+                      minHeight: "50px",
+                      paddingTop: "6px",
+                      paddingBottom: "6px",
+                    }}
                   >
                     <Row
                       className="align-items-center"
                       style={{ opacity: this.isHouseAvailable(h) ? 1 : 0.3 }}
                     >
                       {!this.randomHouses && (
-                        <Col xs="auto" className="no-gutters">
+                        <Col xs="auto" style={{ width: "48px" }}>
                           <HouseIconComponent house={h} />
                         </Col>
                       )}
-                      <Col className="no-gutters">
-                        <div>
-                          <b>
-                            {this.randomHouses ? "Seat " + (i + 1) : h.name}
-                          </b>
-                        </div>
-                        <div
-                          className={classNames({
-                            invisible: !this.lobby.players.has(h),
-                          })}
-                        >
-                          {this.lobby.players.has(h) && (
-                            <UserLabel
-                              gameClient={this.props.gameClient}
-                              gameState={this.lobby}
-                              user={this.lobby.players.get(h)}
-                            />
-                          )}
-                        </div>
+                      <Col xs="auto" style={{ width: "100px" }}>
+                        <b>{this.randomHouses ? "Seat " + (i + 1) : h.name}</b>
+                      </Col>
+                      <Col
+                        className={classNames({
+                          invisible: !this.lobby.players.has(h),
+                        })}
+                      >
+                        {this.lobby.players.has(h) && (
+                          <UserLabel
+                            gameClient={this.props.gameClient}
+                            gameState={this.lobby}
+                            user={this.lobby.players.get(h)}
+                          />
+                        )}
                       </Col>
                       {this.renderLobbyHouseButtons(h)}
                     </Row>
@@ -126,7 +125,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             </Card.Body>
           </Card>
         </Col>
-        <Col xs={10} lg={8} className="mb-2">
+        <Col xs={10} lg className="mb-2">
           <Row className="no-space-around">
             <Col
               xs={connectedSpectators.length > 0 ? 8 : 12}
@@ -180,7 +179,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             )}
           </Row>
         </Col>
-        <Col xs={11}>
+        <Col xs={12}>
           <Row className="justify-content-center no-space-around">
             <Card>
               <Card.Body className="py-2">
@@ -261,7 +260,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                           </OverlayTrigger>
                         )}
                       >
-                        <FontAwesomeIcon icon={faTimes} />
+                        <>Cancel</>
                       </ConditionalWrap>
                     </Button>
                   </Col>
@@ -325,7 +324,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             name="Notifications"
             onVolumeChange={(val) =>
               this.props.gameClient.sfxManager.notificationVolumeChanged(
-                val / 100
+                val / 100,
               )
             }
           />
@@ -384,7 +383,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
   getConnectedSpectators(): User[] {
     return _.difference(
       this.entireGame.users.values.filter((u) => u.connected),
-      this.lobby.players.values
+      this.lobby.players.values,
     );
   }
 
@@ -394,29 +393,40 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     if (this.lobby.readyUsers != null) {
       // Ready-check ongoing
       if (!this.lobby.players.has(h) || invisible) {
-        return null;
+        return (
+          <Col xs="auto">
+            <Button type="button" size="sm" className="invisible">
+              INVISIBLE DUMMY
+            </Button>
+          </Col>
+        );
       }
       return this.lobby.readyUsers.includes(this.lobby.players.get(h)) ? (
         <Col xs="auto">
           <Badge variant="success">
-            <FontAwesomeIcon icon={faCheck} size="2x" />
+            <FontAwesomeIcon icon={faCheck} size="sm" />
           </Badge>
         </Col>
       ) : this.lobby.players.get(h) == this.authenticatedUser ? (
-        <Col xs="auto">
+        <Col xs="auto" className="d-flex align-items-center">
           <Button
             type="button"
+            size="sm"
             variant="outline-success"
             onClick={() => this.ready()}
-            style={{ verticalAlign: 6 }}
           >
             Ready
           </Button>
-          <Spinner className="ml-3" animation="border" variant="info" />
+          <Spinner
+            className="ml-3"
+            size="sm"
+            animation="border"
+            variant="info"
+          />
         </Col>
       ) : (
         <Col xs="auto">
-          <Spinner animation="border" variant="info" />
+          <Spinner size="sm" animation="border" variant="info" />
         </Col>
       );
     }
@@ -438,20 +448,30 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
     return !this.lobby.players.has(h) ? (
       <Col xs="auto" className={invisible ? "invisible" : ""}>
-        <Button type="button" onClick={() => this.choose(h)}>
+        <Button type="button" size="sm" onClick={() => this.choose(h)}>
           Choose
         </Button>
       </Col>
     ) : this.lobby.players.get(h) == this.authenticatedUser ? (
       <Col xs="auto" className={invisible ? "invisible" : ""}>
-        <Button type="button" variant="danger" onClick={() => this.leave()}>
+        <Button
+          type="button"
+          size="sm"
+          variant="danger"
+          onClick={() => this.leave()}
+        >
           Leave
         </Button>
       </Col>
     ) : (
       this.props.gameClient.isRealOwner() && (
         <Col xs="auto" className={invisible ? "invisible" : ""}>
-          <Button type="button" variant="danger" onClick={() => this.kick(h)}>
+          <Button
+            type="button"
+            size="sm"
+            variant="danger"
+            onClick={() => this.kick(h)}
+          >
             Kick
           </Button>
         </Col>
@@ -502,6 +522,6 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
   setChatHeight(): void {
     this.chatHeight =
       document.getElementById("lobby-houses-list")?.getBoundingClientRect()
-        ?.height ?? 496;
+        ?.height ?? 400;
   }
 }

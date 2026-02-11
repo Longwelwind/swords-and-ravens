@@ -141,23 +141,23 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                           id="only-live-setting-tooltip"
                           className="tooltip-w-100"
                         >
-                          If this option is enabled each player will have a game
-                          clock of 45, 60, 75, 90 or 120 minutes.
+                          If this option is enabled, each player will have a
+                          game clock of 30, 45, 60, 75, 90, or 120 minutes.
                           <br />
-                          When a player&apos;s time runs out, he is
+                          When a player&apos;s time runs out, they are
                           automatically turned into a vassal and this cannot be
                           undone!
                           <br />
                           The last remaining player immediately wins the game.
                           <br />
-                          All player clocks can be extended by vote once for 15
+                          All player clocks can be extended by vote: once for 15
                           minutes and a second time in the last round.
                           <br />
                           After 2 failed voting attempts, no further voting can
                           be initiated.
                           <br />
-                          In addition, these games can be paused, but public
-                          games will automatically resume after 10 minutes
+                          These games can be paused, but public games will
+                          automatically resume after 10 minutes,
                           <br />
                           and the game host will not be able to switch to PBEM
                           in-game.
@@ -244,9 +244,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <OverlayTrigger
                       overlay={
                         <Tooltip id="private-game-setting-tooltip">
-                          Enable this option if you know all participants and if
-                          you want to prevent security and replacement
-                          mechanisms from being activated.
+                          Enable this option if you know all participants and
+                          want to prevent security and replacement mechanisms
+                          from being activated.
                         </Tooltip>
                       }
                     >
@@ -287,10 +287,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             available online.
             <br />
             The Neutral Force tokens for 4 and 5 players are not implemented, as
-            the unoffical variants
+            the unofficial variants
             <br />
-            and the Vassals of Mother&nbsp;of&nbsp;Dragons expansion are much
-            better.
+            and the Vassals from the Mother&nbsp;of&nbsp;Dragons expansion are
+            much better.
           </>
         );
       case "mother-of-dragons":
@@ -680,9 +680,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="decks-evolution-setting-tooltip">
-                      This is a community variant, starting with the house cards
-                      from the base game. However, from round <b>5</b> onwards,
-                      each house returns its alternative deck when the last
+                      This is a community variant that starts with the house
+                      cards from the base game. From round <b>5</b> onwards,
+                      each house receives its alternative deck when the last
                       house card has been played.
                     </Tooltip>
                   }
@@ -772,8 +772,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         ) : (
                           <>
                             A community proposal to improve Tyrell&apos;s
-                            starting position by adding a ship to Redwyne
-                            Straight&apos;s.
+                            starting position by adding a ship to the Redwyne
+                            Straights.
                           </>
                         )}
                       </Tooltip>
@@ -947,8 +947,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="dragon-war-tooltip">
-                      All houses, except Targaryen, will replace their starting
-                      knight by a dragon.{" "}
+                      All houses except Targaryen will replace their starting
+                      knight with a dragon.{" "}
                       <small>
                         <i>(Inspired by LordWazza)</i>
                       </small>
@@ -1029,8 +1029,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   overlay={
                     <Tooltip id="random-chosen-houses-tooltip">
                       Only the selected house assignments are randomly
-                      exchanged. This way, users can define player and vassal
-                      houses and are still able to randomize the player houses.
+                      exchanged. This allows you to designate player and vassal
+                      houses while still randomizing the player house
+                      assignments.
                     </Tooltip>
                   }
                 >
@@ -1247,7 +1248,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="faceless-setting-tooltip">
-                      Player names will be hidden and revealed after game ended.
+                      Player names will be hidden and revealed after the game
+                      ends.
                     </Tooltip>
                   }
                 >
@@ -1382,7 +1384,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="use-vassal-positions-tooltip">
-                      Player houses will as well start with their vassal start
+                      Player houses will also start with their vassal starting
                       positions.
                     </Tooltip>
                   }
@@ -1411,9 +1413,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   overlay={
                     <Tooltip id="hold-vps-setting-tooltip">
                       When this option is enabled, players do not win
-                      immediately when they score their 7th victory point.
-                      Instead, to win the game, players must hold 7 victory
-                      points until the end of the round.
+                      immediately upon reaching the required number of victory
+                      points. Instead, they must hold the required victory
+                      points until the end of the round to win.
                     </Tooltip>
                   }
                 >
@@ -1439,10 +1441,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   overlay={
                     <Tooltip id="tournament-mode-tooltip">
                       This option is intended for tournaments. It disables the
-                      possibility to launch the following votes:
+                      ability to launch the following votes:
                       <br />
                       Offer replacement, Replace vassal, Swap houses, Extend
-                      player clocks, Declare winner, Abort game and End game.
+                      player clocks, Declare winner, Abort game, and End game.
                     </Tooltip>
                   }
                 >
@@ -1471,11 +1473,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="draft-house-cards-tooltip">
-                      Players will draft their House cards or a position on a
-                      chosen Influence track step by step in a randomly chosen
-                      order before the game starts. House cards can be chosen
-                      from all 2nd Edition Base Game House cards and from all
-                      expansions (ASoS, ADwD, AFfC, MoD) House cards.
+                      Players will draft their House cards step by step in a
+                      randomly chosen order before the game starts.
+                      <br />
+                      If <b>Draft Influence tracks</b> is enabled, players can
+                      also choose to draft a position on an Influence track
+                      instead of a House card.
+                      <br />
+                      House cards can be chosen from all 2nd Edition Base Game
+                      House cards and from all expansions (ASoS, ADwD, AFfC,
+                      MoD) House cards.
                     </Tooltip>
                   }
                 >
@@ -1502,8 +1509,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="thematic-draft-tooltip">
-                      Players will draft their House cards simultaneously from
-                      the available decks of their house.
+                      Players draft their House cards simultaneously from their
+                      house&apos;s available decks.
                     </Tooltip>
                   }
                 >
@@ -1529,7 +1536,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   overlay={
                     <Tooltip id="random-draft-tooltip">
                       Players receive random House cards and Influence
-                      positions. Can be combined with <i>Limited Draft</i>.
+                      positions. Can be combined with <b>Limited&nbsp;Draft</b>.
                     </Tooltip>
                   }
                 >
@@ -1542,32 +1549,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   () =>
                     (this.gameSettings.randomDraft =
                       !this.gameSettings.randomDraft),
-                )
-              }
-            />
-          </Col>
-          <Col xs="12">
-            <FormCheck
-              id="limited-draft-setting"
-              type="switch"
-              label={
-                <OverlayTrigger
-                  overlay={
-                    <Tooltip id="limited-draft-tooltip">
-                      This option will remove house card decks from houses that
-                      are not in play.
-                    </Tooltip>
-                  }
-                >
-                  <label htmlFor="limited-draft-setting">Limited Draft</label>
-                </OverlayTrigger>
-              }
-              checked={this.gameSettings.limitedDraft}
-              onChange={() =>
-                this.changeGameSettings(
-                  () =>
-                    (this.gameSettings.limitedDraft =
-                      !this.gameSettings.limitedDraft),
                 )
               }
             />
@@ -1628,102 +1609,19 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
           >
             <Col xs="12">
               <FormCheck
-                id="base-deck-setting"
-                type="checkbox"
-                label={
-                  <OverlayTrigger
-                    overlay={
-                      <Tooltip id="base-deck-setting-tooltip">
-                        This option will add the 2nd edition base game decks and
-                        the Mother of Dragons A decks for Arryn and Targaryen.
-                      </Tooltip>
-                    }
-                  >
-                    <label htmlFor="base-deck-setting">
-                      2nd ed base and MoD A
-                    </label>
-                  </OverlayTrigger>
-                }
-                checked={
-                  (this.gameSettings.selectedDraftDecks &
-                    HouseCardDecks.BaseAndModA) ==
-                  HouseCardDecks.BaseAndModA
-                }
-                onChange={(e) =>
-                  this.selectHouseCardDeck(e, HouseCardDecks.BaseAndModA)
-                }
-              />
-            </Col>
-            <Col xs="12">
-              <FormCheck
-                id="alternative-deck-setting"
-                type="checkbox"
-                label={
-                  <OverlayTrigger
-                    overlay={
-                      <Tooltip id="alternative-deck-setting-tooltip">
-                        This option will add the decks from the Dance with
-                        Dragons expansion for the base game houses, the Feast
-                        For Crows deck for Arryn and the Mother of Dragons B
-                        Deck for Targaryen.
-                      </Tooltip>
-                    }
-                  >
-                    <label htmlFor="alternative-deck-setting">
-                      DwD, FfC and MoD B
-                    </label>
-                  </OverlayTrigger>
-                }
-                checked={
-                  (this.gameSettings.selectedDraftDecks &
-                    HouseCardDecks.DwdFfcModB) ==
-                  HouseCardDecks.DwdFfcModB
-                }
-                onChange={(e) =>
-                  this.selectHouseCardDeck(e, HouseCardDecks.DwdFfcModB)
-                }
-              />
-            </Col>
-            <Col xs="12">
-              <FormCheck
-                id="sos-deck-setting"
-                type="checkbox"
-                label={
-                  <OverlayTrigger
-                    overlay={
-                      <Tooltip id="sos-deck-setting-tooltip">
-                        This option will add the decks from the Storm of Swords
-                        expansion and the Mother of Dragons A decks for Arryn
-                        and Targaryen.
-                      </Tooltip>
-                    }
-                  >
-                    <label htmlFor="sos-deck-setting">SoS and MoD A</label>
-                  </OverlayTrigger>
-                }
-                checked={
-                  (this.gameSettings.selectedDraftDecks &
-                    HouseCardDecks.StormOfSwords) ==
-                  HouseCardDecks.StormOfSwords
-                }
-                onChange={(e) =>
-                  this.selectHouseCardDeck(e, HouseCardDecks.StormOfSwords)
-                }
-              />
-            </Col>
-            <Col xs="12">
-              <FormCheck
                 id="draft-tracks-settings"
                 type="switch"
                 label={
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="draft-tracks-tooltip">
-                        Influence tracks will be drafted together with House
-                        cards. If this option is enabled, players can choose to
-                        draft a position on one of the three Influence tracks
-                        instead of drafting a House card during their draft
-                        turn.
+                        If this option is enabled, players can choose to draft a
+                        position on one of the three Influence tracks instead of
+                        drafting a House card during their draft turn.
+                        <br />
+                        If enabled in Random or Blind Draft modes, Influence
+                        tracks will also be randomly assigned together with
+                        House cards.
                       </Tooltip>
                     }
                   >
@@ -1738,6 +1636,32 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     () =>
                       (this.gameSettings.draftTracks =
                         !this.gameSettings.draftTracks),
+                  )
+                }
+              />
+            </Col>
+            <Col xs="12">
+              <FormCheck
+                id="limited-draft-setting"
+                type="switch"
+                label={
+                  <OverlayTrigger
+                    overlay={
+                      <Tooltip id="limited-draft-tooltip">
+                        This option removes house card decks from houses that
+                        are not in play.
+                      </Tooltip>
+                    }
+                  >
+                    <label htmlFor="limited-draft-setting">Limited Draft</label>
+                  </OverlayTrigger>
+                }
+                checked={this.gameSettings.limitedDraft}
+                onChange={() =>
+                  this.changeGameSettings(
+                    () =>
+                      (this.gameSettings.limitedDraft =
+                        !this.gameSettings.limitedDraft),
                   )
                 }
               />
@@ -1779,8 +1703,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="perpetuum-draft-tooltip">
-                            Players will receive a new deck every time after
-                            last House card has been played.
+                            Players receive a new deck each time after the last
+                            House card has been played.
                           </Tooltip>
                         }
                       >
@@ -1801,6 +1725,96 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 </Col>
               </>
             )}
+            <Col xs="12">
+              <FormCheck
+                id="base-deck-setting"
+                type="checkbox"
+                label={
+                  <OverlayTrigger
+                    overlay={
+                      <Tooltip id="base-deck-setting-tooltip">
+                        This option adds the{" "}
+                        <b>2nd&nbsp;edition&nbsp;base&nbsp;game</b> decks and
+                        the <b>Mother&nbsp;of&nbsp;Dragons&nbsp;A</b> decks for{" "}
+                        <b>Arryn</b> and <b>Targaryen</b>.
+                      </Tooltip>
+                    }
+                  >
+                    <label htmlFor="base-deck-setting">
+                      2nd ed base and MoD A
+                    </label>
+                  </OverlayTrigger>
+                }
+                checked={
+                  (this.gameSettings.selectedDraftDecks &
+                    HouseCardDecks.BaseAndModA) ==
+                  HouseCardDecks.BaseAndModA
+                }
+                onChange={(e) =>
+                  this.selectHouseCardDeck(e, HouseCardDecks.BaseAndModA)
+                }
+              />
+            </Col>
+            <Col xs="12">
+              <FormCheck
+                id="alternative-deck-setting"
+                type="checkbox"
+                label={
+                  <OverlayTrigger
+                    overlay={
+                      <Tooltip id="alternative-deck-setting-tooltip">
+                        This option adds the decks from the{" "}
+                        <b>Dance&nbsp;with&nbsp;Dragons</b> expansion for the
+                        base game houses, the <b>Feast&nbsp;for&nbsp;Crows</b>{" "}
+                        deck for <b>Arryn</b>, and the{" "}
+                        <b>Mother&nbsp;of&nbsp;Dragons&nbsp;B</b> deck for{" "}
+                        <b>Targaryen</b>.
+                      </Tooltip>
+                    }
+                  >
+                    <label htmlFor="alternative-deck-setting">
+                      DwD, FfC and MoD B
+                    </label>
+                  </OverlayTrigger>
+                }
+                checked={
+                  (this.gameSettings.selectedDraftDecks &
+                    HouseCardDecks.DwdFfcModB) ==
+                  HouseCardDecks.DwdFfcModB
+                }
+                onChange={(e) =>
+                  this.selectHouseCardDeck(e, HouseCardDecks.DwdFfcModB)
+                }
+              />
+            </Col>
+            <Col xs="12">
+              <FormCheck
+                id="sos-deck-setting"
+                type="checkbox"
+                label={
+                  <OverlayTrigger
+                    overlay={
+                      <Tooltip id="sos-deck-setting-tooltip">
+                        This option adds the decks from the{" "}
+                        <b>Storm&nbsp;of&nbsp;Swords</b> expansion and the{" "}
+                        <b>Mother&nbsp;of&nbsp;Dragons&nbsp;A</b> decks for{" "}
+                        <b>Arryn</b> and <b>Targaryen</b>.
+                      </Tooltip>
+                    }
+                  >
+                    <label htmlFor="sos-deck-setting">SoS and MoD A</label>
+                  </OverlayTrigger>
+                }
+                checked={
+                  (this.gameSettings.selectedDraftDecks &
+                    HouseCardDecks.StormOfSwords) ==
+                  HouseCardDecks.StormOfSwords
+                }
+                onChange={(e) =>
+                  this.selectHouseCardDeck(e, HouseCardDecks.StormOfSwords)
+                }
+              />
+            </Col>
           </Col>
         )}
       </Row>
