@@ -58,7 +58,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
     const bannedUsers = this.getBannedUsers();
     const connectedSpectators = _.difference(
       this.getConnectedSpectators(),
-      bannedUsers
+      bannedUsers,
     );
 
     return (
@@ -142,14 +142,14 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                             {getUserLinkOrLabel(
                               this.ingame.entireGame,
                               u,
-                              null
+                              null,
                             )}
                           </b>
                           <button
                             type="button"
                             className={classNames(
                               "close",
-                              !this.gameClient.canActAsOwner() ? "d-none" : ""
+                              !this.gameClient.canActAsOwner() ? "d-none" : "",
                             )}
                             onClick={() => this.banUser(u)}
                           >
@@ -183,7 +183,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                           type="button"
                           className={classNames(
                             "close",
-                            !this.gameClient.canActAsOwner() ? "d-none" : ""
+                            !this.gameClient.canActAsOwner() ? "d-none" : "",
                           )}
                           onClick={() => this.unbanUser(u)}
                         >
@@ -203,7 +203,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
   }
 
   private renderInfluenceTracks(
-    tracks: InfluenceTrackDetails[]
+    tracks: InfluenceTrackDetails[],
   ): React.ReactNode {
     return tracks.map(({ name, trackToShow, realTrack, stars }, i) => (
       <ListGroupItem
@@ -300,7 +300,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
   private getConnectedSpectators(): User[] {
     return _.difference(
       this.ingame.entireGame.users.values.filter((u) => u.connected),
-      this.ingame.players.keys
+      this.ingame.players.keys,
     );
   }
 

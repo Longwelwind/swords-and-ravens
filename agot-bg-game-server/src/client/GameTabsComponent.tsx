@@ -89,7 +89,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
 
   private get publicChatRoom(): Channel {
     return this.gameClient.chatClient.channels.get(
-      this.ingame.entireGame.publicChatRoomId
+      this.ingame.entireGame.publicChatRoomId,
     );
   }
 
@@ -110,7 +110,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
         }}
         className={classNames(
           { "flex-fill-remaining": this.gameClient.isMapScrollbarSet },
-          "text-large"
+          "text-large",
         )}
       >
         <Tab.Container
@@ -343,7 +343,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                         this.ingame.entireGame,
                         u,
                         this.ingame.players.tryGet(u, null),
-                        this.user?.settings.chatHouseNames
+                        this.user?.settings.chatHouseNames,
                       )}
                     </b>
                   )}
@@ -436,7 +436,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                           this.ingame.entireGame,
                           u,
                           this.ingame.players.tryGet(u, null),
-                          this.user?.settings.chatHouseNames
+                          this.user?.settings.chatHouseNames,
                         )}
                       </b>
                     )}
@@ -513,26 +513,26 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     const users = _.sortBy([this.user as User, u], (u) => u.id);
 
     return this.gameClient.chatClient.channels.get(
-      this.ingame.entireGame.privateChatRoomsIds.get(users[0]).get(users[1])
+      this.ingame.entireGame.privateChatRoomsIds.get(users[0]).get(users[1]),
     );
   }
 
   getOtherPlayers(): Player[] {
     return _.sortBy(this.ingame.players.values, (p) =>
-      this.user?.settings.chatHouseNames ? p.house.name : p.user.name
+      this.user?.settings.chatHouseNames ? p.house.name : p.user.name,
     ).filter((p) => p.user != this.user);
   }
 
   injectBetweenMessages(
     _previous: Message | null,
-    _next: Message | null
+    _next: Message | null,
   ): ReactNode {
     return null;
   }
 
   renderGameLogRoundsDropDownItems(): ReactNode {
     const gameRoundElements = document.querySelectorAll(
-      '*[id^="gamelog-round-"]'
+      '*[id^="gamelog-round-"]',
     );
 
     const result: JSX.Element[] = [];
@@ -553,7 +553,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
           }}
         >
           Round {round}
-        </Dropdown.Item>
+        </Dropdown.Item>,
       );
     });
 
@@ -592,7 +592,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   componentDidUpdate(
     _prevProps: Readonly<GameTabsComponentProps>,
     _prevState: Readonly<any>,
-    _snapshot?: any
+    _snapshot?: any,
   ): void {
     if (this.currentOpenedTab == "note") {
       this.unseenNotes = false;
@@ -604,7 +604,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     if (visibilityChangedCallback) {
       document.removeEventListener(
         "visibilitychange",
-        visibilityChangedCallback
+        visibilityChangedCallback,
       );
     }
   }
