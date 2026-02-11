@@ -19,6 +19,7 @@ import { preventOverflow } from "@popperjs/core";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import { observer } from "mobx-react";
+import { ReplacePlayer } from "../common/ingame-game-state/vote-system/VoteType";
 
 interface VoteComponentProps {
   vote: Vote;
@@ -36,6 +37,14 @@ export default class VoteComponent extends Component<VoteComponentProps> {
     const state = this.vote.state;
     const { result: canVote, reason } = this.props.vote.canVote;
     const disabled = !canVote;
+    const showBanButton =
+      !this.vote.ingame.bannedUsers.has(this.vote.initiator.id) &&
+      this.vote.type instanceof ReplacePlayer &&
+      this.vote.state != VoteState.ONGOING &&
+      !this.vote.ingame.players.keys.some(
+        (p) => p.id === this.vote.initiator.id,
+      ) &&
+      this.props.gameClient.canActAsOwner();
 
     return (
       <Row key={this.vote.id} className="flex-row">
@@ -79,8 +88,9 @@ export default class VoteComponent extends Component<VoteComponentProps> {
           </OverlayTrigger>
         </Col>
         <Col>
-          <b>{getUserLinkOrLabel(this.vote.initiator)}</b> initiated a vote to{" "}
-          <b>{this.vote.type.verb()}</b>. {this.vote.positiveCountToPass} player
+          <b>{getUserLinkOrLabel(this.vote.initiator, false, showBanButton)}</b>{" "}
+          initiated a vote to <b>{this.vote.type.verb()}</b>.{" "}
+          {this.vote.positiveCountToPass}&nbsp;player
           {this.vote.positiveCountToPass != 1 ? "s" : ""} must accept to pass
           the vote.
           <Row className="mt-1">

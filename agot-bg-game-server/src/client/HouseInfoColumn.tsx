@@ -10,7 +10,6 @@ import {
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import classNames from "classnames";
 import _ from "lodash";
 
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
@@ -138,17 +137,13 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                     >
                       {connectedSpectators.map((u) => (
                         <Col xs="auto" key={`specatator_${u.id}`}>
-                          <b>{getUserLinkOrLabel(u)}</b>
-                          <button
-                            type="button"
-                            className={classNames(
-                              "close",
-                              !this.gameClient.canActAsOwner() ? "d-none" : "",
+                          <b>
+                            {getUserLinkOrLabel(
+                              u,
+                              false,
+                              this.gameClient.canActAsOwner(),
                             )}
-                            onClick={() => this.banUser(u)}
-                          >
-                            <span>&times;</span>
-                          </button>
+                          </b>
                         </Col>
                       ))}
                     </Row>
@@ -171,16 +166,16 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                     {bannedUsers.map((u) => (
                       <Col xs="auto" key={`banned_${u.id}`}>
                         <b>{getUserLinkOrLabel(u)}</b>
-                        <button
-                          type="button"
-                          className={classNames(
-                            "close",
-                            !this.gameClient.canActAsOwner() ? "d-none" : "",
-                          )}
-                          onClick={() => this.unbanUser(u)}
-                        >
-                          <span>&#x2713;</span>
-                        </button>
+                        {this.gameClient.canActAsOwner() && (
+                          <button
+                            type="button"
+                            className="close ml-1"
+                            style={{ float: "none" }}
+                            onClick={() => this.unbanUser(u)}
+                          >
+                            <span>&#x2713;</span>
+                          </button>
+                        )}
                       </Col>
                     ))}
                   </Row>
@@ -302,24 +297,11 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
       .map((uid) => this.ingame.entireGame.users.get(uid));
   }
 
-  private banUser(user: User): void {
-    if (this.gameClient.canActAsOwner()) {
-      if (
-        !window.confirm("Do you want to ban " + user.name + " from your game?")
-      ) {
-        return;
-      }
-
-      this.ingame.entireGame.sendMessageToServer({
-        type: "ban-user",
-        userId: user.id,
-      });
-    }
-  }
-
   private unbanUser(user: User): void {
     if (this.gameClient.canActAsOwner()) {
-      if (!window.confirm("Do you want to unban " + user.name + "?")) {
+      if (
+        !window.confirm("Are you sure you want to unban '" + user.name + "'?")
+      ) {
         return;
       }
 
