@@ -138,13 +138,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                     >
                       {connectedSpectators.map((u) => (
                         <Col xs="auto" key={`specatator_${u.id}`}>
-                          <b>
-                            {getUserLinkOrLabel(
-                              this.ingame.entireGame,
-                              u,
-                              null,
-                            )}
-                          </b>
+                          <b>{getUserLinkOrLabel(u)}</b>
                           <button
                             type="button"
                             className={classNames(
@@ -176,9 +170,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                   >
                     {bannedUsers.map((u) => (
                       <Col xs="auto" key={`banned_${u.id}`}>
-                        <b>
-                          {getUserLinkOrLabel(this.ingame.entireGame, u, null)}
-                        </b>
+                        <b>{getUserLinkOrLabel(u)}</b>
                         <button
                           type="button"
                           className={classNames(

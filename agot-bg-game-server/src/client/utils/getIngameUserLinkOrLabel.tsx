@@ -1,16 +1,14 @@
 import * as React from "react";
 import User from "../../server/User";
-import EntireGame from "../../common/EntireGame";
-import Player from "../../common/ingame-game-state/Player";
 import ConditionalWrap from "./ConditionalWrap";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export default function getUserLinkOrLabel(
-  entireGame: EntireGame,
   user: User,
-  player: Player | null,
-  houseNames: boolean | undefined = false,
+  houseNames?: boolean,
 ): JSX.Element {
+  const entireGame = user.entireGame;
+  const player = entireGame.ingameGameState?.players.tryGet(user, null) ?? null;
   const displayName = !houseNames || !player ? user.name : player.house.name;
 
   return (

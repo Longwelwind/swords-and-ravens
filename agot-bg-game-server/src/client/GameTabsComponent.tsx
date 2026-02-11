@@ -340,9 +340,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   getUserDisplayName={(u) => (
                     <b>
                       {getUserLinkOrLabel(
-                        this.ingame.entireGame,
                         u,
-                        this.ingame.players.tryGet(u, null),
                         this.user?.settings.chatHouseNames,
                       )}
                     </b>
@@ -433,9 +431,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                     getUserDisplayName={(u) => (
                       <b>
                         {getUserLinkOrLabel(
-                          this.ingame.entireGame,
                           u,
-                          this.ingame.players.tryGet(u, null),
                           this.user?.settings.chatHouseNames,
                         )}
                       </b>

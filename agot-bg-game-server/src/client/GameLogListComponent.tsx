@@ -283,14 +283,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             {assignments.map(([house, user]) => (
               <p key={`${house.id}_${user.id}`}>
                 {this.renderHouseName(house)} is controlled by{" "}
-                <b>
-                  {getUserLinkOrLabel(
-                    this.ingame.entireGame,
-                    user,
-                    this.ingame.players.tryGet(user, null),
-                  )}
-                </b>
-                .
+                <b>{getUserLinkOrLabel(user)}</b>.
               </p>
             ))}
           </>
@@ -2201,13 +2194,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const newCommanderHouse = data.newCommanderHouse
           ? this.game.houses.get(data.newCommanderHouse)
           : null;
-        const newUserLabel = newUser
-          ? getUserLinkOrLabel(
-              this.ingame.entireGame,
-              newUser,
-              this.ingame.players.tryGet(newUser, null),
-            )
-          : null;
+        const newUserLabel = newUser ? getUserLinkOrLabel(newUser) : null;
         const reason =
           data.reason == ReplacementReason.CLOCK_TIMEOUT
             ? " due to clock timeout"
@@ -2217,15 +2204,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <>
-            <b>
-              {getUserLinkOrLabel(
-                this.ingame.entireGame,
-                oldUser,
-                this.ingame.players.tryGet(oldUser, null),
-              )}
-            </b>{" "}
-            ({this.renderHouseName(house)}) was replaced by{" "}
-            {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}
+            <b>{getUserLinkOrLabel(oldUser)}</b> ({this.renderHouseName(house)})
+            was replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}
             {reason}.<br />
             {newCommanderHouse && (
               <>
@@ -2244,14 +2224,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             Vassal house <b>{house.name}</b> was replaced by{" "}
-            <b>
-              {getUserLinkOrLabel(
-                this.ingame.entireGame,
-                user,
-                this.ingame.players.tryGet(user, null),
-              )}
-            </b>
-            .
+            <b>{getUserLinkOrLabel(user)}</b>.
           </>
         );
       }
@@ -3321,22 +3294,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         );
         const initiatorHouse = this.game.houses.get(data.initiatorHouse);
         const swappingHouse = this.game.houses.get(data.swappingHouse);
-        const newUserLabel = getUserLinkOrLabel(
-          this.ingame.entireGame,
-          swappingUser,
-          this.ingame.players.tryGet(swappingUser, null),
-        );
+        const newUserLabel = getUserLinkOrLabel(swappingUser);
 
         return (
           <>
-            <b>
-              {getUserLinkOrLabel(
-                this.ingame.entireGame,
-                initiator,
-                this.ingame.players.tryGet(initiator, null),
-              )}
-            </b>{" "}
-            (House <b>{initiatorHouse.name}</b>) swapped houses with{" "}
+            <b>{getUserLinkOrLabel(initiator)}</b> (House{" "}
+            <b>{initiatorHouse.name}</b>) swapped houses with{" "}
             {<b>{newUserLabel}</b>} (House <b>{swappingHouse.name}</b>).
           </>
         );

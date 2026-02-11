@@ -507,26 +507,21 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     );
   }
 
-  private showTimeoutWarning(controllerOfHouse: Player): void {
+  private showTimeoutWarning(player: Player): void {
     toast(
       <div>
         <Card>
           <Card.Body className="d-flex align-items-center">
             <img src={stopwatchImage} width={64} className="dye-critical" />
             <h4 className="d-inline ml-3" style={{ color: "white" }}>
-              {getUserLinkOrLabel(
-                this.props.ingame.entireGame,
-                controllerOfHouse.user,
-                controllerOfHouse,
-              )}{" "}
-              is runnig out of time!
+              {getUserLinkOrLabel(player.user)} is running out of time!
             </h4>
           </Card.Body>
         </Card>
       </div>,
       {
         autoClose: 3000,
-        toastId: `${controllerOfHouse.user.id}-timeout-warning`,
+        toastId: `${player.user.id}-timeout-warning`,
         theme: "light",
       },
     );

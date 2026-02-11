@@ -79,15 +79,8 @@ export default class VoteComponent extends Component<VoteComponentProps> {
           </OverlayTrigger>
         </Col>
         <Col>
-          <b>
-            {getUserLinkOrLabel(
-              this.vote.ingame.entireGame,
-              this.vote.initiator,
-              this.vote.ingame.players.tryGet(this.vote.initiator, null)
-            )}
-          </b>{" "}
-          initiated a vote to <b>{this.vote.type.verb()}</b>.{" "}
-          {this.vote.positiveCountToPass} player
+          <b>{getUserLinkOrLabel(this.vote.initiator)}</b> initiated a vote to{" "}
+          <b>{this.vote.type.verb()}</b>. {this.vote.positiveCountToPass} player
           {this.vote.positiveCountToPass != 1 ? "s" : ""} must accept to pass
           the vote.
           <Row className="mt-1">
@@ -165,7 +158,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
   wrapVoteButtons(
     button: ReactElement,
     disabled: boolean,
-    reason: string
+    reason: string,
   ): ReactNode {
     return (
       <ConditionalWrap
