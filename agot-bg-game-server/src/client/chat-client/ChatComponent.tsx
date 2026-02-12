@@ -17,6 +17,7 @@ import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFaceSmile, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import EmojiPicker, {
+  Categories,
   EmojiStyle,
   SuggestionMode,
   Theme,
@@ -28,6 +29,14 @@ import ConditionalWrap from "../utils/ConditionalWrap";
 import getElapsedSeconds, {
   getTimeDeltaInSeconds,
 } from "../../utils/getElapsedSeconds";
+import houseIconImages from "../houseIconImages";
+import stoneThroneImage from "../../../public/images/icons/stone-throne.svg";
+import diamondHiltImage from "../../../public/images/icons/diamond-hilt.svg";
+import ravenImage from "../../../public/images/icons/raven.svg";
+import spikedDragonHeadImage from "../../../public/images/icons/spiked-dragon-head.svg";
+import barrelImage from "../../../public/images/icons/barrel.svg";
+import mammothImage from "../../../public/images/icons/mammoth.svg";
+import crownImage from "../../../public/images/icons/crown.svg";
 
 interface ChatComponentProps {
   gameClient: GameClient;
@@ -54,6 +63,9 @@ interface ChatComponentProps {
 
 @observer
 export default class ChatComponent extends Component<ChatComponentProps> {
+  private chatContainerRef = React.createRef<HTMLDivElement>();
+  private chatInputRef = React.createRef<HTMLInputElement>();
+
   @observable inputText = "";
   @observable noMoreMessages = false;
   @observable selectedMessageId: string | null = null;
@@ -76,44 +88,164 @@ export default class ChatComponent extends Component<ChatComponentProps> {
     return this.chatClient.channels.get(this.props.roomId);
   }
 
+  static customEmojis = [
+    {
+      id: ":baratheon:",
+      names: ["Baratheon"],
+      imgUrl: houseIconImages.get("baratheon"),
+    },
+    {
+      id: ":lannister:",
+      names: ["Lannister"],
+      imgUrl: houseIconImages.get("lannister"),
+    },
+    {
+      id: ":stark:",
+      names: ["Stark"],
+      imgUrl: houseIconImages.get("stark"),
+    },
+    {
+      id: ":bolton:",
+      names: ["Bolton"],
+      imgUrl: houseIconImages.get("bolton"),
+    },
+    {
+      id: ":martell:",
+      names: ["Martell"],
+      imgUrl: houseIconImages.get("martell"),
+    },
+    {
+      id: ":greyjoy:",
+      names: ["Greyjoy"],
+      imgUrl: houseIconImages.get("greyjoy"),
+    },
+    {
+      id: ":tyrell:",
+      names: ["Tyrell"],
+      imgUrl: houseIconImages.get("tyrell"),
+    },
+    {
+      id: ":arryn:",
+      names: ["Arryn"],
+      imgUrl: houseIconImages.get("arryn"),
+    },
+    {
+      id: ":targaryen:",
+      names: ["Targaryen"],
+      imgUrl: houseIconImages.get("targaryen"),
+    },
+    {
+      id: ":throne:",
+      names: ["Throne"],
+      imgUrl: stoneThroneImage,
+    },
+    {
+      id: ":vsb:",
+      names: ["Valyrian Steel Blade", "VSB"],
+      imgUrl: diamondHiltImage,
+    },
+    {
+      id: ":raven:",
+      names: ["Raven"],
+      imgUrl: ravenImage,
+    },
+    {
+      id: ":wildlings:",
+      names: ["Wildlings"],
+      imgUrl: mammothImage,
+    },
+    {
+      id: ":dragon:",
+      names: ["Dragon"],
+      imgUrl: spikedDragonHeadImage,
+    },
+    {
+      id: ":supply:",
+      names: ["Barrel", "Supply"],
+      imgUrl: barrelImage,
+    },
+    {
+      id: ":crown:",
+      names: ["Crown"],
+      imgUrl: crownImage,
+    },
+  ];
+
+  // Create regex and map once for performance
+  static customEmojiRegex = new RegExp(
+    ChatComponent.customEmojis
+      .map((emoji) => emoji.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|"),
+    "g",
+  );
+
+  static customEmojiMap = new Map(
+    ChatComponent.customEmojis.map((emoji) => [emoji.id, emoji]),
+  );
+
+  static unicodeEmojiRegex = new RegExp(
+    "^(?:" +
+      "(?:" +
+      "\\p{RI}\\p{RI}" + // Regional indicator pairs (flags)
+      "|" +
+      "\\p{Emoji}" + // Base emoji
+      "(?:" + // Optional modifiers
+      "\\p{Emoji_Modifier}" +
+      "|\\u{FE0F}\\u{20E3}?" +
+      "|[\\u{E0020}-\\u{E007E}]+\\u{E007F}" +
+      ")?" +
+      "(?:" + // Zero or more joined sequences
+      "\\u{200D}\\p{Emoji}" + // Zero-width joiner + emoji
+      "(?:" +
+      "\\p{Emoji_Modifier}" +
+      "|\\u{FE0F}\\u{20E3}?" +
+      "|[\\u{E0020}-\\u{E007E}]+\\u{E007F}" +
+      ")?" +
+      ")*" +
+      ")" +
+      "|" +
+      "[\\u{1f900}-\\u{1f9ff}\\u{2600}-\\u{26ff}\\u{2700}-\\u{27bf}]" + // Common emoji ranges
+      ")+$",
+    "u",
+  );
+
   render(): ReactNode {
     const messages = this.channel.messages;
-    /* const messages = [{
-            createdAt: new Date(),
-            id: "1",
-            text: "Hello 😬 my friend :smile:",
-            user: this.props.entireGame.users.values[0]
-        },
-        {
-            createdAt: new Date(),
-            id: "2",
-            text: "😬",
-            user: this.props.entireGame.users.values[0]
-        },
-        {
-            createdAt: new Date(),
-            id: "3",
-            text: "😶‍🌫️🥳👨‍👩‍👧‍👦7️⃣🇩🇪",
-            user: this.props.entireGame.users.values[0]
-        },
-        {
-            createdAt: new Date(),
-            id: "4",
-            text: "😶‍🌫️Party!!!🥳👨‍👩‍👧‍👦7️⃣🇩🇪",
-            user: this.props.entireGame.users.values[0]
-        }];
+    /* const messages = [
+      {
+        createdAt: new Date(),
+        id: "1",
+        text: "Hello 😬 my friend :targaryen: :vsb:",
+        user: this.props.entireGame.users.values[0],
+      },
+      {
+        createdAt: new Date(),
+        id: "2",
+        text: "😬 :baratheon: :dragon:",
+        user: this.props.entireGame.users.values[0],
+      },
+      {
+        createdAt: new Date(),
+        id: "3",
+        text: "😶‍🌫️🥳👨‍👩‍👧‍👦7️⃣🇩🇪",
+        user: this.props.entireGame.users.values[0],
+      },
+      {
+        createdAt: new Date(),
+        id: "4",
+        text: "😶‍🌫️Party!!!🥳👨‍👩‍👧‍👦7️⃣🇩🇪",
+        user: this.props.entireGame.users.values[0],
+      },
+    ];
 
-        for(let i=0; i<5; i++) {
-            const length = messages.length;
-            for(let j=0; j<length; j++) {
-                messages.push(messages[j]);
-            }
-        } */
+    for (let i = 0; i < 5; i++) {
+      const length = messages.length;
+      for (let j = 0; j < length; j++) {
+        messages.push(messages[j]);
+      }
+    } */
     return (
-      <div
-        id={`chat-container-${this.props.roomId}`}
-        className="d-flex flex-column h-100"
-      >
+      <div ref={this.chatContainerRef} className="d-flex flex-column h-100">
         {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
         <ScrollToBottom
           className="mb-2 flex-fill-remaining"
@@ -196,8 +328,8 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             <Row className="d-flex align-items-center">
               <Col>
                 <Form.Control
+                  ref={this.chatInputRef}
                   size="lg"
-                  id={`chat-client-input-${this.channel.id}`}
                   type="text"
                   maxLength={200}
                   value={this.inputText}
@@ -224,21 +356,77 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                         suggestedEmojisMode={SuggestionMode.RECENT}
                         lazyLoadEmojis={true}
                         onEmojiClick={(emoji) => {
-                          const input = document.getElementById(
-                            `chat-client-input-${this.channel.id}`,
-                          ) as HTMLInputElement;
+                          const input = this.chatInputRef.current;
                           const position =
-                            input.selectionStart ?? this.inputText.length;
+                            input?.selectionStart ?? this.inputText.length;
                           this.inputText = [
                             this.inputText.slice(0, position),
                             emoji.emoji,
                             this.inputText.slice(position),
                           ].join("");
                         }}
+                        previewConfig={{ showPreview: false }}
+                        customEmojis={ChatComponent.customEmojis}
+                        categories={[
+                          {
+                            category: Categories.SUGGESTED,
+                            name: "Recently Used",
+                          },
+                          {
+                            category: Categories.CUSTOM,
+                            name: "Swords and Ravens",
+                            icon: (
+                              <img
+                                src={ravenImage}
+                                width={24}
+                                height={24}
+                                className="raven-category-icon"
+                                style={{
+                                  marginLeft: "-5px",
+                                  filter:
+                                    "brightness(0) saturate(100%) invert(56%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(91%) contrast(85%)",
+                                  transition: "filter 0.2s ease",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.filter =
+                                    "brightness(0) saturate(100%) invert(39%) sepia(39%) saturate(1389%) hue-rotate(184deg) brightness(110%) contrast(88%)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.filter =
+                                    "brightness(0) saturate(100%) invert(56%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(91%) contrast(85%)";
+                                }}
+                              />
+                            ),
+                          },
+                          {
+                            category: Categories.SMILEYS_PEOPLE,
+                            name: "Smileys & People",
+                          },
+                          {
+                            category: Categories.ANIMALS_NATURE,
+                            name: "Animals & Nature",
+                          },
+                          {
+                            category: Categories.FOOD_DRINK,
+                            name: "Food & Drink",
+                          },
+                          {
+                            category: Categories.TRAVEL_PLACES,
+                            name: "Travel & Places",
+                          },
+                          {
+                            category: Categories.ACTIVITIES,
+                            name: "Activities",
+                          },
+                          {
+                            category: Categories.OBJECTS,
+                            name: "Objects",
+                          },
+                        ]}
                       />
                     </Popover>
                   }
-                  placement="auto"
+                  placement="top-start"
                   trigger="click"
                   rootClose
                 >
@@ -339,12 +527,60 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                   currentMessage.user,
               })}
             >
-              {currentMessage.text}
+              {this.renderTextWithCustomEmojis(currentMessage.text, onlyEmojis)}
             </div>
           </Col>
         </OverlayTrigger>
       </>
     );
+  }
+
+  private renderTextWithCustomEmojis(
+    text: string,
+    onlyEmojis: boolean,
+  ): ReactNode {
+    // Find all matches and their positions
+    const parts: ReactNode[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    // Reset regex state before using it
+    ChatComponent.customEmojiRegex.lastIndex = 0;
+
+    while ((match = ChatComponent.customEmojiRegex.exec(text)) !== null) {
+      // Add text before the match
+      if (match.index > lastIndex) {
+        parts.push(text.substring(lastIndex, match.index));
+      }
+
+      // Find the custom emoji data using the map for O(1) lookup
+      const customEmoji = ChatComponent.customEmojiMap.get(match[0]);
+      if (customEmoji) {
+        parts.push(
+          <img
+            key={`emoji-${match.index}`}
+            src={customEmoji.imgUrl}
+            alt={customEmoji.id}
+            style={{
+              height: onlyEmojis ? "1.75em" : "1.5em",
+              width: onlyEmojis ? "1.75em" : "1.5em",
+              verticalAlign: "middle",
+              display: "inline-block",
+            }}
+          />,
+        );
+      }
+
+      lastIndex = ChatComponent.customEmojiRegex.lastIndex;
+    }
+
+    // Add remaining text after the last match
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    // If no custom emojis were found, return the original text
+    return parts.length > 0 ? parts : text;
   }
 
   getMoment(message: Message): ReactNode {
@@ -401,16 +637,34 @@ export default class ChatComponent extends Component<ChatComponentProps> {
   }
 
   containsOnlyEmojis(str: string): boolean {
+    // Remove spaces for testing
     const stringToTest = str.replace(/ /g, "");
-    const emojiRegex =
-      /^(?:(?:\p{RI}\p{RI}|\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u{200D}\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?)*)|[\u{1f900}-\u{1f9ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}])+$/u;
-    return emojiRegex.test(stringToTest) && Number.isNaN(Number(stringToTest));
+
+    // First check if it's empty after removing spaces
+    if (stringToTest.length === 0) {
+      return false;
+    }
+
+    // Remove all custom emojis from the string using the pre-created regex
+    const withoutCustomEmojis = stringToTest.replace(
+      ChatComponent.customEmojiRegex,
+      "",
+    );
+
+    // If nothing is left, it was only custom emojis
+    if (withoutCustomEmojis.length === 0) {
+      return true;
+    }
+
+    // Check if remaining characters are only Unicode emojis
+    return (
+      ChatComponent.unicodeEmojiRegex.test(withoutCustomEmojis) &&
+      Number.isNaN(Number(withoutCustomEmojis))
+    );
   }
 
   onResize(): void {
-    const width = document
-      .getElementById(`chat-container-${this.props.roomId}`)
-      ?.getBoundingClientRect()?.width;
+    const width = this.chatContainerRef.current?.getBoundingClientRect()?.width;
     if (width && width > 0) {
       this.containerWidth = width;
     }
