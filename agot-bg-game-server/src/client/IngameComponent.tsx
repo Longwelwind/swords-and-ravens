@@ -113,11 +113,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   calcInfluenceTrackDetails(): InfluenceTrackDetails[] {
     const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(
-      (track) => Array.from(track)
+      (track) => Array.from(track),
     );
     if (this.ingame.hasChildGameState(ClashOfKingsGameState)) {
       const cok = this.ingame.getChildGameState(
-        ClashOfKingsGameState
+        ClashOfKingsGameState,
       ) as ClashOfKingsGameState;
       for (let i = cok.currentTrackI; i < influenceTracks.length; i++) {
         influenceTracks[i] = this.clientGetFixedInfluenceTrack(
@@ -125,8 +125,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             (i == 0 && h == this.game.ironThroneHolder) ||
             h == this.game.targaryen
               ? h
-              : null
-          )
+              : null,
+          ),
         );
       }
     } else if (this.ingame.hasChildGameState(DraftHouseCardsGameState)) {
@@ -142,7 +142,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             this.game.targaryen;
         }
         influenceTracks[i] = this.clientGetFixedInfluenceTrack(
-          influenceTracks[i]
+          influenceTracks[i],
         );
       }
     }
@@ -405,7 +405,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     try {
       ironThroneHolder =
         _.first(
-          tracks[0].trackToShow.filter((h) => h == this.game.ironThroneHolder)
+          tracks[0].trackToShow.filter((h) => h == this.game.ironThroneHolder),
         ) ?? null;
     } catch {
       // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. ironThroneHolder simply stays null then.
@@ -415,8 +415,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       vsbHolder =
         _.first(
           tracks[1].trackToShow.filter(
-            (h) => h == this.game.valyrianSteelBladeHolder
-          )
+            (h) => h == this.game.valyrianSteelBladeHolder,
+          ),
         ) ?? null;
     } catch {
       // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. vsbHolder simply stays null then.
@@ -425,7 +425,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     try {
       ravenHolder =
         _.first(
-          tracks[2].trackToShow.filter((h) => h == this.game.ravenHolder)
+          tracks[2].trackToShow.filter((h) => h == this.game.ravenHolder),
         ) ?? null;
     } catch {
       // Swallow possible exceptions thrown by getTokenHolder, e.g. during drafting. ravenHolder simply stays null then.
@@ -589,7 +589,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               LocalStorageService.setWithExpiry<boolean>(
                 "dontShowScrollbarHintsAgain",
                 evt.target.checked,
-                30 * 24 * 60 * 60
+                30 * 24 * 60 * 60,
               );
             }}
           />
@@ -914,13 +914,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     wildlingCard: WildlingCardType,
     biddings: [number, House[]][] | null,
     highestBidder: House | null,
-    lowestBidder: House | null
+    lowestBidder: House | null,
   ): React.ReactNode {
     const results = biddings
       ? _.flatMap(
           biddings.map(([bid, houses]) =>
-            houses.map((h) => [h, bid] as [House, number])
-          )
+            houses.map((h) => [h, bid] as [House, number]),
+          ),
         )
       : null;
 
@@ -958,14 +958,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   componentDidMount(): void {
     this.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
+      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap()),
     );
     this.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
+      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap()),
     );
 
     const dontShowAgainFromStorage = LocalStorageService.getWithExpiry<boolean>(
-      "dontShowScrollbarHintsAgain"
+      "dontShowScrollbarHintsAgain",
     );
 
     const dontShowAgain = isMobile || (dontShowAgainFromStorage ?? false);
@@ -989,15 +989,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       wildlingCard,
       biddings,
       highestBidder,
-      lowestBidder
+      lowestBidder,
     ) => {
       toast(
         this.getWildlingsAttackFastTrackedComponent(
           wildlingCard,
           biddings,
           highestBidder,
-          lowestBidder
-        )
+          lowestBidder,
+        ),
       );
     };
 
@@ -1007,8 +1007,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           preemptiveRaid,
           biddings,
           highestBidder,
-          null
-        )
+          null,
+        ),
       );
     };
 
@@ -1035,7 +1035,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           autoClose: 3000,
           toastId: "game-paused-toast",
           theme: "light",
-        }
+        },
       );
     };
 
@@ -1055,14 +1055,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           autoClose: 3000,
           toastId: "game-paused-toast",
           theme: "light",
-        }
+        },
       );
     };
   }
 
   hasVerticalScrollbar(): boolean {
     const gameContainer = document.getElementById(
-      "game-container"
+      "game-container",
     ) as HTMLElement;
     return gameContainer.scrollHeight > gameContainer.clientHeight;
   }
