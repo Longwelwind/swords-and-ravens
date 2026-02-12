@@ -43,6 +43,8 @@ interface LobbyComponentProps {
 
 @observer
 export default class LobbyComponent extends Component<LobbyComponentProps> {
+  private lobbyHousesListRef = React.createRef<HTMLDivElement>();
+
   @observable password = this.props.gameClient.isRealOwner()
     ? this.lobby.password
     : "";
@@ -78,10 +80,13 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     const connectedSpectators = this.getConnectedSpectators();
 
     return (
-      <>
-        <Col xs={10} lg={"auto"} className="mb-2">
+      <Row className="justify-content-center no-space-around">
+        <Col xs={10} lg="auto" className="mb-2" style={{ minWidth: 400 }}>
           <Card>
-            <Card.Body id="lobby-houses-list" className="no-space-around">
+            <Card.Body
+              ref={this.lobbyHousesListRef}
+              className="no-space-around"
+            >
               <ListGroup variant="flush">
                 {this.lobby.lobbyHouses.values.map((h, i) => (
                   <ListGroupItem
@@ -94,7 +99,9 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                   >
                     <Row
                       className="align-items-center"
-                      style={{ opacity: this.isHouseAvailable(h) ? 1 : 0.3 }}
+                      style={{
+                        opacity: this.isHouseAvailable(h) ? 1 : 0.3,
+                      }}
                     >
                       {!this.randomHouses && (
                         <Col xs="auto" style={{ width: "48px" }}>
@@ -125,7 +132,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             </Card.Body>
           </Card>
         </Col>
-        <Col xs={10} lg className="mb-2">
+        <Col xs={10} lg xl={6} className="mb-2 col-xxl-5">
           <Row className="no-space-around">
             <Col
               xs={connectedSpectators.length > 0 ? 8 : 12}
@@ -306,7 +313,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             </Card>
           </Row>
         </Col>
-      </>
+      </Row>
     );
   }
 
@@ -519,7 +526,6 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
 
   setChatHeight(): void {
     this.chatHeight =
-      document.getElementById("lobby-houses-list")?.getBoundingClientRect()
-        ?.height ?? 400;
+      this.lobbyHousesListRef.current?.getBoundingClientRect()?.height ?? 400;
   }
 }

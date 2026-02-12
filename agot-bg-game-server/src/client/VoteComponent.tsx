@@ -48,7 +48,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
 
     return (
       <Row key={this.vote.id} className="flex-row">
-        <Col xs={"auto"}>
+        <Col xs="auto">
           <OverlayTrigger
             placement="auto"
             overlay={
@@ -128,7 +128,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
             <Col>
               <Row>
                 {this.vote.participatingHouses.map((h) => (
-                  <Col xs={"auto"} key={`vote-${this.vote.id}-${h.id}`}>
+                  <Col xs="auto" key={`vote-${this.vote.id}-${h.id}`}>
                     <div className="mb-2">
                       <HouseIconComponent house={h} />
                     </div>
