@@ -9,6 +9,7 @@ from django import template
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.db.models import Q, Count, Prefetch, F, BooleanField, ExpressionWrapper
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
@@ -23,6 +24,15 @@ from agotboardgame_main.forms import UpdateProfileTextForm, UpdateUsernameForm, 
 from agotboardgame_main.views_helpers import enrich_games
 
 logger = logging.getLogger(__name__)
+
+
+def get_public_room_id():
+    """Get the public room ID from cache or database."""
+    public_room_id = cache.get('public_room_id')
+    if public_room_id is None:
+        public_room_id = str(Room.objects.get(name='public').id)
+        cache.set('public_room_id', public_room_id, None)  # Cache indefinitely
+    return public_room_id
 
 
 def index(request):
@@ -256,7 +266,7 @@ def my_games(request):
         last_finished_game = Game.objects.filter(state=FINISHED).annotate(players_count=Count('players')).latest()
     except Game.DoesNotExist:
         last_finished_game = None
-    public_room_id = Room.objects.get(name='public').id
+    public_room_id = get_public_room_id()
 
     return render(request, "agotboardgame_main/my_games.html", {
         "my_games": my_games,
@@ -351,7 +361,7 @@ def games(request):
         public_room_id = ""
 
         if request.user.is_authenticated:
-            public_room_id = Room.objects.get(name='public').id
+            public_room_id = get_public_room_id()
             # QUERY MY GAMES
             games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
                 replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\

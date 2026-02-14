@@ -21,7 +21,7 @@ Your Games -
         <div class="col-lg-11 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Online Users<small class="ml-2">({{ request.online_now | length }})</small>
+                    <h4 class="card-title">Online Users<small class="ml-2" id="online-users-count">(0)</small>
                         <span
                             id="westerosi-time"
                             class="float-right badge badge-secondary"
@@ -37,50 +37,15 @@ Your Games -
                             }
                             update();
                             setInterval(update, 1000);
+                            
+                            // Update online users count
+                            window.addEventListener('connectedUsersUpdated', (e) => {
+                                const count = Object.keys(e.detail).length;
+                                document.getElementById('online-users-count').textContent = `(${count})`;
+                            });
                         </script>
                     </h4>
-                    {% for user in request.online_now %}
-                    {% if user.is_admin %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:brown; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            <span>{{ user.username }}</span>
-                            {% if user.last_won_tournament %}
-                                <span style="color: goldenrod; display: inline-block;"
-                                    data-toggle="tooltip"
-                                    data-html="true"
-                                    title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
-                                >
-                                    <i class="fas fa-trophy"></i>
-                                </span>
-                            {% endif %}
-                        </a>
-                    {% elif user.is_high_member %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; color:darkgoldenrod; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            <span>{{ user.username }}</span>
-                            {% if user.last_won_tournament %}
-                                <span style="color: goldenrod; display: inline-block;"
-                                    data-toggle="tooltip"
-                                    data-html="true"
-                                    title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
-                                >
-                                    <i class="fas fa-trophy"></i>
-                                </span>
-                            {% endif %}
-                        </a>
-                    {% else %}
-                        <a style="margin-right: 10px; font-size: 1.125rem; white-space: nowrap; display: inline-block;" href="/user/{{ user.id }}" target="_blank" rel="noopener noreferrer">
-                            <span>{{ user.username }}</span>
-                            {% if user.last_won_tournament %}
-                                <span style="color: goldenrod; display: inline-block;"
-                                    data-toggle="tooltip"
-                                    data-html="true"
-                                    title="Winner of </br><b>{{ user.last_won_tournament }}</b>"
-                                >
-                                    <i class="fas fa-trophy"></i>
-                                </span>
-                            {% endif %}
-                        </a>
-                    {% endif %}
-                    {% endfor %}
+                    {% include "./components/online_users.html" %}
                 </div>
             </div>
         </div>

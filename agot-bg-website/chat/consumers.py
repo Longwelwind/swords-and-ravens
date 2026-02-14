@@ -13,6 +13,41 @@ from chat.models import Room, Message, UserInRoom
 
 logger = logging.getLogger(__name__)
 
+
+def get_connected_users_cache_key(room_id):
+    """Get cache key for storing connected users in a room."""
+    return f'chat_room_{room_id}_connected_users'
+
+
+def add_connected_user(room_id, user_id, user_data):
+    """Add a user to the connected users list for a room.
+    
+    Args:
+        room_id: The room ID
+        user_id: User ID
+        user_data: Dict with keys: username, is_admin, is_high_member, last_won_tournament
+    """
+    cache_key = get_connected_users_cache_key(room_id)
+    connected_users = cache.get(cache_key, {})
+    connected_users[str(user_id)] = user_data
+    cache.set(cache_key, connected_users, None)  # No expiration
+    return connected_users
+
+
+def remove_connected_user(room_id, user_id):
+    """Remove a user from the connected users list for a room."""
+    cache_key = get_connected_users_cache_key(room_id)
+    connected_users = cache.get(cache_key, {})
+    connected_users.pop(str(user_id), None)
+    cache.set(cache_key, connected_users, None)
+    return connected_users
+
+
+def get_connected_users(room_id):
+    """Get the list of connected users for a room."""
+    cache_key = get_connected_users_cache_key(room_id)
+    return cache.get(cache_key, {})
+
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,9 +90,31 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         await self.accept()
 
+        # Only track connected users for the website's public games chat room
+        if self.room.public and self.room.name == 'public':
+            user_data = await database_sync_to_async(self.get_user_data)(user)
+            await database_sync_to_async(lambda: add_connected_user(
+                str(self.room.id),
+                str(user.id),
+                user_data
+            ))()
+            # Broadcast updated user list to all connected clients
+            await self.broadcast_connected_users()
+
     async def disconnect(self, close_code):
         # Leave room group
         if self.room is not None:
+            # Only track connected users for the website's public games chat room
+            if self.room.public and self.room.name == 'public':
+                user = self.scope['user']
+                if user.is_authenticated:
+                    await database_sync_to_async(lambda: remove_connected_user(
+                        str(self.room.id),
+                        str(user.id)
+                    ))()
+                    # Broadcast updated user list to remaining clients
+                    await self.broadcast_connected_users()
+
             await self.channel_layer.group_discard(
                 str(self.room.id),
                 self.channel_name
@@ -204,3 +261,38 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 [other_user_in_room.user.email],
                 True)
             #print (mailBody)
+
+    async def broadcast_connected_users(self):
+        """Broadcast the current list of connected users to all clients in the room."""
+        if not self.room or not self.room.public or self.room.name != 'public':
+            return
+
+        connected_users = await database_sync_to_async(lambda: get_connected_users(str(self.room.id)))()
+
+        await self.channel_layer.group_send(
+            str(self.room.id),
+            {
+                'type': 'connected_users_update',
+                'users': connected_users
+            }
+        )
+
+    async def connected_users_update(self, event):
+        """Send connected users update to the client."""
+        users = event['users']
+        await self.send_json({
+            'type': 'connected_users',
+            'users': users
+        })
+
+    def get_user_data(self, user):
+        """Get enriched user data including admin status and tournament wins."""
+        is_admin = user.is_in_group("Admin")
+        is_high_member = user.is_in_group("High Member")
+        
+        return {
+            'username': user.username,
+            'is_admin': is_admin,
+            'is_high_member': is_high_member if not is_admin else False,
+            'last_won_tournament': user.last_won_tournament if hasattr(user, 'last_won_tournament') else None
+        }

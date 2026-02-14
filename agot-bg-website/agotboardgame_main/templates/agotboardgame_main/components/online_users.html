@@ -1,0 +1,84 @@
+{% load static %}
+
+<div id="online-users-container"></div>
+<script type="module">
+    import { h, Component, render } from "{% static 'preact/preact.module.js' %}";
+    import htm from "{% static 'preact/htm.module.js' %}";
+    const html = htm.bind(h);
+
+    class OnlineUsers extends Component {
+        constructor() {
+            super();
+            this.state = {
+                connectedUsers: {}
+            };
+        }
+
+        componentDidMount() {
+            // Listen for updates from the chat component
+            window.addEventListener('connectedUsersUpdated', (e) => {
+                this.setState({ connectedUsers: e.detail });
+            });
+            
+            // Initialize with current value if available
+            if (window.chatConnectedUsers) {
+                this.setState({ connectedUsers: window.chatConnectedUsers });
+            }
+        }
+
+        renderUser(userId, userData) {
+            const { username, is_admin, is_high_member, last_won_tournament } = userData;
+            const color = is_admin ? 'brown' : is_high_member ? 'darkgoldenrod' : 'inherit';
+            
+            return html`
+                <a 
+                    key=${userId}
+                    style=${{
+                        marginRight: '10px',
+                        fontSize: '1.125rem',
+                        color: color,
+                        whiteSpace: 'nowrap',
+                        display: 'inline-block'
+                    }}
+                    href="/user/${userId}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <span>${username}</span>
+                    ${last_won_tournament ? html`
+                        <span 
+                            style=${{
+                                color: 'goldenrod',
+                                display: 'inline-block'
+                            }}
+                            data-toggle="tooltip"
+                            data-html="true"
+                            title="Winner of </br><b>${last_won_tournament}</b>"
+                        >
+                            <i class="fas fa-trophy"></i>
+                        </span>
+                    ` : ''}
+                </a>
+            `;
+        }
+
+        render() {
+            const userEntries = Object.entries(this.state.connectedUsers).sort((a, b) => {
+                return a[1].username.localeCompare(b[1].username);
+            });
+
+            return html`
+                ${userEntries.map(([userId, userData]) => this.renderUser(userId, userData))}
+            `;
+        }
+
+        componentDidUpdate() {
+            // Re-initialize Bootstrap tooltips after render
+            if (typeof $ !== 'undefined' && $('[data-toggle="tooltip"]').tooltip) {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        }
+    }
+
+    render(h(OnlineUsers), document.getElementById('online-users-container'));
+</script>
