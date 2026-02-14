@@ -171,11 +171,21 @@ def index(request):
 
 
 def login(request):
-    return render(request, "agotboardgame_main/login.html")
+    # Get the intended redirect URL from query parameter or referer
+    next_url = request.GET.get('next', '/')
+    # Ensure the redirect URL is safe (same domain)
+    if not next_url.startswith('/') or next_url.startswith('//'):
+        next_url = '/'
+    return render(request, "agotboardgame_main/login.html", {'next': next_url})
 
 
 def register(request):
-    return render(request, "agotboardgame_main/register.html")
+    # Get the intended redirect URL from query parameter or referer
+    next_url = request.GET.get('next', '/')
+    # Ensure the redirect URL is safe (same domain)
+    if not next_url.startswith('/') or next_url.startswith('//'):
+        next_url = '/'
+    return render(request, "agotboardgame_main/register.html", {'next': next_url})
 
 
 def about(request):

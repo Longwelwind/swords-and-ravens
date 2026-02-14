@@ -28,10 +28,10 @@ Login -
             or links to allow redirection to the available social auth providers.
         </div>
     </noscript>
-    <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-social btn-google btn-block">
+    <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ next|urlencode }}" class="btn btn-social btn-google btn-block">
         <span class="fab fa-google"></span> Sign in with Google
     </a>
-    <a href="{% url 'social:begin' 'discord' %}?next=/"
+    <a href="{% url 'social:begin' 'discord' %}?next={{ next|urlencode }}"
        class="btn btn-social btn-block"
        style="background-color: #7289DA; border-color: rgba(0,0,0,.2)"
     >
