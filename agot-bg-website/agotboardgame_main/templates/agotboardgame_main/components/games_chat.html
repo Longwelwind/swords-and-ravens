@@ -16,11 +16,13 @@
         constructor() {
             super();
             this.state = {
-                input: '',
                 state: 0,
                 messages: [],
-                noMoreMessages: false
+                noMoreMessages: false,
+                connectedUsers: {}
             };
+            this.inputRef = null;
+            this.pingInterval = null;
         }
 
         componentDidMount() {
@@ -32,11 +34,22 @@
             chatWebsocket.onopen = () => {
                 this.setState({state: 1});
                 chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 20, first_message_id: null, faceless: false}));
+                // Send ping every 30 seconds to keep connection alive
+                this.pingInterval = setInterval(() => {
+                    if (chatWebsocket && chatWebsocket.readyState === WebSocket.OPEN) {
+                        chatWebsocket.send(JSON.stringify({type: 'ping'}));
+                    }
+                }, 30000);
             };
             chatWebsocket.onmessage = m => {
                 const data = JSON.parse(m.data);
 
-                if (data.type == 'chat_message') {
+                if (data.type == 'ping' || data.type == 'pong') {
+                    // Ignore ping/pong messages
+                    return;
+                } else if (data.type == 'connected_users') {
+                    this.setState({ connectedUsers: data.users });
+                } else if (data.type == 'chat_message') {
                     this.addMessage(data);
                 } else if (data.type == 'chat_messages_retrieved') {
                     data.messages.forEach(d => this.addMessage(d));
@@ -48,7 +61,13 @@
                     data.messages.forEach(d => this.addMessage(d, true));
                 }
             };
-            chatWebsocket.onclose = () => this.setState({state: 2});
+            chatWebsocket.onclose = () => {
+                this.setState({state: 2});
+                if (this.pingInterval) {
+                    clearInterval(this.pingInterval);
+                    this.pingInterval = null;
+                }
+            };
         }
 
         addMessage(data, insertAtStart) {
@@ -64,9 +83,12 @@
 
         sendMessage(e) {
             e.preventDefault();
-            const data = {type: 'chat_message', text: this.state.input, faceless: false};
+            if (!this.inputRef) return;
+            const text = this.inputRef.value.trim();
+            if (!text) return;
+            const data = {type: 'chat_message', text: text, faceless: false};
             chatWebsocket.send(JSON.stringify(data));
-            this.setState({input: ''});
+            this.inputRef.value = '';
         }
 
         loadMoreMessages(e) {
@@ -80,7 +102,20 @@
             chatWebsocket.send(JSON.stringify(data));
         }
 
+        componentWillUnmount() {
+            if (this.pingInterval) {
+                clearInterval(this.pingInterval);
+                this.pingInterval = null;
+            }
+        }
+
         render() {
+            // Expose connected users to global scope for OnlineUsers component
+            if (typeof window !== 'undefined') {
+                window.chatConnectedUsers = this.state.connectedUsers;
+                window.dispatchEvent(new CustomEvent('connectedUsersUpdated', { detail: this.state.connectedUsers }));
+            }
+            
             return html`
                 <div style="overflow-y: scroll; overflow-x: hidden; height: 250px; background-color: #444; border-radius: 4px" class="p-2 mb-3">
                     {% if user.is_authenticated %}
@@ -105,39 +140,43 @@
                     <p>Please log in to chat with others.</p>
                     {% endif %}
                 </div>
-                <form id="chat-message-form" class="mb-0">
-                    <div class="form-row align-items-stretch">
-                        <div class="col">
-                            <input type="text"
-                                autoFocus="autofocus"
-                                class="form-control"
-                                id="chat-message"
-                                placeholder="Message"
-                                maxlength="200"
-                                value=${this.state.input}
-                                disabled=${!isAuthenticated}
-                                onChange=${e => { this.cursor = e.target.selectionStart; this.setState({input: e.target.value}); }}
-                                onFocus=${(e) => { e.target.selectionStart = this.cursor; }}
-                            />
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit"
-                                    class="btn btn-primary"
-                                    disabled=${!isAuthenticated}
-                                    onClick=${e => this.sendMessage(e)}>
-                                Send
-                            </button>
-                        </div>
-                        <div class="col-auto">
-                            <button class="btn btn-secondary btn-block h-100"
-                                    disabled=${!isAuthenticated || this.state.noMoreMessages}
-                                    onClick=${e => this.loadMoreMessages(e)}
-                                    >
-                                    <i class="fas fa-sync-alt fa-lg"/>
-                            </button>
-                        </div>
+                ${this.state.state !== 1 ? html`
+                    <div class="alert text-center mb-0" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> Chat connection lost. Please reload the page.
                     </div>
-                </form>
+                ` : html`
+                    <form id="chat-message-form" class="mb-0">
+                        <div class="form-row align-items-stretch">
+                            <div class="col">
+                                <input type="text"
+                                    ref=${(el) => this.inputRef = el}
+                                    autoFocus="autofocus"
+                                    class="form-control"
+                                    id="chat-message"
+                                    placeholder="Message"
+                                    maxlength="200"
+                                    disabled=${!isAuthenticated}
+                                />
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit"
+                                        class="btn btn-primary"
+                                        disabled=${!isAuthenticated}
+                                        onClick=${e => this.sendMessage(e)}>
+                                    Send
+                                </button>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-secondary btn-block h-100"
+                                        disabled=${!isAuthenticated || this.state.noMoreMessages}
+                                        onClick=${e => this.loadMoreMessages(e)}
+                                        >
+                                        <i class="fas fa-sync-alt fa-lg"/>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                `}
             `;
         }
     }

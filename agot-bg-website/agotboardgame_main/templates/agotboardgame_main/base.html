@@ -74,10 +74,10 @@
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" href="/login?next={{ request.path|urlencode }}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/register">Register</a>
+                        <a class="nav-link" href="/register?next={{ request.path|urlencode }}">Register</a>
                     </li>
                 {% endif %}
                 </ul>

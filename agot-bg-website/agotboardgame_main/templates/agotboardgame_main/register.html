@@ -19,13 +19,13 @@ Register -
     </div>
     <div class="row justify-content-center">
         <div class="col-auto">
-            <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-social btn-google btn-block text-center" style="max-width: 210px; min-width: 210px">
+            <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ next|urlencode }}" class="btn btn-social btn-google btn-block text-center" style="max-width: 210px; min-width: 210px">
                 <span class="fab fa-google"></span> Register with Google
             </a>
         </div>
         <div class="col-12"></div>
         <div class="col-auto mt-2">
-            <a href="{% url 'social:begin' 'discord' %}?next=/"
+            <a href="{% url 'social:begin' 'discord' %}?next={{ next|urlencode }}"
             class="btn btn-social btn-block text-center"
             style="background-color: #7289DA; border-color: rgba(0,0,0,.2); max-width: 210px; min-width: 210px"
             >
