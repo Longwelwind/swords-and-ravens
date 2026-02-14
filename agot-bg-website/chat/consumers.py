@@ -67,7 +67,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         user = self.scope['user']
         type = data['type']
 
-        if type == 'chat_message':
+        if type == 'ping':
+            # Respond to ping to keep connection alive
+            await self.send_json({'type': 'pong'})
+            return
+        elif type == 'chat_message':
             text = data['text']
             faceless = data['faceless']
 
