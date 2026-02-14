@@ -28,18 +28,25 @@
 
         renderUser(userId, userData) {
             const { username, is_admin, is_high_member, last_won_tournament } = userData;
-            const color = is_admin ? 'brown' : is_high_member ? 'darkgoldenrod' : 'inherit';
+            
+            // Build style object - only set color for admins and high members
+            const userStyle = {
+                marginRight: '10px',
+                fontSize: '1.125rem',
+                whiteSpace: 'nowrap',
+                display: 'inline-block'
+            };
+            
+            if (is_admin) {
+                userStyle.color = 'brown';
+            } else if (is_high_member) {
+                userStyle.color = 'darkgoldenrod';
+            }
             
             return html`
                 <a 
                     key=${userId}
-                    style=${{
-                        marginRight: '10px',
-                        fontSize: '1.125rem',
-                        color: color,
-                        whiteSpace: 'nowrap',
-                        display: 'inline-block'
-                    }}
+                    style=${userStyle}
                     href="/user/${userId}"
                     target="_blank"
                     rel="noopener noreferrer"
