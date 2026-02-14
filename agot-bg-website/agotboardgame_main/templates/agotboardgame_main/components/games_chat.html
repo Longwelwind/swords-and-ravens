@@ -16,11 +16,11 @@
         constructor() {
             super();
             this.state = {
-                input: '',
                 state: 0,
                 messages: [],
                 noMoreMessages: false
             };
+            this.inputRef = null;
         }
 
         componentDidMount() {
@@ -64,9 +64,12 @@
 
         sendMessage(e) {
             e.preventDefault();
-            const data = {type: 'chat_message', text: this.state.input, faceless: false};
+            if (!this.inputRef) return;
+            const text = this.inputRef.value.trim();
+            if (!text) return;
+            const data = {type: 'chat_message', text: text, faceless: false};
             chatWebsocket.send(JSON.stringify(data));
-            this.setState({input: ''});
+            this.inputRef.value = '';
         }
 
         loadMoreMessages(e) {
@@ -109,15 +112,13 @@
                     <div class="form-row align-items-stretch">
                         <div class="col">
                             <input type="text"
+                                ref=${(el) => this.inputRef = el}
                                 autoFocus="autofocus"
                                 class="form-control"
                                 id="chat-message"
                                 placeholder="Message"
                                 maxlength="200"
-                                value=${this.state.input}
                                 disabled=${!isAuthenticated}
-                                onChange=${e => { this.cursor = e.target.selectionStart; this.setState({input: e.target.value}); }}
-                                onFocus=${(e) => { e.target.selectionStart = this.cursor; }}
                             />
                         </div>
                         <div class="col-auto">
