@@ -159,11 +159,11 @@ export default class Vote {
     });
   }
 
-  serializeToClient(_admin: boolean, _player: Player | null): SerializedVote {
+  serializeToClient(admin: boolean, _player: Player | null): SerializedVote {
     return {
       id: this.id,
-      initiator: this.initiator.id,
-      type: this.type.serializeToClient(),
+      initiator: admin ? this.initiator._id : this.initiator.id,
+      type: this.type.serializeToClient(admin),
       createdAt: this.createdAt.getTime(),
       votes: this.votes.entries.map(([h, v]) => [h.id, v]),
       cancelled: this.cancelled,

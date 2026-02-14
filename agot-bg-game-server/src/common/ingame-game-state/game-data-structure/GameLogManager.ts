@@ -30,6 +30,10 @@ export default class GameLogManager {
   @observable logs: GameLog[] = [];
   @observable lastSeenLogTimes: BetterMap<User, number> = new BetterMap();
 
+  get userIdToFakeIdMap(): BetterMap<string, string> {
+    return this.ingameGameState.entireGame.userIdToFakeIdMap;
+  }
+
   constructor(ingameGameState: IngameGameState) {
     this.ingameGameState = ingameGameState;
   }
@@ -55,9 +59,10 @@ export default class GameLogManager {
     this.logs.push(log);
 
     if (this.logFilter(log)) {
+      const migrated = this.migrateForFaceless(false, data);
       this.ingameGameState.entireGame.broadcastToClients({
         type: "add-game-log",
-        data: data,
+        data: migrated,
         time: Math.round(time.getTime() / 1000),
         resolvedAutomatically: resolvedAutomatically,
       });
@@ -71,6 +76,62 @@ export default class GameLogManager {
     });
   }
 
+  migrateForFaceless(admin: boolean, data: GameLogData): GameLogData {
+    if (admin || !this.ingameGameState.entireGame.gameSettings.faceless) {
+      return data;
+    }
+
+    if (data.type == "user-house-assignments") {
+      return {
+        type: "user-house-assignments",
+        assignments: data.assignments.map(([h, userId]) => {
+          return [
+            h,
+            this.userIdToFakeIdMap.has(userId)
+              ? this.userIdToFakeIdMap.get(userId)
+              : userId,
+          ];
+        }),
+      };
+    } else if (data.type == "player-replaced") {
+      return {
+        type: "player-replaced",
+        house: data.house,
+        reason: data.reason,
+        newCommanderHouse: data.newCommanderHouse,
+        newUser:
+          data.newUser && this.userIdToFakeIdMap.has(data.newUser)
+            ? this.userIdToFakeIdMap.get(data.newUser)
+            : data.newUser,
+        oldUser: this.userIdToFakeIdMap.has(data.oldUser)
+          ? this.userIdToFakeIdMap.get(data.oldUser)
+          : data.oldUser,
+      };
+    } else if (data.type == "vassal-replaced") {
+      return {
+        type: "vassal-replaced",
+        house: data.house,
+        user: this.userIdToFakeIdMap.has(data.user)
+          ? this.userIdToFakeIdMap.get(data.user)
+          : data.user,
+      };
+    } else if (data.type == "houses-swapped") {
+      return {
+        type: "houses-swapped",
+        initiatorHouse: data.initiatorHouse,
+        swappingHouse: data.swappingHouse,
+        initiator: this.userIdToFakeIdMap.has(data.initiator)
+          ? this.userIdToFakeIdMap.get(data.initiator)
+          : data.initiator,
+        swappingUser: this.userIdToFakeIdMap.has(data.swappingUser)
+          ? this.userIdToFakeIdMap.get(data.swappingUser)
+          : data.swappingUser,
+      };
+    }
+
+    return data;
+  }
+
   serializeToClient(
     admin: boolean,
     user: User | null,
@@ -78,13 +139,16 @@ export default class GameLogManager {
     const filteredLogs = admin ? this.logs : this.logs.filter(this.logFilter);
 
     return {
-      logs: filteredLogs.map((l) => ({
-        time: timeToTicks(l.time),
-        data: l.data,
-        resolvedAutomatically: l.resolvedAutomatically,
-      })),
+      logs: filteredLogs.map((l) => {
+        const data = this.migrateForFaceless(admin, l.data);
+        return {
+          time: timeToTicks(l.time),
+          data: data,
+          resolvedAutomatically: l.resolvedAutomatically,
+        };
+      }),
       lastSeenLogTimes: admin
-        ? this.lastSeenLogTimes.entries.map(([usr, time]) => [usr.id, time])
+        ? this.lastSeenLogTimes.entries.map(([usr, time]) => [usr._id, time])
         : user
           ? this.lastSeenLogTimes.entries
               .filter(([usr, _time]) => usr == user)
