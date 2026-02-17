@@ -85,7 +85,7 @@ export default class DraftHouseCardsGameState extends GameState<
 
       // Clear the influence tracks
       for (let i = 0; i < this.game.influenceTracks.length; i++) {
-        this.game.influenceTracks[i].length = 0;
+        this.ingame.setInfluenceTrack(i, []);
       }
     }
 
