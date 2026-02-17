@@ -6,7 +6,15 @@ import { observable } from "mobx";
 import _ from "lodash";
 
 export default class User {
-  id: string;
+  _id: string;
+  get id(): string {
+    if (this.entireGame.userIdToFakeIdMap.has(this._id))
+      return this.entireGame.userIdToFakeIdMap.get(this._id);
+    return this._id;
+  }
+  set id(value: string) {
+    this._id = value;
+  }
   @observable name: string;
   @observable facelessName: string;
   @observable settings: UserSettings;
@@ -75,7 +83,7 @@ export default class User {
   serializeToClient(admin: boolean, user: User | null): SerializedUser {
     const hideUserName = this.entireGame.gameSettings.faceless;
     return {
-      id: this.id,
+      id: admin ? this._id : this.id,
       name: admin ? this.name : hideUserName ? this.facelessName : this.name,
       facelessName: this.facelessName,
       settings: admin || user == this ? this.settings : undefined,
