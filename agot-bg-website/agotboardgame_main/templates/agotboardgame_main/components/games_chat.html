@@ -22,7 +22,6 @@
                 connectedUsers: {}
             };
             this.inputRef = null;
-            this.pingInterval = null;
         }
 
         componentDidMount() {
@@ -34,20 +33,11 @@
             chatWebsocket.onopen = () => {
                 this.setState({state: 1});
                 chatWebsocket.send(JSON.stringify({type: 'chat_retrieve', count: 20, first_message_id: null, faceless: false}));
-                // Send ping every 30 seconds to keep connection alive
-                this.pingInterval = setInterval(() => {
-                    if (chatWebsocket && chatWebsocket.readyState === WebSocket.OPEN) {
-                        chatWebsocket.send(JSON.stringify({type: 'ping'}));
-                    }
-                }, 30000);
             };
             chatWebsocket.onmessage = m => {
                 const data = JSON.parse(m.data);
 
-                if (data.type == 'ping' || data.type == 'pong') {
-                    // Ignore ping/pong messages
-                    return;
-                } else if (data.type == 'connected_users') {
+                if (data.type == 'connected_users') {
                     this.setState({ connectedUsers: data.users });
                 } else if (data.type == 'chat_message') {
                     this.addMessage(data);
@@ -63,10 +53,6 @@
             };
             chatWebsocket.onclose = () => {
                 this.setState({state: 2});
-                if (this.pingInterval) {
-                    clearInterval(this.pingInterval);
-                    this.pingInterval = null;
-                }
             };
         }
 
@@ -100,13 +86,6 @@
 
             const data = {type: 'chat_retrieve', count: 50, first_message_id: this.state.messages[0].id, faceless: false};
             chatWebsocket.send(JSON.stringify(data));
-        }
-
-        componentWillUnmount() {
-            if (this.pingInterval) {
-                clearInterval(this.pingInterval);
-                this.pingInterval = null;
-            }
         }
 
         render() {
