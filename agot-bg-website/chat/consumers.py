@@ -51,8 +51,11 @@ def get_connected_users(room_id):
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.room = None
-        self.user_in_room = None
+        self.room_id = None
+        self.room_public = False
+        self.room_name = None
+        self.room_max_retrieve_count = None
+        self.user_in_room_id = None
 
     async def connect(self):
         user = self.scope['user']
@@ -62,39 +65,45 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
             return
 
-        # Check if the channel exists
+        # Check if the channel exists - only load minimal fields
         try:
-            room = await database_sync_to_async(lambda: Room.objects.get(id=room_id))()
+            room = await database_sync_to_async(lambda: Room.objects.only('id', 'public', 'name', 'max_retrieve_count').get(id=room_id))()
         except Room.DoesNotExist:
             await self.close()
             return
 
-        self.user_in_room = await database_sync_to_async(lambda: room.users.prefetch_related('last_viewed_message').filter(user=user).first())()
+        # Store only necessary data, not the full object
+        self.room_id = str(room.id)
+        self.room_public = room.public
+        self.room_name = room.name
+        self.room_max_retrieve_count = room.max_retrieve_count
+
+        user_in_room = await database_sync_to_async(lambda: UserInRoom.objects.filter(user=user, room_id=room_id).only('id').first())()
 
         # Check if the user has access to this channel
-        if not room.public and not self.user_in_room:
+        if not self.room_public and not user_in_room:
             await self.close()
             return
 
         # Always create a UserInRoom entity for each user that connected to this channel
-        if not self.user_in_room:
-            self.user_in_room = await database_sync_to_async(lambda: UserInRoom.objects.create(user=user, room=room))()
+        if not user_in_room:
+            user_in_room = await database_sync_to_async(lambda: UserInRoom.objects.create(user=user, room_id=room_id))()
 
-        self.room = room
+        self.user_in_room_id = user_in_room.id
 
         # Join room group
         await self.channel_layer.group_add(
-            str(self.room.id),
+            self.room_id,
             self.channel_name
         )
 
         await self.accept()
 
         # Only track connected users for the website's public games chat room
-        if self.room.public and self.room.name == 'public':
+        if self.room_public and self.room_name == 'public':
             user_data = await database_sync_to_async(self.get_user_data)(user)
             await database_sync_to_async(lambda: add_connected_user(
-                str(self.room.id),
+                self.room_id,
                 str(user.id),
                 user_data
             ))()
@@ -103,20 +112,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Leave room group
-        if self.room is not None:
+        if self.room_id is not None:
             # Only track connected users for the website's public games chat room
-            if self.room.public and self.room.name == 'public':
+            if self.room_public and self.room_name == 'public':
                 user = self.scope['user']
                 if user.is_authenticated:
                     await database_sync_to_async(lambda: remove_connected_user(
-                        str(self.room.id),
+                        self.room_id,
                         str(user.id)
                     ))()
                     # Broadcast updated user list to remaining clients
                     await self.broadcast_connected_users()
 
             await self.channel_layer.group_discard(
-                str(self.room.id),
+                self.room_id,
                 self.channel_name
             )
 
@@ -129,25 +138,25 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             faceless = data['faceless']
 
             if not text:
-                logger.warning(f'A user tried to send an empty message to room "{self.room.id}"')
+                logger.warning(f'A user tried to send an empty message to room "{self.room_id}"')
                 return
 
             if len(text) > 200:
-                logger.warning(f'A user tried to send a too long message to room ({self.room.id}')
+                logger.warning(f'A user tried to send a too long message to room ({self.room_id}')
                 return
 
             if not user.is_authenticated:
-                logger.warning(f'An unauthenticated user tried to send the message "{text}" to room "{self.room.id}"')
+                logger.warning(f'An unauthenticated user tried to send the message "{text}" to room "{self.room_id}"')
                 return
 
             message = Message()
             message.user = user
             message.text = text
-            message.room = self.room
+            message.room_id = self.room_id
             await database_sync_to_async(lambda: message.save())()
 
             await self.channel_layer.group_send(
-                str(self.room.id),
+                self.room_id,
                 {
                     'type': 'chat_message',
                     'id': message.id,
@@ -158,7 +167,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
 
-            if self.room.public:
+            if self.room_public:
                 return
 
             # notify the other user about a new private message
@@ -167,40 +176,41 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         elif type == 'chat_view_message':
             message_id = data['message_id']
 
-            if not self.user_in_room:
-                logger.warning(f'An unauthenticated used tried to mark a message as viewed in room "{self.room.id}"')
+            if not self.user_in_room_id:
+                logger.warning(f'An unauthenticated used tried to mark a message as viewed in room "{self.room_id}"')
 
-            message = await database_sync_to_async(lambda: Message.objects.get(id=message_id))()
+            message = await database_sync_to_async(lambda: Message.objects.only('id').get(id=message_id))()
 
             if not message:
-                logger.warning(f'A user tried to mark a non-existent message (id: {message_id}) as viewed (user_id: {self.user_in_room.user.id})')
+                logger.warning(f'A user tried to mark a non-existent message (id: {message_id}) as viewed (user_in_room_id: {self.user_in_room_id})')
 
-            self.user_in_room.last_viewed_message = message
-
-            await database_sync_to_async(lambda: self.user_in_room.save())()
+            await database_sync_to_async(lambda: UserInRoom.objects.filter(id=self.user_in_room_id).update(last_viewed_message_id=message.id))()
         elif type == 'chat_retrieve':
             count = data['count']
             first_message_id = data['first_message_id']
             faceless = data['faceless']
 
             if first_message_id is not None:
-                first_message = await database_sync_to_async(lambda: Message.objects.get(id=first_message_id))()
-                first_message_created_at = await database_sync_to_async(lambda: first_message.created_at)()
+                first_message = await database_sync_to_async(lambda: Message.objects.only('id', 'created_at').get(id=first_message_id))()
+                first_message_created_at = first_message.created_at
             else:
                 first_message_created_at = None
 
-            if self.room.max_retrieve_count is not None:
-                count = min(self.room.max_retrieve_count, count)
+            if self.room_max_retrieve_count is not None:
+                count = min(self.room_max_retrieve_count, count)
 
             messages = await database_sync_to_async(lambda: self.get_and_transform_messages(count, first_message_created_at, faceless))()
 
             # Also include the last message viewed in the response
-            last_viewed_message = self.user_in_room.last_viewed_message if first_message_id is None and self.user_in_room else None
+            last_viewed_message_id = None
+            if first_message_id is None and self.user_in_room_id:
+                user_in_room = await database_sync_to_async(lambda: UserInRoom.objects.only('last_viewed_message_id').get(id=self.user_in_room_id))()
+                last_viewed_message_id = user_in_room.last_viewed_message_id
 
             await self.send_json({
                 'type': 'chat_messages_retrieved' if first_message_id is None else 'more_chat_messages_retrieved',
                 'messages': messages,
-                'last_viewed_message': last_viewed_message.id if last_viewed_message else None
+                'last_viewed_message': last_viewed_message_id
             })
 
     async def chat_message(self, event):
@@ -220,10 +230,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         })
 
     def get_and_transform_messages(self, count, first_message_created_at, faceless):
+        # Only select the fields we need, prefetch user with only needed fields
         if first_message_created_at is None:
-            messages = Message.objects.filter(room=self.room).prefetch_related('user').order_by('-created_at')[0:count:-1]
+            messages = Message.objects.filter(room_id=self.room_id).select_related('user').only('id', 'text', 'created_at', 'user__id', 'user__username').order_by('-created_at')[0:count:-1]
         else:
-            messages = Message.objects.filter(Q(room=self.room) & Q(created_at__lt=first_message_created_at)).prefetch_related('user').order_by('-created_at')[:count]
+            messages = Message.objects.filter(Q(room_id=self.room_id) & Q(created_at__lt=first_message_created_at)).select_related('user').only('id', 'text', 'created_at', 'user__id', 'user__username').order_by('-created_at')[:count]
 
         return [{
                     'id': message.id,
@@ -234,23 +245,23 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                  } for message in messages]
 
     def notify_chat_partner(self, user, message, game_id, from_house):
-        game = Game.objects.get(id=game_id)
+        game = Game.objects.only('id', 'name', 'view_of_game').get(id=game_id)
         pbem_active = game.view_of_game.get("settings", False) and game.view_of_game.get("settings").get("pbem", False) == True
         if not pbem_active:
             return
         #print("from " + user.username)
-        other_user_in_room = self.room.users.prefetch_related('user').exclude(user=user).first()
+        other_user_in_room = UserInRoom.objects.filter(room_id=self.room_id).exclude(user=user).select_related('user').only('id', 'user__id', 'user__email', 'user__email_notification_active').first()
         if other_user_in_room is None or not other_user_in_room.user.email_notification_active:
             return
 
         #print("to " + other_user_in_room.user.username)
 
-        user_already_notified = cache.has_key(f'{self.room.id}_{other_user_in_room.user.id}')
+        user_already_notified = cache.has_key(f'{self.room_id}_{other_user_in_room.user.id}')
         if not user_already_notified:
             mailBody = render_to_string('agotboardgame_main/new_private_message_notification.html',
                 {'message': message.text, 'receiver': other_user_in_room.user, 'sender': user, 'game': game,
                 'game_url': f'https://swordsandravens.net/play/{game.id}', 'from_house': from_house })
-            cache.set(f'{self.room.id}_{other_user_in_room.user.id}', True, 7 * 60)
+            cache.set(f'{self.room_id}_{other_user_in_room.user.id}', True, 7 * 60)
             send_mail(f'You received a new private message in game: \'{game.name}\'',
                 mailBody,
                 DEFAULT_FROM_MAIL,
@@ -260,13 +271,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def broadcast_connected_users(self):
         """Broadcast the current list of connected users to all clients in the room."""
-        if not self.room or not self.room.public or self.room.name != 'public':
+        if not self.room_id or not self.room_public or self.room_name != 'public':
             return
 
-        connected_users = await database_sync_to_async(lambda: get_connected_users(str(self.room.id)))()
+        connected_users = await database_sync_to_async(lambda: get_connected_users(self.room_id))()
 
         await self.channel_layer.group_send(
-            str(self.room.id),
+            self.room_id,
             {
                 'type': 'connected_users_update',
                 'users': connected_users
@@ -282,13 +293,44 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         })
 
     def get_user_data(self, user):
-        """Get enriched user data including admin status and tournament wins."""
-        is_admin = user.is_in_group("Admin")
-        is_high_member = user.is_in_group("High Member")
+        """Get enriched user data including admin status and tournament wins.
         
-        return {
-            'username': user.username,
-            'is_admin': is_admin,
-            'is_high_member': is_high_member if not is_admin else False,
-            'last_won_tournament': user.last_won_tournament if hasattr(user, 'last_won_tournament') else None
-        }
+        Uses caching to avoid repeated database queries for the same user.
+        Cache expires after 5 minutes.
+        """
+        cache_key = f'user_data_{user.id}'
+        cached_data = cache.get(cache_key)
+        
+        if cached_data is not None:
+            return cached_data
+        
+        from agotboardgame_main.models import User
+        
+        # Load only the fields we need with groups prefetched in a single query
+        user_data = User.objects.filter(id=user.id).prefetch_related('groups').only(
+            'id', 'username', 'last_won_tournament'
+        ).first()
+        
+        if not user_data:
+            result = {
+                'username': user.username,
+                'is_admin': False,
+                'is_high_member': False,
+                'last_won_tournament': None
+            }
+        else:
+            # Check groups from the prefetched data (no additional queries)
+            group_names = {g.name for g in user_data.groups.all()}
+            is_admin = "Admin" in group_names
+            is_high_member = "High Member" in group_names and not is_admin
+            
+            result = {
+                'username': user_data.username,
+                'is_admin': is_admin,
+                'is_high_member': is_high_member,
+                'last_won_tournament': user_data.last_won_tournament
+            }
+        
+        # Cache for 5 minutes
+        cache.set(cache_key, result, 300)
+        return result
