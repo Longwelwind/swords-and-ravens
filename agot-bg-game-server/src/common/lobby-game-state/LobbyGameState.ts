@@ -715,14 +715,19 @@ export default class LobbyGameState extends GameState<EntireGame> {
     return {
       type: "lobby",
       lobbyHouses: this.lobbyHouses.values,
-      players: this.players.entries.map(([h, u]) => [h.id, u.id]),
+      players: this.players.entries.map(([h, u]) => [
+        h.id,
+        admin ? u._id : u.id,
+      ]),
       password:
         this.password == "" ||
         admin ||
         (user && this.entireGame.isRealOwner(user))
           ? this.password
           : v4(),
-      readyUsers: this.readyUsers ? this.readyUsers.map((u) => u.id) : null,
+      readyUsers: this.readyUsers
+        ? this.readyUsers.map((u) => (admin ? u._id : u.id))
+        : null,
       readyCheckWillTimeoutAt: this.readyCheckWillTimeoutAt
         ? this.readyCheckWillTimeoutAt.getTime()
         : null,

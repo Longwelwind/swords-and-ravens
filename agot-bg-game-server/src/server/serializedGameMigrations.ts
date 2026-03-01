@@ -3031,6 +3031,25 @@ const serializedGameMigrations: {
       return serializedGame;
     },
   },
+  {
+    version: "132",
+    migrate: (serializedGame: any) => {
+      if (!serializedGame.gameSettings.faceless) {
+        return serializedGame;
+      }
+
+      serializedGame.fakeIdToUserIdMap = [];
+      serializedGame.userIdToFakeIdMap = [];
+
+      serializedGame.users.forEach((u: any) => {
+        const fakeId = v4();
+        serializedGame.fakeIdToUserIdMap?.push([fakeId, u.id]);
+        serializedGame.userIdToFakeIdMap?.push([u.id, fakeId]);
+      });
+
+      return serializedGame;
+    },
+  },
 ];
 
 export default serializedGameMigrations;
