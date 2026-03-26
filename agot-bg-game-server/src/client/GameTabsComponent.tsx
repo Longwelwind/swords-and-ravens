@@ -70,6 +70,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   @observable unseenNotes = false;
 
   @observable gameRoundElems: ReactNode | null = null;
+  private previousOpenedTab = this.lastOpenedTab;
 
   get lastOpenedTab(): string {
     return localStorage.getItem("lastOpenedTab") ?? "chat";
@@ -361,19 +362,21 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                 </Tab.Pane>
               )}
               <Tab.Pane eventKey="game-logs" className="h-100">
-                <div className="d-flex flex-column h-100">
-                  <ScrollToBottom
-                    className="flex-fill-remaining"
-                    scrollViewClassName="overflow-x-hidden"
-                    initialScrollBehavior="auto"
-                  >
-                    <GameLogListComponent
-                      ingameGameState={this.ingame}
-                      gameClient={this.gameClient}
-                      currentlyViewed={this.currentOpenedTab == "game-logs"}
-                    />
-                  </ScrollToBottom>
-                </div>
+                {this.currentOpenedTab == "game-logs" || !isMobile ? (
+                  <div className="d-flex flex-column h-100">
+                    <ScrollToBottom
+                      className="flex-fill-remaining"
+                      scrollViewClassName="overflow-x-hidden"
+                      initialScrollBehavior="auto"
+                    >
+                      <GameLogListComponent
+                        ingameGameState={this.ingame}
+                        gameClient={this.gameClient}
+                        currentlyViewed={this.currentOpenedTab == "game-logs"}
+                      />
+                    </ScrollToBottom>
+                  </div>
+                ) : null}
               </Tab.Pane>
               <Tab.Pane eventKey="settings" className="h-100">
                 <GameSettingsComponent
@@ -592,6 +595,19 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   ): void {
     if (this.currentOpenedTab == "note") {
       this.unseenNotes = false;
+    }
+
+    // Only update game round elements when switching TO the game-logs tab
+    if (
+      this.currentOpenedTab == "game-logs" &&
+      this.previousOpenedTab != "game-logs"
+    ) {
+      this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
+    }
+
+    // Track tab changes
+    if (this.currentOpenedTab != this.previousOpenedTab) {
+      this.previousOpenedTab = this.currentOpenedTab;
     }
   }
 
