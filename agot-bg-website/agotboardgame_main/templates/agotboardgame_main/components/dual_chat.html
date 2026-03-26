@@ -1,0 +1,259 @@
+{% load static %}
+
+<div id="dual-chat-container"></div>
+<script type="module">
+    import { h, Component, render } from "{% static 'preact/preact.module.js' %}";
+    import htm from "{% static 'preact/htm.module.js' %}";
+    const html = htm.bind(h);
+
+    const publicRoomId = '{{ public_room_id }}';
+    const issuesRoomId = '{{ issues_room_id }}';
+    const isAuthenticated = '{{ user.is_authenticated }}' === 'True';
+
+    const TABS = ['chat', 'issues'];
+    const TAB_LABELS = { chat: 'Chat', issues: 'Requests / Issues' };
+    // Map tab key -> which room ID to connect to
+    const ROOM_IDS = { chat: publicRoomId, issues: issuesRoomId };
+
+    function emptyRoomState() {
+        return { wsState: 0, messages: [], noMoreMessages: false, lastViewedMessageId: null, hasUnread: false };
+    }
+
+    class DualChat extends Component {
+        constructor() {
+            super();
+            this.state = {
+                activeTab: 'chat',
+                rooms: { chat: emptyRoomState(), issues: emptyRoomState() }
+            };
+            this.inputRefs = { chat: null, issues: null };
+            this.websockets = {};
+        }
+
+        componentDidMount() {
+            // Connect to both rooms immediately so we receive messages for both
+            // even while the other tab is inactive (for unread tracking)
+            TABS.forEach(tab => {
+                if (ROOM_IDS[tab]) {
+                    this.connectRoom(tab, ROOM_IDS[tab]);
+                }
+            });
+        }
+
+        connectRoom(tab, roomId) {
+            const url = window.location;
+            const wsProto = url.protocol === 'http:' ? 'ws:' : 'wss:';
+            const ws = new WebSocket(`${wsProto}//${url.host}/ws/chat/room/${roomId}`);
+            this.websockets[tab] = ws;
+
+            ws.onopen = () => {
+                this.patchRoom(tab, { wsState: 1 });
+                ws.send(JSON.stringify({ type: 'chat_retrieve', count: 20, first_message_id: null, faceless: false }));
+            };
+            ws.onclose = () => this.patchRoom(tab, { wsState: 2 });
+            ws.onmessage = e => this.handleMessage(tab, JSON.parse(e.data));
+        }
+
+        handleMessage(tab, data) {
+            // Only the public chat tab propagates connected-user events to online_users component
+            if (tab === 'chat' && data.type === 'connected_users') {
+                window.chatConnectedUsers = data.users;
+                window.dispatchEvent(new CustomEvent('connectedUsersUpdated', { detail: data.users }));
+                return;
+            }
+
+            if (data.type === 'chat_message') {
+                this.addMessage(tab, data, false);
+                if (this.state.activeTab !== tab) {
+                    this.patchRoom(tab, { hasUnread: true });
+                } else {
+                    this.sendViewMessage(tab, data.id);
+                }
+            } else if (data.type === 'chat_messages_retrieved') {
+                data.messages.forEach(d => this.addMessage(tab, d, false));
+                // Server sends messages oldest-first for initial load.
+                // Newest = last element of data.messages.
+                const newestId = data.messages.length > 0 ? data.messages[data.messages.length - 1].id : null;
+                const lastViewed = data.last_viewed_message != null ? data.last_viewed_message : null;
+                const isActive = this.state.activeTab === tab;
+
+                if (newestId && isActive && String(lastViewed) !== String(newestId)) {
+                    // Active tab: mark the newest message as viewed
+                    this.sendViewMessage(tab, newestId);
+                }
+                const hasUnread = !isActive && newestId != null && String(lastViewed) !== String(newestId);
+                this.patchRoom(tab, { lastViewedMessageId: lastViewed, hasUnread });
+            } else if (data.type === 'more_chat_messages_retrieved') {
+                if (data.messages.length === 0) {
+                    this.patchRoom(tab, { noMoreMessages: true });
+                } else {
+                    // Server returns these newest-first; prepend each so oldest stays at state[0]
+                    data.messages.forEach(d => this.addMessage(tab, d, true));
+                }
+            }
+        }
+
+        addMessage(tab, data, prepend) {
+            const msg = {
+                id: data.id,
+                username: data.user_username,
+                user_id: data.user_id,
+                text: data.text,
+                created_at: new Date(Date.parse(data.created_at))
+            };
+            this.setState(s => {
+                const msgs = s.rooms[tab].messages;
+                const updated = prepend ? [msg, ...msgs] : [...msgs, msg];
+                return { rooms: { ...s.rooms, [tab]: { ...s.rooms[tab], messages: updated } } };
+            });
+        }
+
+        patchRoom(tab, patch) {
+            this.setState(s => ({ rooms: { ...s.rooms, [tab]: { ...s.rooms[tab], ...patch } } }));
+        }
+
+        sendViewMessage(tab, messageId) {
+            const ws = this.websockets[tab];
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'chat_view_message', message_id: messageId }));
+            }
+            this.patchRoom(tab, { lastViewedMessageId: messageId, hasUnread: false });
+        }
+
+        switchTab(tab) {
+            this.setState({ activeTab: tab }, () => {
+                // Mark newest message as viewed when switching to tab
+                const room = this.state.rooms[tab];
+                if (room.messages.length > 0) {
+                    // messages[0]=oldest, messages[last]=newest (oldest-first storage)
+                    const newestMsg = room.messages[room.messages.length - 1];
+                    if (String(newestMsg.id) !== String(room.lastViewedMessageId)) {
+                        this.sendViewMessage(tab, newestMsg.id);
+                    } else {
+                        this.patchRoom(tab, { hasUnread: false });
+                    }
+                } else {
+                    this.patchRoom(tab, { hasUnread: false });
+                }
+            });
+        }
+
+        sendChatMessage(e, tab) {
+            e.preventDefault();
+            const ref = this.inputRefs[tab];
+            if (!ref) return;
+            const text = ref.value.trim();
+            if (!text) return;
+            const ws = this.websockets[tab];
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'chat_message', text, faceless: false }));
+            }
+            ref.value = '';
+        }
+
+        loadMore(e, tab) {
+            e.preventDefault();
+            const room = this.state.rooms[tab];
+            if (room.messages.length === 0) {
+                this.patchRoom(tab, { noMoreMessages: true });
+                return;
+            }
+            // messages[0] is the oldest currently shown — load messages older than it
+            const ws = this.websockets[tab];
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'chat_retrieve', count: 50, first_message_id: room.messages[0].id, faceless: false }));
+            }
+        }
+
+        renderChatPane(tab) {
+            const room = this.state.rooms[tab];
+            const isActive = this.state.activeTab === tab;
+            const paneStyle = 'display:' + (isActive ? 'block' : 'none');
+            return html`
+                <div key=${tab} style=${paneStyle}>
+                    <div style="overflow-y: scroll; overflow-x: hidden; height: 250px; background-color: #444; border-radius: 4px" class="p-2 mb-3">
+                        {% if user.is_authenticated %}
+                        <div class="row">
+                            ${room.messages.slice().reverse().map(m => html`
+                                <div class="col-12" key=${m.id}>
+                                    <div class="row flex-nowrap no-gutters">
+                                        <div class="col-auto mx-1" style="margin-top: 0.2rem;" data-toggle="tooltip" title="${m.created_at.toLocaleString()}">
+                                            <small class="text-muted">${('0' + m.created_at.getHours()).slice(-2)}:${('0' + m.created_at.getMinutes()).slice(-2)}</small>
+                                        </div>
+                                        <div class="col-auto mx-2">
+                                            <b><a href="/user/${m.user_id}" target="_blank" rel="noopener noreferrer" style="color: white;">${m.username}</a></b>
+                                        </div>
+                                        <div class="col" style="overflow-wrap: break-all; max-width: 650px;">
+                                            ${m.text}
+                                        </div>
+                                    </div>
+                                </div>
+                            `)}
+                        </div>
+                        {% else %}
+                        <p>Please log in to chat with others.</p>
+                        {% endif %}
+                    </div>
+                    ${room.wsState !== 1 ? html`
+                        <div class="alert text-center mb-0" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i> Chat connection lost. Please reload the page.
+                        </div>
+                    ` : html`
+                        <form class="mb-0" onSubmit=${e => this.sendChatMessage(e, tab)}>
+                            <div class="form-row align-items-stretch">
+                                <div class="col">
+                                    <input type="text"
+                                        ref=${el => this.inputRefs[tab] = el}
+                                        class="form-control"
+                                        placeholder="Message"
+                                        maxlength="200"
+                                        disabled=${!isAuthenticated}
+                                    />
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary" disabled=${!isAuthenticated}>Send</button>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-secondary btn-block h-100"
+                                            disabled=${!isAuthenticated || room.noMoreMessages}
+                                            onClick=${e => this.loadMore(e, tab)}>
+                                        <i class="fas fa-sync-alt fa-lg"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    `}
+                </div>
+            `;
+        }
+
+        render() {
+            const { activeTab, rooms } = this.state;
+            return html`
+                <div>
+                    <ul class="nav nav-tabs mb-2" role="tablist">
+                        ${TABS.map(tab => {
+                            const unread = rooms[tab].hasUnread;
+                            return html`
+                                <li class="nav-item" key=${tab}>
+                                    <a
+                                        class=${'nav-link' + (activeTab === tab ? ' active' : '')}
+                                        style=${unread ? 'border: 3px solid #f39c12 !important;' : ''}
+                                        href="#"
+                                        role="tab"
+                                        onClick=${e => { e.preventDefault(); this.switchTab(tab); }}
+                                    >
+                                        ${TAB_LABELS[tab]}
+                                    </a>
+                                </li>
+                            `;
+                        })}
+                    </ul>
+                    ${TABS.map(tab => this.renderChatPane(tab))}
+                </div>
+            `;
+        }
+    }
+
+    render(h(DualChat), document.getElementById('dual-chat-container'));
+</script>
