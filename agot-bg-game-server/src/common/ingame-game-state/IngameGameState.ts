@@ -2496,16 +2496,6 @@ export default class IngameGameState extends GameState<
       }
     }
 
-    const existingVotes = this.votes.values.filter(
-      (v) =>
-        v.state == VoteState.ONGOING &&
-        ((!replaceWithVassal && v.type instanceof ReplacePlayer) ||
-          v.type instanceof ReplacePlayerByVassal),
-    );
-    if (existingVotes.length > 0) {
-      return { result: false, reason: "ongoing-vote" };
-    }
-
     if (this.isCancelled) {
       return { result: false, reason: "game-cancelled" };
     }
@@ -2639,14 +2629,6 @@ export default class IngameGameState extends GameState<
       return { result: false, reason: "not-a-replaced-vassal" };
     }
 
-    const existingVotes = this.votes.values.filter(
-      (v) =>
-        v.state == VoteState.ONGOING && v.type instanceof ReplaceVassalByPlayer,
-    );
-    if (existingVotes.length > 0) {
-      return { result: false, reason: "ongoing-vote" };
-    }
-
     if (this.isCancelled) {
       return { result: false, reason: "game-cancelled" };
     }
@@ -2656,6 +2638,18 @@ export default class IngameGameState extends GameState<
     }
 
     return { result: true, reason: "" };
+  }
+
+  cancelOngoingReplacementVotes(except: Vote): void {
+    const votes = this.votes.values.filter(
+      (v) =>
+        v.state == VoteState.ONGOING &&
+        (v.type instanceof ReplacePlayer ||
+          v.type instanceof ReplacePlayerByVassal ||
+          v.type instanceof ReplaceVassalByPlayer) &&
+        v != except,
+    );
+    votes.forEach((v) => v.cancelVote());
   }
 
   isHouseDefeated(house: House | null): boolean {
