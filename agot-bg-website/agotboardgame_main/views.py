@@ -35,6 +35,19 @@ def get_public_room_id():
     return public_room_id
 
 
+def get_issues_room_id():
+    """Get (or create) the public issues chat room ID, cached indefinitely."""
+    issues_room_id = cache.get('issues_room_id')
+    if issues_room_id is None:
+        room, _ = Room.objects.get_or_create(
+            name='issues',
+            defaults={'public': True, 'max_retrieve_count': 50}
+        )
+        issues_room_id = str(room.id)
+        cache.set('issues_room_id', issues_room_id, None)
+    return issues_room_id
+
+
 def index(request):
     posts = [
         {
@@ -267,6 +280,7 @@ def my_games(request):
     except Game.DoesNotExist:
         last_finished_game = None
     public_room_id = get_public_room_id()
+    issues_room_id = get_issues_room_id()
 
     return render(request, "agotboardgame_main/my_games.html", {
         "my_games": my_games,
@@ -274,7 +288,8 @@ def my_games(request):
         "open_live_games": open_live_games,
         "running_live_games": running_live_games,
         "last_finished_game": last_finished_game,
-        "public_room_id": public_room_id
+        "public_room_id": public_room_id,
+        "issues_room_id": issues_room_id
     })
 
 
@@ -362,6 +377,7 @@ def games(request):
 
         if request.user.is_authenticated:
             public_room_id = get_public_room_id()
+            issues_room_id = get_issues_room_id()
             # QUERY MY GAMES
             games_query = games_query_base.annotate(user_is_in_game=Count('players', filter=Q(players__user=request.user)),\
                 replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()),\
@@ -390,6 +406,7 @@ def games(request):
             "inactive_private_games": inactive_private_games,
             "inactive_tournament_games": inactive_tournament_games,
             "public_room_id": public_room_id,
+            "issues_room_id": issues_room_id if request.user.is_authenticated else "",
             "last_finished_game": last_finished_game
         })
     elif request.method == "POST":

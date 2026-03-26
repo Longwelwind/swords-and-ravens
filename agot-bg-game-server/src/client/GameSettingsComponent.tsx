@@ -520,9 +520,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <option key="15" value={15}>
                     15
                   </option>
-                  <option key="50" value={50}>
-                    50
-                  </option>
                 </select>
                 &nbsp;VPs
               </div>
@@ -572,9 +569,6 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     </option>
                     <option key="15" value={15}>
                       15
-                    </option>
-                    <option key="50" value={50}>
-                      50
                     </option>
                   </select>
                   &nbsp;LTs

@@ -16,7 +16,6 @@ import faviconAlert from "../../public/images/favicon-alert.ico";
 import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
 import trophyCupImage from "../../public/images/icons/trophy-cup.svg";
-import crownedSkullImage from "../../public/images/icons/crowned-skull.svg";
 import perpetuumRandomImage from "../../public/images/icons/perpetuum-random.svg";
 import { Helmet } from "react-helmet";
 import { Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
@@ -83,15 +82,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
   get isInCombat(): boolean {
     return this.entireGame.hasChildGameState(CombatGameState);
-  }
-
-  get isWorldDomination(): boolean {
-    const settings = this.entireGame.gameSettings;
-    return (
-      settings.endless &&
-      settings.victoryPointsCountNeededToWin === 50 &&
-      (settings.playerCount < 8 || settings.loyaltyTokenCountNeededToWin === 50)
-    );
   }
 
   get settings(): GameSettings {
@@ -433,21 +423,6 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
               <h4>
                 <FontAwesomeIcon icon={faTriangleExclamation} />
               </h4>
-            </OverlayTrigger>
-          </Col>
-        )}
-        {this.isWorldDomination && (
-          <Col xs="auto">
-            <OverlayTrigger
-              placement="bottom"
-              overlay={
-                <Tooltip id="world-domination-tooltip">
-                  World Domination
-                </Tooltip>
-              }
-              popperConfig={{ modifiers: [preventOverflow] }}
-            >
-              <img src={crownedSkullImage} width="30" />
             </OverlayTrigger>
           </Col>
         )}

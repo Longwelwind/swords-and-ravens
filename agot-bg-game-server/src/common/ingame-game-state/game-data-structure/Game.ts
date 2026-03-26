@@ -316,13 +316,11 @@ export default class Game {
       (h) => [h, this.getVictoryPoints(h)] as [House, number],
     );
 
-    return (
-      numberVictoryPointsPerHouse.some(([h, n]) => {
-        return h != this.targaryen
-          ? n >= this.victoryPointsCountNeededToWin
-          : n >= this.loyaltyTokenCountNeededToWin;
-      }) || this.isWorldConquered()
-    );
+    return numberVictoryPointsPerHouse.some(([h, n]) => {
+      return h != this.targaryen
+        ? n >= this.victoryPointsCountNeededToWin
+        : n >= this.loyaltyTokenCountNeededToWin;
+    });
   }
 
   isWorldConquered(): boolean {

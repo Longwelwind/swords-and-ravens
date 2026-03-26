@@ -238,14 +238,14 @@ export default class LobbyGameState extends GameState<EntireGame> {
 
       if (
         settings.victoryPointsCountNeededToWin < 6 ||
-        settings.victoryPointsCountNeededToWin > 50
+        settings.victoryPointsCountNeededToWin > 15
       ) {
         settings.victoryPointsCountNeededToWin = 7;
       }
 
       if (
         settings.loyaltyTokenCountNeededToWin < 6 ||
-        settings.loyaltyTokenCountNeededToWin > 50
+        settings.loyaltyTokenCountNeededToWin > 15
       ) {
         settings.loyaltyTokenCountNeededToWin = 7;
       }

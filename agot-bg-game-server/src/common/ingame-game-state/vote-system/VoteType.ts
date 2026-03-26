@@ -439,42 +439,43 @@ export class ReplacePlayer extends VoteType {
   }
 
   executeAccepted(vote: Vote): void {
-    vote.ingame.cancelPendingReplaceVotes();
+    const ingame = vote.ingame;
+    ingame.cancelPendingReplaceVotes();
 
     // Create a new player to replace the old one
-    const oldPlayer = vote.ingame.players.values.find(
+    const oldPlayer = ingame.players.values.find(
       (p) => p.house == this.forHouse,
     ) as Player;
-    vote.ingame.endPlayerClock(oldPlayer);
+    ingame.endPlayerClock(oldPlayer);
 
     const newPlayer = new Player(this.replacer, this.forHouse);
-    vote.ingame.applyAverageOfRemainingClocksToNewPlayer(newPlayer, oldPlayer);
+    ingame.applyAverageOfRemainingClocksToNewPlayer(newPlayer, oldPlayer);
 
-    if (vote.ingame.entireGame.gameSettings.faceless) {
+    if (ingame.entireGame.gameSettings.faceless) {
       newPlayer.user.facelessName =
-        vote.ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
-      vote.ingame.entireGame.hideOrRevealUserNames(false);
+        ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
+      ingame.entireGame.hideOrRevealUserNames(false);
     }
 
-    if (!vote.ingame.oldPlayerIds.includes(oldPlayer.user.id)) {
-      vote.ingame.oldPlayerIds.push(oldPlayer.user.id);
+    if (!ingame.oldPlayerIds.includes(oldPlayer.user.id)) {
+      ingame.oldPlayerIds.push(oldPlayer.user.id);
     }
 
-    if (!vote.ingame.replacerIds.includes(newPlayer.user.id)) {
-      vote.ingame.replacerIds.push(newPlayer.user.id);
+    if (!ingame.replacerIds.includes(newPlayer.user.id)) {
+      ingame.replacerIds.push(newPlayer.user.id);
     }
 
-    vote.ingame.players.delete(oldPlayer.user);
-    vote.ingame.players.set(newPlayer.user, newPlayer);
+    ingame.players.delete(oldPlayer.user);
+    ingame.players.set(newPlayer.user, newPlayer);
 
-    vote.ingame.entireGame.broadcastToClients({
+    ingame.entireGame.broadcastToClients({
       type: "player-replaced",
       oldUser: oldPlayer.user.id,
       newUser: newPlayer.user.id,
       liveClockRemainingSeconds: newPlayer.liveClockData?.remainingSeconds,
     });
 
-    vote.ingame.log({
+    ingame.log({
       type: "player-replaced",
       oldUser: this.replaced.id,
       newUser: this.replacer.id,
@@ -484,17 +485,18 @@ export class ReplacePlayer extends VoteType {
     // Resend the entire game so new player receives possible new secret data (like objectives in FFC)
     newPlayer.user.send({
       type: "authenticate-response",
-      game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
+      game: ingame.entireGame.serializeToClient(newPlayer.user),
       userId: newPlayer.user.id,
     });
 
     // If we are waiting for newPlayer, notify him about his turn
-    if (vote.ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
+    if (ingame.leafState.getWaitedUsers().includes(newPlayer.user)) {
       newPlayer.setWaitedFor();
-      vote.ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
+      ingame.entireGame.notifyWaitedUsers([newPlayer.user]);
     }
 
-    vote.ingame.entireGame.saveGame(true);
+    ingame.cancelOngoingReplacementVotes(vote);
+    ingame.entireGame.saveGame(true);
   }
 
   serializeToClient(): SerializedReplacePlayer {
@@ -560,6 +562,7 @@ export class ReplacePlayerByVassal extends VoteType {
     }
 
     ingame.replacePlayerByVassal(oldPlayer, ReplacementReason.VOTE);
+    ingame.cancelOngoingReplacementVotes(vote);
     vote.ingame.entireGame.saveGame(true);
   }
 
@@ -610,74 +613,76 @@ export class ReplaceVassalByPlayer extends VoteType {
   }
 
   executeAccepted(vote: Vote): void {
-    vote.ingame.cancelPendingReplaceVotes();
+    const ingame = vote.ingame;
+    ingame.cancelPendingReplaceVotes();
 
     // Create a new player to replace the vassal
     const newPlayer = new Player(this.replacer, this.forHouse);
-    vote.ingame.applyAverageOfRemainingClocksToNewPlayer(newPlayer, null);
+    ingame.applyAverageOfRemainingClocksToNewPlayer(newPlayer, null);
 
-    if (vote.ingame.entireGame.gameSettings.faceless) {
+    if (ingame.entireGame.gameSettings.faceless) {
       newPlayer.user.facelessName =
-        vote.ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
-      vote.ingame.entireGame.hideOrRevealUserNames(false);
+        ingame.getFreeFacelessName() ?? newPlayer.user.facelessName;
+      ingame.entireGame.hideOrRevealUserNames(false);
     }
 
     this.forHouse.hasBeenReplacedByVassal = false;
 
-    vote.ingame.players.set(newPlayer.user, newPlayer);
-    _.pull(vote.ingame.vassalizedHouses, this.forHouse);
+    ingame.players.set(newPlayer.user, newPlayer);
+    _.pull(ingame.vassalizedHouses, this.forHouse);
 
     // Remove house from vassal relations
-    if (vote.ingame.game.vassalRelations.has(this.forHouse)) {
-      vote.ingame.game.vassalRelations.delete(this.forHouse);
+    if (ingame.game.vassalRelations.has(this.forHouse)) {
+      ingame.game.vassalRelations.delete(this.forHouse);
     }
 
     // Broadcast new vassal relations
-    vote.ingame.broadcastVassalRelations();
+    ingame.broadcastVassalRelations();
 
-    vote.ingame.entireGame.broadcastToClients({
+    ingame.entireGame.broadcastToClients({
       type: "vassal-replaced",
       house: this.forHouse.id,
       user: newPlayer.user.id,
       liveClockRemainingSeconds: newPlayer.liveClockData?.remainingSeconds,
     });
 
-    vote.ingame.log({
+    ingame.log({
       type: "vassal-replaced",
       house: this.forHouse.id,
       user: this.replacer.id,
     });
 
     // Reset original house cards
-    this.forHouse.houseCards = vote.ingame.game.oldPlayerHouseCards.get(
+    this.forHouse.houseCards = ingame.game.oldPlayerHouseCards.get(
       this.forHouse,
     );
-    vote.ingame.entireGame.broadcastToClients({
+    ingame.entireGame.broadcastToClients({
       type: "update-house-cards",
       house: this.forHouse.id,
       houseCards: this.forHouse.houseCards.keys,
     });
 
-    vote.ingame.game.oldPlayerHouseCards.delete(this.forHouse);
-    vote.ingame.entireGame.broadcastToClients({
+    ingame.game.oldPlayerHouseCards.delete(this.forHouse);
+    ingame.entireGame.broadcastToClients({
       type: "update-old-player-house-cards",
-      houseCards: vote.ingame.game.oldPlayerHouseCards.entries.map(
-        ([h, hcs]) => [h.id, hcs.values.map((hc) => hc.id)],
-      ),
+      houseCards: ingame.game.oldPlayerHouseCards.entries.map(([h, hcs]) => [
+        h.id,
+        hcs.values.map((hc) => hc.id),
+      ]),
     });
 
     const hasPlaceOrders =
-      vote.ingame.hasChildGameState(PlanningGameState) &&
-      (vote.ingame.hasChildGameState(PlaceOrdersGameState) ||
-        vote.ingame.hasChildGameState(PlaceOrdersForVassalsGameState));
+      ingame.hasChildGameState(PlanningGameState) &&
+      (ingame.hasChildGameState(PlaceOrdersGameState) ||
+        ingame.hasChildGameState(PlaceOrdersForVassalsGameState));
 
     if (hasPlaceOrders) {
-      const planning = vote.ingame.getChildGameState(
+      const planning = ingame.getChildGameState(
         PlanningGameState,
       ) as PlanningGameState;
 
       // Reset waitedFor data, to properly call ingame.setWaitedForPlayers() by the game-state-change
-      vote.ingame.resetAllWaitedForData();
+      ingame.resetAllWaitedForData();
 
       // Restart planning, so we will return to a fresh PlaceOrdersGameState where everyone has to
       // submit their orders again
@@ -687,16 +692,17 @@ export class ReplaceVassalByPlayer extends VoteType {
     }
 
     // Force a new claim-vassals game-state, as undoing a vassal may steal a vassal from an earlier house on IT
-    vote.ingame.proceedWithClaimVassals();
+    ingame.proceedWithClaimVassals();
 
     // Resend the entire game so new player receives possible new secret data (like objectives in FFC)
     newPlayer.user.send({
       type: "authenticate-response",
-      game: vote.ingame.entireGame.serializeToClient(newPlayer.user),
+      game: ingame.entireGame.serializeToClient(newPlayer.user),
       userId: newPlayer.user.id,
     });
 
-    vote.ingame.entireGame.saveGame(true);
+    ingame.cancelOngoingReplacementVotes(vote);
+    ingame.entireGame.saveGame(true);
   }
 
   serializeToClient(): SerializedReplaceVassalByPlayer {
