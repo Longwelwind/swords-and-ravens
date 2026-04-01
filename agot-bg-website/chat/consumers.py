@@ -29,7 +29,14 @@ def add_connected_user(room_id, user_id, user_data):
     """
     cache_key = get_connected_users_cache_key(room_id)
     connected_users = cache.get(cache_key, {})
-    connected_users[str(user_id)] = user_data
+    user_id_str = str(user_id)
+    if user_id_str in connected_users:
+        # User already tracked (multiple tabs); just increment the connection count
+        connected_users[user_id_str]['_count'] = connected_users[user_id_str].get('_count', 1) + 1
+    else:
+        entry = dict(user_data)
+        entry['_count'] = 1
+        connected_users[user_id_str] = entry
     cache.set(cache_key, connected_users, None)  # No expiration
     return connected_users
 
@@ -38,7 +45,13 @@ def remove_connected_user(room_id, user_id):
     """Remove a user from the connected users list for a room."""
     cache_key = get_connected_users_cache_key(room_id)
     connected_users = cache.get(cache_key, {})
-    connected_users.pop(str(user_id), None)
+    user_id_str = str(user_id)
+    if user_id_str in connected_users:
+        count = connected_users[user_id_str].get('_count', 1) - 1
+        if count <= 0:
+            connected_users.pop(user_id_str)
+        else:
+            connected_users[user_id_str]['_count'] = count
     cache.set(cache_key, connected_users, None)
     return connected_users
 
@@ -276,11 +289,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         connected_users = await database_sync_to_async(lambda: get_connected_users(self.room_id))()
 
+        # Strip the internal _count field before sending to clients
+        users_to_send = {
+            uid: {k: v for k, v in data.items() if k != '_count'}
+            for uid, data in connected_users.items()
+        }
+
         await self.channel_layer.group_send(
             self.room_id,
             {
                 'type': 'connected_users_update',
-                'users': connected_users
+                'users': users_to_send
             }
         )
 
