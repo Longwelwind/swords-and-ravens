@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone, timedelta
 
 from agotboardgame_main.models import Game
 from django.core.mail import send_mail
@@ -8,6 +9,9 @@ from agotboardgame.settings import DEFAULT_FROM_MAIL
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.db.models import Q
+
+CONNECTED_USER_STALE_AFTER = timedelta(hours=12)
+INTERNAL_KEYS = {'_count', '_last_active_at'}
 
 from chat.models import Room, Message, UserInRoom
 
@@ -19,9 +23,21 @@ def get_connected_users_cache_key(room_id):
     return f'chat_room_{room_id}_connected_users'
 
 
+def _prune_stale(connected_users):
+    """Remove entries that have no _last_active_at or are older than CONNECTED_USER_STALE_AFTER."""
+    cutoff = datetime.now(timezone.utc) - CONNECTED_USER_STALE_AFTER
+    stale = [
+        uid for uid, data in connected_users.items()
+        if not data.get('_last_active_at') or
+           datetime.fromisoformat(data['_last_active_at']) < cutoff
+    ]
+    for uid in stale:
+        connected_users.pop(uid)
+
+
 def add_connected_user(room_id, user_id, user_data):
     """Add a user to the connected users list for a room.
-    
+
     Args:
         room_id: The room ID
         user_id: User ID
@@ -29,15 +45,19 @@ def add_connected_user(room_id, user_id, user_data):
     """
     cache_key = get_connected_users_cache_key(room_id)
     connected_users = cache.get(cache_key, {})
+    _prune_stale(connected_users)
     user_id_str = str(user_id)
+    now = datetime.now(timezone.utc).isoformat()
     if user_id_str in connected_users:
-        # User already tracked (multiple tabs); just increment the connection count
+        # User already tracked (multiple tabs); increment the connection count and refresh timestamp
         connected_users[user_id_str]['_count'] = connected_users[user_id_str].get('_count', 1) + 1
+        connected_users[user_id_str]['_last_active_at'] = now
     else:
         entry = dict(user_data)
         entry['_count'] = 1
+        entry['_last_active_at'] = now
         connected_users[user_id_str] = entry
-    cache.set(cache_key, connected_users, None)  # No expiration
+    cache.set(cache_key, connected_users, None)  # No expiration; staleness handled per-entry
     return connected_users
 
 
@@ -45,10 +65,11 @@ def remove_connected_user(room_id, user_id):
     """Remove a user from the connected users list for a room."""
     cache_key = get_connected_users_cache_key(room_id)
     connected_users = cache.get(cache_key, {})
+    _prune_stale(connected_users)
     user_id_str = str(user_id)
     if user_id_str in connected_users:
-        count = connected_users[user_id_str].get('_count', 1) - 1
-        if count <= 0:
+        count = max(0, connected_users[user_id_str].get('_count', 1) - 1)
+        if count == 0:
             connected_users.pop(user_id_str)
         else:
             connected_users[user_id_str]['_count'] = count
@@ -57,9 +78,15 @@ def remove_connected_user(room_id, user_id):
 
 
 def get_connected_users(room_id):
-    """Get the list of connected users for a room."""
+    """Get the list of connected users for a room, pruning stale entries."""
     cache_key = get_connected_users_cache_key(room_id)
-    return cache.get(cache_key, {})
+    connected_users = cache.get(cache_key, {})
+    if connected_users:
+        original_len = len(connected_users)
+        _prune_stale(connected_users)
+        if len(connected_users) != original_len:
+            cache.set(cache_key, connected_users, None)
+    return connected_users
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -289,9 +316,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         connected_users = await database_sync_to_async(lambda: get_connected_users(self.room_id))()
 
-        # Strip the internal _count field before sending to clients
+        # Strip internal bookkeeping fields before sending to clients
         users_to_send = {
-            uid: {k: v for k, v in data.items() if k != '_count'}
+            uid: {k: v for k, v in data.items() if k not in INTERNAL_KEYS}
             for uid, data in connected_users.items()
         }
 
