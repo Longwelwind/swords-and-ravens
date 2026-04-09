@@ -28,19 +28,68 @@
             };
             this.inputRefs = { chat: null, issues: null };
             this.websockets = {};
+            this._wsConnected = false;
         }
 
         componentDidMount() {
-            // Connect to both rooms immediately so we receive messages for both
-            // even while the other tab is inactive (for unread tracking)
+            this.reconnectAll();
+
+            this._onVisibilityChange = () => {
+                if (document.visibilityState === 'hidden') {
+                    this.disconnectAll();
+                } else {
+                    this.reconnectAll();
+                }
+            };
+            this._onPageHide = () => this.disconnectAll();
+            // pageshow with persisted=true means the page was restored from bfcache
+            this._onPageShow = e => { if (e.persisted) this.reconnectAll(); };
+
+            document.addEventListener('visibilitychange', this._onVisibilityChange);
+            window.addEventListener('pagehide', this._onPageHide);
+            window.addEventListener('pageshow', this._onPageShow);
+        }
+
+        componentWillUnmount() {
+            document.removeEventListener('visibilitychange', this._onVisibilityChange);
+            window.removeEventListener('pagehide', this._onPageHide);
+            window.removeEventListener('pageshow', this._onPageShow);
+            this.disconnectAll();
+        }
+
+        disconnectAll() {
+            if (!this._wsConnected) return;
+            this._wsConnected = false;
+            TABS.forEach(tab => {
+                const ws = this.websockets[tab];
+                if (ws) {
+                    ws.onclose = null; // Prevent wsState from being set to 2 (error)
+                    ws.close();
+                    this.websockets[tab] = null;
+                }
+                this.patchRoom(tab, { wsState: 0 });
+            });
+        }
+
+        reconnectAll() {
+            if (this._wsConnected) return;
+            this._wsConnected = true;
             TABS.forEach(tab => {
                 if (ROOM_IDS[tab]) {
+                    // Reset messages so we don't accumulate duplicates after re-fetch
+                    this.patchRoom(tab, { messages: [], noMoreMessages: false });
                     this.connectRoom(tab, ROOM_IDS[tab]);
                 }
             });
         }
 
         connectRoom(tab, roomId) {
+            // Close any existing connection before opening a new one
+            const existing = this.websockets[tab];
+            if (existing) {
+                existing.onclose = null;
+                existing.close();
+            }
             const url = window.location;
             const wsProto = url.protocol === 'http:' ? 'ws:' : 'wss:';
             const ws = new WebSocket(`${wsProto}//${url.host}/ws/chat/room/${roomId}`);
