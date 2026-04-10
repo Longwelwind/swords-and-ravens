@@ -10,10 +10,11 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.db.models import Q
 
-CONNECTED_USER_STALE_AFTER = timedelta(hours=12)
+CONNECTED_USER_STALE_AFTER = timedelta(hours=1)
 INTERNAL_KEYS = {'_count', '_last_active_at'}
 
 from chat.models import Room, Message, UserInRoom
+from agotboardgame_main.views import get_public_room_id
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,8 @@ def get_connected_users_cache_key(room_id):
 
 
 def _prune_stale(connected_users):
-    """Remove entries that have no _last_active_at or are older than CONNECTED_USER_STALE_AFTER."""
+    """Remove entries that have no _last_active_at or are older than CONNECTED_USER_STALE_AFTER.
+    Returns the list of pruned user ID strings."""
     cutoff = datetime.now(timezone.utc) - CONNECTED_USER_STALE_AFTER
     stale = [
         uid for uid, data in connected_users.items()
@@ -33,6 +35,7 @@ def _prune_stale(connected_users):
     ]
     for uid in stale:
         connected_users.pop(uid)
+    return stale
 
 
 def add_connected_user(room_id, user_id, user_data):
@@ -45,7 +48,6 @@ def add_connected_user(room_id, user_id, user_data):
     """
     cache_key = get_connected_users_cache_key(room_id)
     connected_users = cache.get(cache_key, {})
-    _prune_stale(connected_users)
     user_id_str = str(user_id)
     now = datetime.now(timezone.utc).isoformat()
     if user_id_str in connected_users:
@@ -65,7 +67,6 @@ def remove_connected_user(room_id, user_id):
     """Remove a user from the connected users list for a room."""
     cache_key = get_connected_users_cache_key(room_id)
     connected_users = cache.get(cache_key, {})
-    _prune_stale(connected_users)
     user_id_str = str(user_id)
     if user_id_str in connected_users:
         count = max(0, connected_users[user_id_str].get('_count', 1) - 1)
@@ -78,15 +79,26 @@ def remove_connected_user(room_id, user_id):
 
 
 def get_connected_users(room_id):
-    """Get the list of connected users for a room, pruning stale entries."""
+    """Get the list of connected users for a room, pruning stale entries.
+    Returns (connected_users_dict, pruned_user_ids)."""
     cache_key = get_connected_users_cache_key(room_id)
     connected_users = cache.get(cache_key, {})
+    pruned_uids = []
     if connected_users:
-        original_len = len(connected_users)
-        _prune_stale(connected_users)
-        if len(connected_users) != original_len:
+        pruned_uids = _prune_stale(connected_users)
+        if pruned_uids:
             cache.set(cache_key, connected_users, None)
-    return connected_users
+    return connected_users, pruned_uids
+
+
+def refresh_last_active_at(room_id, user_id):
+    """Refresh the _last_active_at timestamp for a connected user."""
+    cache_key = get_connected_users_cache_key(room_id)
+    connected_users = cache.get(cache_key, {})
+    user_id_str = str(user_id)
+    if user_id_str in connected_users:
+        connected_users[user_id_str]['_last_active_at'] = datetime.now(timezone.utc).isoformat()
+        cache.set(cache_key, connected_users, None)
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -156,13 +168,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             # Only track connected users for the website's public games chat room
             if self.room_public and self.room_name == 'public':
                 user = self.scope['user']
-                if user.is_authenticated:
-                    await database_sync_to_async(lambda: remove_connected_user(
-                        self.room_id,
-                        str(user.id)
-                    ))()
-                    # Broadcast updated user list to remaining clients
-                    await self.broadcast_connected_users()
+                await database_sync_to_async(lambda: remove_connected_user(
+                    self.room_id,
+                    str(user.id)
+                ))()
+                # Broadcast updated user list to remaining clients
+                await self.broadcast_connected_users()
 
             await self.channel_layer.group_discard(
                 self.room_id,
@@ -206,6 +217,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     'created_at': message.created_at.isoformat()
                 }
             )
+
+            if self.room_public and self.room_name in ('public', 'issues'):
+                # Refresh activity in the public room (where online tracking lives)
+                # for both the public and issues channels shown on the main pages.
+                public_room_id = await database_sync_to_async(get_public_room_id)()
+                await database_sync_to_async(lambda: refresh_last_active_at(public_room_id, str(user.id)))()
 
             if self.room_public:
                 return
@@ -311,10 +328,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def broadcast_connected_users(self):
         """Broadcast the current list of connected users to all clients in the room."""
-        if not self.room_id or not self.room_public or self.room_name != 'public':
+        if not self.room_public or self.room_name != 'public':
             return
 
-        connected_users = await database_sync_to_async(lambda: get_connected_users(self.room_id))()
+        connected_users, pruned_uids = await database_sync_to_async(lambda: get_connected_users(self.room_id))()
+
+        if pruned_uids:
+            await self.channel_layer.group_send(
+                self.room_id,
+                {
+                    'type': 'close_stale_connections',
+                    'user_ids': pruned_uids
+                }
+            )
 
         # Strip internal bookkeeping fields before sending to clients
         users_to_send = {
@@ -337,6 +363,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             'type': 'connected_users',
             'users': users
         })
+
+    async def close_stale_connections(self, event):
+        """Tell the client to disconnect if this consumer's user was pruned as stale.
+        The client's disconnectAll() will close both the public and issues WebSockets,
+        triggering a clean server-side disconnect() for each."""
+        user = self.scope['user']
+        if user.is_authenticated and str(user.id) in event['user_ids']:
+            await self.send_json({'type': 'force_disconnect'})
 
     def get_user_data(self, user):
         """Get enriched user data including admin status and tournament wins.
