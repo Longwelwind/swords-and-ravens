@@ -60,10 +60,14 @@
         disconnectAll() {
             if (!this._wsConnected) return;
             this._wsConnected = false;
+            // Clear the online users list immediately on any disconnect
+            window.chatConnectedUsers = {};
+            window.dispatchEvent(new CustomEvent('connectedUsersUpdated', { detail: {} }));
             TABS.forEach(tab => {
                 const ws = this.websockets[tab];
                 if (ws) {
-                    ws.onclose = null; // Prevent wsState from being set to 2 (error)
+                    ws.onclose = null;   // Prevent wsState from being set to 2 (error)
+                    ws.onmessage = null; // Prevent any buffered messages from being handled
                     ws.close();
                     this.websockets[tab] = null;
                 }
@@ -106,8 +110,17 @@
         handleMessage(tab, data) {
             // Only the public chat tab propagates connected-user events to online_users component
             if (tab === 'chat' && data.type === 'connected_users') {
+                // Ignore updates that arrive after we've already disconnected (race with force_disconnect)
+                if (!this._wsConnected) return;
                 window.chatConnectedUsers = data.users;
                 window.dispatchEvent(new CustomEvent('connectedUsersUpdated', { detail: data.users }));
+                return;
+            }
+
+            if (data.type === 'force_disconnect') {
+                // Server pruned this user as stale; close both connections cleanly so
+                // the server's disconnect() fires for both public and issues rooms.
+                this.disconnectAll();
                 return;
             }
 
