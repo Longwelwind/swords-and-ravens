@@ -348,12 +348,16 @@ def games(request):
         if request.user.has_perm("agotboardgame_main.can_play_as_another_player"):
             # QUERY INACTIVE GAMES
             games_query = games_query_base\
-                .annotate(has_inactive_players=Count('players', filter=Q(players__user__last_activity__lt=eight_days_past)),\
-                          inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
-                          is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()))
+                .annotate(inactive_5=ExpressionWrapper(Q(last_active_at__lt=five_days_past), output_field=BooleanField()),\
+                          inactive_2=ExpressionWrapper(Q(last_active_at__lt=two_days_past), output_field=BooleanField()),\
+                          is_private=Cast(KeyTextTransform('private', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+                          is_faceless=Cast(KeyTextTransform('faceless', KeyTextTransform('settings', 'view_of_game')), BooleanField()),\
+                          replace_player_vote_ongoing=Cast(KeyTextTransform('replacePlayerVoteOngoing', 'view_of_game'), BooleanField()))\
+                .prefetch_related(Prefetch('players', queryset=PlayerInGame.objects.filter(user__last_activity__lt=eight_days_past), to_attr="inactive_players"))
 
-            inactive_games = games_query.filter(Q(state=ONGOING) & Q(inactive_5=True) & (Q(is_private__isnull=True) | Q(is_private=False)) & Q(has_inactive_players=0)).order_by("state", "-last_active_at")
-            enrich_games(request, inactive_games, False, True, False)
+            inactive_games = games_query.filter(Q(state=ONGOING) & Q(inactive_5=True) & (Q(is_private__isnull=True) | Q(is_private=False))).order_by("state", "-last_active_at")
+            enrich_games(request, inactive_games, True, True, False)
+            inactive_games = [game for game in inactive_games if game.inactive_players is None]
 
             # QUERY INACTIVE TOURNAMENT GAMES
             games_query = games_query_base\
