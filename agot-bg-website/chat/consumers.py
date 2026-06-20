@@ -200,6 +200,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 logger.warning(f'An unauthenticated user tried to send the message "{text}" to room "{self.room_id}"')
                 return
 
+            is_tongueless = await database_sync_to_async(lambda: user.is_in_group('Tongueless'))()
+            if is_tongueless:
+                logger.warning(f'A tongueless user (id: {user.id}) tried to send the message "{text}" to room "{self.room_id}"')
+                return
+
             message = Message()
             message.user = user
             message.text = text

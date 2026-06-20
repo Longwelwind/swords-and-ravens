@@ -266,7 +266,8 @@ GROUP_COLORS = {
     "Admin": "danger",
     "High Member": "info",
     "Banned": "danger",
-    "On probation": "warning"
+    "On probation": "warning",
+    "Tongueless": "warning"
 }
 
 # Vanilla Forum
