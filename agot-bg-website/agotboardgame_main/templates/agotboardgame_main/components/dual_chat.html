@@ -260,31 +260,30 @@
                         <div class="alert text-center mb-0" role="alert">
                             <i class="fas fa-exclamation-triangle"></i> Chat connection lost. Please reload the page.
                         </div>
-                    ` : html`
-                        <form class="mb-0" onSubmit=${e => this.sendChatMessage(e, tab)}>
-                            <div class="form-row align-items-stretch">
-                                <div class="col">
-                                    <input type="text"
-                                        ref=${el => this.inputRefs[tab] = el}
-                                        class="form-control"
-                                        placeholder="Message"
-                                        maxlength="200"
-                                        disabled=${!isAuthenticated}
-                                    />
-                                </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary" disabled=${!isAuthenticated}>Send</button>
-                                </div>
-                                <div class="col-auto">
-                                    <button type="button" class="btn btn-secondary btn-block h-100"
-                                            disabled=${!isAuthenticated || room.noMoreMessages}
-                                            onClick=${e => this.loadMore(e, tab)}>
-                                        <i class="fas fa-sync-alt fa-lg"/>
-                                    </button>
-                                </div>
+                    ` : ''}
+                    <form class="mb-0" style=${room.wsState !== 1 ? 'display:none' : ''} onSubmit=${e => this.sendChatMessage(e, tab)}>
+                        <div class="form-row align-items-stretch">
+                            <div class="col">
+                                <input type="text"
+                                    ref=${el => this.inputRefs[tab] = el}
+                                    class="form-control"
+                                    placeholder="Message"
+                                    maxlength="200"
+                                    disabled=${!isAuthenticated}
+                                />
                             </div>
-                        </form>
-                    `}
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary" disabled=${!isAuthenticated}>Send</button>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-secondary btn-block h-100"
+                                        disabled=${!isAuthenticated || room.noMoreMessages}
+                                        onClick=${e => this.loadMore(e, tab)}>
+                                    <i class="fas fa-sync-alt fa-lg"/>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             `;
         }
