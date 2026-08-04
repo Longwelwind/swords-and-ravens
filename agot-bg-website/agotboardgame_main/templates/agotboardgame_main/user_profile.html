@@ -11,9 +11,9 @@
 <div class="row decrease-container-margin">
     <div class="col-12">
         <h3>
-            {% if group_name %}
-                <span class="badge badge badge-{{ group_color }}">{{ group_name }}</span>
-            {% endif %}
+            {% for group in user_groups %}
+                <span class="badge badge badge-{{ group.color }}">{{ group.name }}</span>
+            {% endfor %}
             {{ viewed_user.username }}
             {% if viewed_user.last_won_tournament %}
                 <span style="color: goldenrod"

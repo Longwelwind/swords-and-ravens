@@ -540,13 +540,11 @@ def settings(request):
 def user_profile(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
-    group_name = None
-    group_color = None
-    for possible_group_name, possible_group_color in GROUP_COLORS.items():
-        if user.is_in_group(possible_group_name):
-            group_name = possible_group_name
-            group_color = possible_group_color
-            break
+    user_groups = [
+        {"name": possible_group_name, "color": possible_group_color}
+        for possible_group_name, possible_group_color in GROUP_COLORS.items()
+        if user.is_in_group(possible_group_name)
+    ]
 
     games_of_user = PlayerInGame.objects.select_related('game').prefetch_related('game__players')\
         .defer('game__serialized_game')\
@@ -585,8 +583,7 @@ def user_profile(request, user_id):
         user.average_pbem_speed = "n/a"
     return render(request, "agotboardgame_main/user_profile.html", {
         "viewed_user": user,
-        "group_name": group_name,
-        "group_color": group_color,
+        "user_groups": user_groups,
         "on_probation": request.user.is_authenticated and request.user.is_in_group("On probation")
     })
 

@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import datetime, timezone, timedelta
 
 from agotboardgame_main.models import Game
@@ -101,6 +102,9 @@ def refresh_last_active_at(room_id, user_id):
         cache.set(cache_key, connected_users, None)
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
+    # Tongueless users may only reply with a single digit, '+' (yes) or '-' (no)
+    TONGUELESS_MESSAGE_REGEX = re.compile(r'^[0-9+-]$')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.room_id = None
@@ -202,8 +206,16 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
             is_tongueless = await database_sync_to_async(lambda: user.is_in_group('Tongueless'))()
             if is_tongueless:
-                logger.warning(f'A tongueless user (id: {user.id}) tried to send the message "{text}" to room "{self.room_id}"')
-                return
+                if not self.TONGUELESS_MESSAGE_REGEX.match(text):
+                    logger.warning(f'A tongueless user (id: {user.id}, username: {user.username}) tried to send the message "{text}" to room "{self.room_id}"')
+                    return
+
+                # cache.add sets the key only if absent, giving us an atomic once-per-minute check
+                tongueless_rate_limit_key = f'tongueless_rate_limit_{user.id}'
+                allowed_to_send = await database_sync_to_async(lambda: cache.add(tongueless_rate_limit_key, True, 60))()
+                if not allowed_to_send:
+                    logger.warning(f'A tongueless user (id: {user.id}, username: {user.username}) tried to send more than one message per minute to room "{self.room_id}"')
+                    return
 
             message = Message()
             message.user = user
