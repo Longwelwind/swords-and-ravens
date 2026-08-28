@@ -258,7 +258,7 @@ export default class IngameGameState extends GameState<
 
     this.log({
       type: "user-house-assignments",
-      assignments: futurePlayers.map((house, user) => [house, user.id]) as [
+      assignments: futurePlayers.map((house, user) => [house, user._id]) as [
         string,
         string
       ][]
@@ -580,7 +580,12 @@ export default class IngameGameState extends GameState<
             v.initiator.id == message.userId
         )
       ) {
-        this.entireGame.onGetUser(message.userId).then((storedData) => {
+        const translatedUserId = this.entireGame.fakeIdToUserIdMap.has(
+          message.userId
+        )
+          ? this.entireGame.fakeIdToUserIdMap.get(message.userId)
+          : message.userId;
+        this.entireGame.onGetUser(translatedUserId).then((storedData) => {
           if (
             !storedData ||
             storedData.groups.some(
@@ -590,7 +595,7 @@ export default class IngameGameState extends GameState<
             return;
           }
 
-          this.bannedUsers.add(message.userId);
+          this.bannedUsers.add(translatedUserId);
           this.entireGame.broadcastToClients({
             type: "user-banned",
             userId: message.userId
@@ -602,7 +607,12 @@ export default class IngameGameState extends GameState<
       }
     } else if (message.type == "unban-user") {
       if (this.entireGame.canActAsOwner(user)) {
-        this.bannedUsers.delete(message.userId);
+        const translatedUserId = this.entireGame.fakeIdToUserIdMap.has(
+          message.userId
+        )
+          ? this.entireGame.fakeIdToUserIdMap.get(message.userId)
+          : message.userId;
+        this.bannedUsers.delete(translatedUserId);
         this.entireGame.broadcastToClients({
           type: "user-unbanned",
           userId: message.userId
@@ -993,7 +1003,7 @@ export default class IngameGameState extends GameState<
     if (!this.players.has(player.user)) {
       if (this.entireGame.onCaptureSentryMessage) {
         this.entireGame.onCaptureSentryMessage(
-          `onPlayerClockTimeout was called twice for user ${player.user.name} (${player.user.id}). LiveClockData.remainingSeconds: ${player.liveClockData?.remainingSeconds}`,
+          `onPlayerClockTimeout was called twice for user ${player.user.name} (${player.user._id}). LiveClockData.remainingSeconds: ${player.liveClockData?.remainingSeconds}`,
           "warning"
         );
       }
@@ -1140,13 +1150,13 @@ export default class IngameGameState extends GameState<
 
     if (
       reason == ReplacementReason.VOTE &&
-      !this.oldPlayerIds.includes(player.user.id)
+      !this.oldPlayerIds.includes(player.user._id)
     ) {
-      this.oldPlayerIds.push(player.user.id);
+      this.oldPlayerIds.push(player.user._id);
     } else if (reason == ReplacementReason.CLOCK_TIMEOUT) {
       this.housesTimedOut.push(player.house);
-      if (!this.timeoutPlayerIds.includes(player.user.id)) {
-        this.timeoutPlayerIds.push(player.user.id);
+      if (!this.timeoutPlayerIds.includes(player.user._id)) {
+        this.timeoutPlayerIds.push(player.user._id);
       }
     }
 
@@ -1214,7 +1224,7 @@ export default class IngameGameState extends GameState<
 
     this.log({
       type: "player-replaced",
-      oldUser: player.user.id,
+      oldUser: player.user._id,
       house: newVassalHouse.id,
       reason: reason
     });
@@ -2633,7 +2643,7 @@ export default class IngameGameState extends GameState<
 
     return {
       type: "ingame",
-      players: this.players.values.map((p) => p.serializeToClient()),
+      players: this.players.values.map((p) => p.serializeToClient(admin)),
       game: this.game.serializeToClient(admin, player),
       unitVisibilityRangeModifier:
         this.unitVisibilityRangeModifier != 0
