@@ -15,7 +15,11 @@ RUN yarn run build-client
 
 FROM python:3.8-slim@sha256:8f9d73f3f3ffcabcfbe7c8a0330c8cb054bde96dd46992e97539d43153434dba
 
-RUN apt-get update && apt-get install -y gcc libpq-dev
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
