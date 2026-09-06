@@ -116,7 +116,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                   <img src={podiumWinnerImage} width={40} />
                 </OverlayTrigger>
               </ListGroupItem>
-              {this.game.getPotentialWinners().map((h) => (
+              {this.gameClient.getPotentialWinners().map((h) => (
                 <HouseRowComponent
                   key={`house-row_${h.id}`}
                   gameClient={this.gameClient}
