@@ -1,5 +1,6 @@
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
+import Order from "../common/ingame-game-state/game-data-structure/Order";
 import { observable } from "mobx";
 import PartialRecursive from "../utils/PartialRecursive";
 import { ReactElement } from "react";
@@ -30,6 +31,14 @@ export interface UnitOnMapProperties {
 export interface UnitMoveAnimationEntry {
   id: number;
   unit: Unit;
+  from: Region;
+  to: Region;
+  durationMs: number;
+}
+
+export interface OrderMoveAnimationEntry {
+  id: number;
+  order: Order;
   from: Region;
   to: Region;
   durationMs: number;

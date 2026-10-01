@@ -239,6 +239,13 @@ strong {
   transform: translate(-50%, -50%);
 }
 
+.moving-order {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
 .unit-icon.baby-dragon {
   width: 28px;
   height: 28px;

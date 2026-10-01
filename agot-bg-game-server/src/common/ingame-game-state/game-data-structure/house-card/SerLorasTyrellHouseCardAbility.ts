@@ -1,39 +1,23 @@
 import HouseCard from "./HouseCard";
 import HouseCardAbility from "./HouseCardAbility";
 import House from "../House";
-import AfterCombatHouseCardAbilitiesGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-combat-house-card-abilities-game-state/AfterCombatHouseCardAbilitiesGameState";
+import AfterWinnerDeterminationGameState from "../../action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/AfterWinnerDeterminationGameState";
 
 export default class SerLorasTyrellHouseCardAbility extends HouseCardAbility {
-  afterCombat(
-    afterCombat: AfterCombatHouseCardAbilitiesGameState,
+  afterWinnerDetermination(
+    afterWinner: AfterWinnerDeterminationGameState,
     house: House,
     _houseCard: HouseCard
   ): void {
     if (
-      afterCombat.postCombatGameState.winner == house &&
-      afterCombat.combatGameState.attacker == house &&
-      !afterCombat.postCombatGameState.isAttackingArmyMovementPrevented()
+      afterWinner.postCombatGameState.winner == house &&
+      afterWinner.combatGameState.attacker == house &&
+      !afterWinner.postCombatGameState.isAttackingArmyMovementPrevented()
     ) {
-      afterCombat.combatGameState.actionGameState.ordersOnBoard.set(
-        afterCombat.combatGameState.defendingRegion,
-        afterCombat.combatGameState.order
-      );
-
-      afterCombat.entireGame.broadcastToClients({
-        type: "action-phase-change-order",
-        region: afterCombat.combatGameState.defendingRegion.id,
-        order: afterCombat.combatGameState.order.id,
-        animate: "grey"
-      });
-
-      afterCombat.parentGameState.combat.ingameGameState.log({
-        type: "loras-tyrell-attack-order-moved",
-        house: house.id,
-        region: afterCombat.combatGameState.defendingRegion.id,
-        order: afterCombat.combatGameState.order.id
-      });
+      afterWinner.postCombatGameState.orderMovingToDefendingRegion =
+        afterWinner.combatGameState.order;
     }
 
-    afterCombat.childGameState.onHouseCardResolutionFinish(house);
+    afterWinner.childGameState.onHouseCardResolutionFinish(house);
   }
 }
