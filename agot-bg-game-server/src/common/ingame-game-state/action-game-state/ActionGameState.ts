@@ -247,6 +247,9 @@ export default class ActionGameState extends GameState<
       const region = this.game.world.regions.get(message.region);
       const order = message.order ? orders.get(message.order) : null;
 
+      // A running order move animation targeting this region must not place its order later
+      this.ingame.flushOrderMoveAnimations(region);
+
       if (order) {
         this.ordersOnBoard.set(region, order);
         if (message.animate && !this.ingame.fogOfWar) {

@@ -28,6 +28,7 @@ export type ServerMessage =
   | NewTurn
   | RemovePlacedOrder
   | MoveUnits
+  | MoveOrder
   | CombatChangeArmy
   | NextHouse
   | UnitsWounded
@@ -321,6 +322,13 @@ interface MoveUnits {
   to: string;
   units: number[];
   isRetreat?: boolean;
+}
+
+interface MoveOrder {
+  type: "move-order";
+  from: string;
+  to: string;
+  order: number;
 }
 
 interface NewTurn {

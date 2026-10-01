@@ -15,14 +15,14 @@ export function ticksToTime(ticks: number): Date {
 const fogOfWarBannedLogs = [
   "orders-revealed",
   "garrison-removed",
-  "garrison-returned",
+  "garrison-returned"
 ];
 
 const blindDraftBannedLogs = [
   "orders-revealed",
   "house-cards-returned",
   "roose-bolton-house-cards-returned",
-  "massing-on-the-milkwater-house-cards-back",
+  "massing-on-the-milkwater-house-cards-back"
 ];
 
 export default class GameLogManager {
@@ -59,7 +59,7 @@ export default class GameLogManager {
         type: "add-game-log",
         data: data,
         time: Math.round(time.getTime() / 1000),
-        resolvedAutomatically: resolvedAutomatically,
+        resolvedAutomatically: resolvedAutomatically
       });
     }
   }
@@ -67,13 +67,13 @@ export default class GameLogManager {
   sendGameLogSeen(time: number): void {
     this.ingameGameState.entireGame.sendMessageToServer({
       type: "game-log-seen",
-      time: time,
+      time: time
     });
   }
 
   serializeToClient(
     admin: boolean,
-    user: User | null,
+    user: User | null
   ): SerializedGameLogManager {
     const filteredLogs = admin ? this.logs : this.logs.filter(this.logFilter);
 
@@ -81,7 +81,7 @@ export default class GameLogManager {
       logs: filteredLogs.map((l) => ({
         time: timeToTicks(l.time),
         data: l.data,
-        resolvedAutomatically: l.resolvedAutomatically,
+        resolvedAutomatically: l.resolvedAutomatically ? true : undefined
       })),
       lastSeenLogTimes: admin
         ? this.lastSeenLogTimes.entries.map(([usr, time]) => [usr.id, time])
@@ -89,26 +89,26 @@ export default class GameLogManager {
           ? this.lastSeenLogTimes.entries
               .filter(([usr, _time]) => usr == user)
               .map(([usr, time]) => [usr.id, time])
-          : [],
+          : []
     };
   }
 
   static deserializeFromServer(
     ingameGameState: IngameGameState,
-    data: SerializedGameLogManager,
+    data: SerializedGameLogManager
   ): GameLogManager {
     const gameLogManager = new GameLogManager(ingameGameState);
 
     gameLogManager.logs = data.logs.map((l) => ({
       time: ticksToTime(l.time),
       data: l.data,
-      resolvedAutomatically: l.resolvedAutomatically,
+      resolvedAutomatically: l.resolvedAutomatically ?? false
     }));
     gameLogManager.lastSeenLogTimes = new BetterMap(
       data.lastSeenLogTimes.map(([uid, time]) => [
         ingameGameState.entireGame.users.get(uid),
-        time,
-      ]),
+        time
+      ])
     );
 
     return gameLogManager;

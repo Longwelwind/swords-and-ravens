@@ -454,15 +454,16 @@ forwardedHeadersOptions.KnownIPNetworks.Clear();
 forwardedHeadersOptions.KnownProxies.Clear();
 app.UseForwardedHeaders(forwardedHeadersOptions);
 
-// Report-only CSP rollout (see Infrastructure/ContentSecurityPolicyMiddleware.cs) - registered
-// this early so the per-request nonce it stores in HttpContext.Items exists well before any Razor
-// Page renders further down the pipeline.
-app.UseContentSecurityPolicy();
+// Apply enforcing CSP in production only. Local development has no CSP middleware; the
+// optional nonce helper leaves Razor's nonce attributes out of its responses.
+// Register early so production Razor Pages have a nonce before rendering.
+if (app.Environment.IsProduction())
+{
+    app.UseContentSecurityPolicy();
+}
 
-// Configure the HTTP request pipeline. No "Development" environment is ever used (see the
-// AddUserSecrets comment above), so there's no dev-only branch here anymore — every environment
-// (local Docker debug, Staging on the DO droplet, eventual Production) gets the same
-// production-safe error page rather than the EF Core migrations-endpoint/detailed-exception page.
+// Keep the production-safe error page in every environment, including local development, rather
+// than exposing the EF Core migrations-endpoint/detailed-exception page.
 app.UseExceptionHandler("/Error");
 
 app.UseHttpsRedirection();
@@ -565,9 +566,9 @@ app.MapNotificationsApi().RequireLocalPort(gameServerApiPort);
 app.MapPlayApi();
 app.MapChatWebSocket();
 
-// Logs Content-Security-Policy-Report-Only violations (see
-// Infrastructure/ContentSecurityPolicyMiddleware.cs) so real violations can be reviewed before
-// ever switching to an enforcing policy. Browsers POST a JSON body here - either the legacy
+// Logs Content-Security-Policy violations (see
+// Infrastructure/ContentSecurityPolicyMiddleware.cs) to monitor blocked resources after
+// enforcement. Browsers POST a JSON body here - either the legacy
 // "report-uri" shape or, on newer browsers, an "application/reports+json" batch - logged as-is
 // rather than deserialized into a strict DTO, since the exact shape differs by browser and this
 // is diagnostic-only.

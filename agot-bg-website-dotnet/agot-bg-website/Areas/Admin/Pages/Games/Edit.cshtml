@@ -1,6 +1,7 @@
 @page "{id:guid}"
 @model agot_bg_website.Areas.Admin.Pages.Games.EditModel
 @using agot_bg_website.Domain
+@using agot_bg_website.Infrastructure
 @{
     ViewData["Title"] = "Admin - Edit game";
 }
@@ -72,7 +73,7 @@
 </form>
 
 @section Scripts {
-    <script>
+    <script nonce="@HttpContext.GetCspNonce()">
         // Client-side only (no server round-trip): lets an admin expand SerializedGameJson to a
         // readable, indented form for editing, then compact it back down before saving - the
         // in-browser equivalent of pasting into Notepad++ to pretty-print/minify.
