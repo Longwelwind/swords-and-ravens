@@ -58,6 +58,7 @@
         <thead>
             <tr>
                 <th class="whitespace-nowrap">@SortHeader("username", "Username")</th>
+                <th class="text-right whitespace-nowrap">@SortHeader("ongoing", "Ongoing games")</th>
                 <th class="text-right whitespace-nowrap">@SortHeader("finished", "Finished games")</th>
                 <th class="text-right whitespace-nowrap">@SortHeader("won", "Won games")</th>
                 <th class="text-right whitespace-nowrap">@SortHeader("winrate", "Win rate")</th>
@@ -96,6 +97,7 @@
                             }
                         </div>
                     </td>
+                    <td class="text-right whitespace-nowrap">@Model.OngoingGamesCountByUserId.GetValueOrDefault(user.Id)</td>
                     <td class="text-right whitespace-nowrap">@(user.CachedFinishedGamesCount ?? 0)</td>
                     <td class="text-right whitespace-nowrap">@(user.CachedWonGamesCount ?? 0)</td>
                     <td class="text-right whitespace-nowrap">@winRateDisplay</td>

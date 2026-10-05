@@ -1269,6 +1269,12 @@ Follow-up work after first getting the app running locally end-to-end:
   have an optional CoreAdmin-managed `CustomUserBadge`, rendered as a neutral badge immediately
   after the trophy on their profile only. The obsolete `VanillaForumUserId` field and database
   column were removed because the retired forum will not be revived in place.
+- **Games/users list fixes**: the shared games table's "Host" column (and the settings popup's
+  owner data) shows "-" for faceless games via `GameListItem.PublicOwnerDisplayName`; the cancel
+  confirmation names the game. `/Users` has a live, sortable "Ongoing games" column (non-faceless
+  Ongoing games only; sorted in memory for users with ≥1 game, SQL-paged for the rest). `/Users`
+  and `/Admin/Users` now *redirect* when restoring their saved page/sort cookie, so the restored
+  sort is in the querystring and survives the pager's prev/next links.
 
 ## 15. Roadmap / follow-ups (as of 2026-09-16)
 

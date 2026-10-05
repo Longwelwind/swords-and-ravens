@@ -60,7 +60,7 @@ public class IndexModel(
     [TempData]
     public string? StatusMessage { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
         if (!Request.Query.ContainsKey("pageSize"))
         {
@@ -72,15 +72,21 @@ public class IndexModel(
         // (e.g. clicking "Users" in the Admin nav) - as soon as ANY querystring parameter is
         // present (a search, a sort-header click, a pager link, ...) that request's own
         // querystring/model-bound values are trusted as-is, matching the public "/Users" page's
-        // identical restore logic (see Pages.UsersModel.OnGetAsync).
+        // identical restore logic (see Pages.UsersModel.OnGetAsync), including redirecting so
+        // the restored sort lands in the querystring the pager links round-trip.
         if (!Request.QueryString.HasValue)
         {
             var saved = AdminUsersListPreferencesCookie.Read(Request);
             if (saved is { } prefs)
             {
-                PageNumber = prefs.PageNumber;
-                SortBy = prefs.SortBy;
-                SortDir = prefs.SortDir;
+                return RedirectToPage(
+                    new
+                    {
+                        prefs.PageNumber,
+                        prefs.SortBy,
+                        prefs.SortDir,
+                    }
+                );
             }
         }
 
@@ -124,6 +130,7 @@ public class IndexModel(
         }
 
         AdminUsersListPreferencesCookie.Persist(Response, PageNumber, SortBy, SortDir);
+        return Page();
     }
 
     public async Task<IActionResult> OnPostToggleBanAsync(Guid id)

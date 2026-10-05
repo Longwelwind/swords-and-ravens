@@ -2,6 +2,7 @@ using agot_bg_website.Data;
 using agot_bg_website.Domain;
 using agot_bg_website.Infrastructure.Auth;
 using agot_bg_website.Infrastructure.Paging;
+using agot_bg_website.Services.GameListing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +56,7 @@ public class UsersModel(
     )
     {
         ["username"] = "asc",
+        ["ongoing"] = "desc",
         ["finished"] = "desc",
         ["won"] = "desc",
         ["removed"] = "desc",
@@ -92,6 +94,10 @@ public class UsersModel(
 
     public Dictionary<Guid, IList<string>> RolesByUserId { get; set; } = [];
 
+    /// <summary>Live count of non-faceless Ongoing games per user - see <see
+    /// cref="LoadOngoingGamesCountsAsync"/>. Users without any are absent (i.e. 0).</summary>
+    public Dictionary<Guid, int> OngoingGamesCountByUserId { get; set; } = [];
+
     public bool CanManageUserStatus { get; set; }
 
     [TempData]
@@ -112,7 +118,7 @@ public class UsersModel(
             ? (SortDir == "asc" ? "▲" : "▼")
             : "";
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
         if (!Request.Query.ContainsKey("pageSize"))
         {
@@ -125,14 +131,23 @@ public class UsersModel(
         // (a search, a sort-header click, a pager link, ...) that request's own
         // querystring/model-bound values are trusted as-is, so e.g. submitting a new search still
         // resets back to page 1 rather than being overridden by a stale saved page number.
+        // The restore is a redirect (rather than just rendering the restored values) so the
+        // restored sort ends up in the querystring - the pager's prev/next/go-to-page links and
+        // page-size form round-trip the current querystring, and would otherwise silently drop
+        // the restored sort and fall back to the default ordering.
         if (!Request.QueryString.HasValue)
         {
             var saved = UsersListPreferencesCookie.Read(Request);
             if (saved is { } prefs)
             {
-                PageNumber = prefs.PageNumber;
-                SortBy = prefs.SortBy;
-                SortDir = prefs.SortDir;
+                return RedirectToPage(
+                    new
+                    {
+                        prefs.PageNumber,
+                        prefs.SortBy,
+                        prefs.SortDir,
+                    }
+                );
             }
         }
 
@@ -175,6 +190,144 @@ public class UsersModel(
             query = query.Where(u => userIdsInRole.Contains(u.Id));
         }
 
+        OngoingGamesCountByUserId = await LoadOngoingGamesCountsAsync();
+
+        var paged = SortBy.Equals("ongoing", StringComparison.OrdinalIgnoreCase)
+            ? await PageByOngoingGamesCountAsync(query)
+            : await OrderByCachedColumn(query).ToPagedResultAsync(PageNumber, PageSize);
+        Users = paged.Items;
+        Pager = paged.Pager;
+
+        foreach (var user in Users)
+        {
+            RolesByUserId[user.Id] = await userManager.GetRolesAsync(user);
+
+            // Same "never compute inline, just enqueue" fallback as the individual profile page
+            // (Pages.User.cshtml.cs) - a user whose stats have never been cached yet shows 0/n-a
+            // for this one request and gets picked up by the background service instead.
+            if (user.StatsCachedAt is null)
+            {
+                userStatsQueue.Enqueue(user.Id);
+            }
+        }
+
+        UsersListPreferencesCookie.Persist(Response, PageNumber, SortBy, SortDir);
+        return Page();
+    }
+
+    /// <summary>
+    /// Number of currently Ongoing games per user, computed live (it changes far too often - on
+    /// every game start/end - to be worth caching like the finished-game stats). Faceless games
+    /// are excluded, matching the profile page's foreign-profile games list and the cached
+    /// finished-games stat, so the count never hints at a hidden faceless participation. Only
+    /// users with at least one such game appear in the result.
+    /// </summary>
+    private async Task<Dictionary<Guid, int>> LoadOngoingGamesCountsAsync()
+    {
+        var ongoingGames = await dbContext
+            .Games.Where(g => g.State == GameState.Ongoing)
+            .Select(g => new { g.Id, g.ViewOfGame })
+            .ToListAsync();
+        var nonFacelessGameIds = ongoingGames
+            .Where(g => !ViewOfGameInfo.Parse(g.ViewOfGame).IsFaceless)
+            .Select(g => g.Id)
+            .ToList();
+
+        var counts = await dbContext
+            .PlayersInGame.Where(p => nonFacelessGameIds.Contains(p.GameId))
+            .GroupBy(p => p.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToListAsync();
+        return counts.ToDictionary(c => c.UserId, c => c.Count);
+    }
+
+    /// <summary>
+    /// Pages <paramref name="query"/> sorted by <see cref="OngoingGamesCountByUserId"/>, which is
+    /// computed in memory (faceless filtering needs the parsed ViewOfGame) and so can't be
+    /// ordered by in SQL. The few users with at least one ongoing game are sorted in memory; all
+    /// remaining (zero-count) users are a single SQL-ordered-by-username block placed after them
+    /// (descending) or before them (ascending), so only the requested page is ever loaded.
+    /// </summary>
+    private async Task<PagedResult<ApplicationUser>> PageByOngoingGamesCountAsync(
+        IQueryable<ApplicationUser> query
+    )
+    {
+        var activeIds = OngoingGamesCountByUserId.Keys.ToList();
+        var activeUsers = await query
+            .Where(u => activeIds.Contains(u.Id))
+            .Select(u => new { u.Id, u.UserName })
+            .ToListAsync();
+        var activeOrdered = (
+            SortDir == "desc"
+                ? activeUsers.OrderByDescending(u => OngoingGamesCountByUserId[u.Id])
+                : activeUsers.OrderBy(u => OngoingGamesCountByUserId[u.Id])
+        )
+            .ThenBy(u => u.UserName, StringComparer.OrdinalIgnoreCase)
+            .Select(u => u.Id)
+            .ToList();
+
+        var inactiveQuery = query.Where(u => !activeIds.Contains(u.Id)).OrderBy(u => u.UserName);
+        var inactiveCount = await inactiveQuery.LongCountAsync();
+
+        var pageNumber = Math.Max(1, PageNumber);
+        var skip = (long)(pageNumber - 1) * PageSize;
+        var items = new List<ApplicationUser>();
+
+        if (SortDir == "desc")
+        {
+            var activeSlice = activeOrdered
+                .Skip((int)Math.Min(skip, int.MaxValue))
+                .Take(PageSize)
+                .ToList();
+            items.AddRange(await LoadInOrderAsync(query, activeSlice));
+            var remaining = PageSize - activeSlice.Count;
+            if (remaining > 0)
+            {
+                var inactiveSkip = (int)Math.Max(0, skip - activeOrdered.Count);
+                items.AddRange(
+                    await inactiveQuery.Skip(inactiveSkip).Take(remaining).ToListAsync()
+                );
+            }
+        }
+        else
+        {
+            var inactiveItems = await inactiveQuery
+                .Skip((int)Math.Min(skip, int.MaxValue))
+                .Take(PageSize)
+                .ToListAsync();
+            items.AddRange(inactiveItems);
+            var remaining = PageSize - inactiveItems.Count;
+            if (remaining > 0)
+            {
+                var activeSkip = (int)Math.Max(0, skip - inactiveCount);
+                var activeSlice = activeOrdered.Skip(activeSkip).Take(remaining).ToList();
+                items.AddRange(await LoadInOrderAsync(query, activeSlice));
+            }
+        }
+
+        return new PagedResult<ApplicationUser>
+        {
+            Items = items,
+            Pager = new PagerInfo(pageNumber, PageSize, activeOrdered.Count + inactiveCount),
+        };
+    }
+
+    private static async Task<List<ApplicationUser>> LoadInOrderAsync(
+        IQueryable<ApplicationUser> query,
+        List<Guid> ids
+    )
+    {
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        var byId = await query.Where(u => ids.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
+        return [.. ids.Select(id => byId[id])];
+    }
+
+    private IQueryable<ApplicationUser> OrderByCachedColumn(IQueryable<ApplicationUser> query)
+    {
         // Every non-username column ties-break on username too, so paging stays stable/reproducible
         // even when many users share the same (e.g. 0) stat value. Null-valued stat columns
         // (no games recalculated yet, or a win rate that's never been defined because the user
@@ -183,7 +336,7 @@ public class UsersModel(
         // players under a wall of "n/a" accounts on page 1 whenever sorting a stats column
         // descending (the exact bug reported: sorting looked like it only affected the current
         // page, because the real top performers were pushed many pages deep).
-        var ordered = (SortBy, SortDir) switch
+        return (SortBy, SortDir) switch
         {
             ("finished", "desc") => query
                 .OrderBy(u => u.CachedFinishedGamesCount == null)
@@ -234,25 +387,6 @@ public class UsersModel(
             (_, "desc") => query.OrderByDescending(u => u.UserName),
             _ => query.OrderBy(u => u.UserName),
         };
-
-        var paged = await ordered.ToPagedResultAsync(PageNumber, PageSize);
-        Users = paged.Items;
-        Pager = paged.Pager;
-
-        foreach (var user in Users)
-        {
-            RolesByUserId[user.Id] = await userManager.GetRolesAsync(user);
-
-            // Same "never compute inline, just enqueue" fallback as the individual profile page
-            // (Pages.User.cshtml.cs) - a user whose stats have never been cached yet shows 0/n-a
-            // for this one request and gets picked up by the background service instead.
-            if (user.StatsCachedAt is null)
-            {
-                userStatsQueue.Enqueue(user.Id);
-            }
-        }
-
-        UsersListPreferencesCookie.Persist(Response, PageNumber, SortBy, SortDir);
     }
 
     public async Task<IActionResult> OnPostToggleStatusAsync(Guid id, string role)

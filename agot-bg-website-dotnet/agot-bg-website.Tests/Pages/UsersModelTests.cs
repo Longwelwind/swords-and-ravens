@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json;
 using agot_bg_website.Data;
 using agot_bg_website.Domain;
 using agot_bg_website.Infrastructure.Auth;
@@ -7,6 +8,7 @@ using agot_bg_website.Pages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -228,11 +230,78 @@ public class UsersModelTests : IDisposable
         {
             PageContext = new PageContext { HttpContext = secondContext },
         };
-        await second.OnGetAsync();
+        var result = await second.OnGetAsync();
 
-        Assert.Equal("won", second.SortBy);
-        Assert.Equal("desc", second.SortDir);
-        Assert.Equal(["beta", "alpha"], second.Users.Select(u => u.UserName));
+        // The restore redirects so the restored sort ends up in the querystring - otherwise the
+        // pager's prev/next links (which round-trip the querystring) would drop it again.
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal("won", redirect.RouteValues!["SortBy"]);
+        Assert.Equal("desc", redirect.RouteValues["SortDir"]);
+        Assert.Equal(1, redirect.RouteValues["PageNumber"]);
+    }
+
+    /// <summary>
+    /// The "Ongoing games" column counts only currently Ongoing, non-faceless games, and sorting
+    /// by it (computed in memory, see UsersModel.PageByOngoingGamesCountAsync) pages correctly
+    /// across the in-memory-sorted active users and the SQL-ordered zero-count users.
+    /// </summary>
+    [Theory]
+    [InlineData("desc", 1, new[] { "busy", "some", "u1", "u2", "u3" })]
+    [InlineData("desc", 2, new[] { "u4", "u5" })]
+    [InlineData("asc", 1, new[] { "u1", "u2", "u3", "u4", "u5" })]
+    [InlineData("asc", 2, new[] { "some", "busy" })]
+    public async Task SortByOngoingGames_CountsNonFacelessOngoingGamesAndPages(
+        string sortDir,
+        int pageNumber,
+        string[] expected
+    )
+    {
+        var busy = await CreateUserAsync("busy", finished: 0, won: 0, removed: 0, winRate: null);
+        var some = await CreateUserAsync("some", finished: 0, won: 0, removed: 0, winRate: null);
+        var u1 = await CreateUserAsync("u1", finished: 0, won: 0, removed: 0, winRate: null);
+        foreach (var name in new[] { "u2", "u3", "u4", "u5" })
+        {
+            await CreateUserAsync(name, finished: 0, won: 0, removed: 0, winRate: null);
+        }
+
+        AddGame(GameState.Ongoing, faceless: false, busy, some);
+        AddGame(GameState.Ongoing, faceless: false, busy);
+        // Neither a faceless ongoing game nor a non-ongoing game may count.
+        AddGame(GameState.Ongoing, faceless: true, busy, some, u1);
+        AddGame(GameState.Finished, faceless: false, busy, u1);
+        await _db.SaveChangesAsync();
+
+        var model = CreatePageModel();
+        model.HttpContext.Request.QueryString = new QueryString("?pageSize=5");
+        model.SortBy = "ongoing";
+        model.SortDir = sortDir;
+        model.PageSize = 5;
+        model.PageNumber = pageNumber;
+        await model.OnGetAsync();
+
+        Assert.Equal(7, model.Pager.TotalCount);
+        Assert.Equal(expected, model.Users.Select(u => u.UserName));
+        Assert.Equal(2, model.OngoingGamesCountByUserId[busy.Id]);
+        Assert.Equal(1, model.OngoingGamesCountByUserId[some.Id]);
+        Assert.False(model.OngoingGamesCountByUserId.ContainsKey(u1.Id));
+    }
+
+    private void AddGame(GameState state, bool faceless, params ApplicationUser[] players)
+    {
+        var game = new Game
+        {
+            Name = "game",
+            OwnerUserId = players[0].Id,
+            State = state,
+            ViewOfGame = JsonDocument.Parse(
+                "{\"settings\":{\"faceless\":" + (faceless ? "true" : "false") + "}}"
+            ),
+        };
+        foreach (var player in players)
+        {
+            game.Players.Add(new PlayerInGame { UserId = player.Id });
+        }
+        _db.Games.Add(game);
     }
 
     [Fact]

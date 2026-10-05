@@ -4,7 +4,7 @@
 @{
     string Href(int page)
     {
-        var query = new Dictionary<string, StringValues>(Context.Request.Query) { ["pageNumber"] = page.ToString() };
+        var query = new Dictionary<string, StringValues>(Context.Request.Query, StringComparer.OrdinalIgnoreCase) { ["pageNumber"] = page.ToString() };
         var pairs = query.Select(kv => new KeyValuePair<string, string?>(kv.Key, kv.Value.ToString()));
         return Context.Request.Path + QueryString.Create(pairs);
     }
