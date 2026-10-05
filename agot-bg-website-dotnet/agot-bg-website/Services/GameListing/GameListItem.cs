@@ -41,4 +41,10 @@ public sealed record GameListItem(
     // popup - see GameSettingsDisplay.
     string SetupName,
     IReadOnlyList<string> EnabledSettingLabels
-);
+)
+{
+    /// <summary>The host's name as it may be shown publicly in any games list - null for a
+    /// faceless game, since naming the host would reveal the identity of at least one of its
+    /// players.</summary>
+    public string? PublicOwnerDisplayName => IsFaceless ? null : OwnerDisplayName;
+}

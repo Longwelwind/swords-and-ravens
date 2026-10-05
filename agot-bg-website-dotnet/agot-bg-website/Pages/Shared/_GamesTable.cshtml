@@ -98,7 +98,7 @@ else
                         </td>
                         @if (allOpen)
                         {
-                            <td>@(game.OwnerDisplayName ?? "-")</td>
+                            <td>@(game.PublicOwnerDisplayName ?? "-")</td>
                         }
                         @if (anyOngoing)
                         {
@@ -115,7 +115,7 @@ else
                             <div class="flex flex-nowrap items-center justify-end gap-1">
                                 <button type="button" class="btn btn-ghost btn-sm btn-square js-game-settings-btn" title="View game settings" aria-label="View game settings"
                                         data-game-name="@game.Name" data-setup-name="@game.SetupName" data-player-count="@game.PlayersCount@(game.MaxPlayerCount is not null && game.PlayersCount != game.MaxPlayerCount ? $"/{game.MaxPlayerCount}" : "")"
-                                        data-owner-name="@game.OwnerDisplayName"
+                                        data-owner-name="@game.PublicOwnerDisplayName"
                                         data-is-faceless="@game.IsFaceless"
                                         data-created-at="@game.CreatedAt.ToString("O")"
                                         data-last-active-at="@(isOpen ? null : game.LastActiveAt.ToString("O"))"
@@ -138,7 +138,7 @@ else
                                 }
                                 @if (Model.CanCancelGame)
                                 {
-                                    <form method="post" asp-page-handler="CancelGame" onsubmit="return confirm('Are you sure you want to cancel this game?');" class="inline">
+                                    <form method="post" asp-page-handler="CancelGame" data-game-name="@game.Name" onsubmit="return confirm('Are you sure you want to cancel the game &quot;' + this.dataset.gameName + '&quot;?');" class="inline">
                                         <input type="hidden" name="gameId" value="@game.Id" />
                                         <button type="submit" class="btn btn-error btn-sm btn-square" title="Cancel this game" aria-label="Cancel this game">
                                             <i class="fas fa-xmark"></i>

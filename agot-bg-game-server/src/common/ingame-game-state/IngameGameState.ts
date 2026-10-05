@@ -74,6 +74,7 @@ import getElapsedSeconds from "../../utils/getElapsedSeconds";
 import orders from "./game-data-structure/orders";
 import {
   OrderAnimationEntry,
+  OrderMoveAnimationEntry,
   OrderOnMapProperties,
   UnitMoveAnimationEntry,
   UnitOnMapProperties
@@ -166,8 +167,10 @@ export default class IngameGameState extends GameState<
     new BetterMap();
   @observable unitMoveAnimations: UnitMoveAnimationEntry[] = [];
   @observable orderAnimations: OrderAnimationEntry[] = [];
+  @observable orderMoveAnimations: OrderMoveAnimationEntry[] = [];
   private nextUnitMoveAnimationId = 1;
   private nextOrderAnimationId = 1;
+  private nextOrderMoveAnimationId = 1;
 
   onVoteStarted: (() => void) | null = null;
   onPreemptiveRaidNewAttack:
@@ -211,6 +214,33 @@ export default class IngameGameState extends GameState<
     if (index >= 0) {
       this.orderAnimations.splice(index, 1);
     }
+  }
+
+  /**
+   * Finishes a running order move animation by really placing its order in the target region.
+   * Safe to call multiple times (e.g. from the animation timeout and from a flush).
+   */
+  finishOrderMoveAnimation(id: number): void {
+    const animation = this.orderMoveAnimations.find((a) => a.id == id);
+    if (!animation) {
+      return;
+    }
+
+    this.orderMoveAnimations = this.orderMoveAnimations.filter(
+      (a) => a.id != id
+    );
+    this.ordersOnBoard.set(animation.to, animation.order);
+  }
+
+  /**
+   * Immediately finishes all running order move animations (optionally only those targeting
+   * `region`). Must be called before any other message modifies the orders on board, so a
+   * pending animation can't place a stale order once it ends.
+   */
+  flushOrderMoveAnimations(region?: Region): void {
+    this.orderMoveAnimations
+      .filter((a) => !region || a.to == region)
+      .forEach((a) => this.finishOrderMoveAnimation(a.id));
   }
 
   get world(): World {
@@ -1538,6 +1568,33 @@ export default class IngameGameState extends GameState<
           moveAction();
         }
       }
+    } else if (message.type == "move-order") {
+      const from = this.world.regions.get(message.from);
+      const to = this.world.regions.get(message.to);
+      const order = orders.get(message.order);
+
+      // The order must not be shown in the source region while (or after) it moves
+      if (from != to && this.ordersOnBoard.has(from)) {
+        if (this.ordersOnBoard.get(from) == order) {
+          this.ordersOnBoard.delete(from);
+        }
+      }
+
+      const visibleRegions = gameClient.visibleRegionsSet;
+
+      if (
+        from != to &&
+        (visibleRegions == null ||
+          (visibleRegions.has(from) && visibleRegions.has(to)))
+      ) {
+        const durationMs = 5000;
+        const id = this.nextOrderMoveAnimationId++;
+        this.orderMoveAnimations.push({ id, order, from, to, durationMs });
+
+        window.setTimeout(() => this.finishOrderMoveAnimation(id), durationMs);
+      } else {
+        this.ordersOnBoard.set(to, order);
+      }
     } else if (message.type == "units-wounded") {
       const region = this.world.regions.get(message.regionId);
       const units = message.unitIds.map((uid) => region.units.get(uid));
@@ -1882,6 +1939,7 @@ export default class IngameGameState extends GameState<
       initiator.house = swappingHouse;
       this.forceRerender();
     } else if (message.type == "reveal-orders") {
+      this.flushOrderMoveAnimations();
       // The real order data is applied to ordersOnBoard immediately, in both branches below.
       // FlipIcon performs a real 3D flip (front face = hidden, house-colored order back; back
       // face = the now-known revealed order) via backface-visibility, so the reveal itself only
@@ -1903,6 +1961,7 @@ export default class IngameGameState extends GameState<
         });
       }
     } else if (message.type == "remove-orders") {
+      this.flushOrderMoveAnimations();
       message.regions
         .map((rid) => this.world.regions.get(rid))
         .forEach((r) => {

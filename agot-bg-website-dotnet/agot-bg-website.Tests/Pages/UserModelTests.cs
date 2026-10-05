@@ -71,6 +71,17 @@ public class UserModelTests : IDisposable
 
     private static JsonDocument Json(string json) => JsonDocument.Parse(json);
 
+    private static ClaimsPrincipal AuthenticatedPrincipal(ApplicationUser user) =>
+        new(
+            new ClaimsIdentity(
+                [
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.UserName ?? user.Email ?? user.Id.ToString()),
+                ],
+                authenticationType: "Test"
+            )
+        );
+
     [Fact]
     public async Task DeletedUser_Returns404()
     {
@@ -257,6 +268,75 @@ public class UserModelTests : IDisposable
         Assert.DoesNotContain(model.GamesOfUser, g => g.GameId == facelessGame.Id);
         Assert.Single(model.CancelledGames);
         Assert.Equal(cancelledGame.Id, model.CancelledGames[0].GameId);
+    }
+
+    [Fact]
+    public async Task FacelessGames_AreHiddenOnForeignProfile_ButVisibleOnOwnProfile()
+    {
+        var user = new ApplicationUser
+        {
+            UserName = "faceless_profile_user",
+            Email = "faceless-profile@example.com",
+        };
+        await _userManager.CreateAsync(user);
+
+        var facelessOngoingGame = new Game
+        {
+            Id = Guid.NewGuid(),
+            Name = "Faceless ongoing game",
+            OwnerUserId = user.Id,
+            State = GameState.Ongoing,
+            ViewOfGame = Json(
+                """{"turn": 2, "maxPlayerCount": 6, "waitingFor": "Stark", "settings": {"setupId": "base-game", "faceless": true}}"""
+            ),
+        };
+        var visibleOngoingGame = new Game
+        {
+            Id = Guid.NewGuid(),
+            Name = "Visible ongoing game",
+            OwnerUserId = user.Id,
+            State = GameState.Ongoing,
+            ViewOfGame = Json(
+                """{"turn": 2, "maxPlayerCount": 6, "waitingFor": "Stark", "settings": {"setupId": "base-game"}}"""
+            ),
+        };
+
+        _db.Games.AddRange(facelessOngoingGame, visibleOngoingGame);
+        _db.PlayersInGame.AddRange(
+            new PlayerInGame
+            {
+                Id = Guid.NewGuid(),
+                GameId = facelessOngoingGame.Id,
+                UserId = user.Id,
+                Data = Json("""{"house": "stark"}"""),
+            },
+            new PlayerInGame
+            {
+                Id = Guid.NewGuid(),
+                GameId = visibleOngoingGame.Id,
+                UserId = user.Id,
+                Data = Json("""{"house": "stark"}"""),
+            }
+        );
+        await _db.SaveChangesAsync();
+
+        var foreignViewModel = CreatePageModel();
+        var foreignResult = await foreignViewModel.OnGetAsync(user.Id);
+
+        Assert.IsType<PageResult>(foreignResult);
+        Assert.DoesNotContain(
+            foreignViewModel.GamesOfUser,
+            g => g.GameId == facelessOngoingGame.Id
+        );
+        Assert.Equal(1, foreignViewModel.OngoingCount);
+
+        var ownViewModel = CreatePageModel(AuthenticatedPrincipal(user));
+        var ownResult = await ownViewModel.OnGetAsync(user.Id);
+
+        Assert.IsType<PageResult>(ownResult);
+        Assert.True(ownViewModel.IsOwnProfile);
+        Assert.Contains(ownViewModel.GamesOfUser, g => g.GameId == facelessOngoingGame.Id);
+        Assert.Equal(2, ownViewModel.OngoingCount);
     }
 
     [Fact]

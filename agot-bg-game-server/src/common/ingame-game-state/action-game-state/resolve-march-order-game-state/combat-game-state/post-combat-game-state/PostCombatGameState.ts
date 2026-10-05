@@ -28,6 +28,8 @@ import BetterMap from "../../../../../../utils/BetterMap";
 import { TidesOfBattleCard } from "../../../../game-data-structure/static-data-structure/tidesOfBattleCards";
 import { NotificationType } from "../../../../../EntireGame";
 import popRandom from "../../../../../../utils/popRandom";
+import Order from "../../../../../../common/ingame-game-state/game-data-structure/Order";
+import orders from "../../../../../../common/ingame-game-state/game-data-structure/orders";
 
 export default class PostCombatGameState extends GameState<
   CombatGameState,
@@ -40,6 +42,7 @@ export default class PostCombatGameState extends GameState<
   loser: House;
   originalLoser: House | null = null;
   resolvedSkullIcons: House[] = [];
+  orderMovingToDefendingRegion: Order | null = null;
 
   get combat(): CombatGameState {
     return this.parentGameState;
@@ -473,6 +476,32 @@ export default class PostCombatGameState extends GameState<
     // Remove the order from attacking region
     this.removeOrderFromRegion(this.combat.attackingRegion);
 
+    // We handled retreat and any necessary movement of the attacking army.
+    // So, before we do houseCardHandling now,
+    // we have to safely move the order to the attacked region if needed.
+    // If the whole attacking army died, the order would be orphaned immediately, so skip it.
+    if (
+      this.orderMovingToDefendingRegion &&
+      this.combat.attackingArmy.length > 0
+    ) {
+      this.combat.actionGameState.ordersOnBoard.set(
+        this.combat.defendingRegion,
+        this.orderMovingToDefendingRegion
+      );
+      this.entireGame.broadcastToClients({
+        type: "move-order",
+        from: this.combat.attackingRegion.id,
+        to: this.combat.defendingRegion.id,
+        order: this.orderMovingToDefendingRegion.id
+      });
+      this.combat.ingameGameState.log({
+        type: "loras-tyrell-attack-order-moved",
+        house: this.winner.id,
+        region: this.combat.defendingRegion.id,
+        order: this.orderMovingToDefendingRegion.id
+      });
+    }
+
     this.proceedHouseCardHandling();
   }
 
@@ -713,8 +742,14 @@ export default class PostCombatGameState extends GameState<
       type: "post-combat",
       winner: this.winner.id,
       loser: this.loser.id,
-      originalLoser: this.originalLoser ? this.originalLoser.id : null,
-      resolvedSkullIcons: this.resolvedSkullIcons.map((h) => h.id),
+      originalLoser: this.originalLoser ? this.originalLoser.id : undefined,
+      resolvedSkullIcons:
+        this.resolvedSkullIcons.length > 0
+          ? this.resolvedSkullIcons.map((h) => h.id)
+          : undefined,
+      orderMovingToDefendingRegion: this.orderMovingToDefendingRegion
+        ? this.orderMovingToDefendingRegion.id
+        : undefined,
       childGameState: this.childGameState.serializeToClient(admin, player)
     };
   }
@@ -730,9 +765,11 @@ export default class PostCombatGameState extends GameState<
     postCombat.originalLoser = data.originalLoser
       ? combat.game.houses.get(data.originalLoser)
       : null;
-    postCombat.resolvedSkullIcons = data.resolvedSkullIcons.map((hid) =>
-      combat.game.houses.get(hid)
-    );
+    postCombat.resolvedSkullIcons =
+      data.resolvedSkullIcons?.map((hid) => combat.game.houses.get(hid)) ?? [];
+    postCombat.orderMovingToDefendingRegion = data.orderMovingToDefendingRegion
+      ? orders.get(data.orderMovingToDefendingRegion)
+      : null;
     postCombat.childGameState = postCombat.deserializeChildGameState(
       data.childGameState
     );
@@ -766,8 +803,9 @@ export interface SerializedPostCombatGameState {
   type: "post-combat";
   winner: string;
   loser: string;
-  originalLoser: string | null;
-  resolvedSkullIcons: string[];
+  originalLoser?: string;
+  resolvedSkullIcons?: string[];
+  orderMovingToDefendingRegion?: number;
   childGameState:
     | SerializedResolveRetreatGameState
     | SerializedChooseCasualtiesGameState

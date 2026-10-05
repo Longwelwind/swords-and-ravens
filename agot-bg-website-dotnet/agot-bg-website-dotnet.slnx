@@ -1,6 +1,16 @@
 <Solution>
-  <Project Path="agot-bg-website/agot-bg-website.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="../.env.prod.example" />
+    <File Path="../.github/workflows/ci.yml" />
+    <File Path="../.github/workflows/deploy.yml" />
+    <File Path="../Caddyfile" />
+    <File Path="../docker-compose.prod.yml" />
+    <File Path="../docker-compose.yml" />
+    <File Path="../game_server.Dockerfile" />
+    <File Path="../README.md" />
+  </Folder>
   <Project Path="agot-bg-website.Data/agot-bg-website.Data.csproj" />
   <Project Path="agot-bg-website.Tests/agot-bg-website.Tests.csproj" />
+  <Project Path="agot-bg-website/agot-bg-website.csproj" />
   <Project Path="Snr.Migration/Snr.Migration.csproj" />
 </Solution>

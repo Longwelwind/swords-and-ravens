@@ -4,15 +4,13 @@ namespace agot_bg_website.Infrastructure;
 
 /// <summary>
 /// Adds a per-request CSP nonce to <see cref="HttpContext.Items"/> and emits a
-/// <c>Content-Security-Policy-Report-Only</c> header on every response. Report-only so it never
-/// blocks anything yet - it just lets browsers log violations, which the <c>/csp-report</c>
-/// endpoint (see Program.cs) records for review. This is intentionally the first step of a
-/// two-phase rollout: only switch to an enforcing <c>Content-Security-Policy</c> header once a
-/// real observation period (covering /play, the chat widget, Identity/Turnstile registration, and
-/// the Admin/CoreAdmin/Scalar areas) confirms the policy below doesn't need further loosening.
+/// <c>Content-Security-Policy</c> header on production responses. Browsers report blocked
+/// resources to the <c>/csp-report</c> endpoint (see Program.cs). The policy was first deployed
+/// in report-only mode and observed across production traffic before enforcement.
 ///
 /// Inline &lt;script&gt; blocks (_Layout.cshtml, _ChatWidget.cshtml, _CookieConsentPartial.cshtml,
-/// _Pager.cshtml, Games.cshtml, MyGames.cshtml) render <c>nonce="@Context.GetCspNonce()"</c> so
+/// _Pager.cshtml, Games.cshtml, MyGames.cshtml, Admin/Games/Edit.cshtml) render
+/// <c>nonce="@Context.GetCspNonce()"</c> so
 /// they're allowed under the nonce below without resorting to 'unsafe-inline' for script
 /// elements - the actual protection this policy buys against an attacker injecting a brand new
 /// &lt;script&gt; tag, by far the most common real-world XSS payload shape.
@@ -52,28 +50,22 @@ namespace agot_bg_website.Infrastructure;
 /// apple/..." reports from /play in a single day - this affected every desktop user who received
 /// or sent a chat emoji, by far the highest-volume genuine gap found in the report-only window.
 ///
-/// Rollout plan to flip from report-only to enforcing: after deploying, watch /csp-report across
-/// a real traffic window (a few days to a week) covering every page family, not just the busiest
-/// ones - /play across different game phases, Games/MyGames, Login/Register (including the
-/// Turnstile challenge) and the Google/Discord/Facebook OAuth redirects, password reset, and the
-/// chat widget. /CoreAdmin and /api/docs are excluded above, so nothing to watch for there.
+/// Continue to watch /csp-report after enforcement across /play, Games/MyGames,
+/// Login/Register (including Turnstile), OAuth redirects, password reset and chat.
+/// /CoreAdmin and /api/docs remain excluded.
 /// Unlike an extension that sets its own separate CSP (which reports to its own target, not
 /// here), an extension that merely injects/rewrites DOM content still gets checked against THIS
 /// real header, and genuinely-blocked injected content is reported here too - confirmed live via
 /// a run of "font-src"/fonts.gstatic.com reports that all carried "source-file":"chrome-extension".
-/// Filter those out (by that field) when judging whether /csp-report is "clean" enough to flip to
-/// enforcing; they're not something this app can or should allow for. The same applies to
+/// These aren't something this app can or should allow for. The same applies to
 /// Facebook's own in-app-browser: links opened from Facebook/Messenger (recognizable by an
 /// "fbclid" query string) get its "pcm.js" measurement script auto-injected client-side and
 /// reported as a "script-src-elem"/blocked-uri":"https://connect.facebook.net/en_US/pcm.js"
 /// violation with source-file set to our own page URL - this app has no Facebook Pixel/SDK code
 /// anywhere, so it isn't something we inject or can fix, just Facebook's webview instrumenting
-/// pages it opens. Once it's been quiet for
-/// that whole window aside from such extension noise, flip by renaming the response header below
-/// from Content-Security-Policy-Report-Only to Content-Security-Policy WITHOUT also changing the
-/// policy string in the same change, so a regression is unambiguously caused by enforcement
-/// itself rather than by a simultaneous policy tweak, and is a one-line revert if it breaks
-/// something report-only didn't catch.
+/// pages it opens. The last production observation also found un-nonced scripts in
+/// Admin/Games/Edit.cshtml, which were corrected before enforcement. The policy directives
+/// themselves were not changed during the switch from report-only to enforcement.
 /// </summary>
 public static class ContentSecurityPolicyMiddlewareExtensions
 {
@@ -86,13 +78,12 @@ public static class ContentSecurityPolicyMiddlewareExtensions
         "https://swords-and-ravens-spaces.fra1.cdn.digitaloceanspaces.com";
 
     /// <summary>
-    /// Reads the CSP nonce generated for the current request by
-    /// <see cref="UseContentSecurityPolicy"/>. Razor views call this
-    /// (<c>nonce="@Context.GetCspNonce()"</c>) on every inline &lt;script&gt; block so it's
-    /// allowed under the nonce-based policy below.
+    /// Reads the CSP nonce generated for production requests by
+    /// <see cref="UseContentSecurityPolicy"/>. Returns null in local development, where no
+    /// CSP middleware runs and Razor omits the nonce attribute.
     /// </summary>
-    public static string GetCspNonce(this HttpContext context) =>
-        (string)context.Items[CspNonceItemsKey]!;
+    public static string? GetCspNonce(this HttpContext context) =>
+        context.Items.TryGetValue(CspNonceItemsKey, out var nonce) ? (string)nonce! : null;
 
     /// <summary>
     /// Must run before routing/Razor Pages execute (so the nonce exists in
@@ -130,8 +121,10 @@ public static class ContentSecurityPolicyMiddlewareExtensions
                     )
                     {
                         var config = context.RequestServices.GetRequiredService<IConfiguration>();
-                        context.Response.Headers["Content-Security-Policy-Report-Only"] =
-                            BuildPolicy(config, nonce);
+                        context.Response.Headers["Content-Security-Policy"] = BuildPolicy(
+                            config,
+                            nonce
+                        );
                     }
                     return Task.CompletedTask;
                 });
@@ -145,8 +138,7 @@ public static class ContentSecurityPolicyMiddlewareExtensions
     {
         // Mirrors GameClient.ts's own "localhost -> ws://localhost:5000, else ->
         // wss://play.<host>" branch (agot-bg-game-server/src/client/GameClient.ts), so this stays
-        // correct for local dev, Staging (winordie.net) and Production (swordsandravens.net)
-        // without hardcoding a hostname.
+        // correct for the configured production public site without hardcoding its hostname.
         var publicSiteHost = new Uri(config["PublicSiteUrl"] ?? "http://localhost:8000").Host;
         var gameWebSocketOrigin =
             publicSiteHost == "localhost" ? "ws://localhost:5000" : $"wss://play.{publicSiteHost}";

@@ -1,7 +1,7 @@
 import { ServerMessage } from "../messages/ServerMessage";
 import { ClientMessage } from "../messages/ClientMessage";
 import EntireGame from "../common/EntireGame";
-import { computed, observable } from "mobx";
+import { computed, observable, runInAction } from "mobx";
 import FogOfWarHelper from "./utils/fogOfWarHelper";
 import User from "../server/User";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
@@ -36,6 +36,8 @@ export default class GameClient {
   onOwnTurnChange: (() => void) | null = null;
   // Only alert once per session so a burst of errors doesn't spam the user with modals
   private hasShownServerMessageErrorDialog = false;
+  private pendingMessages: ServerMessage[] = [];
+  private pendingMessagesFlushTimeout: number | null = null;
 
   @observable connectionState: ConnectionState = ConnectionState.INITIALIZING;
   @observable entireGame: EntireGame | null = null;
@@ -390,12 +392,43 @@ export default class GameClient {
     // without processing any further messages.
     if (message.type == "user-banned") {
       if (this.authenticatedUser?.id == message.userId) {
+        this.clearPendingMessages();
         this.connectionState = ConnectionState.BANNED;
         this.socket?.close();
         return;
       }
     }
 
+    this.pendingMessages.push(message);
+    if (this.pendingMessagesFlushTimeout == null) {
+      this.pendingMessagesFlushTimeout = window.setTimeout(
+        () => this.flushPendingMessages(),
+        0
+      );
+    }
+  }
+
+  private flushPendingMessages(): void {
+    this.pendingMessagesFlushTimeout = null;
+    const messages = this.pendingMessages;
+    this.pendingMessages = [];
+
+    if (messages.length > 0) {
+      runInAction(() => {
+        messages.forEach((message) => this.processMessage(message));
+      });
+    }
+  }
+
+  private clearPendingMessages(): void {
+    if (this.pendingMessagesFlushTimeout != null) {
+      window.clearTimeout(this.pendingMessagesFlushTimeout);
+      this.pendingMessagesFlushTimeout = null;
+    }
+    this.pendingMessages = [];
+  }
+
+  private processMessage(message: ServerMessage): void {
     if (message.type == "authenticate-response") {
       const previousVersion = this.entireGame?.stateVersion ?? -1;
       this.entireGame = EntireGame.deserializeFromServer(message.game);
@@ -522,6 +555,7 @@ export default class GameClient {
   }
 
   setDisconnectedState(): void {
+    this.clearPendingMessages();
     if (this.connectionState != ConnectionState.BANNED) {
       this.connectionState = ConnectionState.CLOSED;
     }

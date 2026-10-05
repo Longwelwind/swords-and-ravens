@@ -200,9 +200,9 @@ public class UserModel(
         {
             var view = ViewOfGameInfo.Parse(row.ViewOfGame);
 
-            // A faceless game hides who's playing which house entirely - Django excludes these
-            // from the profile's games list outright rather than showing misleading data.
-            if (view.IsFaceless)
+            // A faceless game hides who's playing which house entirely. Keep those hidden on
+            // foreign profiles, but let users still see their own faceless games.
+            if (view.IsFaceless && !IsOwnProfile)
             {
                 continue;
             }

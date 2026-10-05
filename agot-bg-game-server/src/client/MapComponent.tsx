@@ -6,6 +6,7 @@ import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
 import MapControls, {
+  OrderMoveAnimationEntry,
   OrderOnMapProperties,
   RegionOnMapProperties,
   UnitMoveAnimationEntry,
@@ -168,6 +169,55 @@ class MovingUnit extends Component<MovingUnitProps> {
             backgroundImage: `url(${unitImages.get(unit.allegiance.id).get(unit.upgradedType ? unit.upgradedType.id : unit.type.id)})`,
             opacity,
             transform
+          }}
+        />
+      </div>
+    );
+  }
+}
+
+interface MovingOrderProps {
+  animation: OrderMoveAnimationEntry;
+  borderColor?: string;
+}
+
+// Order slots are static map coordinates, so unlike MovingUnit no DOM measuring is needed.
+class MovingOrder extends Component<MovingOrderProps> {
+  element = React.createRef<HTMLDivElement>();
+
+  componentDidMount(): void {
+    const { from, to, durationMs } = this.props.animation;
+
+    this.element.current?.animate(
+      [
+        { transform: "translate(-50%, -50%) translate(0, 0)" },
+        {
+          transform: `translate(-50%, -50%) translate(${to.orderSlot.x - from.orderSlot.x}px, ${to.orderSlot.y - from.orderSlot.y}px)`
+        }
+      ],
+      {
+        duration: Math.max(0, durationMs - 50),
+        easing: "ease-in-out",
+        fill: "forwards"
+      }
+    );
+  }
+
+  render(): ReactNode {
+    const { order, from } = this.props.animation;
+    const drawBorder = order.type.restrictedTo == sea.kind;
+
+    return (
+      <div
+        ref={this.element}
+        className="moving-order"
+        style={{ left: from.orderSlot.x, top: from.orderSlot.y }}
+      >
+        <div
+          className={classNames("order-icon", { "order-border": drawBorder })}
+          style={{
+            backgroundImage: `url(${orderImages.get(order.type.id)})`,
+            borderColor: drawBorder ? this.props.borderColor : undefined
           }}
         />
       </div>
@@ -388,6 +438,15 @@ export default class MapComponent extends Component<MapComponentProps> {
             />
           ))}
           {this.renderOrders(allRegions, isVisible)}
+          {this.ingame.orderMoveAnimations.map((animation) => (
+            <MovingOrder
+              key={`moving-order-${animation.id}`}
+              animation={animation}
+              borderColor={this.allRegionsWithControllers
+                .get(animation.from)
+                ?.getHighlightColor()}
+            />
+          ))}
           {this.renderRegionTexts(propertiesForRegions, isVisible)}
           {this.renderIronBankInfos(ironBankView)}
           {this.renderLoanCardDeck(ironBankView)}
