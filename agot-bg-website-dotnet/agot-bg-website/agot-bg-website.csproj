@@ -9,12 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.SimpleEmailV2" Version="4.0.105.1" />
+    <PackageReference Include="AWSSDK.SimpleEmailV2" Version="4.0.106.1" />
     <PackageReference Include="CoreAdmin" Version="4.0.0" />
-    <PackageReference
-      Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis"
-      Version="10.0.12"
-    />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.12">
@@ -23,14 +20,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="10.0.12" />
-    <PackageReference
-      Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets"
-      Version="1.24.1-preview.1"
-    />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.17.7" />
-    <PackageReference Include="Sentry.AspNetCore" Version="6.11.1" />
-    <PackageReference Include="Soenneker.Validators.Email.Disposable.Online" Version="4.0.5543" />
-    <PackageReference Include="StackExchange.Redis" Version="3.3.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.24.1-preview.1" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.17.13" />
+    <PackageReference Include="Sentry.AspNetCore" Version="6.12.0" />
+    <PackageReference Include="Soenneker.Validators.Email.Disposable.Online" Version="4.0.5579" />
+    <PackageReference Include="StackExchange.Redis" Version="3.3.1" />
   </ItemGroup>
 
   <ItemGroup>
