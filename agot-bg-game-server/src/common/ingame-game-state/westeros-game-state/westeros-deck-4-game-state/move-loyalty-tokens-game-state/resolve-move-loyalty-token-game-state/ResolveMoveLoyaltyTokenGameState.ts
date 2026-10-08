@@ -53,6 +53,8 @@ export default class ResolveMoveLoyaltyTokenGameState extends GameState<MoveLoya
           .getValidTargetRegions(regionFrom)
           .includes(regionTo)
       ) {
+        // Lets the sender's client undo its local preview of the move
+        player.user.send({ type: "loyalty-token-move-rejected" });
         return;
       }
 

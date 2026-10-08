@@ -8,19 +8,32 @@ import { observable } from "mobx";
 import _ from "lodash";
 import PartialRecursive from "../../../utils/PartialRecursive";
 import { RegionOnMapProperties } from "../../MapControls";
+import IngameGameState from "../../../common/ingame-game-state/IngameGameState";
 import ResolveMoveLoyaltyTokenGameState from "../../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/move-loyalty-tokens-game-state/resolve-move-loyalty-token-game-state/ResolveMoveLoyaltyTokenGameState";
 
 @observer
 export default class ResolveMoveLoyaltyTokenComponent extends Component<
   GameStateComponentProps<ResolveMoveLoyaltyTokenGameState>
 > {
-  @observable from: Region | null;
-  @observable to: Region | null;
+  @observable from: Region | null = null;
+  @observable to: Region | null = null;
+  // Set after confirming until the server answered with "loyalty-token-moved" or a rejection
+  @observable waitingForServer = false;
+  previewAnimationId: number | null = null;
 
   modifyRegionsOnMapCallback: any;
 
+  onLoyaltyTokenMovedCallback = (from: Region, to: Region): void =>
+    this.onLoyaltyTokenMoved(from, to);
+  onLoyaltyTokenMoveRejectedCallback = (): void =>
+    this.onLoyaltyTokenMoveRejected();
+
   get gameState(): ResolveMoveLoyaltyTokenGameState {
     return this.props.gameState;
+  }
+
+  get ingame(): IngameGameState {
+    return this.gameState.ingame;
   }
 
   render(): ReactNode {
@@ -50,7 +63,11 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                     type="button"
                     variant="success"
                     onClick={() => this.confirm()}
-                    disabled={this.from == null || this.to == null}
+                    disabled={
+                      this.from == null ||
+                      this.to == null ||
+                      this.waitingForServer
+                    }
                   >
                     Confirm
                   </Button>
@@ -60,7 +77,10 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                     type="button"
                     variant="danger"
                     onClick={() => this.reset()}
-                    disabled={this.from == null && this.to == null}
+                    disabled={
+                      (this.from == null && this.to == null) ||
+                      this.waitingForServer
+                    }
                   >
                     Reset
                   </Button>
@@ -82,26 +102,55 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
       return;
     }
 
-    const from = this.from;
-    const to = this.to;
-
-    // Undo the local preview now, otherwise it stacks with the server's authoritative "loyalty-token-moved" broadcast
-    this.reset();
-
-    this.gameState.sendMovePowerTokens(from, to);
+    // The local preview is kept until the server answers. It is either confirmed by
+    // "loyalty-token-moved" (see onLoyaltyTokenMoved) or undone by "loyalty-token-move-rejected".
+    this.waitingForServer = true;
+    this.gameState.sendMovePowerTokens(this.from, this.to);
   }
 
   private reset(): void {
     if (this.from != null && this.to != null) {
-      this.from.loyaltyTokens += 1;
-      this.to.loyaltyTokens -= 1;
+      this.ingame.undoLoyaltyTokenMoveOnClient(
+        this.from,
+        this.to,
+        this.previewAnimationId
+      );
     }
+    this.clear();
+  }
+
+  // Forgets the preview without undoing it, e.g. because the server confirmed exactly this move
+  private clear(): void {
     this.from = null;
     this.to = null;
+    this.previewAnimationId = null;
+    this.waitingForServer = false;
+  }
+
+  private onLoyaltyTokenMoved(from: Region, to: Region): void {
+    if (this.from == null || this.to == null) {
+      return;
+    }
+
+    if (this.from == from && this.to == to) {
+      this.clear();
+    } else {
+      // E.g. the same player confirmed a different move on another device
+      this.reset();
+    }
+  }
+
+  private onLoyaltyTokenMoveRejected(): void {
+    if (this.waitingForServer) {
+      this.reset();
+    }
   }
 
   modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-    if (this.props.gameClient.doesControlHouse(this.props.gameState.house)) {
+    if (
+      !this.waitingForServer &&
+      this.props.gameClient.doesControlHouse(this.props.gameState.house)
+    ) {
       if (this.from == null) {
         return this.props.gameState.parentGameState.validFromRegions.map(
           (r) => [
@@ -133,20 +182,41 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
       this.from = region;
     } else if (this.from != null && this.to == null) {
       this.to = region;
-      this.from.loyaltyTokens -= 1;
-      this.to.loyaltyTokens += 1;
+      this.previewAnimationId = this.ingame.moveLoyaltyTokenOnClient(
+        this.from,
+        this.to,
+        this.ingame.canSeeLoyaltyTokenMove(
+          this.props.gameClient,
+          this.from,
+          this.to
+        )
+      );
     }
   }
 
   componentDidMount(): void {
+    this.ingame.onLoyaltyTokenMoved = this.onLoyaltyTokenMovedCallback;
+    this.ingame.onLoyaltyTokenMoveRejected =
+      this.onLoyaltyTokenMoveRejectedCallback;
     this.props.mapControls.modifyRegionsOnMap.push(
       (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
     );
   }
 
   componentWillUnmount(): void {
-    // Discard any pending, unsent loyalty token moves so they don't corrupt the shared game model
+    // Discard a preview that wasn't confirmed by the server so it doesn't corrupt the shared game model.
+    // A confirmed move has already been cleared by onLoyaltyTokenMoved, making this a no-op.
     this.reset();
+
+    if (this.ingame.onLoyaltyTokenMoved == this.onLoyaltyTokenMovedCallback) {
+      this.ingame.onLoyaltyTokenMoved = null;
+    }
+    if (
+      this.ingame.onLoyaltyTokenMoveRejected ==
+      this.onLoyaltyTokenMoveRejectedCallback
+    ) {
+      this.ingame.onLoyaltyTokenMoveRejected = null;
+    }
 
     _.pull(
       this.props.mapControls.modifyRegionsOnMap,

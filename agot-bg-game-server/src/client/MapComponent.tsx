@@ -6,6 +6,7 @@ import Region from "../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../common/ingame-game-state/game-data-structure/Unit";
 import PlanningGameState from "../common/ingame-game-state/planning-game-state/PlanningGameState";
 import MapControls, {
+  LoyaltyTokenMoveAnimationEntry,
   OrderMoveAnimationEntry,
   OrderOnMapProperties,
   RegionOnMapProperties,
@@ -170,6 +171,100 @@ class MovingUnit extends Component<MovingUnitProps> {
             opacity,
             transform
           }}
+        />
+      </div>
+    );
+  }
+}
+
+interface MovingLoyaltyTokenProps {
+  animation: LoyaltyTokenMoveAnimationEntry;
+}
+
+// Loyalty tokens are laid out in the units flex container, so like MovingUnit their real
+// positions must be measured. The source is either the remaining token icon of the source region
+// or a hidden placeholder that keeps the token's slot for the first frame.
+class MovingLoyaltyToken extends Component<MovingLoyaltyTokenProps> {
+  element = React.createRef<HTMLDivElement>();
+  animationFrame: number | null = null;
+
+  componentDidMount(): void {
+    const { id, from, to, durationMs } = this.props.animation;
+    const element = this.element.current;
+    const placeholder = document.getElementById(
+      `map-loyalty-move-source-${id}`
+    );
+    const source =
+      placeholder ?? document.getElementById(`map-loyalty-token-${from.id}`);
+    const layer = element?.parentElement;
+
+    if (!element || !source || !layer || layer.offsetWidth == 0) {
+      return;
+    }
+
+    const layerRect = layer.getBoundingClientRect();
+    const sourceRect = source.getBoundingClientRect();
+    const scale = layerRect.width / layer.offsetWidth;
+    const sourceX =
+      (sourceRect.left + sourceRect.width / 2 - layerRect.left) / scale;
+    const sourceY =
+      (sourceRect.top + sourceRect.height / 2 - layerRect.top) / scale;
+
+    element.style.left = `${sourceX}px`;
+    element.style.top = `${sourceY}px`;
+    element.style.visibility = "visible";
+
+    this.animationFrame = window.requestAnimationFrame(() => {
+      if (placeholder) {
+        placeholder.style.display = "none";
+      }
+      this.animationFrame = window.requestAnimationFrame(() => {
+        const target =
+          document.getElementById(`map-loyalty-move-target-${to.id}`) ??
+          document.getElementById(`map-loyalty-token-${to.id}`);
+        if (!target) {
+          return;
+        }
+
+        const targetRect = target.getBoundingClientRect();
+        const targetX =
+          (targetRect.left + targetRect.width / 2 - layerRect.left) / scale;
+        const targetY =
+          (targetRect.top + targetRect.height / 2 - layerRect.top) / scale;
+
+        element.animate(
+          [
+            { transform: "translate(-50%, -50%) translate(0, 0)" },
+            {
+              transform: `translate(-50%, -50%) translate(${targetX - sourceX}px, ${targetY - sourceY}px)`
+            }
+          ],
+          {
+            duration: Math.max(0, durationMs - 50),
+            easing: "ease-in-out",
+            fill: "forwards"
+          }
+        );
+      });
+    });
+  }
+
+  componentWillUnmount(): void {
+    if (this.animationFrame != null) {
+      window.cancelAnimationFrame(this.animationFrame);
+    }
+  }
+
+  render(): ReactNode {
+    return (
+      <div
+        ref={this.element}
+        className="moving-loyalty-token"
+        style={{ visibility: "hidden" }}
+      >
+        <div
+          className="loyalty-icon"
+          style={{ backgroundImage: `url(${loyaltyTokenImage})` }}
         />
       </div>
     );
@@ -435,6 +530,12 @@ export default class MapComponent extends Component<MapComponentProps> {
               key={`moving-unit-${animation.id}`}
               animation={animation}
               dragonStrength={this.ingame.game.currentDragonStrength}
+            />
+          ))}
+          {this.ingame.loyaltyTokenMoveAnimations.map((animation) => (
+            <MovingLoyaltyToken
+              key={`moving-loyalty-token-${animation.id}`}
+              animation={animation}
             />
           ))}
           {this.renderOrders(allRegions, isVisible)}
@@ -732,6 +833,26 @@ export default class MapComponent extends Component<MapComponentProps> {
       }
 
       const controller = this.allRegionsWithControllers.get(r);
+
+      const showLoyaltyTokens = isVisible(r) || isTargaryenPlayer;
+      // The model already contains moving loyalty tokens in their target region, so they
+      // are only shown there once their move animation has finished.
+      const arrivingLoyaltyTokens =
+        this.ingame.loyaltyTokenMoveAnimations.filter(
+          (animation) => animation.to == r
+        ).length;
+      const displayedLoyaltyTokens = Math.max(
+        0,
+        r.loyaltyTokens - arrivingLoyaltyTokens
+      );
+      // Only needed as an anchor for the moving token if no token remains in the source region
+      const departingLoyaltyTokens =
+        displayedLoyaltyTokens > 0
+          ? []
+          : this.ingame.loyaltyTokenMoveAnimations.filter(
+              (animation) => animation.from == r
+            );
+
       return (
         <div
           key={`map-units_${r.id}`}
@@ -907,7 +1028,24 @@ export default class MapComponent extends Component<MapComponentProps> {
               ></div>
             </OverlayTrigger>
           )}
-          {(isVisible(r) || isTargaryenPlayer) && r.loyaltyTokens > 0 && (
+          {showLoyaltyTokens &&
+            departingLoyaltyTokens.map((animation) => (
+              <div
+                id={`map-loyalty-move-source-${animation.id}`}
+                key={`map-loyalty-move-source-${animation.id}`}
+                className="loyalty-icon v-hidden"
+              />
+            ))}
+          {showLoyaltyTokens &&
+            displayedLoyaltyTokens == 0 &&
+            arrivingLoyaltyTokens > 0 && (
+              <div
+                id={`map-loyalty-move-target-${r.id}`}
+                key={`map-loyalty-move-target-${r.id}`}
+                className="loyalty-icon v-hidden"
+              />
+            )}
+          {showLoyaltyTokens && displayedLoyaltyTokens > 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id={"loyalty-tooltip-" + r.id}>
@@ -926,6 +1064,7 @@ export default class MapComponent extends Component<MapComponentProps> {
               popperConfig={{ modifiers: [preventOverflow] }}
             >
               <div
+                id={`map-loyalty-token-${r.id}`}
                 className="loyalty-icon hover-weak-outline"
                 style={{
                   left: r.unitSlot.point.x,
@@ -938,7 +1077,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                   color: "white"
                 }}
               >
-                {r.loyaltyTokens > 1 ? r.loyaltyTokens : ""}
+                {displayedLoyaltyTokens > 1 ? displayedLoyaltyTokens : ""}
               </div>
             </OverlayTrigger>
           )}

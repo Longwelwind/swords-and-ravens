@@ -84,6 +84,7 @@ export type ServerMessage =
   | LoyaltyTokenGained
   | LoyaltyTokenPlaced
   | LoyaltyTokenMoved
+  | LoyaltyTokenMoveRejected
   | DrangonStrengthTokenRemoved
   | UpdateLoanCards
   | UpdateRegionModifiers
@@ -503,6 +504,14 @@ interface LoyaltyTokenMoved {
   type: "loyalty-token-moved";
   from: string;
   to: string;
+  // Absolute counts after the move, so a client that already previewed the move can detect it
+  fromRegionLoyaltyCount: number;
+  toRegionLoyaltyCount: number;
+}
+
+// Sent only to the user whose "move-loyalty-token" request was invalid
+interface LoyaltyTokenMoveRejected {
+  type: "loyalty-token-move-rejected";
 }
 
 interface DrangonStrengthTokenRemoved {

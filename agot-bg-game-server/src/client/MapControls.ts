@@ -44,6 +44,15 @@ export interface OrderMoveAnimationEntry {
   durationMs: number;
 }
 
+// Unlike units and orders, the loyalty token counts in the model are updated right away.
+// The entry only makes the map show the arriving token once it has reached the target region.
+export interface LoyaltyTokenMoveAnimationEntry {
+  id: number;
+  from: Region;
+  to: Region;
+  durationMs: number;
+}
+
 export interface OrderOnMapProperties {
   highlight?: HighlightProperties;
   onClick?: () => void;
