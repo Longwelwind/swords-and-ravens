@@ -73,6 +73,7 @@ import WildlingCardEffectInTurnOrderGameState from "./westeros-game-state/wildli
 import getElapsedSeconds from "../../utils/getElapsedSeconds";
 import orders from "./game-data-structure/orders";
 import {
+  LoyaltyTokenMoveAnimationEntry,
   OrderAnimationEntry,
   OrderMoveAnimationEntry,
   OrderOnMapProperties,
@@ -168,9 +169,11 @@ export default class IngameGameState extends GameState<
   @observable unitMoveAnimations: UnitMoveAnimationEntry[] = [];
   @observable orderAnimations: OrderAnimationEntry[] = [];
   @observable orderMoveAnimations: OrderMoveAnimationEntry[] = [];
+  @observable loyaltyTokenMoveAnimations: LoyaltyTokenMoveAnimationEntry[] = [];
   private nextUnitMoveAnimationId = 1;
   private nextOrderAnimationId = 1;
   private nextOrderMoveAnimationId = 1;
+  private nextLoyaltyTokenMoveAnimationId = 1;
 
   onVoteStarted: (() => void) | null = null;
   onPreemptiveRaidNewAttack:
@@ -179,6 +182,10 @@ export default class IngameGameState extends GameState<
   onLogReceived: ((log: GameLogData) => void) | null = null;
   onGamePaused: (() => void) | null = null;
   onGameResumed: (() => void) | null = null;
+  // Called before a "loyalty-token-moved" message is applied, so a pending local preview can be
+  // settled (kept if it is the same move, undone otherwise) before the absolute counts are compared.
+  onLoyaltyTokenMoved: ((from: Region, to: Region) => void) | null = null;
+  onLoyaltyTokenMoveRejected: (() => void) | null = null;
 
   get entireGame(): EntireGame {
     return this.parentGameState;
@@ -241,6 +248,86 @@ export default class IngameGameState extends GameState<
     this.orderMoveAnimations
       .filter((a) => !region || a.to == region)
       .forEach((a) => this.finishOrderMoveAnimation(a.id));
+  }
+
+  /**
+   * Client-side only: moves a loyalty token in the client model right away and, if `animate`
+   * is set, registers a move animation for it. Returns the animation id (or null if not animated)
+   * so a preview can cancel it again via `undoLoyaltyTokenMoveOnClient`.
+   */
+  moveLoyaltyTokenOnClient(
+    from: Region,
+    to: Region,
+    animate: boolean
+  ): number | null {
+    let id: number | null = null;
+    runInAction(() => {
+      from.loyaltyTokens--;
+      to.loyaltyTokens++;
+
+      if (animate && from != to) {
+        id = this.addLoyaltyTokenMoveAnimation(from, to);
+      }
+    });
+    return id;
+  }
+
+  private addLoyaltyTokenMoveAnimation(from: Region, to: Region): number {
+    // Faster than unit/order moves, as no follow-up message depends on the token having arrived
+    const durationMs = 2000;
+    const id = this.nextLoyaltyTokenMoveAnimationId++;
+    this.loyaltyTokenMoveAnimations.push({ id, from, to, durationMs });
+    window.setTimeout(
+      () => this.removeLoyaltyTokenMoveAnimation(id),
+      durationMs
+    );
+    return id;
+  }
+
+  // Client-side only: reverts a move done by `moveLoyaltyTokenOnClient` without animating it back.
+  undoLoyaltyTokenMoveOnClient(
+    from: Region,
+    to: Region,
+    animationId: number | null
+  ): void {
+    runInAction(() => {
+      if (animationId != null) {
+        this.removeLoyaltyTokenMoveAnimation(animationId);
+      }
+      from.loyaltyTokens++;
+      to.loyaltyTokens--;
+    });
+  }
+
+  removeLoyaltyTokenMoveAnimation(id: number): void {
+    this.loyaltyTokenMoveAnimations = this.loyaltyTokenMoveAnimations.filter(
+      (a) => a.id != id
+    );
+  }
+
+  // Client-side only: whether the loyalty tokens of both regions are visible on this client's map.
+  canSeeLoyaltyTokenMove(
+    gameClient: GameClient,
+    from: Region,
+    to: Region
+  ): boolean {
+    if (!this.fogOfWar) {
+      return true;
+    }
+
+    if (
+      this.game.targaryen &&
+      gameClient.doesControlHouse(this.game.targaryen)
+    ) {
+      return true;
+    }
+
+    const visibleRegions = gameClient.visibleRegionsSet;
+    return (
+      visibleRegions != null &&
+      visibleRegions.has(from) &&
+      visibleRegions.has(to)
+    );
   }
 
   get world(): World {
@@ -1808,10 +1895,32 @@ export default class IngameGameState extends GameState<
     } else if (message.type == "loyalty-token-moved") {
       const regionFrom = this.world.regions.get(message.from);
       const regionTo = this.world.regions.get(message.to);
-      runInAction(() => {
-        regionFrom.loyaltyTokens--;
-        regionTo.loyaltyTokens++;
-      });
+
+      if (this.onLoyaltyTokenMoved) {
+        this.onLoyaltyTokenMoved(regionFrom, regionTo);
+      }
+
+      // If this client already previewed exactly this move, the counts match and nothing is left to do
+      if (
+        regionFrom.loyaltyTokens != message.fromRegionLoyaltyCount ||
+        regionTo.loyaltyTokens != message.toRegionLoyaltyCount
+      ) {
+        runInAction(() => {
+          regionFrom.loyaltyTokens = message.fromRegionLoyaltyCount;
+          regionTo.loyaltyTokens = message.toRegionLoyaltyCount;
+
+          if (
+            regionFrom != regionTo &&
+            this.canSeeLoyaltyTokenMove(gameClient, regionFrom, regionTo)
+          ) {
+            this.addLoyaltyTokenMoveAnimation(regionFrom, regionTo);
+          }
+        });
+      }
+    } else if (message.type == "loyalty-token-move-rejected") {
+      if (this.onLoyaltyTokenMoveRejected) {
+        this.onLoyaltyTokenMoveRejected();
+      }
     } else if (message.type == "dragon-strength-token-removed") {
       runInAction(() => {
         _.pull(this.game.dragonStrengthTokens, message.fromRound);

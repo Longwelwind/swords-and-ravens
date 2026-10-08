@@ -239,7 +239,8 @@ strong {
   transform: translate(-50%, -50%);
 }
 
-.moving-order {
+.moving-order,
+.moving-loyalty-token {
   position: absolute;
   z-index: 2;
   pointer-events: none;

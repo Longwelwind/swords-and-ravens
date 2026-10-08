@@ -167,7 +167,9 @@ export default class MoveLoyaltyTokensGameState extends GameState<
     this.entireGame.broadcastToClients({
       type: "loyalty-token-moved",
       from: regionFrom.id,
-      to: regionTo.id
+      to: regionTo.id,
+      fromRegionLoyaltyCount: regionFrom.loyaltyTokens,
+      toRegionLoyaltyCount: regionTo.loyaltyTokens
     });
   }
 

@@ -41,6 +41,7 @@ export default class ResolveMoveLoyaltyTokenGameState extends GameState<MoveLoya
   onPlayerMessage(player: Player, message: ClientMessage): void {
     if (message.type == "move-loyalty-token") {
       if (this.ingame.getControllerOfHouse(this.house) != player) {
+        player.user.send({ type: "loyalty-token-move-rejected" });
         return;
       }
 
@@ -53,6 +54,8 @@ export default class ResolveMoveLoyaltyTokenGameState extends GameState<MoveLoya
           .getValidTargetRegions(regionFrom)
           .includes(regionTo)
       ) {
+        // Lets the sender's client undo its local preview of the move
+        player.user.send({ type: "loyalty-token-move-rejected" });
         return;
       }
 
@@ -86,7 +89,11 @@ export default class ResolveMoveLoyaltyTokenGameState extends GameState<MoveLoya
     return [this.ingame.getControllerOfHouse(this.house).user];
   }
 
-  getRequiredVisibleRegionsForPlayer(_player: Player): Region[] {
+  getRequiredVisibleRegionsForPlayer(player: Player): Region[] {
+    if (this.ingame.getControllerOfHouse(this.house) != player) {
+      return [];
+    }
+
     const regionsWithLT = this.ingame.world.regions.values.filter(
       (r) => r.loyaltyTokens > 0
     );
