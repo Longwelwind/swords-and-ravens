@@ -46,6 +46,68 @@ public class GameListQueryServiceTests : IDisposable
     private static JsonDocument ViewOfGame(int maxPlayerCount) =>
         JsonDocument.Parse($$"""{"maxPlayerCount": {{maxPlayerCount}}}""");
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task GetInactiveTournamentGamesAsync_PopulatesJoinAsTargetAndViewerMembership(
+        bool viewerIsPlayer,
+        bool hasWaitedForPlayer
+    )
+    {
+        var waitedForPlayer = new ApplicationUser
+        {
+            UserName = "waited-player",
+            Email = "waited-player@example.com",
+            LastActivity = DateTimeOffset.UtcNow,
+        };
+        var viewer = new ApplicationUser { UserName = "viewer", Email = "viewer@example.com" };
+        Assert.True((await _userManager.CreateAsync(waitedForPlayer)).Succeeded);
+        Assert.True((await _userManager.CreateAsync(viewer)).Succeeded);
+
+        var waitingForIds = hasWaitedForPlayer ? new[] { waitedForPlayer.Id } : [];
+        var game = new Game
+        {
+            Id = Guid.NewGuid(),
+            Name = "Stalled tournament",
+            OwnerUserId = waitedForPlayer.Id,
+            State = GameState.Ongoing,
+            LastActiveAt = DateTimeOffset.UtcNow.AddDays(-3),
+            ViewOfGame = JsonSerializer.SerializeToDocument(
+                new { settings = new { tournamentMode = true }, waitingForIds }
+            ),
+            Players =
+            [
+                new PlayerInGame
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = waitedForPlayer.Id,
+                    Data = JsonDocument.Parse("""{"house":"stark","waited_for":true}"""),
+                },
+            ],
+        };
+        if (viewerIsPlayer)
+        {
+            game.Players.Add(
+                new PlayerInGame
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = viewer.Id,
+                    Data = JsonDocument.Parse("""{"house":"lannister","waited_for":false}"""),
+                }
+            );
+        }
+        _db.Games.Add(game);
+        await _db.SaveChangesAsync();
+
+        var result = Assert.Single(await _sut.GetInactiveTournamentGamesAsync(viewer.Id));
+
+        Assert.Equal(hasWaitedForPlayer ? waitedForPlayer.Id : (Guid?)null, result.JoinAsUserId);
+        Assert.Equal(viewerIsPlayer ? "Lannister" : null, result.MyHouse);
+        Assert.False(result.MyTurn);
+    }
+
     [Fact]
     public async Task GetLastFinishedGameAsync_PicksMostRecentlyActive_NotMostRecentlyCreated()
     {
