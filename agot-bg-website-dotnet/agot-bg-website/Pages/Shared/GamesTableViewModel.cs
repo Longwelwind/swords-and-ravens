@@ -12,7 +12,7 @@ public sealed class GamesTableViewModel
     /// <summary>Show the Open/Ongoing badge per row - needed whenever a list can mix both states (e.g. "My games").</summary>
     public bool ShowStateBadge { get; init; } = true;
 
-    /// <summary>Show a "Join as &lt;waited player&gt;" action for admins/high members (replacement-needed list only).</summary>
+    /// <summary>Show a "Join as &lt;waited player&gt;" action for admins/high members on replacement-needed and inactive lists.</summary>
     public bool ShowJoinAsWaited { get; init; }
 
     /// <summary>

@@ -204,7 +204,10 @@ public sealed class GameListQueryService(ApplicationDbContext db)
     }
 
     /// <summary>Ongoing tournament-mode games with no move for 2+ days. Admin/High Member only in the UI.</summary>
-    public async Task<List<GameListItem>> GetInactiveTournamentGamesAsync(int take = 200)
+    public async Task<List<GameListItem>> GetInactiveTournamentGamesAsync(
+        Guid? viewerId = null,
+        int take = 200
+    )
     {
         var twoDaysAgo = DateTimeOffset.UtcNow - TwoDays;
 
@@ -216,7 +219,7 @@ public sealed class GameListQueryService(ApplicationDbContext db)
             .ToListAsync();
 
         return rows.Where(r => ViewOfGameInfo.Parse(r.ViewOfGame).IsTournamentMode)
-            .Select(r => Build(r, currentUserId: null))
+            .Select(r => Build(r, currentUserId: viewerId, computeJoinAsWaiting: true))
             .ToList();
     }
 
