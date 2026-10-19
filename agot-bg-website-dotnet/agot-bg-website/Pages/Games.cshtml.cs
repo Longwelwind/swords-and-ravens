@@ -81,7 +81,7 @@ public class GamesModel(
         if (CanPlayAsAnotherPlayer)
         {
             InactiveGames = await gameLists.GetInactiveGamesAsync(viewerId);
-            InactiveTournamentGames = await gameLists.GetInactiveTournamentGamesAsync();
+            InactiveTournamentGames = await gameLists.GetInactiveTournamentGamesAsync(viewerId);
         }
 
         if (CanCancelGame)
