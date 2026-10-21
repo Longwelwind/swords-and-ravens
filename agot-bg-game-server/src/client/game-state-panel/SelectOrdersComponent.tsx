@@ -1,3 +1,4 @@
+import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import { observer } from "mobx-react";
@@ -9,7 +10,7 @@ import Col from "react-bootstrap/Col";
 import { Row } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import _ from "lodash";
 import { OrderOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -20,13 +21,16 @@ import Order from "../../common/ingame-game-state/game-data-structure/Order";
 export default class SelectOrdersComponent extends Component<
   GameStateComponentProps<SelectOrdersGameState<ParentGameState>>
 > {
-  @observable selectedRegions: Region[] = [];
-
-  modifyOrdersOnMapCallback: any;
+  @observable accessor selectedRegions: Region[] = [];
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(
             this.props.gameState.house
@@ -93,14 +97,17 @@ export default class SelectOrdersComponent extends Component<
     );
   }
 
+  @action
   private reset(): void {
     this.selectedRegions = [];
   }
 
+  @action
   confirm(): void {
     this.props.gameState.selectOrders(this.selectedRegions);
   }
 
+  @action
   onOrderClick(region: Region): void {
     if (!this.selectedRegions.includes(region)) {
       this.selectedRegions.push(region);
@@ -120,18 +127,5 @@ export default class SelectOrdersComponent extends Component<
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
   }
 }

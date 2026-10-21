@@ -42,9 +42,9 @@ export interface Message {
 export class Channel {
   id: string;
   websocket: WebSocket;
-  @observable connected = false;
-  @observable messages: Message[] = [];
-  @observable lastViewedMessageId: string;
+  @observable accessor connected = false;
+  @observable accessor messages: Message[] = [];
+  @observable accessor lastViewedMessageId: string;
   onMessage:
     ((singleMessageRetrieved: boolean, noMoreMessages: boolean) => void) | null;
 
@@ -66,7 +66,7 @@ export class Channel {
 export default class ChatClient {
   gameClient: GameClient;
   // key = channel id
-  @observable channels: BetterMap<string, Channel> = new BetterMap<
+  @observable accessor channels: BetterMap<string, Channel> = new BetterMap<
     string,
     Channel
   >();

@@ -26,10 +26,13 @@ interface ParentGameState extends GameState<any, any> {
 export default class SelectObjectiveCardsGameState<
   P extends ParentGameState
 > extends GameState<P> {
-  @observable selectableCardsPerHouse: BetterMap<House, ObjectiveCard[]>;
+  @observable accessor selectableCardsPerHouse: BetterMap<
+    House,
+    ObjectiveCard[]
+  >;
   count: number;
   canBeSkipped: boolean;
-  @observable readyHouses: BetterMap<House, ObjectiveCard[]>;
+  @observable accessor readyHouses: BetterMap<House, ObjectiveCard[]>;
 
   get participatingHouses(): House[] {
     return this.selectableCardsPerHouse.keys;

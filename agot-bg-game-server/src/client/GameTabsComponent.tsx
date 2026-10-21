@@ -12,7 +12,7 @@ import {
 import ScrollToBottom from "react-scroll-to-bottom";
 
 import classNames from "classnames";
-import { observable } from "mobx";
+import { observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
 import { isMobile } from "react-device-detect";
 import * as _ from "lodash";
@@ -67,10 +67,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   private ingame = this.props.ingame;
   private gameSettings = this.ingame.entireGame.gameSettings;
 
-  @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
-  @observable unseenNotes = false;
+  @observable accessor currentOpenedTab =
+    this.user?.settings.lastOpenedTab ?? "chat";
+  @observable accessor unseenNotes = false;
 
-  @observable gameRoundElems: ReactNode | null = null;
+  @observable accessor gameRoundElems: ReactNode | null = null;
   private previousOpenedTab = this.currentOpenedTab;
 
   get logChatFullScreen(): boolean {
@@ -78,7 +79,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   }
 
   set logChatFullScreen(value: boolean) {
-    this.gameClient.logChatFullScreen = value;
+    runInAction(() => {
+      this.gameClient.logChatFullScreen = value;
+    });
   }
 
   private get publicChatRoom(): Channel {
@@ -112,7 +115,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
         <Tab.Container
           activeKey={this.currentOpenedTab}
           onSelect={(k) => {
-            this.currentOpenedTab = k ?? "chat";
+            runInAction(() => {
+              this.currentOpenedTab = k ?? "chat";
+            });
           }}
         >
           <Card.Header>
@@ -525,7 +530,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
         (this.user as User).syncSettings();
       }
 
-      this.currentOpenedTab = privateRoomId;
+      runInAction(() => {
+        this.currentOpenedTab = privateRoomId;
+      });
       this.gameClient.chatClient.markAsViewed(
         this.gameClient.chatClient.channels.get(privateRoomId)
       );
@@ -620,7 +627,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   }
 
   onNewPrivateChatRoomCreated(roomId: string): void {
-    this.currentOpenedTab = roomId;
+    runInAction(() => {
+      this.currentOpenedTab = roomId;
+    });
   }
 
   componentDidMount(): void {
@@ -631,11 +640,13 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) =>
       this.onNewPrivateChatRoomCreated(roomId);
 
-    if ((this.user as User)?.note.length ?? 0 > 0) {
-      this.unseenNotes = true;
-    }
+    runInAction(() => {
+      if ((this.user as User)?.note.length ?? 0 > 0) {
+        this.unseenNotes = true;
+      }
 
-    this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
+      this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
+    });
   }
 
   componentDidUpdate(
@@ -644,7 +655,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     _snapshot?: any
   ): void {
     if (this.currentOpenedTab == "note") {
-      this.unseenNotes = false;
+      runInAction(() => {
+        this.unseenNotes = false;
+      });
     }
 
     // Only update game round elements when switching TO the game-logs tab
@@ -652,7 +665,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
       this.currentOpenedTab == "game-logs" &&
       this.previousOpenedTab != "game-logs"
     ) {
-      this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
+      runInAction(() => {
+        this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
+      });
     }
 
     // Track tab changes

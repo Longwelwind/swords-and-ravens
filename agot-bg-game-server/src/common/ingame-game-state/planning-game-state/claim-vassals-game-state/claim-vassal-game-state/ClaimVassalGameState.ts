@@ -12,7 +12,7 @@ import _ from "lodash";
 export default class ClaimVassalGameState extends GameState<ClaimVassalsGameState> {
   house: House;
   count: number;
-  @observable claimableVassals: House[];
+  @observable accessor claimableVassals: House[];
 
   get ingame(): IngameGameState {
     return this.parentGameState.ingame;

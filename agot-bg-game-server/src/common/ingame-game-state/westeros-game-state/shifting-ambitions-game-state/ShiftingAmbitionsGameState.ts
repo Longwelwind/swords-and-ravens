@@ -24,9 +24,9 @@ export default class ShiftingAmbitionsGameState extends GameState<
   WesterosGameState,
   SelectObjectiveCardsGameState<ShiftingAmbitionsGameState>
 > {
-  @observable step: ShiftingAmbitionsStep;
-  @observable objectiveCardPool: ObjectiveCard[];
-  @observable turnOrder: House[];
+  @observable accessor step: ShiftingAmbitionsStep;
+  @observable accessor objectiveCardPool: ObjectiveCard[];
+  @observable accessor turnOrder: House[];
 
   get game(): Game {
     return this.parentGameState.game;

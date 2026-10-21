@@ -16,7 +16,7 @@ import Region from "../../common/ingame-game-state/game-data-structure/Region";
 export default class ResolveRetreatComponent extends Component<
   GameStateComponentProps<ResolveRetreatGameState>
 > {
-  @observable selectRegionComponent: SelectRegionComponent;
+  @observable accessor selectRegionComponent: SelectRegionComponent;
 
   render(): ReactNode {
     const unitCountToBeDestroyed =

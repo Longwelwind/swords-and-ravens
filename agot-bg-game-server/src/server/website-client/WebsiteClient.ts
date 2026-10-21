@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import User from "../User";
 
 export interface StoredProfileSettings {

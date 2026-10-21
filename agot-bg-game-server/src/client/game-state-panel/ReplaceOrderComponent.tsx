@@ -1,11 +1,11 @@
+import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import ReplaceOrderGameState from "../../common/ingame-game-state/action-game-state/use-raven-game-state/replace-order-game-state/ReplaceOrderGameState";
 import React from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
-import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -17,14 +17,17 @@ import PartialRecursive from "../../utils/PartialRecursive";
 export default class ReplaceOrderComponent extends Component<
   GameStateComponentProps<ReplaceOrderGameState>
 > {
-  @observable selectedRegion: Region | null;
-  @observable selectedOrder: Order | null;
-
-  modifyOrdersOnMapCallback: any;
+  @observable accessor selectedRegion: Region | null;
+  @observable accessor selectedOrder: Order | null;
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Col xs={12} className="text-center">
           The holder of the Raven token may now choose to replace one of its
           Order tokens or to look at the top card of the Wildling deck.
@@ -104,6 +107,7 @@ export default class ReplaceOrderComponent extends Component<
     );
   }
 
+  @action
   onOrderClick(region: Region): void {
     if (region.getController() == this.props.gameState.ravenHolder) {
       if (this.selectedRegion == region) {
@@ -176,19 +180,7 @@ export default class ReplaceOrderComponent extends Component<
     return [];
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-  }
-
+  @action
   private reset(): void {
     this.selectedRegion = null;
     this.selectedOrder = null;

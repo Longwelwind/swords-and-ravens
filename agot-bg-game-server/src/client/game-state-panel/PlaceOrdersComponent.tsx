@@ -1,4 +1,6 @@
-import { Component, ReactNode, ReactElement } from "react";
+import { action } from "mobx";
+import MapContribution, { wrapMapElement } from "../MapContribution";
+import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import React from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
@@ -52,15 +54,19 @@ export default class PlaceOrdersComponent extends Component<
     [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows }]
   ]);
 
-  modifyRegionsOnMapCallback: any;
-  modifyOrdersOnMapCallback: any;
+  private get gameState(): PlaceOrdersGameState {
+    return this.props.gameState;
+  }
+  private get gameClient(): GameStateComponentProps<PlaceOrdersGameState>["gameClient"] {
+    return this.props.gameClient;
+  }
 
   get player(): Player {
-    if (!this.props.gameClient.authenticatedPlayer) {
+    if (!this.gameClient.authenticatedPlayer) {
       throw new Error();
     }
 
-    return this.props.gameClient.authenticatedPlayer;
+    return this.gameClient.authenticatedPlayer;
   }
 
   get housesToPlaceOrdersFor(): House[] {
@@ -68,12 +74,18 @@ export default class PlaceOrdersComponent extends Component<
   }
 
   get placeOrders(): PlaceOrdersGameState {
-    return this.props.gameState;
+    return this.gameState;
   }
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
             Players must now place orders in every area where they have at least
@@ -100,14 +112,14 @@ export default class PlaceOrdersComponent extends Component<
               )
             )}
           <Col xs={12}>
-            {this.props.gameClient.authenticatedPlayer && (
+            {this.gameClient.authenticatedPlayer && (
               <Row className="justify-content-center">
                 <Col xs="auto">
                   <Button
                     type="button"
                     disabled={
                       !this.placeOrders.canReady(
-                        this.props.gameClient.authenticatedPlayer
+                        this.gameClient.authenticatedPlayer
                       ).status
                     }
                     onClick={() => this.onReadyClick()}
@@ -121,7 +133,7 @@ export default class PlaceOrdersComponent extends Component<
                     type="button"
                     disabled={
                       !this.placeOrders.canUnready(
-                        this.props.gameClient.authenticatedPlayer
+                        this.gameClient.authenticatedPlayer
                       ).status
                     }
                     onClick={() => this.onUnreadyClick()}
@@ -148,28 +160,8 @@ export default class PlaceOrdersComponent extends Component<
     );
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-  }
-
   modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-    if (this.props.gameClient.authenticatedPlayer) {
+    if (this.gameClient.authenticatedPlayer) {
       const possibleRegions = _.flatMap(
         this.housesToPlaceOrdersFor.map((h) =>
           this.placeOrders.getPossibleRegionsForOrders(h)
@@ -183,7 +175,7 @@ export default class PlaceOrdersComponent extends Component<
             {
               // Highlight areas with no order
               highlight: { active: !this.placeOrders.placedOrders.has(r) },
-              wrap: (child: ReactElement) => (
+              wrap: wrapMapElement(
                 <OverlayTrigger
                   placement="auto-start"
                   trigger="click"
@@ -238,7 +230,7 @@ export default class PlaceOrdersComponent extends Component<
                     </Popover>
                   }
                 >
-                  {child}
+                  <span />
                 </OverlayTrigger>
               )
             }
@@ -250,7 +242,7 @@ export default class PlaceOrdersComponent extends Component<
   }
 
   modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-    if (this.props.gameClient.authenticatedPlayer) {
+    if (this.gameClient.authenticatedPlayer) {
       return _.flatMap(
         this.housesToPlaceOrdersFor.map((h) =>
           this.placeOrders.getPossibleRegionsForOrders(h).map(
@@ -270,24 +262,24 @@ export default class PlaceOrdersComponent extends Component<
     return [];
   }
 
+  @action
   onOrderClick(region: Region): void {
-    if (!this.props.gameClient.authenticatedPlayer) {
+    if (!this.gameClient.authenticatedPlayer) {
       return;
     }
 
     this.placeOrders.assignOrder(region, null);
   }
 
+  @action
   onReadyClick(): void {
-    if (!this.props.gameClient.authenticatedPlayer) {
+    if (!this.gameClient.authenticatedPlayer) {
       return;
     }
 
     if (
       this.placeOrders
-        .getHousesToPutOrdersForPlayer(
-          this.props.gameClient.authenticatedPlayer
-        )
+        .getHousesToPutOrdersForPlayer(this.gameClient.authenticatedPlayer)
         .some((h) =>
           this.placeOrders.game
             .getPlacedOrders(this.placeOrders.placedOrders, h)
@@ -312,6 +304,7 @@ export default class PlaceOrdersComponent extends Component<
     this.placeOrders.ready();
   }
 
+  @action
   onUnreadyClick(): void {
     this.placeOrders.unready();
   }

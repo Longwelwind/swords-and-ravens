@@ -1,4 +1,5 @@
 import { observer } from "mobx-react";
+import { runInAction } from "mobx";
 import { Component, default as React, ReactNode } from "react";
 import EntireGame from "../common/EntireGame";
 import { GameSettings } from "../common/GameSettings";
@@ -607,7 +608,11 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
 
   setNow(): void {
     // Correct for client/server clock skew so countdowns against server-issued deadlines stay accurate
-    this.entireGame.now = new Date(Date.now() + this.entireGame.clockOffsetMs);
+    runInAction(() => {
+      this.entireGame.now = new Date(
+        Date.now() + this.entireGame.clockOffsetMs
+      );
+    });
   }
 
   componentDidMount(): void {

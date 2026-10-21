@@ -21,8 +21,8 @@ export default class ChooseHouseCardGameState extends GameState<CombatGameState>
   choosableHouseCards: BetterMap<House, HouseCard[]>;
   // A null value for a value can be present client-side, it indicates
   // that a house card was chosen but it may not be shown to the player.
-  @observable houseCards = new BetterMap<House, HouseCard | null>();
-  @observable selectedHouseCard: HouseCard | null;
+  @observable accessor houseCards = new BetterMap<House, HouseCard | null>();
+  @observable accessor selectedHouseCard: HouseCard | null;
 
   get combatGameState(): CombatGameState {
     return this.parentGameState;

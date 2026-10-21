@@ -19,7 +19,7 @@ interface VolumeSliderComponentProps {
 
 @observer
 class VolumeSliderComponent extends Component<VolumeSliderComponentProps> {
-  @observable volume = Math.floor(this.props.volume);
+  @observable accessor volume = Math.floor(this.props.volume);
 
   handleVolumeChange = (e: any): void => {
     const newVolume = typeof e === "number" ? e : parseInt(e.target.value);

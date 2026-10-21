@@ -1,5 +1,6 @@
+import MapContribution, { wrapMapElement } from "../MapContribution";
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Component, ReactElement, ReactNode } from "react";
+import { Component, ReactNode } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -19,7 +20,6 @@ import unitTypes from "../../common/ingame-game-state/game-data-structure/unitTy
 import UnitType from "../../common/ingame-game-state/game-data-structure/UnitType";
 
 import { preventOverflow } from "@popperjs/core";
-import _ from "lodash";
 import UnitIconComponent from "../UnitIconComponent";
 import housePowerTokensImages from "../housePowerTokensImages";
 import getGarrisonToken from "../garrisonTokens";
@@ -28,9 +28,6 @@ import getGarrisonToken from "../garrisonTokens";
 export default class DraftMapComponent extends Component<
   GameStateComponentProps<DraftMapGameState>
 > {
-  modifyRegionsOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
-
   get player(): Player | null {
     return this.props.gameClient.authenticatedPlayer;
   }
@@ -47,6 +44,12 @@ export default class DraftMapComponent extends Component<
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          units={this.modifyUnitsOnMap()}
+        />
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
             All players can add and remove pieces according to their unit and
@@ -110,14 +113,14 @@ export default class DraftMapComponent extends Component<
           modifiedRegion,
           {
             highlight: { active: true },
-            wrap: (child: ReactElement) => (
+            wrap: wrapMapElement(
               <OverlayTrigger
                 placement="auto"
                 trigger="click"
                 rootClose
                 overlay={this.renderMusteringPopover(modifiedRegion)}
               >
-                {child}
+                <span />
               </OverlayTrigger>
             )
           }
@@ -304,25 +307,5 @@ export default class DraftMapComponent extends Component<
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 }

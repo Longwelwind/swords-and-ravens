@@ -1,3 +1,4 @@
+import MapContribution from "../MapContribution";
 import PlayerReconcileArmiesGameState from "../../common/ingame-game-state/westeros-game-state/reconcile-armies-game-state/player-reconcile-armies-game-state/PlayerReconcileArmiesGameState";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -10,7 +11,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Row from "react-bootstrap/Row";
 import { UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -21,9 +22,8 @@ import joinReactNodes from "../utils/joinReactNodes";
 export default class PlayerReconcileArmiesComponent extends Component<
   GameStateComponentProps<PlayerReconcileArmiesGameState>
 > {
-  @observable unitsToRemove: BetterMap<Region, Unit[]> = new BetterMap();
-
-  modifyUnitsOnMapCallback: any;
+  @observable accessor unitsToRemove: BetterMap<Region, Unit[]> =
+    new BetterMap();
 
   get house(): House {
     return this.props.gameState.house;
@@ -70,6 +70,11 @@ export default class PlayerReconcileArmiesComponent extends Component<
     const notEnough = !this.enoughReconciled;
     return (
       <Row className="p-2">
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          units={this.modifyUnitsOnMap()}
+        />
         <Col xs={12} className="text-center">
           <b>{this.props.gameState.house.name}</b> must reconcile their armies
           according to their supply limits.
@@ -143,6 +148,7 @@ export default class PlayerReconcileArmiesComponent extends Component<
     );
   }
 
+  @action
   onUnitClick(unit: Unit): void {
     // If there's no array for this region, add one
     if (!this.unitsToRemove.has(unit.region)) {
@@ -163,11 +169,13 @@ export default class PlayerReconcileArmiesComponent extends Component<
     }
   }
 
+  @action
   confirm(): void {
     this.props.gameState.reconcileArmies(this.unitsToRemove);
     this.reset();
   }
 
+  @action
   private reset(): void {
     this.unitsToRemove = new BetterMap();
   }
@@ -190,18 +198,5 @@ export default class PlayerReconcileArmiesComponent extends Component<
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 }

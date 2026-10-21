@@ -1,3 +1,4 @@
+import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import CombatGameState, {
@@ -28,7 +29,6 @@ import {
   UnitOnMapProperties
 } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
-import _ from "lodash";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import BeforeCombatHouseCardAbilitiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 import BeforeCombatHouseCardAbilitiesComponent from "./house-card-abilities/BeforeCombatHouseCardsAbilitiesComponent";
@@ -42,10 +42,6 @@ import AfterCombatHouseCardAbilitiesGameState from "../../common/ingame-game-sta
 export default class CombatComponent extends Component<
   GameStateComponentProps<CombatGameState>
 > {
-  modifyRegionsOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
-  modifyOrdersOnMapCallback: any;
-
   get combat(): CombatGameState {
     return this.props.gameState;
   }
@@ -147,6 +143,13 @@ export default class CombatComponent extends Component<
           ];
     return (
       <div key={`combat-component-${this.props.gameState.stateVersion}`}>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          units={this.modifyUnitsOnMap()}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Col xs={12}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <h5>
@@ -270,16 +273,6 @@ export default class CombatComponent extends Component<
   }
 
   componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-
     window.setTimeout(() => {
       document.body.click();
       window.setTimeout(() => {
@@ -291,19 +284,6 @@ export default class CombatComponent extends Component<
   }
 
   componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-
     this.props.gameClient.sfxManager.fadeOutCurrentMusic();
   }
 }

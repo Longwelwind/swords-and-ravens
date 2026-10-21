@@ -30,8 +30,7 @@ export default class MoveLoyaltyTokensGameState extends GameState<
   resolveOrder: House[];
   costsToCancelPreviousMovement: number;
   previousMovement: PreviousMovement | null;
-  @observable
-  acceptAllMovements: boolean;
+  @observable accessor acceptAllMovements: boolean;
 
   get game(): Game {
     return this.parentGameState.game;

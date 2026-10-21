@@ -10,9 +10,9 @@ import IIronBankSnapshot from "../../../client/game-replay/IIronBankSnapshot";
 
 export default class IronBank {
   game: Game;
-  @observable loanCardDeck: LoanCard[];
-  @observable purchasedLoans: LoanCard[] = [];
-  @observable loanSlots: (LoanCard | null)[] = [null, null, null];
+  @observable accessor loanCardDeck: LoanCard[];
+  @observable accessor purchasedLoans: LoanCard[] = [];
+  @observable accessor loanSlots: (LoanCard | null)[] = [null, null, null];
 
   loanCosts = [7, 4, 1];
 

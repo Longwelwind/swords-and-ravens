@@ -14,7 +14,7 @@ import WesterosCardComponent from "./utils/WesterosCardComponent";
 export default class SelectWesterosCardComponent extends Component<
   GameStateComponentProps<SelectWesterosCardGameState<any>>
 > {
-  @observable selectedWesterosCard: WesterosCard | null;
+  @observable accessor selectedWesterosCard: WesterosCard | null;
   render(): ReactNode {
     return (
       <>

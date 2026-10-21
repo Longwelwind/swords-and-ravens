@@ -39,36 +39,37 @@ export default class Game {
   lastUnitId = 0;
   world: World;
   houses: BetterMap<string, House> = new BetterMap<string, House>();
-  @observable turn = 0;
-  @observable ironThroneTrack: House[];
-  @observable fiefdomsTrack: House[];
-  @observable valyrianSteelBladeUsed = false;
-  @observable kingsCourtTrack: House[];
-  @observable wildlingStrength = 2;
+  @observable accessor turn = 0;
+  @observable accessor ironThroneTrack: House[];
+  @observable accessor fiefdomsTrack: House[];
+  @observable accessor valyrianSteelBladeUsed = false;
+  @observable accessor kingsCourtTrack: House[];
+  @observable accessor wildlingStrength = 2;
   // number in clients where house.knowsNextWilldingCard is true, otherwise null.
-  @observable clientNextWildlingCardId: number | null;
+  @observable accessor clientNextWildlingCardId: number | null;
   wildlingDeck: WildlingCard[];
   supplyRestrictions: number[][];
   starredOrderRestrictions: number[];
-  @observable westerosDecks: WesterosCard[][];
-  @observable winterIsComingHappened: boolean[];
+  @observable accessor westerosDecks: WesterosCard[][];
+  @observable accessor winterIsComingHappened: boolean[];
   victoryPointsCountNeededToWin: number;
   loyaltyTokenCountNeededToWin: number;
-  @observable maxTurns: number;
+  @observable accessor maxTurns: number;
   vassalHouseCards: BetterMap<string, HouseCard> = new BetterMap<
     string,
     HouseCard
   >();
-  @observable draftPool: BetterMap<string, HouseCard> = new BetterMap();
+  @observable accessor draftPool: BetterMap<string, HouseCard> =
+    new BetterMap();
   deletedHouseCards: BetterMap<string, HouseCard> = new BetterMap();
   oldPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> =
     new BetterMap();
   previousPlayerHouseCards: BetterMap<House, BetterMap<string, HouseCard>> =
     new BetterMap();
   dragonStrengthTokens: number[] = [];
-  @observable removedDragonStrengthTokens: number[] = [];
+  @observable accessor removedDragonStrengthTokens: number[] = [];
   ironBank: IronBank | null;
-  @observable objectiveDeck: ObjectiveCard[] = [];
+  @observable accessor objectiveDeck: ObjectiveCard[] = [];
   draftMapRegionsPerHouse: BetterMap<House, Region[]> = new BetterMap();
 
   /**
@@ -78,9 +79,9 @@ export default class Game {
   vassalRelations = new BetterMap<House, House>();
   revealedWesterosCards = 0;
 
-  @observable overwrittenIronThroneHolder: House | null;
-  @observable overwrittenValyrianSteelBladeHolder: House | null;
-  @observable overwrittenRavenHolder: House | null;
+  @observable accessor overwrittenIronThroneHolder: House | null;
+  @observable accessor overwrittenValyrianSteelBladeHolder: House | null;
+  @observable accessor overwrittenRavenHolder: House | null;
 
   get ironThroneHolder(): House {
     return this.getTokenHolder(this.ironThroneTrack, 0);

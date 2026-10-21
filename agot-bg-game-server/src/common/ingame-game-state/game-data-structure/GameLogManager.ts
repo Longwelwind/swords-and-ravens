@@ -27,8 +27,9 @@ const blindDraftBannedLogs = [
 
 export default class GameLogManager {
   ingameGameState: IngameGameState;
-  @observable logs: GameLog[] = [];
-  @observable lastSeenLogTimes: BetterMap<User, number> = new BetterMap();
+  @observable accessor logs: GameLog[] = [];
+  @observable accessor lastSeenLogTimes: BetterMap<User, number> =
+    new BetterMap();
 
   constructor(ingameGameState: IngameGameState) {
     this.ingameGameState = ingameGameState;

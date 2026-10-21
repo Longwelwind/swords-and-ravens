@@ -74,15 +74,15 @@ export default class WildlingsAttackGameState extends GameState<
   | TheHordeDescendsNightsWatchVictoryGameState
   | TakeControlOfEnemyPortGameState
 > {
-  @observable participatingHouses: House[];
+  @observable accessor participatingHouses: House[];
 
   // This field is null before the bidding phase is over,
   // as the wildling card will be drawn after the bidding phase is over.
   wildlingCard: WildlingCard | null;
-  @observable wildlingStrength: number;
+  @observable accessor wildlingStrength: number;
   _highestBidder: House | null;
   _lowestBidder: House | null;
-  @observable biddingResults: [number, House[]][] | null;
+  @observable accessor biddingResults: [number, House[]][] | null;
 
   get westerosGameState(): WesterosGameState {
     return this.parentGameState;

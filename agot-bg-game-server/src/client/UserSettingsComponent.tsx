@@ -6,7 +6,7 @@ import { OverlayTrigger, Tooltip, Row } from "react-bootstrap";
 import User from "../server/User";
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import { observable } from "mobx";
+import { observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
 
 interface UserSettingsComponentProps {
@@ -16,9 +16,9 @@ interface UserSettingsComponentProps {
 
 @observer
 export default class UserSettingsComponent extends Component<UserSettingsComponentProps> {
-  @observable mapScrollbar = false;
-  @observable chatHouseNames = false;
-  @observable gameStateColumnRight = false;
+  @observable accessor mapScrollbar = false;
+  @observable accessor chatHouseNames = false;
+  @observable accessor gameStateColumnRight = false;
 
   render(): ReactNode {
     return (
@@ -47,8 +47,10 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                     }
                     checked={this.chatHouseNames}
                     onChange={() => {
-                      this.chatHouseNames = !this.chatHouseNames;
-                      this.changeUserSettings();
+                      runInAction(() => {
+                        this.chatHouseNames = !this.chatHouseNames;
+                        this.changeUserSettings();
+                      });
                     }}
                   />
                 </Col>
@@ -76,8 +78,10 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                     }
                     checked={this.mapScrollbar}
                     onChange={() => {
-                      this.mapScrollbar = !this.mapScrollbar;
-                      this.changeUserSettings();
+                      runInAction(() => {
+                        this.mapScrollbar = !this.mapScrollbar;
+                        this.changeUserSettings();
+                      });
                     }}
                   />
                 </Col>
@@ -104,8 +108,10 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                     }
                     checked={this.gameStateColumnRight}
                     onChange={() => {
-                      this.gameStateColumnRight = !this.gameStateColumnRight;
-                      this.changeUserSettings();
+                      runInAction(() => {
+                        this.gameStateColumnRight = !this.gameStateColumnRight;
+                        this.changeUserSettings();
+                      });
                     }}
                   />
                 </Col>
@@ -127,9 +133,12 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
 
   componentDidMount(): void {
     if (this.props.user) {
-      this.mapScrollbar = this.props.user.settings.mapScrollbar;
-      this.chatHouseNames = this.props.user.settings.chatHouseNames;
-      this.gameStateColumnRight = this.props.user.settings.gameStateColumnRight;
+      const user = this.props.user;
+      runInAction(() => {
+        this.mapScrollbar = user.settings.mapScrollbar;
+        this.chatHouseNames = user.settings.chatHouseNames;
+        this.gameStateColumnRight = user.settings.gameStateColumnRight;
+      });
     }
   }
 

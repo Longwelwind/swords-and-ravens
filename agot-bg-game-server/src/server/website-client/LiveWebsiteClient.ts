@@ -95,7 +95,7 @@ export default class LiveWebsiteClient implements WebsiteClient {
     return response.id;
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async saveGame(
     gameId: string,
     serializedGame: any,

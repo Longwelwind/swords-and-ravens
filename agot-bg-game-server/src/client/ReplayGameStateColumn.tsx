@@ -50,7 +50,7 @@ interface ReplayGameStateColumnProps {
 
 @observer
 export default class ReplayGameStateColumn extends Component<ReplayGameStateColumnProps> {
-  @observable roundDropDownItems: ReactNode[] = [];
+  @observable accessor roundDropDownItems: ReactNode[] = [];
   render(): ReactNode {
     const { gameClient, ingame } = this.props;
 

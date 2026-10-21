@@ -15,7 +15,7 @@ import _ from "lodash";
 import { observable } from "mobx";
 
 export default class TheFacelessMenGameState extends GameState<ExecuteLoanGameState> {
-  @observable house: House;
+  @observable accessor house: House;
 
   get game(): Game {
     return this.parentGameState.game;

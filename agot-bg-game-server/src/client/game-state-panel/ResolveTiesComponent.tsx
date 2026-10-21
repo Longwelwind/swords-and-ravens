@@ -20,7 +20,7 @@ import HouseNumberResultsComponent from "../HouseNumberResultsComponent";
 export default class ResolveTiesComponent extends Component<
   GameStateComponentProps<ResolveTiesGameState>
 > {
-  @observable currentOrdering: House[];
+  @observable accessor currentOrdering: House[];
 
   constructor(props: GameStateComponentProps<ResolveTiesGameState>) {
     super(props);

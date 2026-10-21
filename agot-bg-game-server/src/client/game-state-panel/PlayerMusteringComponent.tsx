@@ -1,13 +1,14 @@
+import MapContribution, { wrapMapElement } from "../MapContribution";
 import PlayerMusteringGameState, {
   Mustering,
   MusteringRule,
   PlayerMusteringType
 } from "../../common/ingame-game-state/westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import { observer } from "mobx-react";
-import React, { Component, ReactElement, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import BetterMap from "../../utils/BetterMap";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import * as _ from "lodash";
 import { Button, OverlayTrigger, Popover } from "react-bootstrap";
@@ -38,12 +39,8 @@ type MusteringPopoverTrigger = "region" | "order";
 export default class PlayerMusteringComponent extends Component<
   GameStateComponentProps<PlayerMusteringGameState>
 > {
-  @observable musterings = new BetterMap<Region, Mustering[]>();
-
-  modifyRegionsOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
-  modifyOrdersOnMapCallback: any;
-  @observable openMusteringPopover: {
+  @observable accessor musterings = new BetterMap<Region, Mustering[]>();
+  @observable accessor openMusteringPopover: {
     region: Region;
     trigger: MusteringPopoverTrigger;
   } | null = null;
@@ -63,6 +60,13 @@ export default class PlayerMusteringComponent extends Component<
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          orders={this.modifyOrdersOnMap()}
+          units={this.modifyUnitsOnMap()}
+        />
         <Col xs={12} className="text-center">
           {this.isStarredConsolidatePowerMusteringType ? (
             <>
@@ -210,6 +214,7 @@ export default class PlayerMusteringComponent extends Component<
     );
   }
 
+  @action
   private removeMustering(musterings: Mustering[], i: number): void {
     const removedMustering = musterings.splice(i, 1)[0];
 
@@ -227,6 +232,7 @@ export default class PlayerMusteringComponent extends Component<
     this.removeEmptyMusterings();
   }
 
+  @action
   private removeEmptyMusterings(): void {
     this.musterings.keys.forEach((r) => {
       const mustering = this.musterings.get(r);
@@ -248,6 +254,7 @@ export default class PlayerMusteringComponent extends Component<
     }
   }
 
+  @action
   private addMustering(initiatingRegion: Region, rule: Mustering): void {
     const musterings: Mustering[] = this.musterings.tryGet(
       initiatingRegion,
@@ -286,6 +293,7 @@ export default class PlayerMusteringComponent extends Component<
     }
   }
 
+  @action
   submit(): void {
     if (this.props.gameState.anyUsablePointsLeft(this.musterings)) {
       if (
@@ -339,7 +347,7 @@ export default class PlayerMusteringComponent extends Component<
         modifiedRegion,
         {
           highlight: { active: true },
-          wrap: (child: ReactElement) => (
+          wrap: wrapMapElement(
             <OverlayTrigger
               placement="auto"
               trigger="click"
@@ -350,7 +358,7 @@ export default class PlayerMusteringComponent extends Component<
               }
               overlay={this.renderMusteringPopover(modifiedRegion)}
             >
-              {child}
+              <span />
             </OverlayTrigger>
           )
         }
@@ -440,6 +448,7 @@ export default class PlayerMusteringComponent extends Component<
     );
   }
 
+  @action
   private setOpenMusteringPopover(
     openMusteringPopover: {
       region: Region;
@@ -447,7 +456,6 @@ export default class PlayerMusteringComponent extends Component<
     } | null
   ): void {
     this.openMusteringPopover = openMusteringPopover;
-    this.props.mapControls.refresh();
   }
 
   private isMusteringPopoverOpen(
@@ -460,6 +468,7 @@ export default class PlayerMusteringComponent extends Component<
     );
   }
 
+  @action
   private toggleMusteringPopover(
     region: Region,
     trigger: MusteringPopoverTrigger,
@@ -512,7 +521,7 @@ export default class PlayerMusteringComponent extends Component<
           r,
           {
             highlight: { active: true },
-            wrap: (child: ReactElement) => (
+            wrap: wrapMapElement(
               <OverlayTrigger
                 placement="auto"
                 trigger="click"
@@ -523,7 +532,7 @@ export default class PlayerMusteringComponent extends Component<
                 }
                 overlay={this.renderMusteringPopover(r)}
               >
-                {child}
+                <span />
               </OverlayTrigger>
             )
           }
@@ -566,16 +575,6 @@ export default class PlayerMusteringComponent extends Component<
   }
 
   componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-
     if (
       this.props.gameState.regions.length != 1 ||
       !this.doesControlCurrentHouse
@@ -599,21 +598,9 @@ export default class PlayerMusteringComponent extends Component<
     // Discard any pending, unsent musterings so they don't corrupt the shared game model
     // (e.g. when the component is torn down by switching to replay mode instead of submitting)
     this.reset();
-
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 
+  @action
   private onUnitClick(unit: Unit): void {
     for (const musteredRegion of this.musterings.keys) {
       const musterings = this.musterings.get(musteredRegion);
@@ -628,6 +615,7 @@ export default class PlayerMusteringComponent extends Component<
     }
   }
 
+  @action
   private reset(): void {
     _.flatMap(this.musterings.values).forEach((r) => {
       r.region.newUnits = [];

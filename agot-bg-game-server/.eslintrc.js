@@ -26,6 +26,7 @@ module.exports = {
     ],
     "@typescript-eslint/no-explicit-any": ["off"],
     "@typescript-eslint/no-empty-function": ["off"],
+    "react/prop-types": ["off"],
     "@typescript-eslint/ban-ts-ignore": ["off"]
   }
 };

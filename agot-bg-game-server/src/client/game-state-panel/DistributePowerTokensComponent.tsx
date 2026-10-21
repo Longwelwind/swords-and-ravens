@@ -20,8 +20,9 @@ export default class ResolveTiesComponent extends Component<
   GameStateComponentProps<DistributePowerTokensGameState>
 > {
   currentBidResults: BetterMap<House, number>;
-  @observable additionalPowerTokens: BetterMap<House, number> = new BetterMap();
-  @observable availablePowerTokensForDistribution: number;
+  @observable accessor additionalPowerTokens: BetterMap<House, number> =
+    new BetterMap();
+  @observable accessor availablePowerTokensForDistribution: number;
 
   constructor(props: GameStateComponentProps<DistributePowerTokensGameState>) {
     super(props);

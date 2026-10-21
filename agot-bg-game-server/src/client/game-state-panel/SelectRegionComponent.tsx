@@ -1,9 +1,9 @@
+import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import React from "react";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
 import { Row, Col, Button } from "react-bootstrap";
 import SelectRegionGameState from "../../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
@@ -14,13 +14,16 @@ import PartialRecursive from "../../utils/PartialRecursive";
 export default class SelectRegionComponent extends Component<
   GameStateComponentProps<SelectRegionGameState<any>>
 > {
-  @observable selectedRegion: Region | null;
-
-  modifyRegionsOnMapCallback: any;
+  @observable accessor selectedRegion: Region | null;
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+        />
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(
             this.props.gameState.house
@@ -93,23 +96,12 @@ export default class SelectRegionComponent extends Component<
     return [];
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-  }
-
+  @action
   private reset(): void {
     this.selectedRegion = null;
   }
 
+  @action
   private onRegionClick(r: Region): void {
     if (this.selectedRegion == r) {
       this.reset();
@@ -118,6 +110,7 @@ export default class SelectRegionComponent extends Component<
     }
   }
 
+  @action
   private confirm(): void {
     if (!this.selectedRegion) {
       return;

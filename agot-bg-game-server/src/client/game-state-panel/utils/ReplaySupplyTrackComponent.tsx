@@ -14,6 +14,7 @@ interface ReplaySupplyTrackComponentProps {
 
 @observer
 export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTrackComponentProps> {
+  private readonly propsSnapshot = this.props;
   modifyRegionsOnMapCallback: any;
 
   render(): ReactNode {
@@ -24,7 +25,7 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
         </Col>
         <Col>
           <Row className="justify-content-center">
-            {this.props.supplyRestrictions.map((allowedArmies, i) => (
+            {this.propsSnapshot.supplyRestrictions.map((allowedArmies, i) => (
               <Col
                 xs="auto"
                 key={`supply-track_${i}`}
@@ -74,6 +75,6 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
   }
 
   getHousesAtSupplyLevel(supplyLevel: number): HouseSnapshot[] {
-    return this.props.houses.filter((h) => h.supply == supplyLevel);
+    return this.propsSnapshot.houses.filter((h) => h.supply == supplyLevel);
   }
 }

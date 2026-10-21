@@ -13,8 +13,8 @@ export default class GameState<
   ParentGameState extends AnyGameState,
   ChildGameState extends AnyGameState = null
 > {
-  @observable parentGameState: ParentGameState;
-  @observable childGameState: ChildGameState;
+  @observable accessor parentGameState: ParentGameState;
+  @observable accessor childGameState: ChildGameState;
 
   needsToBeTransmittedToClient = false;
 

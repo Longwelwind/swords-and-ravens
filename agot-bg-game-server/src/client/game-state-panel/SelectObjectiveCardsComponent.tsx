@@ -16,7 +16,7 @@ import _ from "lodash";
 export default class SelectObjectiveCardsComponent extends Component<
   GameStateComponentProps<SelectObjectiveCardsGameState<any>>
 > {
-  @observable selectedObjectiveCards: ObjectiveCard[] = [];
+  @observable accessor selectedObjectiveCards: ObjectiveCard[] = [];
 
   get house(): House | null {
     return this.props.gameClient.authenticatedPlayer?.house ?? null;

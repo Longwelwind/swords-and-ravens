@@ -22,8 +22,11 @@ export default class BiddingGameState<
 > extends GameState<ParentGameState> {
   participatingHouses: House[];
   // Client-side, this structure will only contain -1 as value.
-  @observable bids: BetterMap<House, number> = new BetterMap<House, number>();
-  @observable powerTokensToBid = 0;
+  @observable accessor bids: BetterMap<House, number> = new BetterMap<
+    House,
+    number
+  >();
+  @observable accessor powerTokensToBid = 0;
 
   get game(): Game {
     return this.parentGameState.game;

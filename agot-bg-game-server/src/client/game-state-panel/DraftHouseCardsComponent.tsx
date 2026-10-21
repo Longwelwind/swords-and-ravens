@@ -23,7 +23,7 @@ import joinReactNodes from "../utils/joinReactNodes";
 export default class DraftHouseCardsComponent extends Component<
   GameStateComponentProps<DraftHouseCardsGameState>
 > {
-  @observable nameFilter = "";
+  @observable accessor nameFilter = "";
   get house(): House {
     return this.props.gameState.childGameState.house;
   }

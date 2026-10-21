@@ -25,7 +25,7 @@ export default class SelectHouseCardGameState<
 > extends GameState<P> {
   house: House;
   houseCards: HouseCard[];
-  @observable selectedHouseCard: HouseCard | null = null;
+  @observable accessor selectedHouseCard: HouseCard | null = null;
 
   firstStart(house: House, houseCards: HouseCard[]): void {
     this.house = house;

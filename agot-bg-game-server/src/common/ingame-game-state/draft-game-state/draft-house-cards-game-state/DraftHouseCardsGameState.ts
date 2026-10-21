@@ -34,10 +34,10 @@ export default class DraftHouseCardsGameState extends GameState<
 > {
   houses: House[];
   draftOrder: number[][];
-  @observable draftStep: DraftStep;
+  @observable accessor draftStep: DraftStep;
   vassalsOnInfluenceTracks: House[][] = [];
-  @observable currentRowIndex: number;
-  @observable currentColumnIndex: number;
+  @observable accessor currentRowIndex: number;
+  @observable accessor currentColumnIndex: number;
 
   get ingame(): IngameGameState {
     return this.parentGameState.parentGameState;

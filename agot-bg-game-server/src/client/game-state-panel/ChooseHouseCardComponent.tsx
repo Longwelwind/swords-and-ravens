@@ -18,7 +18,7 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 export default class ChooseHouseCardComponent extends Component<
   GameStateComponentProps<ChooseHouseCardGameState>
 > {
-  @observable dontSkipVsbQuestion: boolean;
+  @observable accessor dontSkipVsbQuestion: boolean;
 
   get chosenHouseCard(): HouseCard | null {
     const commandedHouse = this.tryGetCommandedHouseInCombat();

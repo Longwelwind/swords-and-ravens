@@ -15,8 +15,8 @@ import _ from "lodash";
 export default class SelectedRandomDraftComponent extends Component<
   GameStateComponentProps<SelectedRandomDraftGameState>
 > {
-  @observable nameFilter = "";
-  @observable selectedHouseCard: HouseCard | null = null;
+  @observable accessor nameFilter = "";
+  @observable accessor selectedHouseCard: HouseCard | null = null;
 
   get player(): Player | null {
     return this.props.gameClient.authenticatedPlayer;

@@ -12,7 +12,7 @@ import { observable } from "mobx";
 export default class AeronDamphairAbilityComponent extends Component<
   GameStateComponentProps<AeronDamphairDwDAbilityGameState>
 > {
-  @observable powerTokens = 0;
+  @observable accessor powerTokens = 0;
 
   get authenticatedPlayer(): Player | null {
     return this.props.gameClient.authenticatedPlayer;

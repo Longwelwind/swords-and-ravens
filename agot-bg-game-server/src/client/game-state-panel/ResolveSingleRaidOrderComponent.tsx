@@ -1,12 +1,12 @@
+import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import ResolveSingleRaidOrderGameState from "../../common/ingame-game-state/action-game-state/resolve-raid-order-game-state/resolve-single-raid-order-game-state/ResolveSingleRaidOrderGameState";
 import GameStateComponentProps from "./GameStateComponentProps";
 import React from "react";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import Button from "react-bootstrap/Button";
-import * as _ from "lodash";
 import RaidOrderType from "../../common/ingame-game-state/game-data-structure/order-types/RaidOrderType";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -19,10 +19,8 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 export default class ResolveSingleRaidOrderComponent extends Component<
   GameStateComponentProps<ResolveSingleRaidOrderGameState>
 > {
-  @observable selectedOrderRegion: Region | null;
-  @observable selectedTargetRegion: Region | null;
-
-  modifyOrdersOnMapCallback: any;
+  @observable accessor selectedOrderRegion: Region | null;
+  @observable accessor selectedTargetRegion: Region | null;
 
   get house(): House {
     return this.props.gameState.house;
@@ -41,6 +39,11 @@ export default class ResolveSingleRaidOrderComponent extends Component<
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Col xs={12} className="text-center">
           House <b>{this.house.name}</b> must resolve one of its Raid Orders.
         </Col>
@@ -109,6 +112,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<
     );
   }
 
+  @action
   confirm(): void {
     if (this.selectedOrderRegion) {
       if (!this.selectedTargetRegion) {
@@ -125,11 +129,13 @@ export default class ResolveSingleRaidOrderComponent extends Component<
     }
   }
 
+  @action
   private reset(): void {
     this.selectedOrderRegion = null;
     this.selectedTargetRegion = null;
   }
 
+  @action
   onOrderClick(
     r: Region,
     _orderType: RaidOrderType | RaidSupportOrderType | null
@@ -171,18 +177,5 @@ export default class ResolveSingleRaidOrderComponent extends Component<
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
   }
 }

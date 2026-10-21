@@ -34,7 +34,6 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
-import PartialRecursive from "../utils/PartialRecursive";
 import {
   land,
   sea
@@ -352,8 +351,6 @@ export default class MapComponent extends Component<MapComponentProps> {
   }
 
   render(): ReactNode {
-    void this.props.mapControls.revision;
-
     const ironBankView = this.ingame.world.ironBankView;
     const fogOfWarActive = this.ingame.fogOfWar;
     const garrisons = new BetterMap<Region, string | null>();
@@ -388,12 +385,11 @@ export default class MapComponent extends Component<MapComponentProps> {
       }
     }
 
-    const propertiesForRegions = this.getModifiedPropertiesForEntities<
-      Region,
-      RegionOnMapProperties
-    >(allRegions, this.props.mapControls.modifyRegionsOnMap, {
-      highlight: { active: false, color: "white" }
-    });
+    const mapProperties = this.props.mapControls.resolve(
+      this.ingame,
+      allRegions
+    );
+    const propertiesForRegions = mapProperties.regions;
 
     // If the user is to select a region, we disable the pointer events for units to forward the click event to the region.
     // This makes it easier to hit the ports!
@@ -406,14 +402,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         (p) => p.onClick != undefined || p.wrap != undefined
       );
 
-    const propertiesForUnits = this.getModifiedPropertiesForEntities<
-      Unit,
-      UnitOnMapProperties
-    >(
-      _.flatMap(allRegions.map((r) => r.allUnits)),
-      this.props.mapControls.modifyUnitsOnMap,
-      {}
-    );
+    const propertiesForUnits = mapProperties.units;
 
     return (
       <div
@@ -538,7 +527,7 @@ export default class MapComponent extends Component<MapComponentProps> {
               animation={animation}
             />
           ))}
-          {this.renderOrders(allRegions, isVisible)}
+          {this.renderOrders(mapProperties.orders, isVisible)}
           {this.ingame.orderMoveAnimations.map((animation) => (
             <MovingOrder
               key={`moving-order-${animation.id}`}
@@ -1143,14 +1132,9 @@ export default class MapComponent extends Component<MapComponentProps> {
   }
 
   renderOrders(
-    regions: Region[],
+    propertiesForOrders: BetterMap<Region, OrderOnMapProperties>,
     isVisible: (region: Region) => boolean
   ): ReactNode {
-    const propertiesForOrders = this.getModifiedPropertiesForEntities<
-      Region,
-      OrderOnMapProperties
-    >(regions, this.props.mapControls.modifyOrdersOnMap, {});
-
     return propertiesForOrders.map((region, properties) => {
       if (!isVisible(region)) {
         return null;
@@ -1214,42 +1198,6 @@ export default class MapComponent extends Component<MapComponentProps> {
 
       return null;
     });
-  }
-
-  /**
-   * This is used to call modifyRegionOnMap, modifyUnitOnMap and merge the properties
-   * of an entity (Region, Unit, ...) that have been modified by `...GameStateComponent` classes.
-   * @param entities
-   * @param modifyPropertiesFunctions
-   * @param defaultProperties
-   */
-  getModifiedPropertiesForEntities<Entity, Property>(
-    entities: Entity[],
-    modifyPropertiesFunctions: (() => [Entity, PartialRecursive<Property>][])[],
-    defaultProperties: Property
-  ): BetterMap<Entity, Property> {
-    // Create a Map of properties for all regions that will be shown.
-    // Every entity needs its own copy as _.merge mutates its target which would leak
-    // properties (onClick, wrap, highlight, ...) of one entity to all the others.
-    const propertiesForEntities = new BetterMap<Entity, Property>();
-    entities.forEach((entity) => {
-      propertiesForEntities.set(entity, _.cloneDeep(defaultProperties));
-    });
-
-    modifyPropertiesFunctions.forEach((modifyPropertiesFunction) => {
-      const modifiedPropertiesForEntities = modifyPropertiesFunction();
-
-      modifiedPropertiesForEntities.forEach(([entity, modifiedProperties]) => {
-        if (propertiesForEntities.has(entity)) {
-          propertiesForEntities.set(
-            entity,
-            _.merge(propertiesForEntities.get(entity), modifiedProperties)
-          );
-        }
-      });
-    });
-
-    return propertiesForEntities;
   }
 
   renderOrder(

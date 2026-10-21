@@ -17,8 +17,8 @@ import { faArrowsAltH } from "@fortawesome/free-solid-svg-icons";
 export default class ResolveSpymasterComponent extends Component<
   GameStateComponentProps<ResolveSpymasterGameState<any>>
 > {
-  @observable selectedWesterosCards: WesterosCard[] = [];
-  @observable drawnWesterosCards: WesterosCard[] =
+  @observable accessor selectedWesterosCards: WesterosCard[] = [];
+  @observable accessor drawnWesterosCards: WesterosCard[] =
     this.props.gameState.westerosCards;
   render(): ReactNode {
     return (

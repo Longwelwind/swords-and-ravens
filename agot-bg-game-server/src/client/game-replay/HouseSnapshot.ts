@@ -5,16 +5,16 @@ import IHouseSnapshot from "./IHouseSnapshot";
 
 export default class HouseSnapshot implements IHouseSnapshot {
   id: string;
-  @observable victoryPointsUI: number;
-  @observable landAreaCount: number;
-  @observable supply: number;
-  @observable houseCards: {
+  @observable accessor victoryPointsUI: number;
+  @observable accessor landAreaCount: number;
+  @observable accessor supply: number;
+  @observable accessor houseCards: {
     id: string;
     state: HouseCardState;
   }[];
-  @observable powerTokens: number;
-  @observable isVassal?: boolean;
-  @observable suzerainHouseId?: string;
+  @observable accessor powerTokens: number;
+  @observable accessor isVassal: boolean | undefined = undefined;
+  @observable accessor suzerainHouseId: string | undefined = undefined;
   victoryPoints: number;
   name: string;
   color: string;

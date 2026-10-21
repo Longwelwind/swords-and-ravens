@@ -18,8 +18,8 @@ interface DebouncedPasswordComponentProps {
 
 @observer
 export default class DebouncedPasswordComponent extends Component<DebouncedPasswordComponentProps> {
-  @observable revealed = false;
-  @observable password = this.props.password;
+  @observable accessor revealed = false;
+  @observable accessor password = this.props.password;
 
   debounce = _.debounce((val) => this.props.onChangeCallback(val), 500, {
     trailing: true

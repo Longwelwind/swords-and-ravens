@@ -4,15 +4,17 @@ import IRegionSnapshot from "./IRegionSnapshot";
 
 export default class RegionSnapshot implements IRegionSnapshot {
   id: string;
-  @observable units?: UnitState[];
-  @observable garrison?: number;
-  @observable controlPowerToken?: string;
-  @observable loyaltyTokens?: number;
-  @observable castleModifier?: number;
-  @observable barrelModifier?: number;
-  @observable crownModifier?: number;
-  @observable overwrittenSuperControlPowerToken?: string;
-  @observable order?: { type: string; restricted?: boolean };
+  @observable accessor units: UnitState[] | undefined = undefined;
+  @observable accessor garrison: number | undefined = undefined;
+  @observable accessor controlPowerToken: string | undefined = undefined;
+  @observable accessor loyaltyTokens: number | undefined = undefined;
+  @observable accessor castleModifier: number | undefined = undefined;
+  @observable accessor barrelModifier: number | undefined = undefined;
+  @observable accessor crownModifier: number | undefined = undefined;
+  @observable accessor overwrittenSuperControlPowerToken: string | undefined =
+    undefined;
+  @observable accessor order:
+    { type: string; restricted?: boolean } | undefined = undefined;
 
   constructor(data: IRegionSnapshot) {
     this.id = data.id;

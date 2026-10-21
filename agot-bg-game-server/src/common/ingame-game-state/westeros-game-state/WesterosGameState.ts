@@ -63,7 +63,7 @@ export default class WesterosGameState extends GameState<
 > {
   revealAndResolveTop2WesterosDeck4Cards = false;
   revealedCards: WesterosCard[];
-  @observable currentCardI = -1;
+  @observable accessor currentCardI = -1;
   /**
    * List of restrictions that will be applied to the planning phase.
    * Elements are added by WesterosCardType.

@@ -1,7 +1,8 @@
+import MapContribution, { wrapMapElement } from "../MapContribution";
 import { observer } from "mobx-react";
-import React, { Component, ReactElement, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import { Button, OverlayTrigger, Popover } from "react-bootstrap";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -14,20 +15,17 @@ import ConsolidatePowerOrderType from "../../common/ingame-game-state/game-data-
 import IronBankOrderType from "../../common/ingame-game-state/game-data-structure/order-types/IronBankOrderType";
 import DefenseMusterOrderType from "../../common/ingame-game-state/game-data-structure/order-types/DefenseMusterOrderType";
 import IronBank from "../../common/ingame-game-state/game-data-structure/IronBank";
-import _ from "lodash";
 
 @observer
 export default class ResolveSingleConsolidatePowerComponent extends Component<
   GameStateComponentProps<ResolveSingleConsolidatePowerGameState>
 > {
-  @observable selectedOrderRegion: Region | null = null;
-  @observable selectedOrderType:
+  @observable accessor selectedOrderRegion: Region | null = null;
+  @observable accessor selectedOrderType:
     | ConsolidatePowerOrderType
     | IronBankOrderType
     | DefenseMusterOrderType
     | null = null;
-
-  modifyOrdersOnMapCallback: any;
 
   get house(): House {
     return this.props.gameState.house;
@@ -64,6 +62,11 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
       );
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Col xs={12} className="text-center">
           {this.gameState.ingame.isVassalHouse(this.house) ? (
             <>
@@ -266,7 +269,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
         {
           highlight: { active: true },
           onClick: () => this.onOrderClick(r, ot),
-          wrap: (child: ReactElement) => (
+          wrap: wrapMapElement(
             <OverlayTrigger
               placement="auto-start"
               trigger="click"
@@ -280,7 +283,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                 </Popover>
               }
             >
-              {child}
+              <span />
             </OverlayTrigger>
           )
         }
@@ -290,6 +293,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
     return [];
   }
 
+  @action
   private onOrderClick(
     region: Region,
     orderType:
@@ -303,22 +307,10 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
     }
   }
 
+  @action
   private reset(): void {
     this.selectedOrderRegion = null;
     this.selectedOrderType = null;
     document.body.click();
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
   }
 }

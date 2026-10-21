@@ -1,7 +1,8 @@
+import MapContribution from "./MapContribution";
 import * as React from "react";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
-import { observable } from "mobx";
+import { action, observable, runInAction } from "mobx";
 import {
   Button,
   FormCheck,
@@ -100,24 +101,33 @@ export interface InfluenceTrackDetails {
 export default class IngameComponent extends Component<IngameComponentProps> {
   mapControls: MapControls = new MapControls();
 
-  @observable showMapScrollbarInfo = false;
-  @observable showBrowserZoomInfo = false;
-  @observable columnSwapAnimationClassName = "";
-  @observable tracksPopoverVisible = false;
-  @observable gameStateColumnWidth: number | null = null;
+  @observable accessor showMapScrollbarInfo = false;
+  @observable accessor showBrowserZoomInfo = false;
+  @observable accessor columnSwapAnimationClassName = "";
+  @observable accessor tracksPopoverVisible = false;
+  @observable accessor gameStateColumnWidth: number | null = null;
 
   gameStateColumnRef = React.createRef<HTMLDivElement>();
   resizeDebounceTimer: number | null = null;
 
-  private ingame = this.props.gameState;
-  private gameClient = this.props.gameClient;
-  private user = this.props.gameClient.authenticatedUser;
-  private authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
-  private game = this.ingame.game;
-  private gameSettings = this.ingame.entireGame.gameSettings;
-
-  modifyOrdersOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
+  private get ingame(): IngameGameState {
+    return this.props.gameState;
+  }
+  private get gameClient(): GameClient {
+    return this.props.gameClient;
+  }
+  private get user(): GameClient["authenticatedUser"] {
+    return this.props.gameClient.authenticatedUser;
+  }
+  private get authenticatedPlayer(): GameClient["authenticatedPlayer"] {
+    return this.props.gameClient.authenticatedPlayer;
+  }
+  private get game(): IngameGameState["game"] {
+    return this.ingame.game;
+  }
+  private get gameSettings(): IngameGameState["entireGame"]["gameSettings"] {
+    return this.ingame.entireGame.gameSettings;
+  }
 
   calcInfluenceTrackDetails(): InfluenceTrackDetails[] {
     const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(
@@ -245,6 +255,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
     return (
       <>
+        <MapContribution
+          mapControls={this.mapControls}
+          gameState={this.props.gameState}
+          kind="animation"
+          orders={this.modifyOrdersOnMap()}
+          units={this.modifyUnitsOnMap()}
+        />
         <Row
           className="justify-content-center"
           style={{
@@ -333,15 +350,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     );
   }
 
+  @action
   onColumnSwap(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     if (this.user && this.columnSwapAnimationClassName === "") {
+      const user = this.user;
       e.currentTarget.blur();
-      this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
-      this.user.settings.gameStateColumnRight =
-        !this.user.settings.gameStateColumnRight;
-      this.tracksPopoverVisible = false;
+      runInAction(() => {
+        this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
+        user.settings.gameStateColumnRight =
+          !user.settings.gameStateColumnRight;
+        this.tracksPopoverVisible = false;
+      });
       window.setTimeout(() => {
-        this.columnSwapAnimationClassName = "";
+        runInAction(() => {
+          this.columnSwapAnimationClassName = "";
+        });
       }, 2050);
     }
   }
@@ -455,7 +478,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               <button
                 type="button"
                 className="close"
-                onClick={() => (this.tracksPopoverVisible = false)}
+                onClick={() => {
+                  runInAction(() => {
+                    this.tracksPopoverVisible = false;
+                  });
+                }}
                 style={{ position: "sticky", top: 0 }}
               >
                 <span>&times;</span>
@@ -481,7 +508,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
           })}
           onClick={() => {
-            this.tracksPopoverVisible = !this.tracksPopoverVisible;
+            runInAction(() => {
+              this.tracksPopoverVisible = !this.tracksPopoverVisible;
+            });
           }}
           style={{
             position: "fixed",
@@ -619,8 +648,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   }
 
   closeModal(): void {
-    this.showMapScrollbarInfo = false;
-    this.showBrowserZoomInfo = false;
+    runInAction(() => {
+      this.showMapScrollbarInfo = false;
+      this.showBrowserZoomInfo = false;
+    });
   }
 
   private renderGameControlsPopover(): OverlayChildren {
@@ -970,13 +1001,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   }
 
   componentDidMount(): void {
-    this.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-    this.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-
     // Measure and lock the column width after initial render
     setTimeout(() => this.measureAndLockColumnWidth(), 100);
 
@@ -994,9 +1018,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       this.gameClient.isMapScrollbarSet &&
       !dontShowAgain
     ) {
-      this.showMapScrollbarInfo = true;
+      runInAction(() => {
+        this.showMapScrollbarInfo = true;
+      });
     } else if (this.hasVerticalScrollbar() && !dontShowAgain) {
-      this.showBrowserZoomInfo = true;
+      runInAction(() => {
+        this.showBrowserZoomInfo = true;
+      });
     }
 
     this.ingame.entireGame.onCombatFastTracked = (stats) => {
@@ -1134,8 +1162,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   componentWillUnmount(): void {
     this.ingame.entireGame.onNewPrivateChatRoomCreated = null;
-    _.pull(this.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
-    _.pull(this.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
 
     this.ingame.entireGame.onWildingsAttackFastTracked = null;
     this.ingame.entireGame.onCombatFastTracked = null;
@@ -1152,7 +1178,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   measureAndLockColumnWidth = (): void => {
     if (this.gameStateColumnRef.current) {
       const width = this.gameStateColumnRef.current.offsetWidth;
-      this.gameStateColumnWidth = width;
+      runInAction(() => {
+        this.gameStateColumnWidth = width;
+      });
     }
   };
 
@@ -1163,7 +1191,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     // Reset width to allow natural sizing, then remeasure after debounce
-    this.gameStateColumnWidth = null;
+    runInAction(() => {
+      this.gameStateColumnWidth = null;
+    });
 
     this.resizeDebounceTimer = window.setTimeout(() => {
       this.measureAndLockColumnWidth();

@@ -1,3 +1,4 @@
+import MapContribution from "./MapContribution";
 import GameClient from "./GameClient";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -42,7 +43,7 @@ import MapControls, { RegionOnMapProperties } from "./MapControls";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import PartialRecursive from "../utils/PartialRecursive";
 import BetterMap from "../utils/BetterMap";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import {
   port,
@@ -65,8 +66,7 @@ interface HouseRowComponentProps {
 
 @observer
 export default class HouseRowComponent extends Component<HouseRowComponentProps> {
-  modifyRegionsOnMapCallback: any;
-  @observable highlightedRegions = new BetterMap<
+  @observable accessor highlightedRegions = new BetterMap<
     Region,
     PartialRecursive<RegionOnMapProperties>
   >();
@@ -227,6 +227,12 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         key={`house-row-${this.house.id}-${this.ingame.stateVersion}`}
         style={{ padding: 0, margin: 0 }}
       >
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.ingame}
+          kind="hover"
+          regions={this.modifyRegionsOnMap()}
+        />
         <div
           className={isWaitedFor ? "orange-border orange-border-animation" : ""}
           style={{
@@ -242,7 +248,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               className="pr-0"
               style={{ width: "32px" }}
               onMouseEnter={() => this.setHighlightedRegions()}
-              onMouseLeave={() => this.highlightedRegions.clear()}
+              onMouseLeave={() => this.clearHighlightedRegions()}
             >
               {controllerOfHouse ? (
                 <div
@@ -276,7 +282,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             </Col>
             <Col
               onMouseEnter={() => this.setHighlightedRegions()}
-              onMouseLeave={() => this.highlightedRegions.clear()}
+              onMouseLeave={() => this.clearHighlightedRegions()}
               className="pr-0"
             >
               <h5 style={{ margin: 0, padding: 0 }}>
@@ -338,7 +344,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                                   this.setHighlightedRegions(type.id)
                                 }
                                 onMouseLeave={() =>
-                                  this.highlightedRegions.clear()
+                                  this.clearHighlightedRegions()
                                 }
                                 style={{
                                   backgroundImage: `url(${unitImages.get(this.house.id).get(type.id)})`
@@ -368,7 +374,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                         : "with-castles-only"
                     )
                   }
-                  onMouseLeave={() => this.highlightedRegions.clear()}
+                  onMouseLeave={() => this.clearHighlightedRegions()}
                 >
                   <div
                     style={{
@@ -402,7 +408,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               onMouseEnter={() =>
                 this.setHighlightedRegions("with-power-tokens-only")
               }
-              onMouseLeave={() => this.highlightedRegions.clear()}
+              onMouseLeave={() => this.clearHighlightedRegions()}
             >
               <OverlayTrigger
                 overlay={this.renderPowerTooltip(
@@ -679,6 +685,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     );
   }
 
+  @action
   onLaunchReplaceVassalVoteClick(): void {
     if (
       window.confirm(
@@ -689,6 +696,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     }
   }
 
+  @action
   setHighlightedRegions(filter = ""): void {
     const controlledRegions =
       this.props.gameClient.allRegionsWithControllers.filter(
@@ -924,16 +932,8 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     return this.highlightedRegions.entries;
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
+  @action
+  clearHighlightedRegions(): void {
+    this.highlightedRegions.clear();
   }
 }

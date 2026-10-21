@@ -1,3 +1,4 @@
+import MapContribution from "../../MapContribution";
 import { Component, default as React, ReactNode } from "react";
 import { observer } from "mobx-react";
 import Badge from "react-bootstrap/Badge";
@@ -15,8 +16,7 @@ import MapControls, {
   RegionOnMapProperties
 } from "../../../client/MapControls";
 import IngameGameState from "../../../common/ingame-game-state/IngameGameState";
-import { observable } from "mobx";
-import _ from "lodash";
+import { action, observable } from "mobx";
 import GameClient from "../../GameClient";
 
 interface SupplyTrackComponentProps {
@@ -29,8 +29,7 @@ interface SupplyTrackComponentProps {
 
 @observer
 export default class SupplyTrackComponent extends Component<SupplyTrackComponentProps> {
-  modifyRegionsOnMapCallback: any;
-  @observable highlightedRegions = new BetterMap<
+  @observable accessor highlightedRegions = new BetterMap<
     Region,
     PartialRecursive<RegionOnMapProperties>
   >();
@@ -42,6 +41,12 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
   render(): ReactNode {
     return (
       <Row>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.ingame}
+          kind="hover"
+          regions={this.modifyRegionsOnMap()}
+        />
         <Col xs="auto">
           <OverlayTrigger
             overlay={
@@ -159,7 +164,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                               marginTop: "-5px"
                             }}
                             onMouseEnter={() => this.setHighlightedRegions(h)}
-                            onMouseLeave={() => this.highlightedRegions.clear()}
+                            onMouseLeave={() => this.clearHighlightedRegions()}
                           ></div>
                         </OverlayTrigger>
                       ))}
@@ -183,6 +188,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     );
   }
 
+  @action
   setHighlightedRegions(house: House): void {
     const regions = this.props.ingame.world.regions.values.filter(
       (r) => r.supplyIcons > 0 && r.getController() == house
@@ -216,16 +222,8 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     return this.highlightedRegions.entries;
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
+  @action
+  clearHighlightedRegions(): void {
+    this.highlightedRegions.clear();
   }
 }

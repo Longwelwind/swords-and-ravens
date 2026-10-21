@@ -1,3 +1,4 @@
+import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import React from "react";
 import BetterMap from "../../utils/BetterMap";
@@ -9,7 +10,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Row from "react-bootstrap/Row";
 import { UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -20,9 +21,8 @@ import joinReactNodes from "../utils/joinReactNodes";
 export default class ResolveSinglePayDebtComponent extends Component<
   GameStateComponentProps<ResolveSinglePayDebtGameState>
 > {
-  @observable unitsToRemove: BetterMap<Region, Unit[]> = new BetterMap();
-
-  modifyUnitsOnMapCallback: any;
+  @observable accessor unitsToRemove: BetterMap<Region, Unit[]> =
+    new BetterMap();
 
   get house(): House {
     return this.props.gameState.house;
@@ -50,6 +50,11 @@ export default class ResolveSinglePayDebtComponent extends Component<
     const notEnough = selected.length < this.props.gameState.debt;
     return (
       <Row>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          units={this.modifyUnitsOnMap()}
+        />
         <Col xs={12} className="text-center">
           <p>
             The holder of the Valyrian Steel Blade destroys one unit for each
@@ -118,6 +123,7 @@ export default class ResolveSinglePayDebtComponent extends Component<
     );
   }
 
+  @action
   onUnitClick(unit: Unit): void {
     // If there's no array for this region, add one
     if (!this.unitsToRemove.has(unit.region)) {
@@ -138,11 +144,13 @@ export default class ResolveSinglePayDebtComponent extends Component<
     }
   }
 
+  @action
   confirm(): void {
     this.props.gameState.sendPayDebt(this.unitsToRemove.entries);
     this.reset();
   }
 
+  @action
   private reset(): void {
     this.unitsToRemove = new BetterMap();
   }
@@ -165,18 +173,5 @@ export default class ResolveSinglePayDebtComponent extends Component<
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 }

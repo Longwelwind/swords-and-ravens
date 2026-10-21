@@ -18,7 +18,7 @@ import { PlayerActionType } from "../../game-data-structure/GameLog";
 import _ from "lodash";
 
 export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
-  @observable readyHouses: House[] = [];
+  @observable accessor readyHouses: House[] = [];
 
   get ingame(): IngameGameState {
     return this.parentGameState.parentGameState;

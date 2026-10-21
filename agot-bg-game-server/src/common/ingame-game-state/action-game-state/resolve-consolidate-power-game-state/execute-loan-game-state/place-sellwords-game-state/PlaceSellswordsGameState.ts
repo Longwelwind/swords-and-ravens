@@ -15,8 +15,8 @@ import { observable } from "mobx";
 import unitTypes from "../../../../game-data-structure/unitTypes";
 
 export default class PlaceSellswordsGameState extends GameState<ExecuteLoanGameState> {
-  @observable house: House;
-  @observable sellswords: UnitType[];
+  @observable accessor house: House;
+  @observable accessor sellswords: UnitType[];
 
   get game(): Game {
     return this.parentGameState.game;

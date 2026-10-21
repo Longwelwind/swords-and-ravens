@@ -16,7 +16,8 @@ interface NoteComponentProps {
 
 @observer
 export default class NoteComponent extends Component<NoteComponentProps> {
-  @observable note = this.props.gameClient.authenticatedUser?.note ?? "";
+  @observable accessor note =
+    this.props.gameClient.authenticatedUser?.note ?? "";
 
   render(): ReactNode {
     return (

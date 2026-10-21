@@ -11,7 +11,7 @@ import IngameGameState from "../../IngameGameState";
 import _ from "lodash";
 
 export default class AgreeOnGameStartGameState extends GameState<DraftGameState> {
-  @observable readyHouses: House[];
+  @observable accessor readyHouses: House[];
 
   get ingame(): IngameGameState {
     return this.parentGameState.ingame;

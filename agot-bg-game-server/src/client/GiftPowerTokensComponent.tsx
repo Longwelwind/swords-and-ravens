@@ -18,7 +18,7 @@ interface GiftPowerTokensComponentProps {
 
 @observer
 export default class GiftPowerTokensComponent extends Component<GiftPowerTokensComponentProps> {
-  @observable powerTokens = 0;
+  @observable accessor powerTokens = 0;
 
   get house(): House {
     return this.props.authenticatedPlayer.house;

@@ -1,3 +1,4 @@
+import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import SelectUnitsGameState from "../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
@@ -9,7 +10,7 @@ import { Row } from "react-bootstrap";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import BetterMap from "../../utils/BetterMap";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import { observer } from "mobx-react";
 import { UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -19,13 +20,16 @@ import joinReactNodes from "../utils/joinReactNodes";
 export default class SelectUnitsComponent extends Component<
   GameStateComponentProps<SelectUnitsGameState<any>>
 > {
-  @observable selectedUnits = new BetterMap<Region, Unit[]>();
-
-  modifyUnitOnMapCallback: any;
+  @observable accessor selectedUnits = new BetterMap<Region, Unit[]>();
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          units={this.modifyUnitOnMap()}
+        />
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(
             this.props.gameState.house
@@ -100,6 +104,7 @@ export default class SelectUnitsComponent extends Component<
     return _.sum(this.selectedUnits.map((r, us) => us.length));
   }
 
+  @action
   confirm(): void {
     if (this.selectedUnits.size == 0) {
       if (
@@ -165,6 +170,7 @@ export default class SelectUnitsComponent extends Component<
     return [];
   }
 
+  @action
   onUnitClick(region: Region, unit: Unit): void {
     let found = false;
     this.selectedUnits.forEach((units, region) => {
@@ -186,19 +192,7 @@ export default class SelectUnitsComponent extends Component<
     }
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitOnMapCallback = () => this.modifyUnitOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitOnMapCallback
-    );
-  }
-
+  @action
   private reset(): void {
     this.selectedUnits = new BetterMap<Region, Unit[]>();
   }

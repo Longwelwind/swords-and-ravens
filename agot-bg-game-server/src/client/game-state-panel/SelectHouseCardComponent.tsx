@@ -16,7 +16,7 @@ import _ from "lodash";
 export default class SelectHouseCardComponent extends Component<
   GameStateComponentProps<SelectHouseCardGameState<any>>
 > {
-  @observable nameFilter = "";
+  @observable accessor nameFilter = "";
 
   get selectedHouseCard(): HouseCard | null {
     return this.props.gameState.selectedHouseCard;

@@ -12,7 +12,7 @@ import _ from "lodash";
 export default class ClaimVassalComponent extends Component<
   GameStateComponentProps<ClaimVassalGameState>
 > {
-  @observable selectedVassals: House[] = [];
+  @observable accessor selectedVassals: House[] = [];
 
   render(): ReactNode {
     return (

@@ -14,7 +14,7 @@ import HouseCard from "../../common/ingame-game-state/game-data-structure/house-
 export default class ThematicDraftHouseCardsComponent extends Component<
   GameStateComponentProps<ThematicDraftHouseCardsGameState>
 > {
-  @observable selectedHouseCard: HouseCard | null;
+  @observable accessor selectedHouseCard: HouseCard | null;
 
   get player(): Player | null {
     return this.props.gameClient.authenticatedPlayer;

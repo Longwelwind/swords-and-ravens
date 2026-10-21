@@ -1,6 +1,7 @@
+import MapContribution from "./MapContribution";
 import React, { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 
 import {
   Col,
@@ -71,19 +72,29 @@ interface GameStateColumnProps {
 
 @observer
 export default class GameStateColumn extends Component<GameStateColumnProps> {
-  @observable highlightedRegions = new BetterMap<
+  @observable accessor highlightedRegions = new BetterMap<
     Region,
     RegionOnMapProperties
   >();
 
-  modifyRegionsOnMapCallback: any;
-
-  private ingame = this.props.ingame;
-  private game = this.ingame.game;
-  private gameClient = this.props.gameClient;
-  private mapControls = this.props.mapControls;
-  private gameSettings = this.ingame.entireGame.gameSettings;
-  private authenticatedPlayer = this.gameClient.authenticatedPlayer;
+  private get ingame(): IngameGameState {
+    return this.props.ingame;
+  }
+  private get game(): IngameGameState["game"] {
+    return this.ingame.game;
+  }
+  private get gameClient(): GameClient {
+    return this.props.gameClient;
+  }
+  private get mapControls(): MapControls {
+    return this.props.mapControls;
+  }
+  private get gameSettings(): IngameGameState["entireGame"]["gameSettings"] {
+    return this.ingame.entireGame.gameSettings;
+  }
+  private get authenticatedPlayer(): GameClient["authenticatedPlayer"] {
+    return this.gameClient.authenticatedPlayer;
+  }
 
   render(): ReactNode {
     const phases = [
@@ -152,6 +163,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
 
     return (
       <div className="flex-ratio-container">
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.ingame}
+          kind="hover"
+          regions={this.modifyRegionsOnMap()}
+        />
         <Card
           key={`leaf-state-${this.props.ingame.entireGame.leafStateId}`}
           id="game-state-panel"
@@ -263,7 +280,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 <Row
                   className="mb-3 mx-0"
                   onMouseEnter={() => this.highlightRegionsOfHouses()}
-                  onMouseLeave={() => this.highlightedRegions.clear()}
+                  onMouseLeave={() => this.clearHighlightedRegions()}
                 >
                   <OverlayTrigger
                     overlay={
@@ -339,7 +356,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                   <Row
                     className="mx-0 mt-3"
                     onMouseEnter={() => this.highlightRegionsWithDragons()}
-                    onMouseLeave={() => this.highlightedRegions.clear()}
+                    onMouseLeave={() => this.clearHighlightedRegions()}
                   >
                     <OverlayTrigger
                       overlay={this.renderDragonStrengthTooltip()}
@@ -532,6 +549,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     );
   }
 
+  @action
   highlightRegionsOfHouses(): void {
     const regionsWithControllers = new BetterMap(
       this.props.gameClient.allRegionsWithControllers
@@ -559,6 +577,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     });
   }
 
+  @action
   highlightRegionsWithDragons(): void {
     const regions = this.ingame.world.regions.values.filter(
       (r) =>
@@ -603,16 +622,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     return this.highlightedRegions.entries;
   }
 
-  componentDidMount(): void {
-    this.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
+  @action
+  clearHighlightedRegions(): void {
+    this.highlightedRegions.clear();
   }
 }

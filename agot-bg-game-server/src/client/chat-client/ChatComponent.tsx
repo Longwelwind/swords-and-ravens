@@ -68,10 +68,10 @@ export default class ChatComponent extends Component<ChatComponentProps> {
   private chatContainerRef = React.createRef<HTMLDivElement>();
   private chatInputRef = React.createRef<HTMLInputElement>();
 
-  @observable inputText = "";
-  @observable noMoreMessages = false;
-  @observable selectedMessageId: string | null = null;
-  @observable containerWidth: number | undefined = 600;
+  @observable accessor inputText = "";
+  @observable accessor noMoreMessages = false;
+  @observable accessor selectedMessageId: string | null = null;
+  @observable accessor containerWidth: number | undefined = 600;
 
   onResizeCallback: (() => void) | null = null;
   audioPlayed = false;

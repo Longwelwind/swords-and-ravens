@@ -12,7 +12,7 @@ import _ from "lodash";
 import { observable } from "mobx";
 
 export default class ScoreSpecialObjectivesGameState extends GameState<ScoreObjectivesGameState> {
-  @observable readyHouses: House[];
+  @observable accessor readyHouses: House[];
 
   get actionGameState(): ActionGameState {
     return this.parentGameState.action;

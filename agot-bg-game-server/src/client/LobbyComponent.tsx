@@ -45,7 +45,7 @@ interface LobbyComponentProps {
 export default class LobbyComponent extends Component<LobbyComponentProps> {
   private lobbyHousesListRef = React.createRef<HTMLDivElement>();
 
-  @observable password = this.props.gameClient.isRealOwner()
+  @observable accessor password = this.props.gameClient.isRealOwner()
     ? this.lobby.password
     : "";
 
@@ -69,7 +69,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     return this.lobby.readyUsers != null;
   }
 
-  @observable chatHeight = 430;
+  @observable accessor chatHeight = 430;
 
   render(): ReactNode {
     const { success: canStartGame, reason: canStartGameReason } =

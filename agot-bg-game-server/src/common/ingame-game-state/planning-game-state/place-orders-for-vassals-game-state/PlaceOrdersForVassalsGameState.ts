@@ -21,8 +21,8 @@ export default class PlaceOrdersForVassalsGameState extends GameState<
   PlanningGameState,
   ResolveSinglePlaceOrdersForVassalsGameState
 > {
-  @observable house: House;
-  @observable commanders: House[] = [];
+  @observable accessor house: House;
+  @observable accessor commanders: House[] = [];
 
   get ingame(): IngameGameState {
     return this.parentGameState.parentGameState;

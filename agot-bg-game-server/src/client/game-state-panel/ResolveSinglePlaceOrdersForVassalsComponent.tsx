@@ -1,4 +1,6 @@
-import { Component, ReactNode, ReactElement } from "react";
+import { action } from "mobx";
+import MapContribution, { wrapMapElement } from "../MapContribution";
+import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import React from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
@@ -53,9 +55,6 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
     [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows }]
   ]);
 
-  modifyRegionsOnMapCallback: any;
-  modifyOrdersOnMapCallback: any;
-
   get player(): Player {
     if (!this.props.gameClient.authenticatedPlayer) {
       throw new Error();
@@ -92,6 +91,12 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
       .map((h) => h.name);
     return (
       <Col>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
             <>
@@ -155,26 +160,6 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
     );
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-  }
-
   modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
     if (this.doesControlCurrentHouse) {
       const possibleRegions = _.flatMap(
@@ -194,7 +179,7 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
               highlight: {
                 active: !this.singlePlaceOrders.placedOrders.has(r)
               },
-              wrap: (child: ReactElement) => (
+              wrap: wrapMapElement(
                 <OverlayTrigger
                   placement="auto-start"
                   trigger="click"
@@ -249,7 +234,7 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
                     </Popover>
                   }
                 >
-                  {child}
+                  <span />
                 </OverlayTrigger>
               )
             }
@@ -283,6 +268,7 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
     return [];
   }
 
+  @action
   onOrderClick(region: Region): void {
     if (!this.doesControlCurrentHouse) {
       return;
@@ -291,6 +277,7 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
     this.singlePlaceOrders.assignOrder(region, null);
   }
 
+  @action
   onSubmitClick(): void {
     if (
       !this.doesControlCurrentHouse ||
