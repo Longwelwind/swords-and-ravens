@@ -17,6 +17,14 @@ const VolumeSlider =
 const AutoScroll = require("../src/client/utils/AutoScroll").default;
 require("../src/common/EntireGame");
 const EntireGame = require("../src/common/EntireGame").default;
+const {
+  default: GameClient,
+  ConnectionState
+} = require("../src/client/GameClient");
+const App = require("../src/client/App").default;
+const EntireGameComponent =
+  require("../src/client/EntireGameComponent").default;
+const { default: User, UserSettings } = require("../src/server/User");
 const GameSettings = require("../src/client/GameSettingsComponent").default;
 const SettingsModel = require("../src/common/GameSettings").GameSettings;
 
@@ -34,6 +42,90 @@ beforeEach((context) => {
 });
 
 afterEach(cleanup);
+
+function gameScreenFixture(context) {
+  const game = new EntireGame("fixture", "owner", "Connected game");
+  const user = new User("owner", "Owner", "Owner", game, new UserSettings());
+  const client = new GameClient({
+    userId: user.id,
+    requestUserId: user.id,
+    gameId: game.id,
+    authToken: "fixture"
+  });
+  runInAction(() => {
+    game.users.set(user.id, user);
+    game.clockOffsetMs = 30000;
+    client.entireGame = game;
+    client.authenticatedUser = user;
+    client.authenticated = true;
+    client.connectionState = ConnectionState.SYNCED;
+  });
+  const ticks = [];
+  const cleared = [];
+  context.mock.method(EntireGameComponent.prototype, "updateFavicon", () => {});
+  context.mock.method(window, "setInterval", (callback) => {
+    ticks.push(callback);
+    return ticks.length;
+  });
+  context.mock.method(window, "clearInterval", (id) => cleared.push(id));
+  context.mock.method(Date, "now", () => 100000);
+  return { game, client, ticks, cleared };
+}
+
+test("disconnecting shows the reload alert immediately and stops the skew-corrected game clock", (context) => {
+  const { game, client, ticks, cleared } = gameScreenFixture(context);
+  const view = render(React.createElement(App, { gameClient: client }));
+  assert.ok(view.getByText("Connected game"));
+  assert.equal(ticks.length, 1);
+  act(() => ticks[0]());
+  assert.equal(game.now.getTime(), 130000);
+  assert.doesNotThrow(() => {
+    act(() => client.onClose());
+  });
+  assert.match(
+    view.getByRole("alert").textContent,
+    /connection to the server is lost/i
+  );
+  assert.ok(view.getByRole("button", { name: "Reload" }));
+  assert.equal(client.entireGame, null);
+  assert.equal(client.onOwnTurnChange, null);
+  assert.equal(game.onClientGameStateChange, null);
+  assert.equal(game.onGameStarted, null);
+  assert.deepEqual(cleared, [1]);
+  act(() => ticks[0]());
+  assert.equal(game.now.getTime(), 130000);
+});
+
+test("game replacement cleans up the old instance without clearing the new instance's clock or callbacks", (context) => {
+  const { game, client, ticks, cleared } = gameScreenFixture(context);
+  const view = render(React.createElement(App, { gameClient: client }));
+  const replacement = new EntireGame("fixture", "owner", "Replacement game");
+  runInAction(() => {
+    replacement.stateVersion = 1;
+    replacement.clockOffsetMs = -10000;
+  });
+  act(() => {
+    runInAction(() => {
+      client.entireGame = replacement;
+    });
+  });
+  assert.ok(view.getByText("Replacement game"));
+  assert.equal(game.onClientGameStateChange, null);
+  assert.equal(game.onGameStarted, null);
+  assert.equal(typeof replacement.onClientGameStateChange, "function");
+  assert.equal(typeof replacement.onGameStarted, "function");
+  assert.equal(ticks.length, 2);
+  assert.deepEqual(cleared, [1]);
+  const previousTime = replacement.now.getTime();
+  act(() => ticks[0]());
+  assert.equal(replacement.now.getTime(), previousTime);
+  act(() => ticks[1]());
+  assert.equal(replacement.now.getTime(), 90000);
+  view.unmount();
+  assert.equal(replacement.onClientGameStateChange, null);
+  assert.equal(replacement.onGameStarted, null);
+  assert.deepEqual(cleared, [1, 2]);
+});
 
 test("volume sliders retain native range controls and publish the selected volume", () => {
   const values = [];

@@ -52,6 +52,7 @@ interface EntireGameComponentProps {
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
   setIntervalId = -1;
+  private mountedGame: EntireGame | null = null;
 
   get entireGame(): EntireGame {
     if (!this.props.gameClient.entireGame) {
@@ -658,16 +659,20 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
   }
 
   setNow(): void {
+    const game = this.mountedGame;
+    if (!game) {
+      return;
+    }
     // Correct for client/server clock skew so countdowns against server-issued deadlines stay accurate
     runInAction(() => {
-      this.entireGame.now = new Date(
-        Date.now() + this.entireGame.clockOffsetMs
-      );
+      game.now = new Date(Date.now() + game.clockOffsetMs);
     });
   }
 
   componentDidMount(): void {
-    document.title = this.entireGame.name;
+    const game = this.entireGame;
+    this.mountedGame = game;
+    document.title = game.name;
     this.updateFavicon();
     this.props.gameClient.onOwnTurnChange = () => this.updateFavicon();
 
@@ -675,21 +680,24 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
       return;
     }
 
-    this.entireGame.onClientGameStateChange = () =>
-      this.onClientGameStateChange();
-    this.entireGame.onGameStarted = () => this.onGameStarted();
+    game.onClientGameStateChange = () => this.onClientGameStateChange();
+    game.onGameStarted = () => this.onGameStarted();
 
     this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
   }
 
   componentWillUnmount(): void {
-    this.props.gameClient.onOwnTurnChange = null;
-    this.entireGame.onClientGameStateChange = null;
-    this.entireGame.onGameStarted = null;
+    const game = this.mountedGame;
+    this.mountedGame = null;
 
     if (this.setIntervalId >= 0) {
       window.clearInterval(this.setIntervalId);
       this.setIntervalId = -1;
+    }
+    this.props.gameClient.onOwnTurnChange = null;
+    if (game) {
+      game.onClientGameStateChange = null;
+      game.onGameStarted = null;
     }
   }
 }
