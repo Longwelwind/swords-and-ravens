@@ -472,6 +472,7 @@ public static class ChatWebSocketApi
         if (
             recipient is null
             || !recipient.EmailNotificationActive
+            || !recipient.EmailPrivateMessageNotificationsActive
             || string.IsNullOrEmpty(recipient.Email)
         )
         {

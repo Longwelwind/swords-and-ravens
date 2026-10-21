@@ -54,11 +54,31 @@
     <div class="col-md-9">
         <h4>Preferences</h4>
         <form id="preferences-form" method="post" asp-page-handler="UpdatePreferences">
-            <div class="flex flex-col gap-2 mb-3">
-                <div class="form-check text-nowrap">
-                    <input asp-for="PreferencesInput.EmailNotificationActive" class="form-check-input" />
-                    <label asp-for="PreferencesInput.EmailNotificationActive" class="form-check-label"></label>
+            <div class="mb-4 flex flex-col gap-3">
+                <label class="label cursor-pointer justify-start gap-3">
+                    <input asp-for="PreferencesInput.EmailNotificationActive" class="toggle" />
+                    <span class="font-semibold">Master email notifications</span>
+                </label>
+                <p class="text-sm text-base-content/80">Turn this off to stop all game and private-message emails. Your category choices are saved.</p>
+                <div class="flex flex-col gap-2 pl-4">
+                    <label class="label cursor-pointer justify-start gap-3">
+                        <input asp-for="PreferencesInput.EmailGameNotificationsActive" class="toggle" />
+                        <span>Game alerts (ready to start, your turn)</span>
+                    </label>
+                    <label class="label cursor-pointer justify-start gap-3">
+                        <input asp-for="PreferencesInput.EmailCombatNotificationsActive" class="toggle" />
+                        <span>Combat alerts (support requests, battle results)</span>
+                    </label>
+                    <label class="label cursor-pointer justify-start gap-3">
+                        <input asp-for="PreferencesInput.EmailVoteGameEndNotificationsActive" class="toggle" />
+                        <span>Vote and game-ended alerts</span>
+                    </label>
+                    <label class="label cursor-pointer justify-start gap-3">
+                        <input asp-for="PreferencesInput.EmailPrivateMessageNotificationsActive" class="toggle" />
+                        <span>Private message alerts</span>
+                    </label>
                 </div>
+                <hr class="my-2 border-base-300" />
                 <div class="form-check text-nowrap">
                     <input asp-for="PreferencesInput.MuteGames" class="form-check-input" />
                     <label asp-for="PreferencesInput.MuteGames" class="form-check-label"></label>

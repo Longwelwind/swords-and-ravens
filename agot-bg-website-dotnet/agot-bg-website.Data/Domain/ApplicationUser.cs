@@ -36,6 +36,14 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public bool EmailNotificationActive { get; set; } = true;
 
+    public bool EmailGameNotificationsActive { get; set; } = true;
+
+    public bool EmailCombatNotificationsActive { get; set; } = true;
+
+    public bool EmailVoteGameEndNotificationsActive { get; set; } = true;
+
+    public bool EmailPrivateMessageNotificationsActive { get; set; } = true;
+
     public bool MuteGames { get; set; }
 
     public bool UseHouseNamesForChat { get; set; }

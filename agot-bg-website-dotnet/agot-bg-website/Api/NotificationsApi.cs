@@ -10,8 +10,8 @@ namespace agot_bg_website.Api;
 /// <summary>
 /// The game-server-facing notification endpoints, equivalent of Django's
 /// api/views.py::notify_* + add_pbem_response_time — see MIGRATION_PLAN.md §6. Each POST body is
-/// <c>{ "users": ["&lt;guid&gt;", ...] }</c>; mail is only sent to users with
-/// <see cref="ApplicationUser.EmailNotificationActive"/> still on, mirroring Django's behavior.
+/// <c>{ "users": ["&lt;guid&gt;", ...] }</c>; mail is sent only when the master preference and
+/// the preference for that notification's category are both on.
 /// Subjects/bodies are ported line-for-line from the corresponding
 /// agotboardgame_main/templates/agotboardgame_main/*_notification.html templates.
 /// </summary>
@@ -19,15 +19,25 @@ public static class NotificationsApi
 {
     private sealed record NotifyRequest(List<Guid> Users);
 
-    // (subject, body) builders, one per notify* route, preserving the wording/structure from the
-    // matching agotboardgame_main/templates/agotboardgame_main/*_notification.html Django
-    // template, but rendered as actual HTML because SMTP sends them with IsBodyHtml=true.
-    private static readonly Dictionary<
-        string,
-        (Func<Game, string> Subject, Func<ApplicationUser, Game, string, string> Body)
-    > Templates = new()
+    private enum NotificationCategory
     {
-        ["notifyReadyToStart"] = (
+        Game,
+        Combat,
+        VoteGameEnd,
+    }
+
+    private sealed record NotificationTemplate(
+        NotificationCategory Category,
+        Func<Game, string> Subject,
+        Func<ApplicationUser, Game, string, string> Body
+    );
+
+    // One category, subject, and body builder per notify* route, preserving the wording/structure
+    // from the matching Django template, but rendered as HTML because email is sent as HTML.
+    private static readonly Dictionary<string, NotificationTemplate> Templates = new()
+    {
+        ["notifyReadyToStart"] = new(
+            NotificationCategory.Game,
             game => $"Your game is ready to start: {game.Name}",
             (user, game, gameUrl) =>
                 BuildNotificationEmailHtml(
@@ -36,7 +46,8 @@ public static class NotificationsApi
                     gameUrl
                 )
         ),
-        ["notifyYourTurn"] = (
+        ["notifyYourTurn"] = new(
+            NotificationCategory.Game,
             game => $"It's your turn in '{game.Name}'",
             (user, game, gameUrl) =>
                 BuildNotificationEmailHtml(
@@ -45,7 +56,8 @@ public static class NotificationsApi
                     gameUrl
                 )
         ),
-        ["notifyBribeForSupport"] = (
+        ["notifyBribeForSupport"] = new(
+            NotificationCategory.Combat,
             game => $"You are attacked and now can call for support in '{game.Name}'",
             (user, game, gameUrl) =>
                 BuildNotificationEmailHtml(
@@ -54,7 +66,8 @@ public static class NotificationsApi
                     gameUrl
                 )
         ),
-        ["notifyBattleResults"] = (
+        ["notifyBattleResults"] = new(
+            NotificationCategory.Combat,
             game => $"Your battle is over in '{game.Name}'",
             (user, game, gameUrl) =>
                 BuildNotificationEmailHtml(
@@ -63,7 +76,8 @@ public static class NotificationsApi
                     gameUrl
                 )
         ),
-        ["notifyNewVote"] = (
+        ["notifyNewVote"] = new(
+            NotificationCategory.VoteGameEnd,
             game => $"Your vote is needed in '{game.Name}'",
             (user, game, gameUrl) =>
                 BuildNotificationEmailHtml(
@@ -72,7 +86,8 @@ public static class NotificationsApi
                     gameUrl
                 )
         ),
-        ["notifyGameEnded"] = (
+        ["notifyGameEnded"] = new(
+            NotificationCategory.VoteGameEnd,
             game => $"Game has ended -  {game.Name}",
             (user, game, gameUrl) =>
                 BuildNotificationEmailHtml(
@@ -153,13 +168,28 @@ public static class NotificationsApi
                         return Results.NotFound();
                     }
 
-                    var users = await db
+                    var candidateUsers = db
                         .Users.Where(u =>
                             body.Users.Contains(u.Id)
                             && u.EmailNotificationActive
                             && u.Email != null
-                        )
-                        .ToListAsync();
+                        );
+                    var eligibleUsers = template.Category switch
+                    {
+                        NotificationCategory.Game => candidateUsers.Where(u =>
+                            u.EmailGameNotificationsActive
+                        ),
+                        NotificationCategory.Combat => candidateUsers.Where(u =>
+                            u.EmailCombatNotificationsActive
+                        ),
+                        NotificationCategory.VoteGameEnd => candidateUsers.Where(u =>
+                            u.EmailVoteGameEndNotificationsActive
+                        ),
+                        _ => throw new InvalidOperationException(
+                            $"Unsupported notification category: {template.Category}"
+                        ),
+                    };
+                    var users = await eligibleUsers.ToListAsync();
 
                     // This endpoint only ever runs on the private GameServerApi Kestrel endpoint
                     // (see Program.cs's RequireLocalPort(gameServerApiPort)) - the TypeScript game
