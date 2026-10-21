@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import React, { Component, ReactNode } from "react";
 
 import {
@@ -9,7 +10,7 @@ import {
   Spinner,
   Tab,
   Nav,
-  Dropdown,
+  Dropdown
 } from "react-bootstrap";
 import classNames from "classnames";
 
@@ -33,7 +34,7 @@ import {
   faBackward,
   faStepBackward,
   faStepForward,
-  faMap,
+  faMap
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
@@ -50,7 +51,7 @@ interface ReplayGameStateColumnProps {
 
 @observer
 export default class ReplayGameStateColumn extends Component<ReplayGameStateColumnProps> {
-  @observable roundDropDownItems: ReactNode[] = [];
+  @observable accessor roundDropDownItems: ReactNode[] = [];
   render(): ReactNode {
     const { gameClient, ingame } = this.props;
 
@@ -88,7 +89,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
           border={border}
           style={{
             maxHeight: gameClient.isMapScrollbarSet ? "70%" : "none",
-            borderWidth: "3px",
+            borderWidth: "3px"
           }}
         >
           <Row
@@ -100,7 +101,13 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                 overlay={
                   <Tooltip id="round-tooltip">
                     <h5>
-                      Round {gameSnapshot?.round} / {ingame.game.maxTurns}
+                      <Trans
+                        i18nKey="common.round"
+                        components={{
+                          value0: <>{gameSnapshot?.round}</>,
+                          value1: <>{ingame.game.maxTurns}</>
+                        }}
+                      />
                     </h5>
                   </Tooltip>
                 }
@@ -121,7 +128,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                         ? "#F39C12"
                         : roundCritical
                           ? "#FF0000"
-                          : undefined,
+                          : undefined
                     }}
                   >
                     {gameSnapshot?.round}
@@ -144,7 +151,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                 <div
                   className={classNames({
                     "txt-warning": wildlingsWarning,
-                    "txt-critical": wildlingsCritical,
+                    "txt-critical": wildlingsCritical
                   })}
                 >
                   {gameSnapshot?.wildlingStrength}
@@ -195,7 +202,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
         style={{ height: gameClient.isMapScrollbarSet ? "auto" : "800px" }}
         className={classNames(
           { "flex-fill-remaining": gameClient.isMapScrollbarSet },
-          "text-large"
+          "text-large game-tabs"
         )}
       >
         <Tab.Container
@@ -207,7 +214,11 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               <Nav.Item>
                 <Nav.Link eventKey="game-logs">
                   <OverlayTrigger
-                    overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                    overlay={
+                      <Tooltip id="logs-tooltip">
+                        {t("common.gameLogs")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -226,7 +237,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="iron-bank-tooltip">
-                            The Iron Bank
+                            {t("gameTabs.theIronBank59437a")}
                           </Tooltip>
                         }
                         placement="top"
@@ -244,7 +255,11 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               <Nav.Item>
                 <Nav.Link eventKey="settings">
                   <OverlayTrigger
-                    overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                    overlay={
+                      <Tooltip id="settings-tooltip">
+                        {t("common.settings")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -328,15 +343,15 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               <Nav.Item>
                 <div className="dropdown-divider"></div>
               </Nav.Item>
-              <Dropdown className="ml-auto mt-1">
+              <Dropdown className="ms-auto mt-1">
                 <Dropdown.Toggle variant="secondary" size="sm">
-                  Jump to
+                  {t("common.jumpTo")}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>{this.roundDropDownItems}</Dropdown.Menu>
               </Dropdown>
             </Nav>
           </Card.Header>
-          <Card.Body id="game-log-panel" className="h-100 px-1">
+          <Card.Body id="game-log-panel" className="px-1">
             <Tab.Content className="h-100">
               <Tab.Pane
                 eventKey="game-logs"
@@ -403,11 +418,14 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
             const elemToScroll = document.getElementById(gameRoundElem.id);
             elemToScroll?.scrollIntoView({
               behavior: "smooth",
-              block: "center",
+              block: "center"
             });
           }}
         >
-          Round {round}
+          <Trans
+            i18nKey="gameTabs.round6f8874"
+            components={{ value0: <>{round}</> }}
+          />
         </Dropdown.Item>
       );
     });

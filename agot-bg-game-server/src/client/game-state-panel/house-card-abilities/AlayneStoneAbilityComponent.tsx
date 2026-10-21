@@ -1,5 +1,6 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { Trans } from "../../i18n";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import React from "react";
@@ -9,17 +10,26 @@ import SimpleChoiceComponent from "../SimpleChoiceComponent";
 import AlayneStoneAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/alayne-stone-ability-game-state/AlayneStoneAbilityGameState";
 
 @observer
-export default class AlayneStoneAbilityComponent extends Component<GameStateComponentProps<AlayneStoneAbilityGameState>> {
-    render(): ReactNode {
-        return (
-            <>
-                <Col xs={12} className="text-center">
-                    <b>Alayne Stone</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may discard 2 Power tokens to force their opponent to discard all their available Power tokens.
-                </Col>
-                {renderChildGameState(this.props, [
-                    [SimpleChoiceGameState, SimpleChoiceComponent],
-                ])}
-            </>
-        );
-    }
+export default class AlayneStoneAbilityComponent extends Component<
+  GameStateComponentProps<AlayneStoneAbilityGameState>
+> {
+  render(): ReactNode {
+    return (
+      <>
+        <Col xs={12} className="text-center">
+          <Trans
+            i18nKey="alayneStoneAbility.alayneStoneHouseMayDiscard2PowerTokensTo715d34"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
+        </Col>
+        {renderChildGameState(this.props, [
+          [SimpleChoiceGameState, SimpleChoiceComponent]
+        ])}
+      </>
+    );
+  }
 }

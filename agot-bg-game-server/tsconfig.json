@@ -10,20 +10,18 @@
     "noImplicitThis": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": false,
-    "lib": ["es2016", "DOM"],
+    "lib": ["es2024", "ESNext.Collection", "DOM"],
     "module": "commonjs",
     "target": "es2016",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "node",
-    "experimentalDecorators": true,
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
   "exclude": [
     "tests/**/*.ts",
     "dist/*.js",
-    "jest.config.js",
     "webpack.client.dev.js",
     "webpack.client.js",
     "webpack.client.local.js"

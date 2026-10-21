@@ -4,18 +4,20 @@ import IGameSnapshot from "./IGameSnapshot";
 import IronBankSnapshot from "./IronBankSnapshot";
 
 export default class GameSnapshot implements IGameSnapshot {
-  @observable round: number;
-  @observable wildlingStrength: number;
-  @observable dragonStrength?: number;
-  @observable ironThroneTrack: string[];
-  @observable fiefdomsTrack: string[];
-  @observable kingsCourtTrack: string[];
-  @observable housesOnVictoryTrack: HouseSnapshot[];
-  @observable vsbUsed?: boolean;
-  @observable ironBank?: IronBankSnapshot;
-  @observable overwrittenIronThroneHolder?: string;
-  @observable overwrittenValyrianSteelBladeHolder?: string;
-  @observable overwrittenRavenHolder?: string;
+  @observable accessor round: number;
+  @observable accessor wildlingStrength: number;
+  @observable accessor dragonStrength: number | undefined = undefined;
+  @observable accessor ironThroneTrack: string[];
+  @observable accessor fiefdomsTrack: string[];
+  @observable accessor kingsCourtTrack: string[];
+  @observable accessor housesOnVictoryTrack: HouseSnapshot[];
+  @observable accessor vsbUsed: boolean | undefined = undefined;
+  @observable accessor ironBank: IronBankSnapshot | undefined = undefined;
+  @observable accessor overwrittenIronThroneHolder: string | undefined =
+    undefined;
+  @observable accessor overwrittenValyrianSteelBladeHolder: string | undefined =
+    undefined;
+  @observable accessor overwrittenRavenHolder: string | undefined = undefined;
 
   constructor(data: IGameSnapshot) {
     this.round = data.round;

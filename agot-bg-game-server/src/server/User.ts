@@ -7,14 +7,15 @@ import _ from "lodash";
 
 export default class User {
   id: string;
-  @observable name: string;
+  @observable accessor name: string;
   facelessName?: string;
-  @observable settings: UserSettings;
+  @observable accessor settings: UserSettings;
   entireGame: EntireGame;
   connectedClients: WebSocket[] = [];
-  @observable otherUsersFromSameNetwork: Set<string> = new Set<string>();
-  @observable connected: boolean;
-  @observable note = "";
+  @observable accessor otherUsersFromSameNetwork: Set<string> =
+    new Set<string>();
+  @observable accessor connected: boolean;
+  @observable accessor note = "";
   onConnectionStateChanged: ((user: User) => void) | null = null;
 
   debouncedSyncSettings = _.debounce(

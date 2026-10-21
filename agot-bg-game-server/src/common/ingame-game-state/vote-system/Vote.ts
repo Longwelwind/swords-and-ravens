@@ -30,9 +30,9 @@ export default class Vote {
   id: string;
   initiator: User;
   type: VoteType;
-  @observable votes: BetterMap<House, boolean>;
+  @observable accessor votes: BetterMap<House, boolean>;
   createdAt: Date;
-  @observable cancelled: boolean;
+  @observable accessor cancelled: boolean;
   participatingHouses: House[];
 
   get positiveCountToPass(): number {

@@ -1,13 +1,15 @@
+import { t, Trans, translateGameText } from "../i18n";
+import MapContribution, { wrapMapElement } from "../MapContribution";
 import PlayerMusteringGameState, {
   Mustering,
   MusteringRule,
   PlayerMusteringType
 } from "../../common/ingame-game-state/westeros-game-state/mustering-game-state/player-mustering-game-state/PlayerMusteringGameState";
 import { observer } from "mobx-react";
-import React, { Component, ReactElement, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import BetterMap from "../../utils/BetterMap";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import * as _ from "lodash";
 import { Button, OverlayTrigger, Popover } from "react-bootstrap";
@@ -21,7 +23,7 @@ import {
 } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import { renderRegionTooltip } from "../regionTooltip";
 import {
   faArrowRight,
@@ -38,12 +40,8 @@ type MusteringPopoverTrigger = "region" | "order";
 export default class PlayerMusteringComponent extends Component<
   GameStateComponentProps<PlayerMusteringGameState>
 > {
-  @observable musterings = new BetterMap<Region, Mustering[]>();
-
-  modifyRegionsOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
-  modifyOrdersOnMapCallback: any;
-  @observable openMusteringPopover: {
+  @observable accessor musterings = new BetterMap<Region, Mustering[]>();
+  @observable accessor openMusteringPopover: {
     region: Region;
     trigger: MusteringPopoverTrigger;
   } | null = null;
@@ -63,43 +61,82 @@ export default class PlayerMusteringComponent extends Component<
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          orders={this.modifyOrdersOnMap()}
+          units={this.modifyUnitsOnMap()}
+        />
         <Col xs={12} className="text-center">
           {this.isStarredConsolidatePowerMusteringType ? (
             <>
-              House <b>{this.house.name}</b> can resolve their Special
-              Consolidate Power order in{" "}
-              {this.props.gameState.regions[0]?.name ?? "Unknown"}.
+              <Trans
+                i18nKey="playerMustering.houseCanResolveTheirSpecialConsolidatePowerOrderIn6c7652"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.house.name}</>,
+                  value2: (
+                    <>
+                      {this.props.gameState.regions[0]?.name ??
+                        t("common.unknown")}
+                    </>
+                  )
+                }}
+              />
             </>
           ) : this.props.gameState.type ==
             PlayerMusteringType.MUSTERING_WESTEROS_CARD ? (
             this.props.gameState.ingame.isVassalHouse(this.house) ? (
               <>
-                Vassal house <b>{this.house.name}</b> can muster units in their
-                home area.
+                <Trans
+                  i18nKey="playerMustering.vassalHouseCanMusterUnitsInTheirHomeArea9124d8"
+                  components={{
+                    element0: <b />,
+                    value1: <>{this.house.name}</>
+                  }}
+                />
               </>
             ) : (
               <>
-                Players can muster units in their controlled Strongholds and
-                Castles.
+                {t(
+                  "playerMustering.playersCanMusterUnitsInTheirControlledStrongholdsAnd9f096f"
+                )}
               </>
             )
           ) : this.props.gameState.type ==
             PlayerMusteringType.THE_HORDE_DESCENDS_WILDLING_CARD ? (
             <>
-              House <b>{this.house.name}</b> can muster units in one of their
-              controlled Strongholds or Castles.
+              <Trans
+                i18nKey="playerMustering.houseCanMusterUnitsInOneOfTheirControlledc78cef"
+                components={{ element0: <b />, value1: <>{this.house.name}</> }}
+              />
             </>
           ) : this.props.gameState.type ==
             PlayerMusteringType.DEFENSE_MUSTER_ORDER ? (
             <>
-              Vassal house <b>{this.house.name}</b> can resolve their
-              Defense/Muster order in{" "}
-              {this.props.gameState.regions[0]?.name ?? "Unknown"}.
+              <Trans
+                i18nKey="playerMustering.vassalHouseCanResolveTheirDefenseMusterOrderIn31fde9"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.house.name}</>,
+                  value2: (
+                    <>
+                      {this.props.gameState.regions[0]?.name ??
+                        t("common.unknown")}
+                    </>
+                  )
+                }}
+              />
             </>
           ) : (
             this.props.gameState.type ==
               PlayerMusteringType.RALLY_THE_MEN_WESTEROS_CARD && (
-              <>Players can muster units in their controlled Castles.</>
+              <>
+                {t(
+                  "playerMustering.playersCanMusterUnitsInTheirControlledCastles1984fa"
+                )}
+              </>
             )
           )}
         </Col>
@@ -109,22 +146,55 @@ export default class PlayerMusteringComponent extends Component<
               <Col xs={12}>
                 <>
                   {this.musterings.values[0].length > 0 && (
-                    <p>Your recruitments:</p>
+                    <p>{t("playerMustering.yourRecruitments21ef76")}</p>
                   )}
                   {this.musterings.entries.map(([r, musterings]) => (
                     <div key={`planned-recruitments_${r.id}`}>
-                      From <b>{r.name}</b>
-                      <ul>
-                        {musterings.map(({ region, from, to }, i) => (
-                          <li
-                            onClick={() => this.removeMustering(musterings, i)}
-                            key={`planned-mustering_${i}`}
-                          >
-                            {from ? "Upgrading to " : "Recruiting "} a {to.name}
-                            {r != region && " in " + region.name}
-                          </li>
-                        ))}
-                      </ul>
+                      <Trans
+                        i18nKey="playerMustering.from72f2df"
+                        components={{
+                          element0: <b />,
+                          value1: <>{r.name}</>,
+                          element2: (
+                            <ul>
+                              {musterings.map(({ region, from, to }, i) => (
+                                <li
+                                  onClick={() =>
+                                    this.removeMustering(musterings, i)
+                                  }
+                                  key={`planned-mustering_${i}`}
+                                >
+                                  <Trans
+                                    i18nKey="playerMustering.acff809"
+                                    components={{
+                                      value0: (
+                                        <>
+                                          {from
+                                            ? t(
+                                                "playerMustering.upgradingTo2578a5"
+                                              )
+                                            : t(
+                                                "playerMustering.recruiting0291f3"
+                                              )}
+                                        </>
+                                      ),
+                                      value1: <>{translateGameText(to.name)}</>,
+                                      value2: (
+                                        <>
+                                          {r != region &&
+                                            t("playerMustering.in2e716c", {
+                                              value0: region.name
+                                            })}
+                                        </>
+                                      )
+                                    }}
+                                  />
+                                </li>
+                              ))}
+                            </ul>
+                          )
+                        }}
+                      />
                     </div>
                   ))}
                 </>
@@ -139,24 +209,42 @@ export default class PlayerMusteringComponent extends Component<
               <Col xs={12} className="text-center">
                 {this.props.gameState.regions.length == 1 ? (
                   <>
-                    Click{" "}
-                    {this.isStarredConsolidatePowerMusteringType ? (
-                      <>
-                        the <b>Special Consolidate Power</b> order or{" "}
-                      </>
-                    ) : this.props.gameState.type ==
-                      PlayerMusteringType.DEFENSE_MUSTER_ORDER ? (
-                      <>
-                        the <b>Defense/Muster</b> order or{" "}
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    into <b>{this.props.gameState.regions[0].name}</b> to
-                    initiate a recruitment from there.
+                    <Trans
+                      i18nKey="playerMustering.clickIntoToInitiateARecruitmentFromThere0b91db"
+                      components={{
+                        value0: (
+                          <>
+                            {this.isStarredConsolidatePowerMusteringType ? (
+                              <>
+                                <Trans
+                                  i18nKey="playerMustering.theSpecialConsolidatePowerOrderOr93d429"
+                                  components={{ element0: <b /> }}
+                                />
+                              </>
+                            ) : this.props.gameState.type ==
+                              PlayerMusteringType.DEFENSE_MUSTER_ORDER ? (
+                              <>
+                                <Trans
+                                  i18nKey="playerMustering.theDefenseMusterOrderOred843f"
+                                  components={{ element0: <b /> }}
+                                />
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </>
+                        ),
+                        element1: <b />,
+                        value2: <>{this.props.gameState.regions[0].name}</>
+                      }}
+                    />
                   </>
                 ) : (
-                  <>Click on a region to initiate a recruitment from there.</>
+                  <>
+                    {t(
+                      "playerMustering.clickOnARegionToInitiateARecruitmentFrom356687"
+                    )}
+                  </>
                 )}
               </Col>
             )}
@@ -169,7 +257,7 @@ export default class PlayerMusteringComponent extends Component<
                     disabled={!this.canSubmit()}
                     onClick={() => this.submit()}
                   >
-                    Submit
+                    {t("common.submit")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -179,7 +267,7 @@ export default class PlayerMusteringComponent extends Component<
                     disabled={this.musterings.size == 0}
                     onClick={() => this.reset()}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
@@ -188,8 +276,9 @@ export default class PlayerMusteringComponent extends Component<
               this.musterings.size == 0 && (
                 <Col xs={12} className="text-center">
                   <small>
-                    Note: If you dont recruit any units, your order will be
-                    resolved to gain Power&nbsp;tokens.
+                    {t(
+                      "playerMustering.noteIfYouDontRecruitAnyUnitsYourOrder2e72b2"
+                    )}
                   </small>
                 </Col>
               )}
@@ -198,18 +287,27 @@ export default class PlayerMusteringComponent extends Component<
         {(!this.doesControlCurrentHouse ||
           this.props.gameState.ingame.isVassalHouse(this.house)) && (
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {
-              this.props.gameState.ingame.getControllerOfHouse(this.house).house
-                .name
-            }
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{
+                houses: (
+                  <>
+                    {
+                      this.props.gameState.ingame.getControllerOfHouse(
+                        this.house
+                      ).house.name
+                    }
+                  </>
+                )
+              }}
+            />
           </Col>
         )}
       </>
     );
   }
 
+  @action
   private removeMustering(musterings: Mustering[], i: number): void {
     const removedMustering = musterings.splice(i, 1)[0];
 
@@ -227,6 +325,7 @@ export default class PlayerMusteringComponent extends Component<
     this.removeEmptyMusterings();
   }
 
+  @action
   private removeEmptyMusterings(): void {
     this.musterings.keys.forEach((r) => {
       const mustering = this.musterings.get(r);
@@ -248,6 +347,7 @@ export default class PlayerMusteringComponent extends Component<
     }
   }
 
+  @action
   private addMustering(initiatingRegion: Region, rule: Mustering): void {
     const musterings: Mustering[] = this.musterings.tryGet(
       initiatingRegion,
@@ -286,11 +386,12 @@ export default class PlayerMusteringComponent extends Component<
     }
   }
 
+  @action
   submit(): void {
     if (this.props.gameState.anyUsablePointsLeft(this.musterings)) {
       if (
         !confirm(
-          "You have not used all of your mustering points. Continue anyway?"
+          t("playerMustering.youHaveNotUsedAllOfYourMusteringPoints2c14a2")
         )
       ) {
         return;
@@ -339,7 +440,7 @@ export default class PlayerMusteringComponent extends Component<
         modifiedRegion,
         {
           highlight: { active: true },
-          wrap: (child: ReactElement) => (
+          wrap: wrapMapElement(
             <OverlayTrigger
               placement="auto"
               trigger="click"
@@ -350,7 +451,7 @@ export default class PlayerMusteringComponent extends Component<
               }
               overlay={this.renderMusteringPopover(modifiedRegion)}
             >
-              {child}
+              <span />
             </OverlayTrigger>
           )
         }
@@ -399,7 +500,7 @@ export default class PlayerMusteringComponent extends Component<
               type="button"
               variant="link"
               className="text-light p-1"
-              aria-label="Close mustering popover"
+              aria-label={t("playerMustering.closeMusteringPopover866447")}
               onClick={() => this.setOpenMusteringPopover(null)}
             >
               <FontAwesomeIcon icon={faTimes} />
@@ -440,6 +541,7 @@ export default class PlayerMusteringComponent extends Component<
     );
   }
 
+  @action
   private setOpenMusteringPopover(
     openMusteringPopover: {
       region: Region;
@@ -447,7 +549,6 @@ export default class PlayerMusteringComponent extends Component<
     } | null
   ): void {
     this.openMusteringPopover = openMusteringPopover;
-    this.props.mapControls.refresh();
   }
 
   private isMusteringPopoverOpen(
@@ -460,6 +561,7 @@ export default class PlayerMusteringComponent extends Component<
     );
   }
 
+  @action
   private toggleMusteringPopover(
     region: Region,
     trigger: MusteringPopoverTrigger,
@@ -487,7 +589,10 @@ export default class PlayerMusteringComponent extends Component<
         <UnitIconComponent house={this.house} unitType={rule.to} />
         {initiatingRegion != rule.region && (
           <>
-            &nbsp;to&nbsp;<b>{rule.region.name}</b>
+            <Trans
+              i18nKey="playerMustering.tobb94fd"
+              components={{ element0: <b />, value1: <>{rule.region.name}</> }}
+            />
           </>
         )}
         <>
@@ -512,7 +617,7 @@ export default class PlayerMusteringComponent extends Component<
           r,
           {
             highlight: { active: true },
-            wrap: (child: ReactElement) => (
+            wrap: wrapMapElement(
               <OverlayTrigger
                 placement="auto"
                 trigger="click"
@@ -523,7 +628,7 @@ export default class PlayerMusteringComponent extends Component<
                 }
                 overlay={this.renderMusteringPopover(r)}
               >
-                {child}
+                <span />
               </OverlayTrigger>
             )
           }
@@ -566,16 +671,6 @@ export default class PlayerMusteringComponent extends Component<
   }
 
   componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-
     if (
       this.props.gameState.regions.length != 1 ||
       !this.doesControlCurrentHouse
@@ -599,21 +694,9 @@ export default class PlayerMusteringComponent extends Component<
     // Discard any pending, unsent musterings so they don't corrupt the shared game model
     // (e.g. when the component is torn down by switching to replay mode instead of submitting)
     this.reset();
-
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 
+  @action
   private onUnitClick(unit: Unit): void {
     for (const musteredRegion of this.musterings.keys) {
       const musterings = this.musterings.get(musteredRegion);
@@ -628,6 +711,7 @@ export default class PlayerMusteringComponent extends Component<
     }
   }
 
+  @action
   private reset(): void {
     _.flatMap(this.musterings.values).forEach((r) => {
       r.region.newUnits = [];

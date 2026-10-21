@@ -29,9 +29,9 @@ function filterArrayByThreshold(arr: number[], threshold: number): void {
 }
 
 export default class GameReplayManager {
-  @observable selectedLogIndex = -1;
-  @observable selectedSnapshot: EntireGameSnapshot | null = null;
-  @observable highlightHouseAreas: boolean;
+  @observable accessor selectedLogIndex = -1;
+  @observable accessor selectedSnapshot: EntireGameSnapshot | null = null;
+  @observable accessor highlightHouseAreas: boolean;
 
   castleRegions: BetterMap<string, StaticRegion> = new BetterMap();
   landRegions: BetterMap<string, StaticRegion> = new BetterMap();

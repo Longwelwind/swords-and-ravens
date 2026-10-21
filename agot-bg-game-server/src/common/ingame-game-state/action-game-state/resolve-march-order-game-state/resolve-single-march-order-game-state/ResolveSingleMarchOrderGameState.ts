@@ -21,7 +21,7 @@ import { destroyAllShipsInPort } from "../../../../ingame-game-state/port-helper
 import IngameGameState from "../../../IngameGameState";
 
 export default class ResolveSingleMarchOrderGameState extends GameState<ResolveMarchOrderGameState> {
-  @observable house: House;
+  @observable accessor house: House;
   supportersAgainstNeutralForce: BetterMap<Region, House[]> | null = null;
 
   constructor(resolveMarchOrderGameState: ResolveMarchOrderGameState) {

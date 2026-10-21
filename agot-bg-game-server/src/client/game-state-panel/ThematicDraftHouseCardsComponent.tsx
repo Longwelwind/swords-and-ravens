@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
@@ -14,7 +15,7 @@ import HouseCard from "../../common/ingame-game-state/game-data-structure/house-
 export default class ThematicDraftHouseCardsComponent extends Component<
   GameStateComponentProps<ThematicDraftHouseCardsGameState>
 > {
-  @observable selectedHouseCard: HouseCard | null;
+  @observable accessor selectedHouseCard: HouseCard | null;
 
   get player(): Player | null {
     return this.props.gameClient.authenticatedPlayer;
@@ -25,7 +26,7 @@ export default class ThematicDraftHouseCardsComponent extends Component<
       <>
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            All houses choose their House cards.
+            {t("thematicDraftHouseCards.allHousesChooseTheirHouseCards6d0fb8")}
           </Col>
         </Row>
         {this.player &&
@@ -33,7 +34,7 @@ export default class ThematicDraftHouseCardsComponent extends Component<
             <>
               <Row className="mt-3 justify-content-center">
                 <Col xs="12" className="text-center">
-                  Please select a House card:
+                  {t("common.pleaseSelectAHouseCard")}
                 </Col>
               </Row>
               <Row className="justify-content-center">
@@ -63,7 +64,7 @@ export default class ThematicDraftHouseCardsComponent extends Component<
                     onClick={() => this.confirm()}
                     disabled={this.selectedHouseCard == null}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
               </Row>
@@ -71,11 +72,18 @@ export default class ThematicDraftHouseCardsComponent extends Component<
           )}
         <Row className="mt-3 justify-content-center">
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {this.props.gameState.unreadyPlayers
-              .map((p) => p.house.name)
-              .join(", ")}
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{
+                houses: (
+                  <>
+                    {this.props.gameState.unreadyPlayers
+                      .map((p) => p.house.name)
+                      .join(", ")}
+                  </>
+                )
+              }}
+            />
           </Col>
         </Row>
       </>

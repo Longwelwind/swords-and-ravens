@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { Component, ReactNode } from "react";
 import * as React from "react";
 import FormCheck from "react-bootstrap/FormCheck";
@@ -6,7 +7,7 @@ import { OverlayTrigger, Tooltip, Row } from "react-bootstrap";
 import User from "../server/User";
 import EntireGame from "../common/EntireGame";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
-import { observable } from "mobx";
+import { observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
 
 interface UserSettingsComponentProps {
@@ -16,9 +17,9 @@ interface UserSettingsComponentProps {
 
 @observer
 export default class UserSettingsComponent extends Component<UserSettingsComponentProps> {
-  @observable mapScrollbar = false;
-  @observable chatHouseNames = false;
-  @observable gameStateColumnRight = false;
+  @observable accessor mapScrollbar = false;
+  @observable accessor chatHouseNames = false;
+  @observable accessor gameStateColumnRight = false;
 
   render(): ReactNode {
     return (
@@ -35,20 +36,23 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="chat-house-names-tooltip">
-                            Show house names instead of user names in chat
-                            windows.
+                            {t(
+                              "userSettings.showHouseNamesInsteadOfUserNamesInChat39166c"
+                            )}
                           </Tooltip>
                         }
                       >
                         <label htmlFor="chat-house-names-setting">
-                          House names for chat
+                          {t("userSettings.houseNamesForChat3f6aa0")}
                         </label>
                       </OverlayTrigger>
                     }
                     checked={this.chatHouseNames}
                     onChange={() => {
-                      this.chatHouseNames = !this.chatHouseNames;
-                      this.changeUserSettings();
+                      runInAction(() => {
+                        this.chatHouseNames = !this.chatHouseNames;
+                        this.changeUserSettings();
+                      });
                     }}
                   />
                 </Col>
@@ -62,22 +66,23 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="map-scrollbar-tooltip">
-                            Enables a fixed game map with a scrollbar. The map
-                            height then resizes with the actual window height.
-                            Keeping it activated won&apos;t affect the mobile
-                            experience.
+                            {t(
+                              "userSettings.enablesAFixedGameMapWithAScrollbarTheab9619"
+                            )}
                           </Tooltip>
                         }
                       >
                         <label htmlFor="map-scrollbar-setting">
-                          Map scrollbar (Desktop only)
+                          {t("userSettings.mapScrollbarDesktopOnlye10676")}
                         </label>
                       </OverlayTrigger>
                     }
                     checked={this.mapScrollbar}
                     onChange={() => {
-                      this.mapScrollbar = !this.mapScrollbar;
-                      this.changeUserSettings();
+                      runInAction(() => {
+                        this.mapScrollbar = !this.mapScrollbar;
+                        this.changeUserSettings();
+                      });
                     }}
                   />
                 </Col>
@@ -91,21 +96,23 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="game-state-column-right-setting-tooltip">
-                            This setting swaps the houses column with the game
-                            state column, so that the game state column is
-                            displayed to the right of the map.
+                            {t(
+                              "userSettings.thisSettingSwapsTheHousesColumnWithTheGamef7fbda"
+                            )}
                           </Tooltip>
                         }
                       >
                         <label htmlFor="game-state-column-right-setting">
-                          Game state column on the right
+                          {t("userSettings.gameStateColumnOnTheRight623f5d")}
                         </label>
                       </OverlayTrigger>
                     }
                     checked={this.gameStateColumnRight}
                     onChange={() => {
-                      this.gameStateColumnRight = !this.gameStateColumnRight;
-                      this.changeUserSettings();
+                      runInAction(() => {
+                        this.gameStateColumnRight = !this.gameStateColumnRight;
+                        this.changeUserSettings();
+                      });
                     }}
                   />
                 </Col>
@@ -116,7 +123,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  FAQ
+                  {t("common.faq")}
                 </a>
               </Row>
             </div>
@@ -127,9 +134,12 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
 
   componentDidMount(): void {
     if (this.props.user) {
-      this.mapScrollbar = this.props.user.settings.mapScrollbar;
-      this.chatHouseNames = this.props.user.settings.chatHouseNames;
-      this.gameStateColumnRight = this.props.user.settings.gameStateColumnRight;
+      const user = this.props.user;
+      runInAction(() => {
+        this.mapScrollbar = user.settings.mapScrollbar;
+        this.chatHouseNames = user.settings.chatHouseNames;
+        this.gameStateColumnRight = user.settings.gameStateColumnRight;
+      });
     }
   }
 

@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import * as React from "react";
@@ -9,15 +10,21 @@ import SelectObjectiveCardsComponent from "./SelectObjectiveCardsComponent";
 import NewInformationGameState from "../../common/ingame-game-state/westeros-game-state/new-information-game-state/NewInformationGameState";
 
 @observer
-export default class NewInformationComponent extends Component<GameStateComponentProps<NewInformationGameState>> {
-    render(): ReactNode {
-        return <>
-                <Col xs={12} className="text-center">
-                    Each house draws one Objective card and then chooses one Objective card in their hand and shuffles it back into the objective deck.
-                </Col>
-                {renderChildGameState(this.props, [
-                    [SelectObjectiveCardsGameState, SelectObjectiveCardsComponent]
-                ])}
-        </>;
-    }
+export default class NewInformationComponent extends Component<
+  GameStateComponentProps<NewInformationGameState>
+> {
+  render(): ReactNode {
+    return (
+      <>
+        <Col xs={12} className="text-center">
+          {t(
+            "newInformation.eachHouseDrawsOneObjectiveCardAndThenChooses71a20f"
+          )}
+        </Col>
+        {renderChildGameState(this.props, [
+          [SelectObjectiveCardsGameState, SelectObjectiveCardsComponent]
+        ])}
+      </>
+    );
+  }
 }

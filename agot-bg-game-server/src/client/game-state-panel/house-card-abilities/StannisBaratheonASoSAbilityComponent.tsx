@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,9 +17,14 @@ export default class StannisBaratheonASoSAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Stannis Baratheon</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may choose to
-          steal the Iron Throne dominance token.
+          <Trans
+            i18nKey="stannisBaratheonASoSAbility.stannisBaratheonHouseMayChooseToStealTheIron45eb16"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

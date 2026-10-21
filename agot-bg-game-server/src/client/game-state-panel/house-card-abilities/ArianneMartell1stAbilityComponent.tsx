@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -20,15 +21,27 @@ export default class ArianneMartell1stAbilityComponent extends Component<
         {this.props.gameState.childGameState instanceof
         SimpleChoiceGameState ? (
           <Col xs={12} className="text-center">
-            <b>Arianne Martell</b>: House{" "}
-            <b>{this.props.gameState.house.name}</b> may kill an army unit of
-            House <b>{this.props.gameState.enemy.name}</b>.
+            <Trans
+              i18nKey="arianneMartell1stAbility.arianneMartellHouseMayKillAnArmyUnitOf6c291a"
+              components={{
+                element0: <b />,
+                element1: <b />,
+                value2: <>{this.props.gameState.house.name}</>,
+                element3: <b />,
+                value4: <>{this.props.gameState.enemy.name}</>
+              }}
+            />
           </Col>
         ) : (
           <Col xs={12} className="text-center">
-            <b>Arianne Martell</b>: House{" "}
-            <b>{this.props.gameState.enemy.name}</b> must choose a unit to
-            destroy.
+            <Trans
+              i18nKey="arianneMartell1stAbility.arianneMartellHouseMustChooseAUnitToDestroyae97fd"
+              components={{
+                element0: <b />,
+                element1: <b />,
+                value2: <>{this.props.gameState.enemy.name}</>
+              }}
+            />
           </Col>
         )}
         {renderChildGameState(this.props, [

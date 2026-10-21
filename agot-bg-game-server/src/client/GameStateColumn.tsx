@@ -1,6 +1,8 @@
+import { t, Trans } from "./i18n";
+import MapContribution from "./MapContribution";
 import React, { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 
 import {
   Col,
@@ -13,7 +15,7 @@ import {
   Spinner,
   Popover
 } from "react-bootstrap";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 import { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
 
@@ -71,19 +73,29 @@ interface GameStateColumnProps {
 
 @observer
 export default class GameStateColumn extends Component<GameStateColumnProps> {
-  @observable highlightedRegions = new BetterMap<
+  @observable accessor highlightedRegions = new BetterMap<
     Region,
     RegionOnMapProperties
   >();
 
-  modifyRegionsOnMapCallback: any;
-
-  private ingame = this.props.ingame;
-  private game = this.ingame.game;
-  private gameClient = this.props.gameClient;
-  private mapControls = this.props.mapControls;
-  private gameSettings = this.ingame.entireGame.gameSettings;
-  private authenticatedPlayer = this.gameClient.authenticatedPlayer;
+  private get ingame(): IngameGameState {
+    return this.props.ingame;
+  }
+  private get game(): IngameGameState["game"] {
+    return this.ingame.game;
+  }
+  private get gameClient(): GameClient {
+    return this.props.gameClient;
+  }
+  private get mapControls(): MapControls {
+    return this.props.mapControls;
+  }
+  private get gameSettings(): IngameGameState["entireGame"]["gameSettings"] {
+    return this.ingame.entireGame.gameSettings;
+  }
+  private get authenticatedPlayer(): GameClient["authenticatedPlayer"] {
+    return this.gameClient.authenticatedPlayer;
+  }
 
   render(): ReactNode {
     const phases = [
@@ -93,12 +105,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
         component: WesterosGameStateComponent
       },
       {
-        name: "Planning",
+        name: t("gameStateColumn.planning21cc30"),
         gameState: PlanningGameState,
         component: PlanningComponent
       },
       {
-        name: "Action",
+        name: t("gameStateColumn.action64cff1"),
         gameState: ActionGameState,
         component: ActionComponent
       }
@@ -152,6 +164,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
 
     return (
       <div className="flex-ratio-container">
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.ingame}
+          kind="hover"
+          regions={this.modifyRegionsOnMap()}
+        />
         <Card
           key={`leaf-state-${this.props.ingame.entireGame.leafStateId}`}
           id="game-state-panel"
@@ -161,7 +179,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             maxHeight: "65%",
             paddingRight: "2px",
             borderWidth: "3px",
-            overflowY: "scroll"
+            overflowY: "scroll",
+            overflowX: "hidden"
           }}
         >
           <Row className="no-space-around">
@@ -194,7 +213,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               condition={isPhaseActive(phases[0])}
                               wrap={(child) => <b>{child}</b>}
                             >
-                              <>{phases[0].name} phase</>
+                              <>
+                                <Trans
+                                  i18nKey="gameStateColumn.phasee16825"
+                                  components={{ value0: <>{phases[0].name}</> }}
+                                />
+                              </>
                             </ConditionalWrap>
                           </div>
                         </OverlayTrigger>
@@ -216,7 +240,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               condition={isPhaseActive(phase)}
                               wrap={(child) => <b>{child}</b>}
                             >
-                              <>{phase.name} phase</>
+                              <>
+                                <Trans
+                                  i18nKey="gameStateColumn.phasee16825"
+                                  components={{ value0: <>{phase.name}</> }}
+                                />
+                              </>
                             </ConditionalWrap>
                           </div>
                         </Col>
@@ -261,15 +290,21 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 className="px-0 text-center"
               >
                 <Row
-                  className="mb-3 mx-0"
+                  className="mb-3 g-0"
                   onMouseEnter={() => this.highlightRegionsOfHouses()}
-                  onMouseLeave={() => this.highlightedRegions.clear()}
+                  onMouseLeave={() => this.clearHighlightedRegions()}
                 >
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="round-tooltip">
                         <h5>
-                          Round {this.game.turn} / {this.game.maxTurns}
+                          <Trans
+                            i18nKey="common.round"
+                            components={{
+                              value0: <>{this.game.turn}</>,
+                              value1: <>{this.game.maxTurns}</>
+                            }}
+                          />
                         </h5>
                       </Tooltip>
                     }
@@ -298,8 +333,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     </div>
                   </OverlayTrigger>
                 </Row>
-                <Row className="mr-0">
-                  <div>
+                <Row className="g-0">
+                  <div className="d-flex flex-column align-items-center">
                     <OverlayTrigger
                       overlay={this.renderWildlingDeckPopover(
                         knowsWildlingCard,
@@ -337,9 +372,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 </Row>
                 {this.game.dragonStrengthTokens.length > 0 && (
                   <Row
-                    className="mx-0 mt-3"
+                    className="mt-3 g-0"
                     onMouseEnter={() => this.highlightRegionsWithDragons()}
-                    onMouseLeave={() => this.highlightedRegions.clear()}
+                    onMouseLeave={() => this.clearHighlightedRegions()}
                   >
                     <OverlayTrigger
                       overlay={this.renderDragonStrengthTooltip()}
@@ -395,7 +430,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             <>
               <Row className="mt-0">
                 <Col>
-                  <h5 className="text-center">Next Westeros Cards</h5>
+                  <h5 className="text-center">
+                    {t("gameStateColumn.nextWesterosCards7700b4")}
+                  </h5>
                 </Col>
               </Row>
               <Row>
@@ -404,7 +441,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     key={"westeros-deck-" + i + "-header"}
                     className="text-center"
                   >
-                    <b>Deck {i + 1}</b>
+                    <b>
+                      <Trans
+                        i18nKey="gameStateColumn.deckdede0b"
+                        components={{ value0: <>{i + 1}</> }}
+                      />
+                    </b>
                   </Col>
                 ))}
               </Row>
@@ -436,7 +478,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
           )}
           <Row className={this.gameSettings.cokWesterosPhase ? "mt-4" : "mt-0"}>
             <Col>
-              <h5 className="text-center">Remaining Westeros Cards</h5>
+              <h5 className="text-center">
+                {t("gameStateColumn.remainingWesterosCards47a43b")}
+              </h5>
             </Col>
           </Row>
           <Row>
@@ -445,7 +489,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 key={"westeros-deck-" + i + "-header"}
                 className="text-center"
               >
-                <b>Deck {i + 1}</b>
+                <b>
+                  <Trans
+                    i18nKey="gameStateColumn.deckdede0b"
+                    components={{ value0: <>{i + 1}</> }}
+                  />
+                </b>
               </Col>
             ))}
           </Row>
@@ -461,7 +510,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                       {count > 1 ? count : <>&nbsp;</>}
                     </Col>
                     <Col
-                      className="pl-0"
+                      className="ps-0"
                       style={{ width: "150px", maxWidth: "150px" }}
                     >
                       <WesterosCardComponent
@@ -498,7 +547,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
           {knowsWildlingCard && nextWildlingCard && (
             <>
               <Col xs={12} className="mt-0">
-                <h5 className="text-center">Top Wilding Card</h5>
+                <h5 className="text-center">
+                  {t("gameStateColumn.topWildingCard5070eb")}
+                </h5>
               </Col>
               <Col xs={12} className="mb-2">
                 <Row className="justify-content-center">
@@ -512,10 +563,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             </>
           )}
           <Col xs={12} className="mt-0">
-            <h5 className="text-center">The Wildling Deck</h5>
+            <h5 className="text-center">
+              {t("gameStateColumn.theWildlingDeck090e33")}
+            </h5>
           </Col>
           <Col xs={12}>
-            <Row className="justify-content-center mr-0 ml-0">
+            <Row className="justify-content-center me-0 ms-0">
               {wildlingDeck.map((wc) => (
                 <Col
                   xs="auto"
@@ -532,6 +585,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     );
   }
 
+  @action
   highlightRegionsOfHouses(): void {
     const regionsWithControllers = new BetterMap(
       this.props.gameClient.allRegionsWithControllers
@@ -559,6 +613,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     });
   }
 
+  @action
   highlightRegionsWithDragons(): void {
     const regions = this.ingame.world.regions.values.filter(
       (r) =>
@@ -586,12 +641,16 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     return (
       <Tooltip id="dragon-strength-tooltip">
         <div className="m-1 text-center">
-          <h5>Current Dragon Strength</h5>
+          <h5>{t("gameStateColumn.currentDragonStrengthed8478")}</h5>
           {roundsWhenIncreased.length > 0 && (
             <p>
-              Will increase in round
-              <br />
-              {joinNaturalLanguage(roundsWhenIncreased)}
+              <Trans
+                i18nKey="gameStateColumn.willIncreaseInRound7dd1c1"
+                components={{
+                  element0: <br />,
+                  value1: <>{joinNaturalLanguage(roundsWhenIncreased)}</>
+                }}
+              />
             </p>
           )}
         </div>
@@ -603,16 +662,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     return this.highlightedRegions.entries;
   }
 
-  componentDidMount(): void {
-    this.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
+  @action
+  clearHighlightedRegions(): void {
+    this.highlightedRegions.clear();
   }
 }

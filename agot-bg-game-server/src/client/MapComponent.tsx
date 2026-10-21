@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "./i18n";
 import { Component, ReactNode } from "react";
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
@@ -34,7 +35,6 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import BetterMap from "../utils/BetterMap";
 import _ from "lodash";
-import PartialRecursive from "../utils/PartialRecursive";
 import {
   land,
   sea
@@ -45,7 +45,7 @@ import UseRavenGameState from "../common/ingame-game-state/action-game-state/use
 import { renderRegionTooltip } from "./regionTooltip";
 import getGarrisonToken from "./garrisonTokens";
 import { ship } from "../common/ingame-game-state/game-data-structure/unitTypes";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png";
 import loanCardImages from "./loanCardImages";
 import StaticIronBankView from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticIronBankView";
@@ -352,8 +352,6 @@ export default class MapComponent extends Component<MapComponentProps> {
   }
 
   render(): ReactNode {
-    void this.props.mapControls.revision;
-
     const ironBankView = this.ingame.world.ironBankView;
     const fogOfWarActive = this.ingame.fogOfWar;
     const garrisons = new BetterMap<Region, string | null>();
@@ -388,12 +386,11 @@ export default class MapComponent extends Component<MapComponentProps> {
       }
     }
 
-    const propertiesForRegions = this.getModifiedPropertiesForEntities<
-      Region,
-      RegionOnMapProperties
-    >(allRegions, this.props.mapControls.modifyRegionsOnMap, {
-      highlight: { active: false, color: "white" }
-    });
+    const mapProperties = this.props.mapControls.resolve(
+      this.ingame,
+      allRegions
+    );
+    const propertiesForRegions = mapProperties.regions;
 
     // If the user is to select a region, we disable the pointer events for units to forward the click event to the region.
     // This makes it easier to hit the ports!
@@ -406,14 +403,7 @@ export default class MapComponent extends Component<MapComponentProps> {
         (p) => p.onClick != undefined || p.wrap != undefined
       );
 
-    const propertiesForUnits = this.getModifiedPropertiesForEntities<
-      Unit,
-      UnitOnMapProperties
-    >(
-      _.flatMap(allRegions.map((r) => r.allUnits)),
-      this.props.mapControls.modifyUnitsOnMap,
-      {}
-    );
+    const propertiesForUnits = mapProperties.units;
 
     return (
       <div
@@ -454,15 +444,19 @@ export default class MapComponent extends Component<MapComponentProps> {
                   overlay={
                     <Tooltip id={"power-token-" + r.id}>
                       <div className="text-center">
-                        <b>Printed Power token</b>
+                        <b>{t("map.printedPowerTokenda7a13")}</b>
                         <small>
-                          {" "}
-                          of{" "}
-                          <b>
-                            {r.overwrittenSuperControlPowerToken.name}
-                            <br />
-                            {r.name}
-                          </b>
+                          <Trans
+                            i18nKey="map.ofda0760"
+                            components={{
+                              element0: <b />,
+                              value1: (
+                                <>{r.overwrittenSuperControlPowerToken.name}</>
+                              ),
+                              element2: <br />,
+                              value3: <>{r.name}</>
+                            }}
+                          />
                         </small>
                       </div>
                     </Tooltip>
@@ -487,15 +481,17 @@ export default class MapComponent extends Component<MapComponentProps> {
                   overlay={
                     <Tooltip id={"power-token-" + r.id}>
                       <div className="text-center">
-                        <b>Power token</b>
+                        <b>{t("map.powerTokene4ee18")}</b>
                         <small>
-                          {" "}
-                          of{" "}
-                          <b>
-                            {r.controlPowerToken.name}
-                            <br />
-                            {r.name}
-                          </b>
+                          <Trans
+                            i18nKey="map.ofda0760"
+                            components={{
+                              element0: <b />,
+                              value1: <>{r.controlPowerToken.name}</>,
+                              element2: <br />,
+                              value3: <>{r.name}</>
+                            }}
+                          />
                         </small>
                       </div>
                     </Tooltip>
@@ -538,7 +534,7 @@ export default class MapComponent extends Component<MapComponentProps> {
               animation={animation}
             />
           ))}
-          {this.renderOrders(allRegions, isVisible)}
+          {this.renderOrders(mapProperties.orders, isVisible)}
           {this.ingame.orderMoveAnimations.map((animation) => (
             <MovingOrder
               key={`moving-order-${animation.id}`}
@@ -804,11 +800,11 @@ export default class MapComponent extends Component<MapComponentProps> {
       return dragonStrength <= -1 ? (
         <></>
       ) : dragonStrength <= 1 ? (
-        <>Baby </>
+        <>{t("map.baby7ad646")}</>
       ) : dragonStrength <= 3 ? (
         <></>
       ) : dragonStrength <= 5 ? (
-        <>Monster </>
+        <>{t("map.monster4baa1d")}</>
       ) : (
         <></>
       );
@@ -901,13 +897,21 @@ export default class MapComponent extends Component<MapComponentProps> {
                       <div className="text-center">
                         <b>
                           {getDragonPrefix(dragonStrength)}
-                          {u.type.name}
+                          {translateGameText(u.type.name)}
                         </b>
                         <small>
-                          {" "}
-                          of <b>{controller?.name ?? "Unknown"}</b>
-                          <br />
-                          <b>{r.name}</b>
+                          <Trans
+                            i18nKey="map.of4fba64"
+                            components={{
+                              element0: <b />,
+                              value1: (
+                                <>{controller?.name ?? t("common.unknown")}</>
+                              ),
+                              element2: <br />,
+                              element3: <b />,
+                              value4: <>{r.name}</>
+                            }}
+                          />
                         </small>
                       </div>
                     </Tooltip>
@@ -992,17 +996,23 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <Tooltip id={"garrison-tooltip-" + r.id}>
                   <div className="text-center">
                     {this.allRegionsWithControllers.get(r) == null ? (
-                      <b>Neutral Force token</b>
+                      <b>{t("map.neutralForceTokenbd93e6")}</b>
                     ) : (
                       <>
-                        <b>Garrison</b>
+                        <b>{t("common.garrison")}</b>
                         <small>
-                          {" "}
-                          of{" "}
-                          <b>
-                            {this.allRegionsWithControllers.get(r)?.name ??
-                              "Unknown"}
-                          </b>
+                          <Trans
+                            i18nKey="common.of"
+                            components={{
+                              element0: <b />,
+                              value1: (
+                                <>
+                                  {this.allRegionsWithControllers.get(r)
+                                    ?.name ?? t("common.unknown")}
+                                </>
+                              )
+                            }}
+                          />
                         </small>
                       </>
                     )}
@@ -1050,7 +1060,7 @@ export default class MapComponent extends Component<MapComponentProps> {
               overlay={
                 <Tooltip id={"loyalty-tooltip-" + r.id}>
                   <div className="text-center">
-                    <b>Loyalty token</b>
+                    <b>{t("map.loyaltyToken6c646e")}</b>
                     <br />
                     <small>
                       <b>{r.name}</b>
@@ -1143,14 +1153,9 @@ export default class MapComponent extends Component<MapComponentProps> {
   }
 
   renderOrders(
-    regions: Region[],
+    propertiesForOrders: BetterMap<Region, OrderOnMapProperties>,
     isVisible: (region: Region) => boolean
   ): ReactNode {
-    const propertiesForOrders = this.getModifiedPropertiesForEntities<
-      Region,
-      OrderOnMapProperties
-    >(regions, this.props.mapControls.modifyOrdersOnMap, {});
-
     return propertiesForOrders.map((region, properties) => {
       if (!isVisible(region)) {
         return null;
@@ -1214,42 +1219,6 @@ export default class MapComponent extends Component<MapComponentProps> {
 
       return null;
     });
-  }
-
-  /**
-   * This is used to call modifyRegionOnMap, modifyUnitOnMap and merge the properties
-   * of an entity (Region, Unit, ...) that have been modified by `...GameStateComponent` classes.
-   * @param entities
-   * @param modifyPropertiesFunctions
-   * @param defaultProperties
-   */
-  getModifiedPropertiesForEntities<Entity, Property>(
-    entities: Entity[],
-    modifyPropertiesFunctions: (() => [Entity, PartialRecursive<Property>][])[],
-    defaultProperties: Property
-  ): BetterMap<Entity, Property> {
-    // Create a Map of properties for all regions that will be shown.
-    // Every entity needs its own copy as _.merge mutates its target which would leak
-    // properties (onClick, wrap, highlight, ...) of one entity to all the others.
-    const propertiesForEntities = new BetterMap<Entity, Property>();
-    entities.forEach((entity) => {
-      propertiesForEntities.set(entity, _.cloneDeep(defaultProperties));
-    });
-
-    modifyPropertiesFunctions.forEach((modifyPropertiesFunction) => {
-      const modifiedPropertiesForEntities = modifyPropertiesFunction();
-
-      modifiedPropertiesForEntities.forEach(([entity, modifiedProperties]) => {
-        if (propertiesForEntities.has(entity)) {
-          propertiesForEntities.set(
-            entity,
-            _.merge(propertiesForEntities.get(entity), modifiedProperties)
-          );
-        }
-      });
-    });
-
-    return propertiesForEntities;
   }
 
   renderOrder(
@@ -1401,15 +1370,21 @@ export default class MapComponent extends Component<MapComponentProps> {
     return (
       <Tooltip id={"order-info"} className="tooltip-w-100">
         <div className="text-center">
-          <b>{order ? order.type.name : "Order token"}</b>
+          <b>
+            {order
+              ? translateGameText(order.type.name)
+              : t("map.orderToken1f66da")}
+          </b>
           <small>
-            {" "}
-            of{" "}
-            <b>
-              {controller?.name ?? "Unknown"}
-              <br />
-              {region.name}
-            </b>
+            <Trans
+              i18nKey="map.ofda0760"
+              components={{
+                element0: <b />,
+                value1: <>{controller?.name ?? t("common.unknown")}</>,
+                element2: <br />,
+                value3: <>{region.name}</>
+              }}
+            />
           </small>
         </div>
       </Tooltip>

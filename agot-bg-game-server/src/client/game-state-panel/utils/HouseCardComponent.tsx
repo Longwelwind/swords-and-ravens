@@ -4,7 +4,7 @@ import HouseCard from "../../../common/ingame-game-state/game-data-structure/hou
 import houseCardImages from "../../houseCardImages";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import classNames from "classnames";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import { preventOverflow } from "@popperjs/core";
 import ImagePopover from "../../utils/ImagePopover";
 

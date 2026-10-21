@@ -11,8 +11,8 @@ import getElapsedSeconds, {
 export default class Player {
   user: User;
   house: House;
-  @observable waitedForData: WaitedForData | null;
-  @observable liveClockData: LiveClockData | null;
+  @observable accessor waitedForData: WaitedForData | null;
+  @observable accessor liveClockData: LiveClockData | null;
 
   get isNeededForVote(): boolean {
     return (

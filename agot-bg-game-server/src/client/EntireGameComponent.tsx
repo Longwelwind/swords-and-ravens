@@ -1,4 +1,6 @@
+import { t, Trans } from "./i18n";
 import { observer } from "mobx-react";
+import { runInAction } from "mobx";
 import { Component, default as React, ReactNode } from "react";
 import EntireGame from "../common/EntireGame";
 import { GameSettings } from "../common/GameSettings";
@@ -36,6 +38,7 @@ import { isMobile } from "react-device-detect";
 import ReplayComponent from "./ReplayComponent";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import classNames from "classnames";
+import LanguageSelector from "./i18n/LanguageSelector";
 
 const yourTurnToastAnimation = cssTransition({
   enter: "slide-in-elliptic-top-fwd",
@@ -49,6 +52,7 @@ interface EntireGameComponentProps {
 @observer
 export default class EntireGameComponent extends Component<EntireGameComponentProps> {
   setIntervalId = -1;
+  private mountedGame: EntireGame | null = null;
 
   get entireGame(): EntireGame {
     if (!this.props.gameClient.entireGame) {
@@ -125,6 +129,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 {this.renderPrivateBadge()}
               </>
             )}
+            <Col xs="auto">
+              <LanguageSelector />
+            </Col>
           </Row>
         </Col>
         {this.entireGame.childGameState instanceof LobbyGameState ? (
@@ -213,25 +220,41 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             overlay={
               <Tooltip id="tob-active-tooltip">
                 <div className="text-center">
-                  Tides of Battle
-                  {this.settings.removeTob3 && (
-                    <>
-                      <br />
-                      <small>No 3s</small>
-                    </>
-                  )}
-                  {this.settings.removeTobSkulls && (
-                    <>
-                      <br />
-                      <small>No skulls</small>
-                    </>
-                  )}
-                  {this.settings.limitTob2 && (
-                    <>
-                      <br />
-                      <small>Only two 2s</small>
-                    </>
-                  )}
+                  <Trans
+                    i18nKey="entireGame.tidesOfBattleaa351e"
+                    components={{
+                      value0: (
+                        <>
+                          {this.settings.removeTob3 && (
+                            <>
+                              <br />
+                              <small>{t("entireGame.no3sa390e1")}</small>
+                            </>
+                          )}
+                        </>
+                      ),
+                      value1: (
+                        <>
+                          {this.settings.removeTobSkulls && (
+                            <>
+                              <br />
+                              <small>{t("entireGame.noSkulls94c957")}</small>
+                            </>
+                          )}
+                        </>
+                      ),
+                      value2: (
+                        <>
+                          {this.settings.limitTob2 && (
+                            <>
+                              <br />
+                              <small>{t("entireGame.onlyTwo2sfe35c3")}</small>
+                            </>
+                          )}
+                        </>
+                      )
+                    }}
+                  />
                 </div>
               </Tooltip>
             }
@@ -255,9 +278,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 <div className="p-2 text-center">
                   <h6>Perpetuum Random</h6>
                   <small>
-                    When a player plays their last House card,
-                    <br />
-                    they will receive a new set of random House cards.
+                    <Trans
+                      i18nKey="entireGame.whenAPlayerPlaysTheirLastHouseCardThey0829f1"
+                      components={{ element0: <br /> }}
+                    />
                   </small>
                 </div>
               </Tooltip>
@@ -279,9 +303,13 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             placement="auto"
             overlay={
               <Tooltip id="evolution-active-tooltip">
-                From round <b>{this.settings.houseCardsEvolutionRound}</b>{" "}
-                onwards, each house receives its alternative deck when the last
-                house card has been played.
+                <Trans
+                  i18nKey="entireGame.fromRoundOnwardsEachHouseReceivesItsAlternativeDeck0f2244"
+                  components={{
+                    element0: <b />,
+                    value1: <>{this.settings.houseCardsEvolutionRound}</>
+                  }}
+                />
               </Tooltip>
             }
             popperConfig={{ modifiers: [preventOverflow] }}
@@ -299,7 +327,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     ) : (
       <Col xs="auto">
         <h4>
-          <Badge variant="primary">PRIVATE</Badge>
+          <Badge bg="primary">{t("entireGame.private7109ec")}</Badge>
         </h4>
       </Col>
     );
@@ -312,12 +340,12 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
           <OverlayTrigger
             overlay={
               <Tooltip id="locked-badge-tooltip">
-                This game is password-protected
+                {t("entireGame.thisGameIsPasswordProtectedb43e52")}
               </Tooltip>
             }
             placement="bottom"
           >
-            <Badge variant="danger">
+            <Badge bg="danger">
               <FontAwesomeIcon icon={faLock} size="sm" />
             </Badge>
           </OverlayTrigger>
@@ -336,15 +364,23 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             <OverlayTrigger
               overlay={
                 <Tooltip id="pbem-badge-tooltip">
-                  <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail
+                  <Trans
+                    i18nKey="entireGame.pLayBYEMAil7dae07"
+                    components={{
+                      element0: <b />,
+                      element1: <b />,
+                      element2: <b />,
+                      element3: <b />
+                    }}
+                  />
                 </Tooltip>
               }
               placement="bottom"
             >
-              <Badge variant="primary">PBEM</Badge>
+              <Badge bg="primary">PBEM</Badge>
             </OverlayTrigger>
           ) : (
-            <Badge variant="success">Live</Badge>
+            <Badge bg="success">{t("common.live")}</Badge>
           )}
         </h4>
       </Col>
@@ -357,7 +393,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         {this.entireGame.ingameGameState?.paused && (
           <Col xs="auto">
             <h4>
-              <Badge variant="danger">PAUSED</Badge>
+              <Badge bg="danger">{t("entireGame.paused5b5f8d")}</Badge>
             </h4>
           </Col>
         )}
@@ -377,33 +413,48 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                       this.settings.loyaltyTokenCountNeededToWin != 7) && (
                       <div>
                         <h6>
-                          The victory conditions
-                          <br />
-                          have been modified!
+                          <Trans
+                            i18nKey="entireGame.theVictoryConditionsHaveBeenModifiedf88c2a"
+                            components={{ element0: <br /> }}
+                          />
                         </h6>
                       </div>
                     )}
                     <div className="text-small">
-                      Required victory points:{" "}
-                      <b className="text-large">
-                        {this.settings.victoryPointsCountNeededToWin}
-                      </b>
+                      <Trans
+                        i18nKey="entireGame.requiredVictoryPoints72bc5d"
+                        components={{
+                          element0: <b className="text-large" />,
+                          value1: (
+                            <>{this.settings.victoryPointsCountNeededToWin}</>
+                          )
+                        }}
+                      />
                     </div>
                     {this.settings.playerCount >= 8 && (
                       <div className="text-small">
-                        Required loyalty tokens:{" "}
-                        <b className="text-large">
-                          {this.settings.loyaltyTokenCountNeededToWin}
-                        </b>
+                        <Trans
+                          i18nKey="entireGame.requiredLoyaltyTokens2f3768"
+                          components={{
+                            element0: <b className="text-large" />,
+                            value1: (
+                              <>{this.settings.loyaltyTokenCountNeededToWin}</>
+                            )
+                          }}
+                        />
                       </div>
                     )}
                     {this.settings.holdVictoryPointsUntilEndOfRound && (
                       <div className="text-small mt-3">
-                        Players must hold{" "}
-                        {this.settings.victoryPointsCountNeededToWin} victory
-                        points
-                        <br />
-                        until the end of the round to win the game!
+                        <Trans
+                          i18nKey="entireGame.playersMustHoldVictoryPointsUntilTheEndOf20b204"
+                          components={{
+                            value0: (
+                              <>{this.settings.victoryPointsCountNeededToWin}</>
+                            ),
+                            element1: <br />
+                          }}
+                        />
                       </div>
                     )}
                   </div>
@@ -426,19 +477,21 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   <div className="text-center">
                     {this.settings.dragonWar && (
                       <div className="p-2">
-                        <h6>Dragon War</h6>
+                        <h6>{t("common.dragonWar")}</h6>
                         <small>
-                          Balon Greyjoy and Aeron Damphair (DwD) have been
-                          nerfed!
+                          {t(
+                            "entireGame.balonGreyjoyAndAeronDamphairDwdHaveBeenNerfed229ea7"
+                          )}
                         </small>
                       </div>
                     )}
                     {this.settings.dragonRevenge && (
                       <div className="p-2">
-                        <h6>Dragon Revenge</h6>
+                        <h6>{t("common.dragonRevenge")}</h6>
                         <small>
-                          The last remaining non-dragon land unit of a defeated
-                          house will transform into a dragon!
+                          {t(
+                            "entireGame.theLastRemainingNonDragonLandUnitOfA775972"
+                          )}
                         </small>
                       </div>
                     )}
@@ -454,7 +507,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         {false && (
           <Col xs="auto">
             <h4>
-              <Badge variant="warning">BETA</Badge>
+              <Badge bg="warning">BETA</Badge>
             </h4>
           </Col>
         )}
@@ -470,7 +523,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             placement="auto"
             overlay={
               <Tooltip id="tournament-game-tooltip">
-                This is a tournament game
+                {t("entireGame.thisIsATournamentGamef4045b")}
               </Tooltip>
             }
             popperConfig={{ modifiers: [preventOverflow] }}
@@ -507,7 +560,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
           <FormCheck
             id="show-hide-map-setting"
             type="switch"
-            label="Show map"
+            label={t("entireGame.showMap9166a7")}
             style={{ marginTop: "-6px" }}
             checked={this.showMapWhileDrafting}
             onChange={() => {
@@ -527,7 +580,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
           type="switch"
           label={
             <label htmlFor="replay-mode-switch">
-              <Badge variant="warning">REPLAY MODE</Badge>
+              <Badge bg="warning">{t("entireGame.replayMode4231bb")}</Badge>
             </label>
           }
           style={{ marginTop: "-6px" }}
@@ -585,8 +638,8 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   house={player.house}
                   size={100}
                 ></HouseIconComponent>
-                <h2 className="d-inline ml-3" style={{ color: "white" }}>
-                  It&apos;s your turn!
+                <h2 className="d-inline ms-3" style={{ color: "white" }}>
+                  {t("entireGame.itSYourTurnae6a42")}
                 </h2>
               </Card.Body>
             </Card>
@@ -606,12 +659,20 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
   }
 
   setNow(): void {
+    const game = this.mountedGame;
+    if (!game) {
+      return;
+    }
     // Correct for client/server clock skew so countdowns against server-issued deadlines stay accurate
-    this.entireGame.now = new Date(Date.now() + this.entireGame.clockOffsetMs);
+    runInAction(() => {
+      game.now = new Date(Date.now() + game.clockOffsetMs);
+    });
   }
 
   componentDidMount(): void {
-    document.title = this.entireGame.name;
+    const game = this.entireGame;
+    this.mountedGame = game;
+    document.title = game.name;
     this.updateFavicon();
     this.props.gameClient.onOwnTurnChange = () => this.updateFavicon();
 
@@ -619,21 +680,24 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
       return;
     }
 
-    this.entireGame.onClientGameStateChange = () =>
-      this.onClientGameStateChange();
-    this.entireGame.onGameStarted = () => this.onGameStarted();
+    game.onClientGameStateChange = () => this.onClientGameStateChange();
+    game.onGameStarted = () => this.onGameStarted();
 
     this.setIntervalId = window.setInterval(() => this.setNow(), 1000);
   }
 
   componentWillUnmount(): void {
-    this.props.gameClient.onOwnTurnChange = null;
-    this.entireGame.onClientGameStateChange = null;
-    this.entireGame.onGameStarted = null;
+    const game = this.mountedGame;
+    this.mountedGame = null;
 
     if (this.setIntervalId >= 0) {
       window.clearInterval(this.setIntervalId);
       this.setIntervalId = -1;
+    }
+    this.props.gameClient.onOwnTurnChange = null;
+    if (game) {
+      game.onClientGameStateChange = null;
+      game.onGameStarted = null;
     }
   }
 }

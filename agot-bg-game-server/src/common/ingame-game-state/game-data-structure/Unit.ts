@@ -13,7 +13,7 @@ export default class Unit {
   allegiance: House;
 
   // Client-side only to support live update of planned musterings
-  @observable upgradedType?: UnitType;
+  @observable accessor upgradedType: UnitType | undefined = undefined;
 
   constructor(id: number, type: UnitType, allegiance: House) {
     this.id = id;

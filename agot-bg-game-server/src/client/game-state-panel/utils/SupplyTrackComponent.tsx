@@ -1,3 +1,5 @@
+import { t, Trans } from "../../i18n";
+import MapContribution from "../../MapContribution";
 import { Component, default as React, ReactNode } from "react";
 import { observer } from "mobx-react";
 import Badge from "react-bootstrap/Badge";
@@ -15,8 +17,7 @@ import MapControls, {
   RegionOnMapProperties
 } from "../../../client/MapControls";
 import IngameGameState from "../../../common/ingame-game-state/IngameGameState";
-import { observable } from "mobx";
-import _ from "lodash";
+import { action, observable } from "mobx";
 import GameClient from "../../GameClient";
 
 interface SupplyTrackComponentProps {
@@ -29,8 +30,7 @@ interface SupplyTrackComponentProps {
 
 @observer
 export default class SupplyTrackComponent extends Component<SupplyTrackComponentProps> {
-  modifyRegionsOnMapCallback: any;
-  @observable highlightedRegions = new BetterMap<
+  @observable accessor highlightedRegions = new BetterMap<
     Region,
     PartialRecursive<RegionOnMapProperties>
   >();
@@ -42,24 +42,25 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
   render(): ReactNode {
     return (
       <Row>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.ingame}
+          kind="hover"
+          regions={this.modifyRegionsOnMap()}
+        />
         <Col xs="auto">
           <OverlayTrigger
             overlay={
               <Tooltip id="supply-track">
-                <b>Supply Track</b>
-                <br />
-                Each supply track column contains a list of numbers illustrating
-                the maximum size and count of each player&apos;s armies. (An
-                army is made up of two or more units within the same land or sea
-                area.) The supply track is updated from game effects, such as
-                the &quot;Supply&quot; Westeros card. The updated supply
-                position is determined by the number of Supply icons printed in
-                areas that the player controls.
+                <Trans
+                  i18nKey="supplyTrack.supplyTrackEachSupplyTrackColumnContainsAList352379"
+                  components={{ element0: <b />, element1: <br /> }}
+                />
               </Tooltip>
             }
             placement="right"
           >
-            <img width="32px" src={barrelImage} alt="Supply" />
+            <img width="32px" src={barrelImage} alt={t("common.supply")} />
           </OverlayTrigger>
         </Col>
         <Col>
@@ -76,53 +77,52 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                       <Tooltip id={`supply-track-col-${i}`}>
                         {i == 0 ? (
                           <>
-                            Players may have two armies with a maximum size of 2
-                            units each.
+                            {t(
+                              "supplyTrack.playersMayHaveTwoArmiesWithAMaximumSize69834f"
+                            )}
                           </>
                         ) : i == 1 ? (
                           <>
-                            Players may have two armies. One with a maximum size
-                            of 3 units and another with a maximum size of 2
-                            units.
+                            {t(
+                              "supplyTrack.playersMayHaveTwoArmiesOneWithAMaximum47e8fb"
+                            )}
                           </>
                         ) : i == 2 ? (
                           <>
-                            Players may have three armies. One with a maximum
-                            size of 3 units and two others with a maximum size
-                            of 2 units each.
+                            {t(
+                              "supplyTrack.playersMayHaveThreeArmiesOneWithAMaximum7d2a6b"
+                            )}
                           </>
                         ) : i == 3 ? (
                           <>
-                            Players may have four armies. One with a maximum
-                            size of 3 units and three others with a maximum size
-                            of 2 units each.
+                            {t(
+                              "supplyTrack.playersMayHaveFourArmiesOneWithAMaximumdb0007"
+                            )}
                           </>
                         ) : i == 4 ? (
                           <>
-                            Players may have four armies. Two with a maximum
-                            size of 3 units each and two others with a maximum
-                            size of 2 units each.
+                            {t(
+                              "supplyTrack.playersMayHaveFourArmiesTwoWithAMaximum03c157"
+                            )}
                           </>
                         ) : i == 5 ? (
                           <>
-                            Players may have four armies. One with a maximum
-                            size of 4 units, another with a maximum size of 3
-                            units, and two others with a maximum size of 2 units
-                            each.
+                            {t(
+                              "supplyTrack.playersMayHaveFourArmiesOneWithAMaximum17167e"
+                            )}
                           </>
                         ) : (
                           <>
-                            Players may have five armies. One with a maximum
-                            size of 4 units, another with a maximum size of 3
-                            units, and three others with a maximum size of 2
-                            units each.
+                            {t(
+                              "supplyTrack.playersMayHaveFiveArmiesOneWithAMaximum4da918"
+                            )}
                           </>
                         )}
                       </Tooltip>
                     }
                     placement="auto"
                   >
-                    <Badge variant="secondary" style={{ fontSize: "1rem" }}>
+                    <Badge bg="secondary" style={{ fontSize: "1rem" }}>
                       {i}
                     </Badge>
                   </OverlayTrigger>
@@ -159,7 +159,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
                               marginTop: "-5px"
                             }}
                             onMouseEnter={() => this.setHighlightedRegions(h)}
-                            onMouseLeave={() => this.highlightedRegions.clear()}
+                            onMouseLeave={() => this.clearHighlightedRegions()}
                           ></div>
                         </OverlayTrigger>
                       ))}
@@ -183,6 +183,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     );
   }
 
+  @action
   setHighlightedRegions(house: House): void {
     const regions = this.props.ingame.world.regions.values.filter(
       (r) => r.supplyIcons > 0 && r.getController() == house
@@ -216,16 +217,8 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
     return this.highlightedRegions.entries;
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
+  @action
+  clearHighlightedRegions(): void {
+    this.highlightedRegions.clear();
   }
 }

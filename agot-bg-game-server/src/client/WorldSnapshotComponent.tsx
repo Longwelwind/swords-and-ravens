@@ -25,7 +25,7 @@ import loanCardImages from "./loanCardImages";
 import IronBankSnapshotComponent from "./IronBankSnapshotComponent";
 import RegionSnapshot from "./game-replay/RegionSnapshot";
 import Region, {
-  BLOCKED,
+  BLOCKED
 } from "../common/ingame-game-state/game-data-structure/Region";
 import GameSnapshot from "./game-replay/GameSnapshot";
 import { observer } from "mobx-react";
@@ -52,7 +52,6 @@ export function getClassNameForDragonStrength(
     return "";
   }
 }
-
 interface WorldSnapshotComponentProps {
   ingameGameState: IngameGameState;
 }
@@ -120,7 +119,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
         style={{
           backgroundImage: `url(${this.backgroundImage})`,
           backgroundSize: "cover",
-          borderRadius: "0.25rem",
+          borderRadius: "0.25rem"
         }}
       >
         <div style={{ position: "relative" }}>
@@ -135,7 +134,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                         ? `url(${castleUpgradeImage})`
                         : `url(${castleDegradeImage})`,
                     left: regions.get(r.id).castleSlot.x,
-                    top: regions.get(r.id).castleSlot.y,
+                    top: regions.get(r.id).castleSlot.y
                   }}
                 />
               )}
@@ -148,7 +147,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                   style={{
                     left: regions.get(r.id).powerTokenSlot.x,
                     top: regions.get(r.id).powerTokenSlot.y,
-                    backgroundImage: `url(${housePowerTokensImages.get(r.overwrittenSuperControlPowerToken)})`,
+                    backgroundImage: `url(${housePowerTokensImages.get(r.overwrittenSuperControlPowerToken)})`
                   }}
                 />
               )}
@@ -158,7 +157,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                   style={{
                     left: regions.get(r.id).powerTokenSlot.x,
                     top: regions.get(r.id).powerTokenSlot.y,
-                    backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken)})`,
+                    backgroundImage: `url(${housePowerTokensImages.get(r.controlPowerToken)})`
                   }}
                 />
               )}
@@ -167,7 +166,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                 className="units-container disable-pointer-events v-hidden"
                 style={{
                   left: regions.get(r.id).nameSlot.x,
-                  top: regions.get(r.id).nameSlot.y,
+                  top: regions.get(r.id).nameSlot.y
                 }}
               />
             </div>
@@ -199,7 +198,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
             <ImagePopover
               className="vertical-game-card bring-to-front"
               style={{
-                backgroundImage: lc ? `url(${loanCardImages.get(lc)})` : "none",
+                backgroundImage: lc ? `url(${loanCardImages.get(lc)})` : "none"
               }}
             />
           }
@@ -211,7 +210,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
             className="order-container"
             style={{
               left: ironBankView.loanSlots[i].point.x,
-              top: ironBankView.loanSlots[i].point.y,
+              top: ironBankView.loanSlots[i].point.y
             }}
           >
             <div
@@ -219,7 +218,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               style={{
                 backgroundImage: lc ? `url(${loanCardImages.get(lc)})` : "none",
                 width: ironBankView.loanSlots[i].width,
-                height: ironBankView.loanSlots[i].height,
+                height: ironBankView.loanSlots[i].height
               }}
             />
           </div>
@@ -238,7 +237,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
           className="order-container"
           style={{
             left: ironBankView.deckSlot.point.x,
-            top: ironBankView.deckSlot.point.y,
+            top: ironBankView.deckSlot.point.y
           }}
         >
           <div
@@ -246,7 +245,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
             style={{
               backgroundImage: `url(${loanCardImages.get("back")})`,
               width: ironBankView.deckSlot.width,
-              height: ironBankView.deckSlot.height,
+              height: ironBankView.deckSlot.height
             }}
           />
         </div>
@@ -267,7 +266,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
             left: ironBankView.infoComponentSlot.point.x,
             top: ironBankView.infoComponentSlot.point.y,
             height: ironBankView.infoComponentSlot.height,
-            width: ironBankView.infoComponentSlot.width,
+            width: ironBankView.infoComponentSlot.width
           }}
         >
           <IronBankSnapshotComponent
@@ -302,7 +301,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                 regions.get(region.id).type.id != "land",
               "highlighted-region-area-strong":
                 highlightColor !== undefined &&
-                regions.get(region.id).type.id == "land",
+                regions.get(region.id).type.id == "land"
             }
           )}
         />
@@ -323,7 +322,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
             top: regions.get(r.id).unitSlot.point.y,
             width: regions.get(r.id).unitSlot.width,
             flexWrap:
-              regions.get(r.id).type.id == "land" ? "wrap-reverse" : "wrap",
+              regions.get(r.id).type.id == "land" ? "wrap-reverse" : "wrap"
           }}
         >
           {r.units !== undefined &&
@@ -356,7 +355,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                   style={{
                     backgroundImage: `url(${unitImages.get(u.house).get(u.type)})`,
                     opacity: opacity,
-                    transform: transform,
+                    transform: transform
                   }}
                 />
               );
@@ -367,7 +366,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               style={{
                 backgroundImage: `url(${garrisons.get(r.id)})`,
                 left: regions.get(r.id).unitSlot.point.x,
-                top: regions.get(r.id).unitSlot.point.y,
+                top: regions.get(r.id).unitSlot.point.y
               }}
             />
           )}
@@ -382,7 +381,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                 fontWeight: "bold",
                 fontFamily: "serif",
                 fontSize: "1.5rem",
-                color: "white",
+                color: "white"
               }}
             >
               {
@@ -405,7 +404,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
           left: region.improvementSlot.point.x,
           top: region.improvementSlot.point.y,
           width: region.improvementSlot.width,
-          flexWrap: "wrap",
+          flexWrap: "wrap"
         }}
       >
         {_.range(0, region.barrelModifier).map((_, i) => {
@@ -414,7 +413,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               key={`world-state_barrel-${region.id}-${i}`}
               className="unit-icon medium"
               style={{
-                backgroundImage: `url(${barrelImage})`,
+                backgroundImage: `url(${barrelImage})`
               }}
             />
           );
@@ -425,7 +424,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               key={`world-state_crown-${region.id}-${i}`}
               className="unit-icon medium"
               style={{
-                backgroundImage: `url(${crownImage})`,
+                backgroundImage: `url(${crownImage})`
               }}
             />
           );
@@ -456,7 +455,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
     return (
       <div
         className={classNames("order-container", {
-          "restricted-order": r.order.restricted,
+          "restricted-order": r.order.restricted
         })}
         style={{ left: region.orderSlot.x, top: region.orderSlot.y }}
         key={"world-state_order-in-region-" + region.id}
@@ -465,7 +464,7 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
           className={classNames("order-icon", { "order-border": drawBorder })}
           style={{
             backgroundImage: `url(${backgroundUrl})`,
-            borderColor: color,
+            borderColor: color
           }}
         />
       </div>

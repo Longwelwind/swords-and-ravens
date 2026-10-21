@@ -1,122 +1,198 @@
-import {Component, ReactNode} from "react";
-import {observer} from "mobx-react";
+import { t, Trans } from "../i18n";
+import { Component, ReactNode } from "react";
+import { observer } from "mobx-react";
 import DistributePowerTokensGameState from "../../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/distribute-power-tokens-game-state/DistributePowerTokensGameState";
 import React from "react";
-import {observable} from "mobx";
+import { observable } from "mobx";
 import House from "../../common/ingame-game-state/game-data-structure/House";
 import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import HouseIconComponent from "./utils/HouseIconComponent";
 import HouseNumberResultsComponent from "../HouseNumberResultsComponent";
 import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
 import BetterMap from "../../utils/BetterMap";
 
 @observer
-export default class ResolveTiesComponent extends Component<GameStateComponentProps<DistributePowerTokensGameState>> {
-    currentBidResults: BetterMap<House, number>;
-    @observable additionalPowerTokens: BetterMap<House, number> = new BetterMap();
-    @observable availablePowerTokensForDistribution: number;
+export default class ResolveTiesComponent extends Component<
+  GameStateComponentProps<DistributePowerTokensGameState>
+> {
+  currentBidResults: BetterMap<House, number>;
+  @observable accessor additionalPowerTokens: BetterMap<House, number> =
+    new BetterMap();
+  @observable accessor availablePowerTokensForDistribution: number;
 
-    constructor(props: GameStateComponentProps<DistributePowerTokensGameState>) {
-        super(props);
+  constructor(props: GameStateComponentProps<DistributePowerTokensGameState>) {
+    super(props);
 
-        this.currentBidResults = this.props.gameState.bidsOfHouses;
-        this.currentBidResults.delete(this.props.gameState.house);
-        this.availablePowerTokensForDistribution = this.props.gameState.bidOfDistributor;
-    }
+    this.currentBidResults = this.props.gameState.bidsOfHouses;
+    this.currentBidResults.delete(this.props.gameState.house);
+    this.availablePowerTokensForDistribution =
+      this.props.gameState.bidOfDistributor;
+  }
 
-    render(): ReactNode {
-        const results = _.flatMap(this.props.gameState.bidResults.map(([bid, houses]) => houses.map(h => [h, bid] as [House, number])));
-        return (
-            <>
-                <Col xs={12} className="text-center">
-                    <b>{this.props.gameState.house.name}</b> can distribute their bid of {this.props.gameState.bidOfDistributor} to other houses.
+  render(): ReactNode {
+    const results = _.flatMap(
+      this.props.gameState.bidResults.map(([bid, houses]) =>
+        houses.map((h) => [h, bid] as [House, number])
+      )
+    );
+    return (
+      <>
+        <Col xs={12} className="text-center">
+          <Trans
+            i18nKey="distributePowerTokens.canDistributeTheirBidOfToOtherHousesa6b601"
+            components={{
+              element0: <b />,
+              value1: <>{this.props.gameState.house.name}</>,
+              value2: <>{this.props.gameState.bidOfDistributor}</>
+            }}
+          />
+        </Col>
+        {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
+          <>
+            <Col xs={12} className="text-center">
+              <Trans
+                i18nKey="distributePowerTokens.availablePowerTokens4d6905"
+                components={{
+                  value0: <>{this.availablePowerTokensForDistribution}</>
+                }}
+              />
+            </Col>
+            <Col xs={12}>
+              <Row className="justify-content-center">
+                {this.currentBidResults.entries.map(([h, bid]) => (
+                  <Col
+                    xs="auto"
+                    key={`distribute-power_${h.id}`}
+                    className="d-flex flex-column align-items-center mb-4"
+                  >
+                    <div className="mb-2">
+                      <HouseIconComponent house={h} />
+                    </div>
+                    <div
+                      className="text-center"
+                      style={{ fontSize: "1.125rem", marginBottom: "5px" }}
+                    >
+                      {bid +
+                        (this.additionalPowerTokens.has(h)
+                          ? this.additionalPowerTokens.get(h)
+                          : 0)}
+                    </div>
+                    <div className="btn-group btn-group-xs">
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        style={{
+                          visibility: this.displayArrow(h, 1)
+                            ? "initial"
+                            : "hidden"
+                        }}
+                        onClick={() => this.changeBid(h, 1)}
+                      >
+                        <FontAwesomeIcon icon={faAngleUp} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        style={{
+                          visibility: this.displayArrow(h, -1)
+                            ? "initial"
+                            : "hidden"
+                        }}
+                        onClick={() => this.changeBid(h, -1)}
+                      >
+                        <FontAwesomeIcon icon={faAngleDown} />
+                      </button>
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+              <Row className="justify-content-center mt-5">
+                <Col xs="auto">
+                  <Button
+                    type="button"
+                    variant="success"
+                    onClick={() => this.submit()}
+                  >
+                    {t("common.submit")}
+                  </Button>
                 </Col>
-                {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
-                    <>
-                        <Col xs={12} className="text-center">Available Power tokens: {this.availablePowerTokensForDistribution}</Col>
-                        <Col xs={12}>
-                            <Row className="justify-content-center">
-                                {this.currentBidResults.entries.map(([h, bid]) => (
-                                    <Col xs="auto" key={`distribute-power_${h.id}`} className="d-flex flex-column align-items-center mb-4">
-                                        <div className="mb-2">
-                                            <HouseIconComponent house={h}/>
-                                        </div>
-                                        <div className="text-center" style={{fontSize: "1.125rem", marginBottom: "5px"}}>{bid + (this.additionalPowerTokens.has(h) ? this.additionalPowerTokens.get(h) : 0)}</div>
-                                        <div className="btn-group btn-group-xs">
-                                            <button type="button"
-                                                className="btn btn-primary"
-                                                style={{visibility: this.displayArrow(h, 1) ? "initial": "hidden"}}
-                                                onClick={() => this.changeBid(h, 1)}
-                                            >
-                                                <FontAwesomeIcon icon={faAngleUp}/>
-                                            </button>
-                                            <button type="button"
-                                                className="btn btn-primary"
-                                                style={{visibility: this.displayArrow(h, -1) ? "initial": "hidden"}}
-                                                onClick={() => this.changeBid(h, -1)}
-                                            >
-                                                <FontAwesomeIcon icon={faAngleDown}/>
-                                            </button>
-                                        </div>
-                                    </Col>
-                                ))}
-                            </Row>
-                            <Row className="justify-content-center mt-5">
-                                <Col xs="auto">
-                                    <Button type="button" variant="success" onClick={() => this.submit()}>Submit</Button>
-                                </Col>
-                            </Row>
-                        </Col>
-                    </>
-                ) : <>
-                    <Col xs={12}>
-                        <p className="text-center">Bidding results:</p>
-                        <div className="d-flex justify-content-center">
-                            <HouseNumberResultsComponent results={results} keyPrefix="cok"/>
-                        </div>
-                    </Col>
-                    <Col xs={12} className="text-center">Waiting for {this.props.gameState.house.name}...</Col>
-                </>}
-            </>
-        );
+              </Row>
+            </Col>
+          </>
+        ) : (
+          <>
+            <Col xs={12}>
+              <p className="text-center">{t("common.biddingResults")}</p>
+              <div className="d-flex justify-content-center">
+                <HouseNumberResultsComponent
+                  results={results}
+                  keyPrefix="cok"
+                />
+              </div>
+            </Col>
+            <Col xs={12} className="text-center">
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.props.gameState.house.name}</> }}
+              />
+            </Col>
+          </>
+        )}
+      </>
+    );
+  }
+
+  displayArrow(house: House, direction: number): boolean {
+    if (direction == 1 && this.availablePowerTokensForDistribution > 0) {
+      return true;
     }
 
-    displayArrow(house: House, direction: number): boolean {
-        if (direction == 1 && this.availablePowerTokensForDistribution > 0) {
-            return true;
-        }
-
-        if (direction == -1 && this.additionalPowerTokens.has(house) && this.additionalPowerTokens.get(house) > 0) {
-            return true;
-        }
-
-        return false;
+    if (
+      direction == -1 &&
+      this.additionalPowerTokens.has(house) &&
+      this.additionalPowerTokens.get(house) > 0
+    ) {
+      return true;
     }
 
-    changeBid(house: House, powerTokens: number): void {
-        if (!this.additionalPowerTokens.has(house)) {
-            this.additionalPowerTokens.set(house, 0);
-        }
+    return false;
+  }
 
-        this.additionalPowerTokens.set(house, this.additionalPowerTokens.get(house) + powerTokens);
-        this.availablePowerTokensForDistribution += -powerTokens;
-
-        if (this.additionalPowerTokens.get(house) <= 0) {
-            this.additionalPowerTokens.delete(house);
-        }
+  changeBid(house: House, powerTokens: number): void {
+    if (!this.additionalPowerTokens.has(house)) {
+      this.additionalPowerTokens.set(house, 0);
     }
 
-    submit(): void {
-        if (this.availablePowerTokensForDistribution > 0) {
-            if (!window.confirm("You haven't distributed all your Power tokens yet. Continue anyway?")) {
-                return;
-            }
-        }
-        this.props.gameState.distributePowerTokens(this.additionalPowerTokens.entries);
+    this.additionalPowerTokens.set(
+      house,
+      this.additionalPowerTokens.get(house) + powerTokens
+    );
+    this.availablePowerTokensForDistribution += -powerTokens;
+
+    if (this.additionalPowerTokens.get(house) <= 0) {
+      this.additionalPowerTokens.delete(house);
     }
+  }
+
+  submit(): void {
+    if (this.availablePowerTokensForDistribution > 0) {
+      if (
+        !window.confirm(
+          t(
+            "distributePowerTokens.youHavenTDistributedAllYourPowerTokensYet28ad45"
+          )
+        )
+      ) {
+        return;
+      }
+    }
+    this.props.gameState.distributePowerTokens(
+      this.additionalPowerTokens.entries
+    );
+  }
 }

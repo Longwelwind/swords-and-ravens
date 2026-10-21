@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import * as React from "react";
@@ -16,7 +17,7 @@ import _ from "lodash";
 export default class SelectHouseCardComponent extends Component<
   GameStateComponentProps<SelectHouseCardGameState<any>>
 > {
-  @observable nameFilter = "";
+  @observable accessor nameFilter = "";
 
   get selectedHouseCard(): HouseCard | null {
     return this.props.gameState.selectedHouseCard;
@@ -32,12 +33,12 @@ export default class SelectHouseCardComponent extends Component<
         {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
           <Col xs={12}>
             {this.props.gameState.entireGame.hasChildGameState(
-              DraftHouseCardsGameState,
+              DraftHouseCardsGameState
             ) && (
               <Row className="justify-content-center mb-2">
                 <input
                   className="form-control"
-                  placeholder="Filter by house card name or strength"
+                  placeholder={t("common.filterByHouseCardNameOrStrength")}
                   type="text"
                   value={this.nameFilter}
                   onChange={(e) => (this.nameFilter = e.target.value)}
@@ -50,7 +51,7 @@ export default class SelectHouseCardComponent extends Component<
                 <Row className="justify-content-center">
                   {_.sortBy(
                     this.props.gameState.houseCards,
-                    (hc) => hc.combatStrength,
+                    (hc) => hc.combatStrength
                   ).map(
                     (hc) =>
                       // The house argument is used to decide which card-back is used
@@ -74,7 +75,7 @@ export default class SelectHouseCardComponent extends Component<
                             }
                           />
                         </Col>
-                      ),
+                      )
                   )}
                 </Row>
               </Col>
@@ -85,7 +86,7 @@ export default class SelectHouseCardComponent extends Component<
                   onClick={() => this.confirm()}
                   disabled={this.selectedHouseCard == null}
                 >
-                  Confirm
+                  {t("common.confirm")}
                 </Button>
               </Col>
             </Row>
@@ -93,7 +94,10 @@ export default class SelectHouseCardComponent extends Component<
         ) : (
           <Col xs={12}>
             <Row className="justify-content-center">
-              Waiting for {this.props.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.props.gameState.house.name}</> }}
+              />
             </Row>
           </Col>
         )}

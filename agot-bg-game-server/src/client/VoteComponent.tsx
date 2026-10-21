@@ -1,3 +1,4 @@
+import { t, Trans, getLanguage } from "./i18n";
 import { Component, ReactElement, ReactNode } from "react";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import GameClient from "./GameClient";
@@ -42,7 +43,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
       this.vote.type instanceof ReplacePlayer &&
       this.vote.state != VoteState.ONGOING &&
       !this.vote.ingame.players.keys.some(
-        (p) => p.id === this.vote.initiator.id,
+        (p) => p.id === this.vote.initiator.id
       ) &&
       this.props.gameClient.canActAsOwner();
 
@@ -53,7 +54,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
             placement="auto"
             overlay={
               <Tooltip id={"vote-date-" + this.vote.id}>
-                {this.vote.createdAt.toLocaleString()}
+                {this.vote.createdAt.toLocaleString(getLanguage())}
               </Tooltip>
             }
             popperConfig={{ modifiers: [preventOverflow] }}
@@ -88,78 +89,106 @@ export default class VoteComponent extends Component<VoteComponentProps> {
           </OverlayTrigger>
         </Col>
         <Col>
-          <b>{getUserLinkOrLabel(this.vote.initiator, false, showBanButton)}</b>{" "}
-          initiated a vote to <b>{this.vote.type.verb()}</b>.{" "}
-          {this.vote.positiveCountToPass}&nbsp;player
-          {this.vote.positiveCountToPass != 1 ? "s" : ""} must accept to pass
-          the vote.
-          <Row className="mt-1">
-            <Col
-              xs="auto"
-              className={classNames({
-                "display-none":
-                  state != VoteState.ONGOING ||
-                  this.props.gameClient.authenticatedPlayer == null,
-              })}
-            >
-              <Button
-                type="button"
-                className="mb-1"
-                variant="success"
-                size="sm"
-                style={{ minWidth: "60px" }}
-                disabled={disabled}
-                onClick={() => this.vote.vote(true)}
-              >
-                {this.wrapVoteButtons(<>Accept</>, disabled, reason)}
-              </Button>
-              <br />
-              <Button
-                type="button"
-                variant="danger"
-                size="sm"
-                style={{ minWidth: "60px" }}
-                disabled={disabled}
-                onClick={() => this.vote.vote(false)}
-              >
-                {this.wrapVoteButtons(<>Refuse</>, disabled, reason)}
-              </Button>
-            </Col>
-            <Col>
-              <Row>
-                {this.vote.participatingHouses.map((h) => (
-                  <Col xs="auto" key={`vote-${this.vote.id}-${h.id}`}>
-                    <div className="mb-2">
-                      <HouseIconComponent house={h} />
-                    </div>
-                    <div className="text-center">
-                      {this.vote.votes.has(h) ? (
-                        this.vote.votes.get(h) ? (
-                          <FontAwesomeIcon
-                            className="text-success"
-                            icon={faCheck}
-                          />
-                        ) : (
-                          <FontAwesomeIcon
-                            className="text-danger"
-                            icon={faBan}
-                          />
-                        )
-                      ) : (
-                        state == VoteState.ONGOING && (
-                          <Spinner
-                            animation="border"
-                            variant="info"
-                            size="sm"
-                          />
-                        )
+          <Trans
+            i18nKey="vote.initiatedAVoteToMustAcceptToPassThe69a13a"
+            components={{
+              element0: <b />,
+              value1: (
+                <>
+                  {getUserLinkOrLabel(
+                    this.vote.initiator,
+                    false,
+                    showBanButton
+                  )}
+                </>
+              ),
+              element2: <b />,
+              value3: <>{this.vote.type.verb()}</>,
+              value4: <>{this.vote.positiveCountToPass}</>,
+              value5: (
+                <>
+                  {t("common.player", { count: this.vote.positiveCountToPass })}
+                </>
+              ),
+              element6: (
+                <Row className="mt-1">
+                  <Col
+                    xs="auto"
+                    className={classNames({
+                      "display-none":
+                        state != VoteState.ONGOING ||
+                        this.props.gameClient.authenticatedPlayer == null
+                    })}
+                  >
+                    <Button
+                      type="button"
+                      className="mb-1"
+                      variant="success"
+                      size="sm"
+                      style={{ minWidth: "60px" }}
+                      disabled={disabled}
+                      onClick={() => this.vote.vote(true)}
+                    >
+                      {this.wrapVoteButtons(
+                        <>{t("vote.accept89713b")}</>,
+                        disabled,
+                        reason
                       )}
-                    </div>
+                    </Button>
+                    <br />
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      style={{ minWidth: "60px" }}
+                      disabled={disabled}
+                      onClick={() => this.vote.vote(false)}
+                    >
+                      {this.wrapVoteButtons(
+                        <>{t("vote.refuse263134")}</>,
+                        disabled,
+                        reason
+                      )}
+                    </Button>
                   </Col>
-                ))}
-              </Row>
-            </Col>
-          </Row>
+                  <Col>
+                    <Row>
+                      {this.vote.participatingHouses.map((h) => (
+                        <Col xs="auto" key={`vote-${this.vote.id}-${h.id}`}>
+                          <div className="mb-2">
+                            <HouseIconComponent house={h} />
+                          </div>
+                          <div className="text-center">
+                            {this.vote.votes.has(h) ? (
+                              this.vote.votes.get(h) ? (
+                                <FontAwesomeIcon
+                                  className="text-success"
+                                  icon={faCheck}
+                                />
+                              ) : (
+                                <FontAwesomeIcon
+                                  className="text-danger"
+                                  icon={faBan}
+                                />
+                              )
+                            ) : (
+                              state == VoteState.ONGOING && (
+                                <Spinner
+                                  animation="border"
+                                  variant="info"
+                                  size="sm"
+                                />
+                              )
+                            )}
+                          </div>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Col>
+                </Row>
+              )
+            }}
+          />
         </Col>
       </Row>
     );
@@ -168,7 +197,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
   wrapVoteButtons(
     button: ReactElement,
     disabled: boolean,
-    reason: string,
+    reason: string
   ): ReactNode {
     return (
       <ConditionalWrap
@@ -178,12 +207,12 @@ export default class VoteComponent extends Component<VoteComponentProps> {
             overlay={
               <Tooltip id="voting-currently-disabled">
                 {reason == "ongoing-combat"
-                  ? "You cannot vote during combat phase"
+                  ? t("vote.youCannotVoteDuringCombatPhase06afc2")
                   : reason == "ongoing-bidding"
-                    ? "You cannot vote during bidding phase"
+                    ? t("vote.youCannotVoteDuringBiddingPhased9fe47")
                     : reason == "secret-orders-placed"
-                      ? "You cannot vote because the houses to be swapped have already placed orders"
-                      : "Voting is currently not possible"}
+                      ? t("vote.youCannotVoteBecauseTheHousesToBeSwappedb5f256")
+                      : t("vote.votingIsCurrentlyNotPossible7026e4")}
               </Tooltip>
             }
             placement="auto"

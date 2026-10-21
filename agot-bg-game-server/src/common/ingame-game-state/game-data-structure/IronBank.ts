@@ -10,9 +10,9 @@ import IIronBankSnapshot from "../../../client/game-replay/IIronBankSnapshot";
 
 export default class IronBank {
   game: Game;
-  @observable loanCardDeck: LoanCard[];
-  @observable purchasedLoans: LoanCard[] = [];
-  @observable loanSlots: (LoanCard | null)[] = [null, null, null];
+  @observable accessor loanCardDeck: LoanCard[];
+  @observable accessor purchasedLoans: LoanCard[] = [];
+  @observable accessor loanSlots: (LoanCard | null)[] = [null, null, null];
 
   loanCosts = [7, 4, 1];
 
@@ -31,7 +31,7 @@ export default class IronBank {
   get interestCostPerHouse(): [House, number][] {
     return this.purchasedLoansPerHouse.entries.map(([house, lcs]) => [
       house,
-      lcs.length,
+      lcs.length
     ]);
   }
 
@@ -57,7 +57,7 @@ export default class IronBank {
         result.push({
           loan: loan.type,
           costs: costsForHouse[i],
-          slotIndex: i,
+          slotIndex: i
         });
       }
     }
@@ -116,7 +116,7 @@ export default class IronBank {
       house: house.id,
       loanType: loan.type.id,
       paid: costs,
-      region: regionOfOrderId,
+      region: regionOfOrderId
     });
 
     this.sendUpdateLoanCards();
@@ -131,7 +131,7 @@ export default class IronBank {
         this.loanCardDeck.map((lc) => lc.serializeToClient())
       ),
       purchasedLoans: this.purchasedLoans.map((lc) => lc.serializeToClient()),
-      loanSlots: this.loanSlots.map((lc) => lc?.serializeToClient() ?? null),
+      loanSlots: this.loanSlots.map((lc) => lc?.serializeToClient() ?? null)
     });
   }
 
@@ -152,7 +152,7 @@ export default class IronBank {
           type: "interest-paid",
           house: house.id,
           cost: cost,
-          paid: reallyPaid,
+          paid: reallyPaid
         });
       });
 
@@ -174,7 +174,7 @@ export default class IronBank {
           : undefined,
       braavosController: this.controllerOfBraavos
         ? this.controllerOfBraavos.id
-        : undefined,
+        : undefined
     };
   }
 
@@ -184,7 +184,7 @@ export default class IronBank {
         ? this.loanCardDeck.map((c) => c.serializeToClient())
         : shuffleInPlace(this.loanCardDeck.map((c) => c.serializeToClient())),
       loanSlots: this.loanSlots.map((c) => c?.serializeToClient() ?? null),
-      purchasedLoans: this.purchasedLoans.map((c) => c.serializeToClient()),
+      purchasedLoans: this.purchasedLoans.map((c) => c.serializeToClient())
     };
   }
 

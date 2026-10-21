@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -27,8 +28,14 @@ export default class AeronDamphairAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Aeron Damphair:</b> House <b>{childGameState.house.name}</b> may
-          discard 2 Power tokens to change their House card.
+          <Trans
+            i18nKey="aeronDamphairAbility.aeronDamphairHouseMayDiscard2PowerTokensTo6499aa"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{childGameState.house.name}</>
+            }}
+          />
         </Col>
         {showWarning && (
           <Col xs={12}>
@@ -36,11 +43,13 @@ export default class AeronDamphairAbilityComponent extends Component<
               <Col xs="auto">
                 <Alert
                   variant="danger"
-                  className="text-center pl-2 pt-1 pr-2 pb-2"
+                  className="text-center ps-2 pt-1 pe-2 pb-2"
                 >
                   <small>
-                    <b>Warning:</b> This card&apos;s ability will have no effect
-                    because the cancellation phase has already passed!
+                    <Trans
+                      i18nKey="aeronDamphairAbility.warningThisCardSAbilityWillHaveNoEffectcab05e"
+                      components={{ element0: <b /> }}
+                    />
                   </small>
                 </Alert>
               </Col>
@@ -49,7 +58,7 @@ export default class AeronDamphairAbilityComponent extends Component<
         )}
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],
-          [SelectHouseCardGameState, SelectHouseCardComponent],
+          [SelectHouseCardGameState, SelectHouseCardComponent]
         ])}
       </>
     );

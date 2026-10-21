@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "./i18n";
 import GameClient from "./GameClient";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -8,7 +9,7 @@ import classNames from "classnames";
 import housePowerTokensImages from "./housePowerTokensImages";
 import _ from "lodash";
 import HouseCard, {
-  HouseCardState,
+  HouseCardState
 } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
@@ -20,7 +21,7 @@ import laurelCrownImage from "../../public/images/icons/laurel-crown.svg";
 import worldImage from "../../public/images/icons/world.svg";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import HouseSnapshot from "./game-replay/HouseSnapshot";
 import allKnownHouseCards from "./utils/houseCardHelper";
 
@@ -86,7 +87,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
             paddingLeft: "8px",
             paddingRight: "10px",
             paddingTop: "12px",
-            paddingBottom: "12px",
+            paddingBottom: "12px"
           }}
         >
           <Row className="align-items-center flex-nowrap">
@@ -96,7 +97,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 width={32}
                 style={{
                   margin: "-4px",
-                  visibility: isVassal ? "visible" : "hidden",
+                  visibility: isVassal ? "visible" : "hidden"
                 }}
               />
             </Col>
@@ -108,13 +109,18 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
               {isVassal &&
                 (this.suzerainHouse ? (
                   <>
-                    Commanded by{" "}
-                    <span style={{ color: this.suzerainHouse.color }}>
-                      {this.suzerainHouse.name}
-                    </span>
+                    <Trans
+                      i18nKey="houseRow.commandedBy467f37"
+                      components={{
+                        element0: (
+                          <span style={{ color: this.suzerainHouse.color }} />
+                        ),
+                        value1: <>{this.suzerainHouse.name}</>
+                      }}
+                    />
                   </>
                 ) : (
-                  <>Up for grab</>
+                  <>{t("houseRow.upForGrab1625c7")}</>
                 ))}
             </Col>
             <Col>
@@ -122,7 +128,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 <Col
                   xs="auto"
                   className={classNames("d-flex align-items-center", {
-                    invisible: isVassal,
+                    invisible: isVassal
                   })}
                 >
                   <div
@@ -132,14 +138,14 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                         ? "#F39C12"
                         : victoryPointsCritical
                           ? "#FF0000"
-                          : undefined,
+                          : undefined
                     }}
                   >
                     <b>{victoryPoints}</b>
                   </div>
                   <img
                     className={classNames(
-                      "ml-2",
+                      "ms-2",
                       { "dye-warning": victoryPointsWarning },
                       { "dye-critical": victoryPointsCritical }
                     )}
@@ -150,27 +156,27 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 <Col xs="auto" className="d-flex align-items-center">
                   <b
                     style={{
-                      fontSize: "1.125rem",
+                      fontSize: "1.125rem"
                     }}
                   >
                     {this.house.landAreaCount}
                   </b>
-                  <img className="ml-2" src={worldImage} width={24} />
+                  <img className="ms-2" src={worldImage} width={24} />
                 </Col>
                 <Col
                   xs="auto"
                   className={classNames("d-flex align-items-center", {
-                    invisible: isVassal,
+                    invisible: isVassal
                   })}
                 >
                   <b style={{ fontSize: "1.125rem" }}>
                     {this.house.powerTokens}
                   </b>
-                  <div className="ml-2 p-1">
+                  <div className="ms-2 p-1">
                     <div
                       className="house-power-token"
                       style={{
-                        backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
+                        backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`
                       }}
                     />
                   </div>
@@ -186,7 +192,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                       [allKnownHouseCards.get(hc.id)!, hc.state] as [
                         HouseCard,
-                        HouseCardState,
+                        HouseCardState
                       ]
                   ),
                   ([card, _]) => card.combatStrength
@@ -228,9 +234,9 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
   private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
     return (
       <Tooltip id={unitType.id + "-tooltip"}>
-        <b>{unitType.name}</b>
+        <b>{translateGameText(unitType.name)}</b>
         <br />
-        {unitType.description}
+        {translateGameText(unitType.description)}
       </Tooltip>
     );
   }

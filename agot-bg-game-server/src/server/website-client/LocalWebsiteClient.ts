@@ -152,7 +152,7 @@ export default class LocalWebsiteClient implements WebsiteClient {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async saveGame(
     _gameId: string,
     serializedGame: SerializedEntireGame,

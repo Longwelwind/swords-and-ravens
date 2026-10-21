@@ -9,42 +9,42 @@ import Player from "../Player";
 import EntireGame from "../../EntireGame";
 import * as _ from "lodash";
 import WildlingsAttackGameState, {
-  SerializedWildlingsAttackGameState,
+  SerializedWildlingsAttackGameState
 } from "./wildlings-attack-game-state/WildlingsAttackGameState";
 import { ClientMessage } from "../../../messages/ClientMessage";
 import { ServerMessage } from "../../../messages/ServerMessage";
 import ReconcileArmiesGameState, {
-  SerializedReconcileArmiesGameState,
+  SerializedReconcileArmiesGameState
 } from "./reconcile-armies-game-state/ReconcileArmiesGameState";
 import MusteringGameState, {
-  SerializedMusteringGameState,
+  SerializedMusteringGameState
 } from "./mustering-game-state/MusteringGameState";
 import ClashOfKingsGameState, {
-  SerializedClashOfKingsGameState,
+  SerializedClashOfKingsGameState
 } from "./clash-of-kings-game-state/ClashOfKingsGameState";
 import PlanningRestriction from "../game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
 import planningRestrictions from "../game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import PutToTheSwordGameState, {
-  SerializedPutToTheSwordGameState,
+  SerializedPutToTheSwordGameState
 } from "./put-to-the-swords-game-state/PutToTheSwordGameState";
 import AThroneOfBladesGameState, {
-  SerializedAThroneOfBladesGameState,
+  SerializedAThroneOfBladesGameState
 } from "./thrones-of-blades-game-state/AThroneOfBladesGameState";
 import DarkWingsDarkWordsGameState, {
-  SerializedDarkWingsDarkWordsGameState,
+  SerializedDarkWingsDarkWordsGameState
 } from "./dark-wings-dark-words-game-state/DarkWingsDarkWordsGameState";
 import WesterosDeck4GameState, {
-  SerializedWesterosDeck4GameState,
+  SerializedWesterosDeck4GameState
 } from "./westeros-deck-4-game-state/WesterosDeck4GameState";
 import Region from "../game-data-structure/Region";
 import TheBurdenOfPowerGameState, {
-  SerializedTheBurdenOfPowerGameState,
+  SerializedTheBurdenOfPowerGameState
 } from "./the-burden-of-power-game-state/TheBurdenOfPowerGameState";
 import ShiftingAmbitionsGameState, {
-  SerializedShiftingAmbitionsGameState,
+  SerializedShiftingAmbitionsGameState
 } from "./shifting-ambitions-game-state/ShiftingAmbitionsGameState";
 import NewInformationGameState, {
-  SerializedNewInformationGameState,
+  SerializedNewInformationGameState
 } from "./new-information-game-state/NewInformationGameState";
 
 export default class WesterosGameState extends GameState<
@@ -63,7 +63,7 @@ export default class WesterosGameState extends GameState<
 > {
   revealAndResolveTop2WesterosDeck4Cards = false;
   revealedCards: WesterosCard[];
-  @observable currentCardI = -1;
+  @observable accessor currentCardI = -1;
   /**
    * List of restrictions that will be applied to the planning phase.
    * Elements are added by WesterosCardType.
@@ -100,7 +100,7 @@ export default class WesterosGameState extends GameState<
 
   firstStart(revealAndResolveTop2WesterosDeck4Cards = false): void {
     this.ingame.log({
-      type: "westeros-phase-began",
+      type: "westeros-phase-began"
     });
 
     this.revealAndResolveTop2WesterosDeck4Cards =
@@ -159,7 +159,7 @@ export default class WesterosGameState extends GameState<
       westerosCardTypes: this.revealedCards.map((c) => c.type.id),
       addedWildlingStrength: addedWildlingStrength,
       revealAndResolveTop3WesterosDeck4Cards:
-        revealAndResolveTop2WesterosDeck4Cards,
+        revealAndResolveTop2WesterosDeck4Cards
     });
 
     if (addedWildlingStrength > 0) {
@@ -167,14 +167,14 @@ export default class WesterosGameState extends GameState<
 
       this.entireGame.broadcastToClients({
         type: "change-wildling-strength",
-        wildlingStrength: this.game.wildlingStrength,
+        wildlingStrength: this.game.wildlingStrength
       });
 
       if (this.game.wildlingStrength == MAX_WILDLING_STRENGTH) {
         // Trigger a wildlings attack
         this.ingame.log({
           type: "wildling-strength-trigger-wildlings-attack",
-          wildlingStrength: this.game.wildlingStrength,
+          wildlingStrength: this.game.wildlingStrength
         });
 
         this.triggerWildlingsAttack();
@@ -188,7 +188,7 @@ export default class WesterosGameState extends GameState<
   triggerWildlingsAttack(): void {
     this.setChildGameState(new WildlingsAttackGameState(this)).firstStart(
       this.game.wildlingStrength,
-      this.game.houses.values,
+      this.game.houses.values
     );
   }
 
@@ -212,7 +212,7 @@ export default class WesterosGameState extends GameState<
 
       this.entireGame.broadcastToClients({
         type: "proceed-westeros-card",
-        currentCardI: this.currentCardI,
+        currentCardI: this.currentCardI
       });
 
       this.executeCard(this.revealedCards[this.currentCardI]);
@@ -236,7 +236,7 @@ export default class WesterosGameState extends GameState<
     // But that's why we pass an empty array for revealAndResolveTop2WesterosDeck4Cards.
     this.ingame.onWesterosGameStateFinish(
       this.planningRestrictions,
-      !this.revealAndResolveTop2WesterosDeck4Cards ? this.revealedCards : [],
+      !this.revealAndResolveTop2WesterosDeck4Cards ? this.revealedCards : []
     );
   }
 
@@ -246,7 +246,7 @@ export default class WesterosGameState extends GameState<
       westerosCardType: card.type.id,
       westerosDeckI: !this.revealAndResolveTop2WesterosDeck4Cards
         ? this.currentCardI
-        : 3,
+        : 3
     });
 
     card.type.execute(this);
@@ -266,24 +266,24 @@ export default class WesterosGameState extends GameState<
       this.entireGame.broadcastToClients({
         type: "loyalty-token-placed",
         region: region.id,
-        newLoyaltyTokenCount: region.loyaltyTokens,
+        newLoyaltyTokenCount: region.loyaltyTokens
       });
 
       this.ingame.log({
         type: "loyalty-token-placed",
-        region: region.id,
+        region: region.id
       });
     } else {
       this.ingame.log({
         type: "no-loyalty-token-available",
-        region: region.id,
+        region: region.id
       });
     }
   }
 
   serializeToClient(
     admin: boolean,
-    player: Player | null,
+    player: Player | null
   ): SerializedWesterosGameState {
     return {
       type: "westeros",
@@ -292,13 +292,13 @@ export default class WesterosGameState extends GameState<
       revealedCardIds: this.revealedCards.map((c) => c.id),
       currentCardI: this.currentCardI,
       planningRestrictions: this.planningRestrictions.map((pr) => pr.id),
-      childGameState: this.childGameState.serializeToClient(admin, player),
+      childGameState: this.childGameState.serializeToClient(admin, player)
     };
   }
 
   static deserializeFromServer(
     ingameGameState: IngameGameState,
-    data: SerializedWesterosGameState,
+    data: SerializedWesterosGameState
   ): WesterosGameState {
     const westerosGameState = new WesterosGameState(ingameGameState);
 
@@ -308,22 +308,22 @@ export default class WesterosGameState extends GameState<
     westerosGameState.revealedCards =
       !data.revealAndResolveTop2WesterosDeck4Cards
         ? data.revealedCardIds.map((cid, i) =>
-            getById(ingameGameState.game.westerosDecks[i], cid),
+            getById(ingameGameState.game.westerosDecks[i], cid)
           )
         : data.revealedCardIds.map((cid) =>
-            getById(ingameGameState.game.westerosDecks[3], cid),
+            getById(ingameGameState.game.westerosDecks[3], cid)
           );
     westerosGameState.childGameState =
       westerosGameState.deserializeChildGameState(data.childGameState);
     westerosGameState.planningRestrictions = data.planningRestrictions.map(
-      (prid) => planningRestrictions.get(prid),
+      (prid) => planningRestrictions.get(prid)
     );
 
     return westerosGameState;
   }
 
   deserializeChildGameState(
-    data: SerializedWesterosGameState["childGameState"],
+    data: SerializedWesterosGameState["childGameState"]
   ): WesterosGameState["childGameState"] {
     switch (data.type) {
       case "wildlings-attack":
