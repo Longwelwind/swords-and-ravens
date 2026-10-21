@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,10 +17,16 @@ export default class SerDavosSeaworthASoSAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Ser Davos Seaworth</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may discard{" "}
-          <b>2</b> of their available Power tokens to gain <b>1</b>{" "}
-          Fortification Icon.
+          <Trans
+            i18nKey="serDavosSeaworthASoSAbility.serDavosSeaworthHouseMayDiscard2OfTheira17eaa"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>,
+              element3: <b />,
+              element4: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

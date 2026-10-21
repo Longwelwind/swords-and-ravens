@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import * as React from "react";
@@ -66,17 +67,20 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="pbem-tooltip">
-                      <b>Live Game</b>
-                      <br />
-                      A live game can be played when all players are online.
-                      They are notified by sound when it is their turn.
-                      <br />
-                      <br />
-                      <b>P</b>lay <b>B</b>y <b>E</b>-<b>M</b>ail
-                      <br />
-                      The asynchronous game mode. Players receive an e-mail when
-                      it is their turn. Those games are typically played over
-                      days or weeks.
+                      <Trans
+                        i18nKey="gameSettings.liveGameALiveGameCanBePlayedWhenc2f959"
+                        components={{
+                          element0: <b />,
+                          element1: <br />,
+                          element2: <br />,
+                          element3: <br />,
+                          element4: <b />,
+                          element5: <b />,
+                          element6: <b />,
+                          element7: <b />,
+                          element8: <br />
+                        }}
+                      />
                     </Tooltip>
                   }
                 >
@@ -92,10 +96,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     }
                   >
                     <option key="Live" value="Live">
-                      Live Game
+                      {t("gameSettings.liveGame5604db")}
                     </option>
                     <option key="PBEM" value="PBEM">
-                      Play By E-Mail
+                      {t("gameSettings.playByEMailcdf5d9")}
                     </option>
                   </select>
                 </OverlayTrigger>
@@ -109,13 +113,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <OverlayTrigger
                       overlay={
                         <Tooltip id="start-when-full-setting-tooltip">
-                          If this option is enabled, the game will start
-                          automatically once all seats are taken.
+                          {t(
+                            "gameSettings.ifThisOptionIsEnabledTheGameWillStart3f9a2c"
+                          )}
                         </Tooltip>
                       }
                     >
                       <label htmlFor="start-when-full-setting">
-                        Start when full
+                        {t("gameSettings.startWhenFull37777f")}
                       </label>
                     </OverlayTrigger>
                   }
@@ -141,30 +146,23 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                           id="only-live-setting-tooltip"
                           className="tooltip-w-100"
                         >
-                          If this option is enabled, each player will have a
-                          game clock of 30, 45, 60, 75, 90, or 120 minutes.
-                          <br />
-                          When a player&apos;s time runs out, they are
-                          automatically turned into a vassal and this cannot be
-                          undone!
-                          <br />
-                          The last remaining player immediately wins the game.
-                          <br />
-                          All player clocks can be extended by vote: once for 15
-                          minutes and a second time in the last round.
-                          <br />
-                          After 2 failed voting attempts, no further voting can
-                          be initiated.
-                          <br />
-                          These games can be paused, but public games will
-                          automatically resume after 10 minutes,
-                          <br />
-                          and the game host will not be able to switch to PBEM
-                          in-game.
+                          <Trans
+                            i18nKey="gameSettings.ifThisOptionIsEnabledEachPlayerWillHaveffd163"
+                            components={{
+                              element0: <br />,
+                              element1: <br />,
+                              element2: <br />,
+                              element3: <br />,
+                              element4: <br />,
+                              element5: <br />
+                            }}
+                          />
                         </Tooltip>
                       }
                     >
-                      <label htmlFor="only-live-setting">Game clock</label>
+                      <label htmlFor="only-live-setting">
+                        {t("gameSettings.gameClockdd5488")}
+                      </label>
                     </OverlayTrigger>
                   }
                   checked={this.gameSettings.onlyLive}
@@ -179,33 +177,39 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
               )}
               {this.gameSettings.onlyLive && !isIngame && (
                 <div>
-                  <select
-                    id="initial-live-clock"
-                    value={this.gameSettings.initialLiveClock}
-                    onChange={(e) =>
-                      this.onInitialLiveClockChange(e.target.value)
-                    }
-                  >
-                    <option key="30" value={30}>
-                      30
-                    </option>
-                    <option key="45" value={45}>
-                      45
-                    </option>
-                    <option key="60" value={60}>
-                      60
-                    </option>
-                    <option key="75" value={75}>
-                      75
-                    </option>
-                    <option key="90" value={90}>
-                      90
-                    </option>
-                    <option key="120" value={120}>
-                      120
-                    </option>
-                  </select>
-                  &nbsp;min
+                  <Trans
+                    i18nKey="gameSettings.min9aef64"
+                    components={{
+                      element0: (
+                        <select
+                          id="initial-live-clock"
+                          value={this.gameSettings.initialLiveClock}
+                          onChange={(e) =>
+                            this.onInitialLiveClockChange(e.target.value)
+                          }
+                        >
+                          <option key="30" value={30}>
+                            30
+                          </option>
+                          <option key="45" value={45}>
+                            45
+                          </option>
+                          <option key="60" value={60}>
+                            60
+                          </option>
+                          <option key="75" value={75}>
+                            75
+                          </option>
+                          <option key="90" value={90}>
+                            90
+                          </option>
+                          <option key="120" value={120}>
+                            120
+                          </option>
+                        </select>
+                      )
+                    }}
+                  />
                 </div>
               )}
               {this.gameSettings.onlyLive && !isIngame && (
@@ -217,12 +221,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <OverlayTrigger
                       overlay={
                         <Tooltip id="fixed-clock-setting-tooltip">
-                          If this option is enabled, players will not be able to
-                          vote to extend their clocks.
+                          {t(
+                            "gameSettings.ifThisOptionIsEnabledPlayersWillNotBe6c9e87"
+                          )}
                         </Tooltip>
                       }
                     >
-                      <label htmlFor="fixed-clock-setting">Fixed clock</label>
+                      <label htmlFor="fixed-clock-setting">
+                        {t("gameSettings.fixedClockd8e378")}
+                      </label>
                     </OverlayTrigger>
                   }
                   checked={this.gameSettings.fixedClock}
@@ -244,13 +251,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <OverlayTrigger
                       overlay={
                         <Tooltip id="private-game-setting-tooltip">
-                          Enable this option if you know all participants and
-                          want to prevent security and replacement mechanisms
-                          from being activated.
+                          {t(
+                            "gameSettings.enableThisOptionIfYouKnowAllParticipantsAnd1caeed"
+                          )}
                         </Tooltip>
                       }
                     >
-                      <label htmlFor="private-game-setting">Private Game</label>
+                      <label htmlFor="private-game-setting">
+                        {t("gameSettings.privateGameb84ee7")}
+                      </label>
                     </OverlayTrigger>
                   }
                   checked={this.gameSettings.private}
@@ -276,158 +285,198 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
       case "base-game":
         return (
           <>
-            <h5>
-              The official{" "}
-              <i>
-                A&nbsp;Game&nbsp;of&nbsp;Thrones&nbsp;Board&nbsp;Game&nbsp;-&nbsp;2nd&nbsp;edition
-              </i>
-            </h5>
-            This setup supports 3-player and 6-player modes. The rulebook is
-            available online.
-            <br />
-            The Neutral Force tokens for 4 and 5 players are not implemented, as
-            the unofficial variants
-            <br />
-            and the Vassals from the Mother&nbsp;of&nbsp;Dragons expansion are
-            much better.
+            <Trans
+              i18nKey="gameSettings.thisSetupSupports3PlayerAnd6PlayerModesd2e9ce"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theOfficialAGameOfThronesBoardGame2nd358ef9"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />,
+                element2: <br />
+              }}
+            />
           </>
         );
       case "mother-of-dragons":
         return (
           <>
-            <h5>
-              The official <i>Mother&nbsp;of&nbsp;Dragons</i> expansion
-            </h5>
-            This expansion adds 2 additional houses: Arryn and Targaryen, as
-            well as some more interesting mechanics:
-            <br />
-            Vassals, Sea Orders and the Iron Bank. If the game is selected with
-            8 players and House Targaryen,
-            <br />a completely new map part &apos;Essos&apos; is also added. The
-            rulebook is available online.
+            <Trans
+              i18nKey="gameSettings.thisExpansionAdds2AdditionalHousesArrynAndTargaryen723511"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theOfficialMotherOfDragonsExpansiona2949c"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />,
+                element2: <br />
+              }}
+            />
           </>
         );
       case "a-dance-with-dragons":
         return (
           <>
-            <h5>
-              The official <i>Dance&nbsp;with&nbsp;Dragons</i> expansion
-            </h5>
-            This expansion thematically reflects a later point in the Game of
-            Thrones story
-            <br />
-            and therefore{" "}
-            <i>
-              lasts only <b>6</b> rounds!
-            </i>{" "}
-            It adds new house cards and new starting positions
-            <br />
-            for all 6 houses from the base game.
+            <Trans
+              i18nKey="gameSettings.thisExpansionThematicallyReflectsALaterPointInThe9c9325"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theOfficialDanceWithDragonsExpansion7824b7"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />,
+                element2: <i />,
+                element3: <b />,
+                element4: <br />
+              }}
+            />
           </>
         );
       case "a-feast-for-crows":
         return (
           <>
-            <h5>
-              The official <i>A&nbsp;Feast&nbsp;for&nbsp;Crows</i> expansion
-            </h5>
-            This is a 4 player expansion. It adds House Arryn and a completely
-            new way to score victory points.
-            <br />
-            Instead of capturing castles you have to complete secret objectives.
-            <br />
-            The exact rules can be found in the game as a tooltip in the
-            Objectives tab.
+            <Trans
+              i18nKey="gameSettings.thisIsA4PlayerExpansionItAddsHoused62d5f"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theOfficialAFeastForCrowsExpansionc31f91"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />,
+                element2: <br />
+              }}
+            />
           </>
         );
       case "a-dance-with-mother-of-dragons":
         return (
           <>
-            <h5>
-              The unofficial{" "}
-              <i>A&nbsp;Dance&nbsp;with&nbsp;Mother&nbsp;of&nbsp;Dragons</i>{" "}
-              variant
-            </h5>
-            This is a community-created variant and combines{" "}
-            <i>A&nbsp;Dance&nbsp;with&nbsp;Dragons</i> and
-            Mother&nbsp;of&nbsp;Dragons.
-            <br />
-            So it also{" "}
-            <i>
-              lasts only <b>6</b> rounds
-            </i>
-            , offers new starting positions and is played with the
-            <br />
-            Dance&nbsp;with&nbsp;Dragons / Feast&nbsp;for&nbsp;Crows house cards
-            and the Mother&nbsp;of&nbsp;Dragons B deck for Targaryen.
+            <Trans
+              i18nKey="gameSettings.thisIsACommunityCreatedVariantAndCombinesA7d2a73"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theUnofficialADanceWithMotherOfDragonsVariantfa93ec"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <i />,
+                element2: <br />,
+                element3: <i />,
+                element4: <b />,
+                element5: <br />
+              }}
+            />
           </>
         );
       case "struggle-in-the-north":
         return (
           <>
-            <h5>
-              The unofficial <i>Struggle&nbsp;in&nbsp;the&nbsp;North</i> variant
-            </h5>
-            This is a community-created variant for 4 and 5 players only.
-            <br />
-            It is very similar to the base game with fewer players, but instead
-            of Neutral Force tokens,
-            <br />
-            the southern territories of House Martell and House Tyrell,
-            respectively, are blocked areas.
+            <Trans
+              i18nKey="gameSettings.thisIsACommunityCreatedVariantFor4Andb19cc8"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theUnofficialStruggleInTheNorthVariant93cc40"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />,
+                element2: <br />
+              }}
+            />
           </>
         );
       case "rumble-in-the-south":
         return (
           <>
-            <h5>
-              The unofficial <i>Rumbe&nbsp;in&nbsp;the&nbsp;South</i> variant
-            </h5>
-            This is a community-created variant for 4 players only.
-            <br />
-            House Stark and House Greyjoy do not participate and thus Pyke is
-            blocked
-            <br />
-            as well as almost all of North.
+            <Trans
+              i18nKey="gameSettings.thisIsACommunityCreatedVariantFor4Playersd25b60"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theUnofficialRumbeInTheSouthVariant044ba3"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />,
+                element2: <br />
+              }}
+            />
           </>
         );
       case "race-to-kings-landing":
         return (
           <>
-            <h5>
-              The unofficial <i>Race&nbsp;to&nbsp;Kings&nbsp;Landing</i> variant
-            </h5>
-            This is a community-created variant for 5 players only.
-            <br />
-            House Baratheon does not participate and thus Dragonstone is
-            blocked.
+            <Trans
+              i18nKey="gameSettings.thisIsACommunityCreatedVariantFor5Players6e4891"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theUnofficialRaceToKingsLandingVariant246958"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />
+              }}
+            />
           </>
         );
       case "no-kraken-for-dinner":
         return (
           <>
-            <h5>
-              The unofficial <i>No&nbsp;Kraken&nbsp;for&nbsp;Dinner</i> variant
-            </h5>
-            This is a community-created variant for 5 players only.
-            <br />
-            House Greyjoy does not participate and thus Pyke is blocked.
+            <Trans
+              i18nKey="gameSettings.thisIsACommunityCreatedVariantFor5Playersa4a230"
+              components={{
+                element0: (
+                  <h5>
+                    <Trans
+                      i18nKey="gameSettings.theUnofficialNoKrakenForDinnerVariant87fa1d"
+                      components={{ element0: <i /> }}
+                    />
+                  </h5>
+                ),
+                element1: <br />
+              }}
+            />
           </>
         );
       case "learn-the-game":
         return (
           <>
-            <h5>Teach&nbsp;the&nbsp;Game&nbsp;mode</h5>
-            This mode allows you to start the game with only 2 players to
-            explain the basic mechanics to a friend.
-            <br />
-            Additionally, the mode can be used with vassals from the
-            Mother&nbsp;of&nbsp;Dragons expansion
-            <br />
-            and the &apos;Random vassal assignment&apos; option to make the game
-            semi-playable with two players.
-            <br />
-            However, victories do not count towards the win rate.
+            <Trans
+              i18nKey="gameSettings.thisModeAllowsYouToStartTheGameWithc24a61"
+              components={{
+                element0: <h5>{t("gameSettings.teachTheGameMode7a34c3")}</h5>,
+                element1: <br />,
+                element2: <br />,
+                element3: <br />
+              }}
+            />
           </>
         );
       default:
@@ -463,114 +512,134 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
           </OverlayTrigger>
           <Col xs="auto" className="d-flex justify-content-between">
             <div className="me-2">
-              <select
-                id="player-count"
-                name="playerCount"
-                value={this.gameSettings.playerCount}
-                onChange={(e) => this.onPlayerCountChange(e.target.value)}
-                style={{ marginBottom: "8px" }}
-              >
-                {this.createPlayerCountItems()}
-              </select>
-              &nbsp;Players
+              <Trans
+                i18nKey="gameSettings.playersf220fc"
+                components={{
+                  element0: (
+                    <select
+                      id="player-count"
+                      name="playerCount"
+                      value={this.gameSettings.playerCount}
+                      onChange={(e) => this.onPlayerCountChange(e.target.value)}
+                      style={{ marginBottom: "8px" }}
+                    >
+                      {this.createPlayerCountItems()}
+                    </select>
+                  )
+                }}
+              />
             </div>
             <OverlayTrigger
               overlay={
                 <Tooltip id="vp-count-setting-tooltip">
-                  Defines the number of Victory&nbsp;points needed to win the
-                  game.
+                  {t(
+                    "gameSettings.definesTheNumberOfVictoryPointsNeededToWin6f1829"
+                  )}
                 </Tooltip>
               }
             >
               <div>
-                <select
-                  id="vp-count-setting"
-                  value={this.gameSettings.victoryPointsCountNeededToWin}
-                  onChange={(e) => this.onVpCountChange(e.target.value)}
-                  style={{ marginBottom: "8px" }}
-                >
-                  <option key="6" value={6}>
-                    6
-                  </option>
-                  <option key="7" value={7}>
-                    7
-                  </option>
-                  <option key="8" value={8}>
-                    8
-                  </option>
-                  <option key="9" value={9}>
-                    9
-                  </option>
-                  <option key="10" value={10}>
-                    10
-                  </option>
-                  <option key="11" value={11}>
-                    11
-                  </option>
-                  <option key="12" value={12}>
-                    12
-                  </option>
-                  <option key="13" value={13}>
-                    13
-                  </option>
-                  <option key="14" value={14}>
-                    14
-                  </option>
-                  <option key="15" value={15}>
-                    15
-                  </option>
-                </select>
-                &nbsp;VPs
+                <Trans
+                  i18nKey="gameSettings.vpsebc6d7"
+                  components={{
+                    element0: (
+                      <select
+                        id="vp-count-setting"
+                        value={this.gameSettings.victoryPointsCountNeededToWin}
+                        onChange={(e) => this.onVpCountChange(e.target.value)}
+                        style={{ marginBottom: "8px" }}
+                      >
+                        <option key="6" value={6}>
+                          6
+                        </option>
+                        <option key="7" value={7}>
+                          7
+                        </option>
+                        <option key="8" value={8}>
+                          8
+                        </option>
+                        <option key="9" value={9}>
+                          9
+                        </option>
+                        <option key="10" value={10}>
+                          10
+                        </option>
+                        <option key="11" value={11}>
+                          11
+                        </option>
+                        <option key="12" value={12}>
+                          12
+                        </option>
+                        <option key="13" value={13}>
+                          13
+                        </option>
+                        <option key="14" value={14}>
+                          14
+                        </option>
+                        <option key="15" value={15}>
+                          15
+                        </option>
+                      </select>
+                    )
+                  }}
+                />
               </div>
             </OverlayTrigger>
             {this.props.entireGame.gameSettings.playerCount >= 8 && (
               <OverlayTrigger
                 overlay={
                   <Tooltip id="lt-count-setting-tooltip">
-                    Defines the number of Loyalty&nbsp;tokens needed to win the
-                    game.
+                    {t(
+                      "gameSettings.definesTheNumberOfLoyaltyTokensNeededToWin9b42ca"
+                    )}
                   </Tooltip>
                 }
               >
                 <div>
-                  <select
-                    id="lt-count-setting"
-                    value={this.gameSettings.loyaltyTokenCountNeededToWin}
-                    onChange={(e) => this.onLtCountChange(e.target.value)}
-                    style={{ marginBottom: "8px" }}
-                  >
-                    <option key="6" value={6}>
-                      6
-                    </option>
-                    <option key="7" value={7}>
-                      7
-                    </option>
-                    <option key="8" value={8}>
-                      8
-                    </option>
-                    <option key="9" value={9}>
-                      9
-                    </option>
-                    <option key="10" value={10}>
-                      10
-                    </option>
-                    <option key="11" value={11}>
-                      11
-                    </option>
-                    <option key="12" value={12}>
-                      12
-                    </option>
-                    <option key="13" value={13}>
-                      13
-                    </option>
-                    <option key="14" value={14}>
-                      14
-                    </option>
-                    <option key="15" value={15}>
-                      15
-                    </option>
-                  </select>
-                  &nbsp;LTs
+                  <Trans
+                    i18nKey="gameSettings.ltsef35a8"
+                    components={{
+                      element0: (
+                        <select
+                          id="lt-count-setting"
+                          value={this.gameSettings.loyaltyTokenCountNeededToWin}
+                          onChange={(e) => this.onLtCountChange(e.target.value)}
+                          style={{ marginBottom: "8px" }}
+                        >
+                          <option key="6" value={6}>
+                            6
+                          </option>
+                          <option key="7" value={7}>
+                            7
+                          </option>
+                          <option key="8" value={8}>
+                            8
+                          </option>
+                          <option key="9" value={9}>
+                            9
+                          </option>
+                          <option key="10" value={10}>
+                            10
+                          </option>
+                          <option key="11" value={11}>
+                            11
+                          </option>
+                          <option key="12" value={12}>
+                            12
+                          </option>
+                          <option key="13" value={13}>
+                            13
+                          </option>
+                          <option key="14" value={14}>
+                            14
+                          </option>
+                          <option key="15" value={15}>
+                            15
+                          </option>
+                        </select>
+                      )
+                    }}
+                  />
                 </div>
               </OverlayTrigger>
             )}
@@ -584,14 +653,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="add-port-to-the-eyrie-setting-tooltip">
-                        If this option is enabled, the Eyrie has a port and
-                        House Arryn scores only 1 victory point for Mercantile
-                        Ventures (the objective about ports).
+                        {t(
+                          "gameSettings.ifThisOptionIsEnabledTheEyrieHasA9a15c9"
+                        )}
                       </Tooltip>
                     }
                   >
                     <label htmlFor="add-port-to-the-eyrie-setting">
-                      Add a port to The Eyrie
+                      {t("gameSettings.addAPortToTheEyriefe6468")}
                     </label>
                   </OverlayTrigger>
                 }
@@ -614,15 +683,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="adwd-house-cards-tooltip">
-                      If this option is enabled, the House cards from the{" "}
-                      <b>A&nbsp;Dance&nbsp;with&nbsp;Dragons</b> and{" "}
-                      <b>A&nbsp;Feast&nbsp;for&nbsp;Crows</b> expansions are
-                      used.
+                      <Trans
+                        i18nKey="gameSettings.ifThisOptionIsEnabledTheHouseCardsFrom36ba0c"
+                        components={{ element0: <b />, element1: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="adwd-house-cards">
-                    Use <i>ADwD</i> House cards
+                    <Trans
+                      i18nKey="gameSettings.useAdwdHouseCards09c29a"
+                      components={{ element0: <i /> }}
+                    />
                   </label>
                 </OverlayTrigger>
               }
@@ -644,14 +716,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="asos-house-cards-setting-tooltip">
-                      If this option is enabled, the House cards from the 1st
-                      edition expansion <b>A&nbsp;Storm&nbsp;of&nbsp;Swords</b>{" "}
-                      are used.
+                      <Trans
+                        i18nKey="gameSettings.ifThisOptionIsEnabledTheHouseCardsFroma220e0"
+                        components={{ element0: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="asos-house-cards-setting">
-                    Use <i>ASoS</i> House cards
+                    <Trans
+                      i18nKey="gameSettings.useAsosHouseCardsfc9124"
+                      components={{ element0: <i /> }}
+                    />
                   </label>
                 </OverlayTrigger>
               }
@@ -673,15 +749,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="first-edition-house-cards-setting-tooltip">
-                      If this option is enabled, the House cards from the{" "}
-                      <b>1st&nbsp;edition</b> base game are used. Only available
-                      for up to 6 players, as the combat strengths of these
-                      cards differ from the 2nd edition and expansion cards.
+                      <Trans
+                        i18nKey="gameSettings.ifThisOptionIsEnabledTheHouseCardsFrom2748f0"
+                        components={{ element0: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="first-edition-house-cards-setting">
-                    Use <i>1st edition</i> House cards
+                    <Trans
+                      i18nKey="gameSettings.use1stEditionHouseCards4f98d7"
+                      components={{ element0: <i /> }}
+                    />
                   </label>
                 </OverlayTrigger>
               }
@@ -703,15 +782,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="decks-evolution-setting-tooltip">
-                      This is a community variant that starts with the house
-                      cards from the base game. From round <b>5</b> onwards,
-                      each house receives its alternative deck when the last
-                      house card has been played.
+                      <Trans
+                        i18nKey="gameSettings.thisIsACommunityVariantThatStartsWithThe4017a7"
+                        components={{ element0: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="decks-evolution-setting">
-                    House cards evolution
+                    {t("gameSettings.houseCardsEvolutionf86001")}
                   </label>
                 </OverlayTrigger>
               }
@@ -726,7 +805,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             />
             {this.gameSettings.houseCardsEvolution && (
               <div>
-                <span className="ms-1">- Round:</span>
+                <span className="ms-1">{t("gameSettings.roundb55b25")}</span>
                 <select
                   id="decks-evolution-setting-round"
                   className="ms-2"
@@ -780,23 +859,25 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <Tooltip id="custom-balancing-tooltip">
                         {this.props.entireGame.isMotherOfDragons ? (
                           <>
-                            A community proposal to avoid an early gang up
-                            against Targaryen. For details see
-                            <br />
-                            <a
-                              href="https://www.boardgamedungeon.net/threads/my-balance-proposition-for-a-game-of-thrones-mother-of-dragons-expansion-targaryen.11/"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              Tex&apos;s balance proposal
-                            </a>
-                            .
+                            <Trans
+                              i18nKey="gameSettings.aCommunityProposalToAvoidAnEarlyGangUp2485ff"
+                              components={{
+                                element0: <br />,
+                                element1: (
+                                  <a
+                                    href="https://www.boardgamedungeon.net/threads/my-balance-proposition-for-a-game-of-thrones-mother-of-dragons-expansion-targaryen.11/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  />
+                                )
+                              }}
+                            />
                           </>
                         ) : (
                           <>
-                            A community proposal to improve Tyrell&apos;s
-                            starting position by adding a ship to the Redwyne
-                            Straights.
+                            {t(
+                              "gameSettings.aCommunityProposalToImproveTyrellSStartingPositionf8d2a2"
+                            )}
                           </>
                         )}
                       </Tooltip>
@@ -805,7 +886,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     placement={isMobile ? "auto" : "bottom"}
                   >
                     <label htmlFor="custom-balancing-setting">
-                      Custom Balancing
+                      {t("gameSettings.customBalancing373a1c")}
                     </label>
                   </OverlayTrigger>
                 }
@@ -830,12 +911,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="vassals-tooltip">
-                      Unassigned houses will be vassals introduced by the{" "}
-                      <b>Mother&nbsp;of&nbsp;Dragons</b> expansion.
+                      <Trans
+                        i18nKey="gameSettings.unassignedHousesWillBeVassalsIntroducedByTheMother979100"
+                        components={{ element0: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="vassals-setting">MoD Vassals</label>
+                  <label htmlFor="vassals-setting">
+                    {t("gameSettings.modVassals4a25e2")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.vassals}
@@ -854,20 +939,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="iron-bank-setting-tooltip">
-                      Enable the Iron&nbsp;Bank from the{" "}
-                      <b>Mother&nbsp;of&nbsp;Dragons</b> expansion. All player
-                      houses start with 7 Power tokens instead of 5.
-                      <br />
-                      <br />
-                      <i>
-                        Note: Enabling the Iron&nbsp;Bank makes the
-                        Iron&nbsp;Bank sea order available, even if sea orders
-                        are deactivated.
-                      </i>
+                      <Trans
+                        i18nKey="gameSettings.enableTheIronBankFromTheMotherOfDragons958c74"
+                        components={{
+                          element0: <b />,
+                          element1: <br />,
+                          element2: <br />,
+                          element3: <i />
+                        }}
+                      />
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="iron-bank-setting">MoD Iron&nbsp;Bank</label>
+                  <label htmlFor="iron-bank-setting">
+                    {t("gameSettings.modIronBanka076a5")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.ironBank}
@@ -887,13 +973,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="sea-orders-tooltip">
-                      Enable Sea&nbsp;Order tokens from the{" "}
-                      <b>Mother&nbsp;of&nbsp;Dragons</b> expansion.
+                      <Trans
+                        i18nKey="gameSettings.enableSeaOrderTokensFromTheMotherOfDragons5b4dda"
+                        components={{ element0: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="sea-orders-setting">
-                    MoD Sea Order Tokens
+                    {t("gameSettings.modSeaOrderTokensbce694")}
                   </label>
                 </OverlayTrigger>
               }
@@ -915,12 +1003,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="gift-power-tokens-tooltip">
-                      Players can freely gift Power tokens to other players.
+                      {t(
+                        "gameSettings.playersCanFreelyGiftPowerTokensToOtherPlayersd85ba7"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="gift-power-tokens-setting">
-                    MoD Gifting Power Tokens
+                    {t("gameSettings.modGiftingPowerTokens1d8f63")}
                   </label>
                 </OverlayTrigger>
               }
@@ -942,12 +1032,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="random-vassal-assignment-tooltip">
-                      Vassals are randomly assigned to the player houses.
+                      {t(
+                        "gameSettings.vassalsAreRandomlyAssignedToThePlayerHouses38bfca"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="random-vassal-assignment-setting">
-                    Random vassal assignment
+                    {t("gameSettings.randomVassalAssignment766874")}
                   </label>
                 </OverlayTrigger>
               }
@@ -969,15 +1061,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="dragon-war-tooltip">
-                      All houses except Targaryen will replace their starting
-                      knight with a dragon.{" "}
-                      <small>
-                        <i>(Inspired by LordWazza)</i>
-                      </small>
+                      <Trans
+                        i18nKey="gameSettings.allHousesExceptTargaryenWillReplaceTheirStartingKnight546494"
+                        components={{ element0: <small />, element1: <i /> }}
+                      />
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="dragon-war-setting">Dragon War</label>
+                  <label htmlFor="dragon-war-setting">
+                    {t("common.dragonWar")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.dragonWar}
@@ -997,12 +1090,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="dragon-revenge-tooltip">
-                      If a player has only one remaining non-dragon land unit
-                      and no more castles, it will turn into a dragon.
+                      {t(
+                        "gameSettings.ifAPlayerHasOnlyOneRemainingNonDragonac8813"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="dragon-revenge-setting">Dragon Revenge</label>
+                  <label htmlFor="dragon-revenge-setting">
+                    {t("common.dragonRevenge")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.dragonRevenge}
@@ -1025,11 +1121,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="random-houses-tooltip">
-                      House assignments are created randomly.
+                      {t(
+                        "gameSettings.houseAssignmentsAreCreatedRandomlyef2f7e"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="random-houses-setting">Random houses</label>
+                  <label htmlFor="random-houses-setting">
+                    {t("gameSettings.randomHouses91db93")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.randomHouses}
@@ -1044,15 +1144,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="random-chosen-houses-tooltip">
-                      Only the selected house assignments are randomly
-                      exchanged. This allows you to designate player and vassal
-                      houses while still randomizing the player house
-                      assignments.
+                      {t(
+                        "gameSettings.onlyTheSelectedHouseAssignmentsAreRandomlyExchangedThis1a56b0"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="random-chosen-houses-setting">
-                    Random chosen houses
+                    {t("gameSettings.randomChosenHousesb5b50a")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1068,13 +1167,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="tides-of-battle-tooltip">
-                      Optional game module that enhances the risks and
-                      uncertainty of combat.
+                      {t(
+                        "gameSettings.optionalGameModuleThatEnhancesTheRisksAndUncertainty479f1a"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="tides-of-battle-setting">
-                    Tides of Battle
+                    {t("gameSettings.tidesOfBattle8e22f4")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1096,13 +1196,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="remove-tob3-setting-tooltip">
-                      If this option is enabled, 3s cards will be removed from
-                      the Tides of Battle deck.
+                      {t(
+                        "gameSettings.ifThisOptionIsEnabled3sCardsWillBe5b212a"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="remove-tob3-setting">
-                    Remove 3s cards from ToB
+                    {t("gameSettings.remove3sCardsFromTob3b6009")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1124,13 +1225,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="remove-tob-skulls-setting-tooltip">
-                      If this option is enabled, skull cards will be removed
-                      from the Tides of Battle deck.
+                      {t(
+                        "gameSettings.ifThisOptionIsEnabledSkullCardsWillBe2caa2b"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="remove-tob-skulls-setting">
-                    Remove skulls from ToB
+                    {t("gameSettings.removeSkullsFromTob56ed58")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1152,12 +1254,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="limit-tob2-setting-tooltip">
-                      If this option is enabled, the Tides of Battle deck will
-                      only contain two 2s cards instead of four.
+                      {t(
+                        "gameSettings.ifThisOptionIsEnabledTheTidesOfBattle40bd50"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="limit-tob2-setting">Limit ToB 2s cards</label>
+                  <label htmlFor="limit-tob2-setting">
+                    {t("gameSettings.limitTob2sCards677193")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.limitTob2}
@@ -1179,17 +1284,22 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="mixed-wd1-setting-tooltip">
-                      If this option is enabled, one <b>Mustering</b> card will
-                      be replaced by <b>Rally&nbsp;The&nbsp;Men</b>, one{" "}
-                      <b>A&nbsp;Throne&nbsp;of&nbsp;Blades</b> card by{" "}
-                      <b>The&nbsp;Burden&nbsp;of&nbsp;Power</b> and the{" "}
-                      <b>Last&nbsp;Days&nbsp;of&nbsp;Summer</b> card by{" "}
-                      <b>Famine</b>.
+                      <Trans
+                        i18nKey="gameSettings.ifThisOptionIsEnabledOneMusteringCardWill5cabaf"
+                        components={{
+                          element0: <b />,
+                          element1: <b />,
+                          element2: <b />,
+                          element3: <b />,
+                          element4: <b />,
+                          element5: <b />
+                        }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="mixed-wd1-setting">
-                    Mixed Westeros Deck 1
+                    {t("gameSettings.mixedWesterosDeck1084041")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1211,13 +1321,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="westeros-phase-variant-tooltip">
-                      Players may look at the next 3 Westeros cards from each
-                      deck at any time.
+                      {t(
+                        "gameSettings.playersMayLookAtTheNext3WesterosCards320840"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="westeros-phase-variant-setting">
-                    CoK Westeros Phase
+                    {t("gameSettings.cokWesterosPhase671f64")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1239,11 +1350,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="endless-setting-tooltip">
-                      The number of game rounds is increased to 1000.
+                      {t(
+                        "gameSettings.theNumberOfGameRoundsIsIncreasedTo1000cd40d6"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="endless-setting">Endless</label>
+                  <label htmlFor="endless-setting">
+                    {t("gameSettings.endlessadf7ab")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.endless}
@@ -1262,12 +1377,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="faceless-setting-tooltip">
-                      Player names will be hidden and revealed after the game
-                      ends.
+                      {t(
+                        "gameSettings.playerNamesWillBeHiddenAndRevealedAfterThe50e6ac"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="faceless-setting">Faceless</label>
+                  <label htmlFor="faceless-setting">
+                    {t("gameSettings.faceless10470f")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.faceless}
@@ -1278,8 +1396,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
 
                 if (
                   !window.confirm(
-                    "Enabling Faceless is permanent and cannot be undone.\n\n" +
-                      "Are you sure you want to enable Faceless?"
+                    t(
+                      "gameSettings.enablingFacelessIsPermanentAndCannotBeUndone515372"
+                    )
                   )
                 ) {
                   return;
@@ -1300,12 +1419,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="fog-of-war-setting-tooltip">
-                      Limit visibility to controlled regions, adjacent regions,
-                      and regions you attack or are attacked from.
+                      {t(
+                        "gameSettings.limitVisibilityToControlledRegionsAdjacentRegionsAndRegions98e8be"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="fog-of-war-setting">Fog of War</label>
+                  <label htmlFor="fog-of-war-setting">
+                    {t("gameSettings.fogOfWar7b814e")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.fogOfWar}
@@ -1325,12 +1447,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="no-private-chats-setting-tooltip">
-                      Players will not be able to create private chat rooms.
+                      {t(
+                        "gameSettings.playersWillNotBeAbleToCreatePrivateChatff7295"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="no-private-chats-setting">
-                    Disable private chats
+                    {t("gameSettings.disablePrivateChats079961")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1354,13 +1478,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="preceding-mustering-tooltip">
-                      All players can recruit units like during a mustering
-                      event in their castles before the game starts.
+                      {t(
+                        "gameSettings.allPlayersCanRecruitUnitsLikeDuringAMustering5b2871"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="preceding-mustering-setting">
-                    Preceding mustering
+                    {t("gameSettings.precedingMustering37bfd9")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1382,12 +1507,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="random-start-positions-setting-tooltip">
-                      Houses randomly change their start positions.
+                      {t(
+                        "gameSettings.housesRandomlyChangeTheirStartPositions54de6e"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="random-start-positions-setting">
-                    Random start positions
+                    {t("gameSettings.randomStartPositionsefafe6")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1409,13 +1536,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="use-vassal-positions-tooltip">
-                      Player houses will also start with their vassal starting
-                      positions.
+                      {t(
+                        "gameSettings.playerHousesWillAlsoStartWithTheirVassalStarting7f9ddd"
+                      )}
                     </Tooltip>
                   }
                 >
                   <label htmlFor="use-vassal-positions-setting">
-                    Vassal start positions
+                    {t("gameSettings.vassalStartPositions404b33")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1437,14 +1565,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="hold-vps-setting-tooltip">
-                      When this option is enabled, players do not win
-                      immediately upon reaching the required number of victory
-                      points. Instead, they must hold the required victory
-                      points until the end of the round to win.
+                      {t(
+                        "gameSettings.whenThisOptionIsEnabledPlayersDoNotWin56e005"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="hold-vps-setting">Hold victory points</label>
+                  <label htmlFor="hold-vps-setting">
+                    {t("gameSettings.holdVictoryPoints216946")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.holdVictoryPointsUntilEndOfRound}
@@ -1465,16 +1594,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="tournament-mode-tooltip">
-                      This option is intended for tournaments. It disables the
-                      ability to launch the following votes:
-                      <br />
-                      Offer replacement, Replace vassal, Swap houses, Extend
-                      player clocks, Declare winner, Abort game, and End game.
+                      <Trans
+                        i18nKey="gameSettings.thisOptionIsIntendedForTournamentsItDisablesThec3323a"
+                        components={{ element0: <br /> }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="tournament-mode-setting">
-                    Tournament mode
+                    {t("gameSettings.tournamentMode2cb5db")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1498,21 +1626,19 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="draft-house-cards-tooltip">
-                      Players will draft their House cards step by step in a
-                      randomly chosen order before the game starts.
-                      <br />
-                      If <b>Draft Influence tracks</b> is enabled, players can
-                      also choose to draft a position on an Influence track
-                      instead of a House card.
-                      <br />
-                      House cards can be chosen from all 2nd Edition Base Game
-                      House cards and from all expansions (ASoS, ADwD, AFfC,
-                      MoD) House cards.
+                      <Trans
+                        i18nKey="gameSettings.playersWillDraftTheirHouseCardsStepByStep47fa57"
+                        components={{
+                          element0: <br />,
+                          element1: <b />,
+                          element2: <br />
+                        }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="draft-house-cards-settings">
-                    Draft House cards
+                    {t("common.draftHouseCards")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1534,12 +1660,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="thematic-draft-tooltip">
-                      Players draft their House cards simultaneously from their
-                      house&apos;s available decks.
+                      {t(
+                        "gameSettings.playersDraftTheirHouseCardsSimultaneouslyFromTheirHouse1de252"
+                      )}
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="thematic-draft-setting">Thematic Draft</label>
+                  <label htmlFor="thematic-draft-setting">
+                    {t("gameSettings.thematicDraft6e1bc9")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.thematicDraft}
@@ -1560,16 +1689,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="selected-random-draft-tooltip">
-                      Players simultaneously draft the House cards to be used.
-                      After the draft, the cards and Influence positions, if{" "}
-                      <b>Draft Influence tracks</b> is enabled, are randomly
-                      assigned to houses. Can be combined with{" "}
-                      <b>Limited&nbsp;Draft</b>.
+                      <Trans
+                        i18nKey="gameSettings.playersSimultaneouslyDraftTheHouseCardsToBeUsed5a613b"
+                        components={{ element0: <b />, element1: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
                   <label htmlFor="selected-random-draft-setting">
-                    Selected Random Draft
+                    {t("gameSettings.selectedRandomDrafta0931e")}
                   </label>
                 </OverlayTrigger>
               }
@@ -1591,13 +1719,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="random-draft-tooltip">
-                      Players receive random House cards and Influence positions
-                      if <b>Draft Influence tracks</b> is enabled. Can be
-                      combined with <b>Limited&nbsp;Draft</b>.
+                      <Trans
+                        i18nKey="gameSettings.playersReceiveRandomHouseCardsAndInfluencePositionsIf40b0ef"
+                        components={{ element0: <b />, element1: <b /> }}
+                      />
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="random-draft-setting">Random Draft</label>
+                  <label htmlFor="random-draft-setting">
+                    {t("gameSettings.randomDraftdee5dd")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.randomDraft}
@@ -1619,32 +1750,38 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   overlay={
                     <Tooltip id="draft-map-tooltip">
                       <p>
-                        Players can adjust starting positions by adding and
-                        removing Units, Power tokens, or Garrisons.
-                        <br />
-                        <small>
-                          Unit and supply limits must be respected at all times.
-                        </small>
+                        <Trans
+                          i18nKey="gameSettings.playersCanAdjustStartingPositionsByAddingAndRemoving8b4747"
+                          components={{ element0: <br />, element1: <small /> }}
+                        />
                       </p>
                       <p>
-                        Unclaimed territories are distributed fairly among
-                        houses:
-                        <ul>
-                          <li>
-                            Territories with one neighboring house are assigned
-                            to that house.
-                          </li>
-                          <li>
-                            Territories with multiple neighbors remain
-                            unassigned.
-                          </li>
-                        </ul>
-                        All players must confirm changes before the game starts.
+                        <Trans
+                          i18nKey="gameSettings.unclaimedTerritoriesAreDistributedFairlyAmongHousesAllPlayers61978c"
+                          components={{
+                            element0: (
+                              <ul>
+                                <li>
+                                  {t(
+                                    "gameSettings.territoriesWithOneNeighboringHouseAreAssignedToThat4b281f"
+                                  )}
+                                </li>
+                                <li>
+                                  {t(
+                                    "gameSettings.territoriesWithMultipleNeighborsRemainUnassigned836f98"
+                                  )}
+                                </li>
+                              </ul>
+                            )
+                          }}
+                        />
                       </p>
                     </Tooltip>
                   }
                 >
-                  <label htmlFor="draft-map-setting">Draft Scenario</label>
+                  <label htmlFor="draft-map-setting">
+                    {t("gameSettings.draftScenarioca4e5c")}
+                  </label>
                 </OverlayTrigger>
               }
               checked={this.gameSettings.draftMap}
@@ -1667,18 +1804,19 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="draft-tracks-tooltip">
-                        If this option is enabled, players can choose to draft a
-                        position on one of the three Influence tracks instead of
-                        drafting a House card during their draft turn.
-                        <br />
-                        If enabled in <b>Random</b> or <b>Blind Draft</b> modes,{" "}
-                        Influence tracks will also be randomly assigned together
-                        with House cards.
+                        <Trans
+                          i18nKey="gameSettings.ifThisOptionIsEnabledPlayersCanChooseTo566c1d"
+                          components={{
+                            element0: <br />,
+                            element1: <b />,
+                            element2: <b />
+                          }}
+                        />
                       </Tooltip>
                     }
                   >
                     <label htmlFor="draft-tracks-settings">
-                      Draft Influence tracks
+                      {t("gameSettings.draftInfluenceTracks1e1ad8")}
                     </label>
                   </OverlayTrigger>
                 }
@@ -1700,12 +1838,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="limited-draft-tooltip">
-                        This option removes house card decks from houses that
-                        are not in play.
+                        {t(
+                          "gameSettings.thisOptionRemovesHouseCardDecksFromHousesThat1d7712"
+                        )}
                       </Tooltip>
                     }
                   >
-                    <label htmlFor="limited-draft-setting">Limited Draft</label>
+                    <label htmlFor="limited-draft-setting">
+                      {t("gameSettings.limitedDrafte5056c")}
+                    </label>
                   </OverlayTrigger>
                 }
                 checked={this.gameSettings.limitedDraft}
@@ -1728,15 +1869,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="blind-draft-tooltip">
-                            Players receive random House cards and Influence
-                            positions if <b>Draft Influence tracks</b> is
-                            enabled. House cards remain hidden throughout the
-                            game. Can be combined with <b>Limited&nbsp;Draft</b>
-                            .
+                            <Trans
+                              i18nKey="gameSettings.playersReceiveRandomHouseCardsAndInfluencePositionsIf7019a6"
+                              components={{ element0: <b />, element1: <b /> }}
+                            />
                           </Tooltip>
                         }
                       >
-                        <label htmlFor="blind-draft-setting">Blind Draft</label>
+                        <label htmlFor="blind-draft-setting">
+                          {t("gameSettings.blindDraft9b1f43")}
+                        </label>
                       </OverlayTrigger>
                     }
                     checked={this.gameSettings.blindDraft}
@@ -1757,8 +1899,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="perpetuum-draft-tooltip">
-                            Players receive a new deck each time after the last
-                            House card has been played.
+                            {t(
+                              "gameSettings.playersReceiveANewDeckEachTimeAfterThed9b84a"
+                            )}
                           </Tooltip>
                         }
                       >
@@ -1787,15 +1930,20 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="base-deck-setting-tooltip">
-                        This option adds the{" "}
-                        <b>2nd&nbsp;edition&nbsp;base&nbsp;game</b> decks and
-                        the <b>Mother&nbsp;of&nbsp;Dragons&nbsp;A</b> decks for{" "}
-                        <b>Arryn</b> and <b>Targaryen</b>.
+                        <Trans
+                          i18nKey="gameSettings.thisOptionAddsThe2ndEditionBaseGameDecks0d72c2"
+                          components={{
+                            element0: <b />,
+                            element1: <b />,
+                            element2: <b />,
+                            element3: <b />
+                          }}
+                        />
                       </Tooltip>
                     }
                   >
                     <label htmlFor="base-deck-setting">
-                      2nd ed base and MoD A
+                      {t("gameSettings.2ndEdBaseAndModA2f96ac")}
                     </label>
                   </OverlayTrigger>
                 }
@@ -1817,17 +1965,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="alternative-deck-setting-tooltip">
-                        This option adds the decks from the{" "}
-                        <b>Dance&nbsp;with&nbsp;Dragons</b> expansion for the
-                        base game houses, the <b>Feast&nbsp;for&nbsp;Crows</b>{" "}
-                        deck for <b>Arryn</b>, and the{" "}
-                        <b>Mother&nbsp;of&nbsp;Dragons&nbsp;B</b> deck for{" "}
-                        <b>Targaryen</b>.
+                        <Trans
+                          i18nKey="gameSettings.thisOptionAddsTheDecksFromTheDanceWitha2c839"
+                          components={{
+                            element0: <b />,
+                            element1: <b />,
+                            element2: <b />,
+                            element3: <b />,
+                            element4: <b />
+                          }}
+                        />
                       </Tooltip>
                     }
                   >
                     <label htmlFor="alternative-deck-setting">
-                      DwD, FfC and MoD B
+                      {t("gameSettings.dwdFfcAndModB4b39f6")}
                     </label>
                   </OverlayTrigger>
                 }
@@ -1849,14 +2001,21 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="sos-deck-setting-tooltip">
-                        This option adds the decks from the{" "}
-                        <b>Storm&nbsp;of&nbsp;Swords</b> expansion and the{" "}
-                        <b>Mother&nbsp;of&nbsp;Dragons&nbsp;A</b> decks for{" "}
-                        <b>Arryn</b> and <b>Targaryen</b>.
+                        <Trans
+                          i18nKey="gameSettings.thisOptionAddsTheDecksFromTheStormOfecdf54"
+                          components={{
+                            element0: <b />,
+                            element1: <b />,
+                            element2: <b />,
+                            element3: <b />
+                          }}
+                        />
                       </Tooltip>
                     }
                   >
-                    <label htmlFor="sos-deck-setting">SoS and MoD A</label>
+                    <label htmlFor="sos-deck-setting">
+                      {t("gameSettings.sosAndModA2de134")}
+                    </label>
                   </OverlayTrigger>
                 }
                 checked={
@@ -1877,13 +2036,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <OverlayTrigger
                     overlay={
                       <Tooltip id="first-edition-deck-setting-tooltip">
-                        This option adds the decks from the{" "}
-                        <b>1st&nbsp;edition</b> base game.
+                        <Trans
+                          i18nKey="gameSettings.thisOptionAddsTheDecksFromThe1stEditione59ff2"
+                          components={{ element0: <b /> }}
+                        />
                       </Tooltip>
                     }
                   >
                     <label htmlFor="first-edition-deck-setting">
-                      1st edition
+                      {t("gameSettings.1stEditiona6f26b")}
                     </label>
                   </OverlayTrigger>
                 }

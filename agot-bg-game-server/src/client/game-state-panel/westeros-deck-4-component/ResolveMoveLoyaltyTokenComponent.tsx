@@ -1,3 +1,4 @@
+import { t, Trans } from "../../i18n";
 import MapContribution from "../../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
@@ -43,22 +44,41 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
           regions={this.modifyRegionsOnMap()}
         />
         <Col xs={12} className="text-center">
-          House <b>{this.gameState.house.name}</b> must move a
-          loyalty&nbsp;token to an adjacent land area.
+          <Trans
+            i18nKey="resolveMoveLoyaltyToken.houseMustMoveALoyaltyTokenToAnAdjacent74d6d6"
+            components={{
+              element0: <b />,
+              value1: <>{this.gameState.house.name}</>
+            }}
+          />
         </Col>
         <Col xs={12} className="mt-2">
           {this.props.gameClient.doesControlHouse(this.gameState.house) ? (
             <>
               <p className="text-center">
-                Move a loyalty&nbsp;token from{" "}
-                {this.from ? (
-                  <>
-                    <b>{this.from.name}</b> to{" "}
-                  </>
-                ) : (
-                  ""
-                )}
-                {this.to ? <b>{this.to.name}</b> : ""}
+                <Trans
+                  i18nKey="resolveMoveLoyaltyToken.moveALoyaltyTokenFrome21f73"
+                  components={{
+                    value0: (
+                      <>
+                        {this.from ? (
+                          <>
+                            <Trans
+                              i18nKey="resolveMoveLoyaltyToken.to17bfa6"
+                              components={{
+                                element0: <b />,
+                                value1: <>{this.from.name}</>
+                              }}
+                            />
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </>
+                    ),
+                    value1: <>{this.to ? <b>{this.to.name}</b> : ""}</>
+                  }}
+                />
               </p>
               <Row className="justify-content-center">
                 <Col xs="auto">
@@ -72,7 +92,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                       this.waitingForServer
                     }
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -85,14 +105,17 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                       this.waitingForServer
                     }
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
             </>
           ) : (
             <div className="text-center">
-              Waiting for {this.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.gameState.house.name}</> }}
+              />
             </div>
           )}
         </Col>

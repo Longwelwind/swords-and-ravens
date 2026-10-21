@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,16 +19,24 @@ export default class SerIlynPayneAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Ser Ilyn Payne</b>: House <b>{this.props.gameState.house.name}</b>{" "}
-          may kill a Footman of House{" "}
-          <b>
-            {
-              this.props.gameState.combatGameState.getEnemy(
-                this.props.gameState.house
-              ).name
-            }
-          </b>
-          .
+          <Trans
+            i18nKey="serIlynPayneAbility.serIlynPayneHouseMayKillAFootmanOf354772"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.house.name}</>,
+              element3: <b />,
+              value4: (
+                <>
+                  {
+                    this.props.gameState.combatGameState.getEnemy(
+                      this.props.gameState.house
+                    ).name
+                  }
+                </>
+              )
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
@@ -31,7 +32,13 @@ export default class SelectRegionComponent extends Component<
             <>
               {this.selectedRegion && (
                 <p className="text-center">
-                  Selected area: <b>{this.selectedRegion.name}</b>
+                  <Trans
+                    i18nKey="selectRegion.selectedArea8b3a09"
+                    components={{
+                      element0: <b />,
+                      value1: <>{this.selectedRegion.name}</>
+                    }}
+                  />
                 </p>
               )}
               <Row className="justify-content-center">
@@ -42,7 +49,7 @@ export default class SelectRegionComponent extends Component<
                     onClick={() => this.confirm()}
                     disabled={this.selectedRegion == null}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -52,20 +59,27 @@ export default class SelectRegionComponent extends Component<
                     onClick={() => this.reset()}
                     disabled={this.selectedRegion == null}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
             </>
           ) : (
             <div className="text-center">
-              Waiting for{" "}
-              {
-                this.props.gameState.ingame.getControllerOfHouse(
-                  this.props.gameState.house
-                ).house.name
-              }
-              ...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{
+                  houses: (
+                    <>
+                      {
+                        this.props.gameState.ingame.getControllerOfHouse(
+                          this.props.gameState.house
+                        ).house.name
+                      }
+                    </>
+                  )
+                }}
+              />
             </div>
           )}
         </Col>

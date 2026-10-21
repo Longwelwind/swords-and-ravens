@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -20,7 +21,7 @@ export default class TheHordeDescendsWildlingVictoryComponent extends Component<
         {this.props.gameState.childGameState instanceof
           SelectUnitsGameState && (
           <Col xs={12} className="text-center">
-            Houses must destroy units.
+            {t("common.housesMustDestroyUnits")}
           </Col>
         )}
         {renderChildGameState(this.props, [

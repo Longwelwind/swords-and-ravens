@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,15 +17,22 @@ export default class SerIlynPayneASoSAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Ser Ilyn Payne</b>: House{" "}
-          <b>
-            {
-              this.props.gameState.combatGameState.getEnemy(
-                this.props.gameState.house
-              ).name
-            }
-          </b>{" "}
-          must lose one casualty.
+          <Trans
+            i18nKey="serIlynPayneASoSAbility.serIlynPayneHouseMustLoseOneCasualty98ca8f"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: (
+                <>
+                  {
+                    this.props.gameState.combatGameState.getEnemy(
+                      this.props.gameState.house
+                    ).name
+                  }
+                </>
+              )
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectUnitsGameState, SelectUnitsComponent]

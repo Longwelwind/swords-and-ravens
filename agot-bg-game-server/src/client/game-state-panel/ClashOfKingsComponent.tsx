@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "../i18n";
 import { observer } from "mobx-react";
 import ClashOfKingsGameState from "../../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
 import { Component, ReactNode, Fragment } from "react";
@@ -33,16 +34,26 @@ export default class ClashOfKingsComponent extends Component<
       <>
         <Row className="justify-content-center mt-2 mb-1">
           <img src={image} width="40px" className="me-2" />
-          <h4 className="mt-2">Clash of Kings</h4>
+          <h4 className="mt-2">{t("clashOfKings.clashOfKings2fb1fa")}</h4>
           <img src={image} width="40px" className="ms-2" />
         </Row>
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            Houses bid for the{" "}
-            <strong>
-              {this.props.gameState.game.getNameInfluenceTrack(currentTrackI)}
-            </strong>{" "}
-            track.
+            <Trans
+              i18nKey="clashOfKings.housesBidForTheTracka3f008"
+              components={{
+                element0: <strong />,
+                value1: (
+                  <>
+                    {translateGameText(
+                      this.props.gameState.game.getNameInfluenceTrack(
+                        currentTrackI
+                      )
+                    )}
+                  </>
+                )
+              }}
+            />
           </Col>
           <Fragment key={`clash-of-kings-comp_${currentTrackI}`}>
             {renderChildGameState(this.props, [

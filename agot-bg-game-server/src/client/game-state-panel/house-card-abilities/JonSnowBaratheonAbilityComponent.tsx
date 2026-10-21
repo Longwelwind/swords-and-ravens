@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,10 +17,14 @@ export default class JonSnowBaratheonAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Jon Snow:</b> House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may decrease
-          or increase the Wildling track by one space (to a minimum of 0 and a
-          maximum of 10).
+          <Trans
+            i18nKey="jonSnowBaratheonAbility.jonSnowHouseMayDecreaseOrIncreaseTheWildling8fd0c1"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

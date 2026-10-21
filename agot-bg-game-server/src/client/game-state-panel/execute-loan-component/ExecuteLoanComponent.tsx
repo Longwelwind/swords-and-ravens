@@ -1,3 +1,4 @@
+import { translateGameText } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, default as React, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -54,7 +55,7 @@ export default class ExecuteLoanComponent extends Component<
         {this.props.gameClient.doesControlHouse(this.house) && (
           <Row className="justify-content-center">
             <Col xs="auto" className="text-center">
-              {this.props.gameState.loanCardType.description}
+              {translateGameText(this.props.gameState.loanCardType.description)}
             </Col>
           </Row>
         )}

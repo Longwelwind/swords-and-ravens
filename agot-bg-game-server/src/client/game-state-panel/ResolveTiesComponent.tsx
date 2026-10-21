@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import ResolveTiesGameState from "../../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/resolve-ties-game-state/ResolveTiesGameState";
@@ -39,7 +40,7 @@ export default class ResolveTiesComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          The holder of the Iron Throne can resolve the ties of the bidding.
+          {t("resolveTies.theHolderOfTheIronThroneCanResolveThe0772c4")}
         </Col>
         {this.props.gameClient.doesControlHouse(
           this.props.gameState.decider
@@ -108,7 +109,7 @@ export default class ResolveTiesComponent extends Component<
                   variant="success"
                   onClick={() => this.submit()}
                 >
-                  Resolve
+                  {t("resolveTies.resolvec8f193")}
                 </Button>
               </Col>
             </Row>
@@ -116,7 +117,7 @@ export default class ResolveTiesComponent extends Component<
         ) : (
           <>
             <Col xs={12}>
-              <p className="text-center">Bidding results:</p>
+              <p className="text-center">{t("common.biddingResults")}</p>
               <div className="d-flex justify-content-center">
                 <HouseNumberResultsComponent
                   results={results}
@@ -125,7 +126,12 @@ export default class ResolveTiesComponent extends Component<
               </div>
             </Col>
             <Col xs={12} className="text-center">
-              Waiting for {this.props.gameState.decider.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{
+                  houses: <>{this.props.gameState.decider.name}</>
+                }}
+              />
             </Col>
           </>
         )}

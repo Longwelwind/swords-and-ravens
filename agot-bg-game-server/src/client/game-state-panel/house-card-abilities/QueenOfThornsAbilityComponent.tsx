@@ -1,3 +1,4 @@
+import { t, Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -23,13 +24,21 @@ export default class QueenOfThornsAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Queen of Thorns</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> must remove an
-          enemy Order token{" "}
-          {this.removingOrderInEmbattledAreaAllowed
-            ? "either in the embattled area or "
-            : ""}
-          adjacent to the embattled area.
+          <Trans
+            i18nKey="queenOfThornsAbility.queenOfThornsHouseMustRemoveAnEnemyOrder17fa9c"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>,
+              value3: (
+                <>
+                  {this.removingOrderInEmbattledAreaAllowed
+                    ? t("queenOfThornsAbility.eitherInTheEmbattledAreaOr7b757d")
+                    : ""}
+                </>
+              )
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectOrdersGameState, SelectOrdersComponent]

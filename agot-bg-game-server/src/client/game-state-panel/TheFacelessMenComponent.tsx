@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "../i18n";
 import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -64,10 +65,17 @@ export default class TheFacelessMenComponent extends Component<
                   style={{ paddingBottom: 10 }}
                 >
                   <div>
-                    <b>
-                      {unit.type.name} <small>of {unit.allegiance.name}</small>
-                    </b>{" "}
-                    in <b>{region.name}</b>
+                    <Trans
+                      i18nKey="theFacelessMen.ofInbc8f9f"
+                      components={{
+                        element0: <b />,
+                        value1: <>{translateGameText(unit.type.name)}</>,
+                        element2: <small />,
+                        value3: <>{unit.allegiance.name}</>,
+                        element4: <b />,
+                        value5: <>{region.name}</>
+                      }}
+                    />
                   </div>
                 </Row>
               ))}
@@ -78,7 +86,7 @@ export default class TheFacelessMenComponent extends Component<
                     variant="success"
                     onClick={() => this.confirm()}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -88,7 +96,7 @@ export default class TheFacelessMenComponent extends Component<
                     disabled={this.unitsToRemove.size == 0}
                     onClick={() => this.reset()}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
@@ -96,7 +104,10 @@ export default class TheFacelessMenComponent extends Component<
           </>
         ) : (
           <Col xs={12} className="text-center">
-            Waiting for {this.house.name}...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{ houses: <>{this.house.name}</> }}
+            />
           </Col>
         )}
       </>
@@ -118,7 +129,7 @@ export default class TheFacelessMenComponent extends Component<
     if (
       this.unitsToRemove.size < 2 &&
       !window.confirm(
-        "You haven't selected all the targets yet. Are you sure you want to continue?"
+        t("theFacelessMen.youHavenTSelectedAllTheTargetsYetAref3c366")
       )
     ) {
       return;

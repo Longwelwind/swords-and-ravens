@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import DistributePowerTokensGameState from "../../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/distribute-power-tokens-game-state/DistributePowerTokensGameState";
@@ -42,13 +43,24 @@ export default class ResolveTiesComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>{this.props.gameState.house.name}</b> can distribute their bid of{" "}
-          {this.props.gameState.bidOfDistributor} to other houses.
+          <Trans
+            i18nKey="distributePowerTokens.canDistributeTheirBidOfToOtherHousesa6b601"
+            components={{
+              element0: <b />,
+              value1: <>{this.props.gameState.house.name}</>,
+              value2: <>{this.props.gameState.bidOfDistributor}</>
+            }}
+          />
         </Col>
         {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
           <>
             <Col xs={12} className="text-center">
-              Available Power tokens: {this.availablePowerTokensForDistribution}
+              <Trans
+                i18nKey="distributePowerTokens.availablePowerTokens4d6905"
+                components={{
+                  value0: <>{this.availablePowerTokensForDistribution}</>
+                }}
+              />
             </Col>
             <Col xs={12}>
               <Row className="justify-content-center">
@@ -106,7 +118,7 @@ export default class ResolveTiesComponent extends Component<
                     variant="success"
                     onClick={() => this.submit()}
                   >
-                    Submit
+                    {t("common.submit")}
                   </Button>
                 </Col>
               </Row>
@@ -115,7 +127,7 @@ export default class ResolveTiesComponent extends Component<
         ) : (
           <>
             <Col xs={12}>
-              <p className="text-center">Bidding results:</p>
+              <p className="text-center">{t("common.biddingResults")}</p>
               <div className="d-flex justify-content-center">
                 <HouseNumberResultsComponent
                   results={results}
@@ -124,7 +136,10 @@ export default class ResolveTiesComponent extends Component<
               </div>
             </Col>
             <Col xs={12} className="text-center">
-              Waiting for {this.props.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.props.gameState.house.name}</> }}
+              />
             </Col>
           </>
         )}
@@ -168,7 +183,9 @@ export default class ResolveTiesComponent extends Component<
     if (this.availablePowerTokensForDistribution > 0) {
       if (
         !window.confirm(
-          "You haven't distributed all your Power tokens yet. Continue anyway?"
+          t(
+            "distributePowerTokens.youHavenTDistributedAllYourPowerTokensYet28ad45"
+          )
         )
       ) {
         return;

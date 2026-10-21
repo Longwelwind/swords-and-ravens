@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import React, { Component, ReactNode } from "react";
 import {
   Card,
@@ -124,7 +125,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               <Nav.Item>
                 <Nav.Link eventKey="game-logs">
                   <OverlayTrigger
-                    overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                    overlay={
+                      <Tooltip id="logs-tooltip">
+                        {t("common.gameLogs")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -145,7 +150,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                 >
                   <Nav.Link eventKey="chat">
                     <OverlayTrigger
-                      overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
+                      overlay={
+                        <Tooltip id="chat-tooltip">
+                          {t("gameTabs.gameChat76ddef")}
+                        </Tooltip>
+                      }
                       placement="top"
                     >
                       <span>
@@ -167,7 +176,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   >
                     <Nav.Link eventKey="votes">
                       <OverlayTrigger
-                        overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
+                        overlay={
+                          <Tooltip id="votes-tooltip">
+                            {t("gameTabs.votescd8e97")}
+                          </Tooltip>
+                        }
                         placement="top"
                       >
                         <span>
@@ -186,7 +199,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   <Nav.Link eventKey="objectives">
                     <OverlayTrigger
                       overlay={
-                        <Tooltip id="objectives-tooltip">Objectives</Tooltip>
+                        <Tooltip id="objectives-tooltip">
+                          {t("common.objectives")}
+                        </Tooltip>
                       }
                       placement="top"
                     >
@@ -204,7 +219,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="iron-bank-tooltip">
-                            The Iron Bank
+                            {t("gameTabs.theIronBank59437a")}
                           </Tooltip>
                         }
                         placement="top"
@@ -226,7 +241,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   <Nav.Link eventKey="note">
                     <OverlayTrigger
                       overlay={
-                        <Tooltip id="note-tooltip">Personal note</Tooltip>
+                        <Tooltip id="note-tooltip">
+                          {t("gameTabs.personalNote27c48d")}
+                        </Tooltip>
                       }
                       placement="top"
                     >
@@ -243,7 +260,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               <Nav.Item>
                 <Nav.Link eventKey="settings">
                   <OverlayTrigger
-                    overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                    overlay={
+                      <Tooltip id="settings-tooltip">
+                        {t("common.settings")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -271,7 +292,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                         <OverlayTrigger
                           overlay={
                             <Tooltip id="private-chat-tooltip">
-                              Private Chat
+                              {t("gameTabs.privateChat11bbff")}
                             </Tooltip>
                           }
                           placement="top"
@@ -325,7 +346,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               {this.currentOpenedTab == "game-logs" && (
                 <Dropdown className="ms-auto mt-1">
                   <Dropdown.Toggle variant="secondary" size="sm">
-                    Jump to
+                    {t("common.jumpTo")}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>{this.gameRoundElems}</Dropdown.Menu>
                 </Dropdown>
@@ -488,7 +509,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
           <OverlayTrigger
             overlay={
               <Tooltip id="user-is-spectator-tooltip">
-                This user does not participate in the game
+                {t("common.thisUserDoesNotParticipateInTheGame")}
               </Tooltip>
             }
             placement="auto"
@@ -605,7 +626,10 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
             });
           }}
         >
-          Round {round}
+          <Trans
+            i18nKey="gameTabs.round6f8874"
+            components={{ value0: <>{round}</> }}
+          />
         </Dropdown.Item>
       );
     });

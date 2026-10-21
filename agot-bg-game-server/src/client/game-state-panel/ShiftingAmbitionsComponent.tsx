@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import * as React from "react";
@@ -33,19 +34,16 @@ export default class ShiftingAmbitionsComponent extends Component<
             {this.gameState.step ==
             ShiftingAmbitionsStep.CHOOSE_OBJECTIVE_FROM_HAND ? (
               <>
-                Each house choose 1 Objective card from their hand and places it
-                facedown in a common area.
-                <br />
-                <small>
-                  (Then the facedown cards are shuffled and flipped faceup and
-                  each house chooses 1 of these cards and places it into their
-                  hand.)
-                </small>
+                <Trans
+                  i18nKey="shiftingAmbitions.eachHouseChoose1ObjectiveCardFromTheirHand5cd87a"
+                  components={{ element0: <br />, element1: <small /> }}
+                />
               </>
             ) : (
               <>
-                In turn order, each house chooses 1 Objective card from the
-                common area and places it into their hand.
+                {t(
+                  "shiftingAmbitions.inTurnOrderEachHouseChooses1ObjectiveCard52297c"
+                )}
               </>
             )}
           </Col>

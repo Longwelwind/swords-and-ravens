@@ -1,3 +1,4 @@
+import { Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import renderChildGameState from "../utils/renderChildGameState";
@@ -89,25 +90,36 @@ export default class ScoreOtherObjectivesComponent extends Component<
     return (
       <Row className="justify-content-center">
         <Col xs={12} className="text-center">
-          Each house may choose to score one Objective card of their choice from
-          their objective hand if the criterion described is fulfilled.
-          {this.raiseBackdoorPoliticsWarning && (
-            <>
-              <br />
-              <br />
-              <b style={{ color: "red" }}>WARNING:</b> You hold{" "}
-              <b>Backdoor Politics</b> in your Objectives hand, and you may be
-              able to score it if the other players score before you. You should
-              wait with your decision!
-            </>
-          )}
+          <Trans
+            i18nKey="scoreOtherObjectives.eachHouseMayChooseToScoreOneObjectiveCarda2d53d"
+            components={{
+              value0: (
+                <>
+                  {this.raiseBackdoorPoliticsWarning && (
+                    <>
+                      <Trans
+                        i18nKey="scoreOtherObjectives.warningYouHoldBackdoorPoliticsInYourObjectivesHand4f7a4e"
+                        components={{
+                          element0: <br />,
+                          element1: <br />,
+                          element2: <b style={{ color: "red" }} />,
+                          element3: <b />
+                        }}
+                      />
+                    </>
+                  )}
+                </>
+              )
+            }}
+          />
         </Col>
         {noCardsToScore && (
           <Col xs={10} className="text-center">
             <>
-              <b>Note:</b> You can&apos;t score any of your secret objectives
-              right now. Nevertheless, you have to click <i>Confirm</i> manually
-              as you don&apos;t want to reaveal that you can&apos;t score.
+              <Trans
+                i18nKey="scoreOtherObjectives.noteYouCanTScoreAnyOfYourSecret7fd1d7"
+                components={{ element0: <b />, element1: <i /> }}
+              />
             </>
           </Col>
         )}

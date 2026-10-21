@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,9 +17,14 @@ export default class BericDondarrionAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Beric Dondarrion</b>: House{" "}
-          <b>{this.props.gameState.house.name}</b> must destroy 1 unit of their
-          army.
+          <Trans
+            i18nKey="bericDondarrionAbility.bericDondarrionHouseMustDestroy1UnitOfTheir5c0f0c"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectUnitsGameState, SelectUnitsComponent]

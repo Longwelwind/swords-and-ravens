@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { observer } from "mobx-react";
 import BiddingGameState, {
   BiddingGameStateParent
@@ -86,20 +87,29 @@ export default class BiddingComponent<
                   variant="success"
                   className="mt-4"
                 >
-                  Confirm
+                  {t("common.confirm")}
                 </Button>
               </Col>
             </>
           )}
         <Col xs={12} className="text-center">
-          Waiting for{" "}
-          {this.gameState
-            .getHousesLeftToBid()
-            .map(
-              (h) =>
-                this.props.gameState.ingame.getControllerOfHouse(h).house.name
-            )
-            .join(", ")}
+          <Trans
+            i18nKey="common.waitingFor"
+            components={{
+              houses: (
+                <>
+                  {this.gameState
+                    .getHousesLeftToBid()
+                    .map(
+                      (h) =>
+                        this.props.gameState.ingame.getControllerOfHouse(h)
+                          .house.name
+                    )
+                    .join(", ")}
+                </>
+              )
+            }}
+          />
         </Col>
       </>
     );

@@ -1,3 +1,4 @@
+import { t, translateGameText } from "./i18n";
 import _ from "lodash";
 import React from "react";
 import { Col, Row, Tooltip } from "react-bootstrap";
@@ -25,12 +26,16 @@ export default function renderLoanCardsToolTip(
           {loanSlots.length > 0 && (
             <Col xs={12} className="mb-3">
               <Row className="justify-content-center mb-2">
-                <h4 className="text-center">Loan slots</h4>
+                <h4 className="text-center">
+                  {t("loanCardsTooltip.loanSlots6c819a")}
+                </h4>
               </Row>
               {loanSlots.map((lc, i) => (
                 <Row key={`loan-slot_${lc?.id}-${i}`}>
                   <b>{lc?.type.name}:&nbsp;</b>
-                  <p className="white-space-pre-line">{lc?.type.description}</p>
+                  <p className="white-space-pre-line">
+                    {translateGameText(lc?.type.description)}
+                  </p>
                 </Row>
               ))}
             </Col>
@@ -38,12 +43,16 @@ export default function renderLoanCardsToolTip(
           {loanDeck.length > 0 && (
             <Col xs={12} className="mb-3">
               <Row className="justify-content-center mb-2">
-                <h4 className="text-center">Available loans</h4>
+                <h4 className="text-center">
+                  {t("loanCardsTooltip.availableLoans0c3ce6")}
+                </h4>
               </Row>
               {loanDeck.map((lc, i) => (
                 <Row key={`available-loan_${lc.id}-${i}`}>
                   <b>{lc.type.name}:&nbsp;</b>
-                  <p className="white-space-pre-line">{lc.type.description}</p>
+                  <p className="white-space-pre-line">
+                    {translateGameText(lc.type.description)}
+                  </p>
                 </Row>
               ))}
             </Col>
@@ -51,7 +60,9 @@ export default function renderLoanCardsToolTip(
           {purchasedLoans.size > 0 && (
             <Col xs={12}>
               <Row className="justify-content-center mb-2">
-                <h4 className="text-center">Purchased loans</h4>
+                <h4 className="text-center">
+                  {t("loanCardsTooltip.purchasedLoansc0832b")}
+                </h4>
               </Row>
               {purchasedLoans.map((house, loans) => (
                 <Col xs={12} key={`purchased-loans_${house.id}`}>
@@ -62,7 +73,7 @@ export default function renderLoanCardsToolTip(
                     <Row key={`purchased-loan_${lc.type.id}-${i}`}>
                       <b>{lc.type.name}:&nbsp;</b>
                       <p className="white-space-pre-line">
-                        {lc.type.description}
+                        {translateGameText(lc.type.description)}
                       </p>
                     </Row>
                   ))}
@@ -73,12 +84,16 @@ export default function renderLoanCardsToolTip(
           {discardedLoans.length > 0 && (
             <Col xs={12} className="mb-3">
               <Row className="justify-content-center mb-2">
-                <h4 className="text-center">Discarded loans</h4>
+                <h4 className="text-center">
+                  {t("loanCardsTooltip.discardedLoansb48546")}
+                </h4>
               </Row>
               {discardedLoans.map((lc, i) => (
                 <Row key={`discarded-loan-${lc.id}-${i}`}>
                   <b>{lc.type.name}:&nbsp;</b>
-                  <p className="white-space-pre-line">{lc.type.description}</p>
+                  <p className="white-space-pre-line">
+                    {translateGameText(lc.type.description)}
+                  </p>
                 </Row>
               ))}
             </Col>

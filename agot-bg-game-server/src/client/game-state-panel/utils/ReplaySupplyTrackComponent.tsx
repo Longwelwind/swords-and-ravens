@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { Component, default as React, ReactNode } from "react";
 import { observer } from "mobx-react";
 import Badge from "react-bootstrap/Badge";
@@ -21,7 +22,7 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
     return (
       <Row>
         <Col xs="auto">
-          <img width="32px" src={barrelImage} alt="Supply" />
+          <img width="32px" src={barrelImage} alt={t("common.supply")} />
         </Col>
         <Col>
           <Row className="justify-content-center">

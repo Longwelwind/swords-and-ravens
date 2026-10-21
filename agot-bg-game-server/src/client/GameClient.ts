@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { ServerMessage } from "../messages/ServerMessage";
 import { ClientMessage } from "../messages/ClientMessage";
 import EntireGame from "../common/EntireGame";
@@ -520,8 +521,7 @@ export default class GameClient {
         if (!this.hasShownServerMessageErrorDialog) {
           this.hasShownServerMessageErrorDialog = true;
           window.alert(
-            "Something strange happened and your game view may be out of sync. " +
-              "Please open the browser console (F12) and send the error details there to the site admin."
+            t("gameClient.somethingStrangeHappenedAndYourGameViewMay9d8eff")
           );
         }
       }

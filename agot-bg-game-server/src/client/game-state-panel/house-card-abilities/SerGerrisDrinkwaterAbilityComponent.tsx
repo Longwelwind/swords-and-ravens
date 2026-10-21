@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,9 +19,14 @@ export default class SerGerrisDrinkwaterAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Ser Gerris Drinkwater</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may move one
-          position higher on one Influence track of their choice.
+          <Trans
+            i18nKey="serGerrisDrinkwaterAbility.serGerrisDrinkwaterHouseMayMoveOnePositionHigher71dfa1"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

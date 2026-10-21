@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import MapContribution from "./MapContribution";
 import React, { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
@@ -104,12 +105,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
         component: WesterosGameStateComponent
       },
       {
-        name: "Planning",
+        name: t("gameStateColumn.planning21cc30"),
         gameState: PlanningGameState,
         component: PlanningComponent
       },
       {
-        name: "Action",
+        name: t("gameStateColumn.action64cff1"),
         gameState: ActionGameState,
         component: ActionComponent
       }
@@ -212,7 +213,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               condition={isPhaseActive(phases[0])}
                               wrap={(child) => <b>{child}</b>}
                             >
-                              <>{phases[0].name} phase</>
+                              <>
+                                <Trans
+                                  i18nKey="gameStateColumn.phasee16825"
+                                  components={{ value0: <>{phases[0].name}</> }}
+                                />
+                              </>
                             </ConditionalWrap>
                           </div>
                         </OverlayTrigger>
@@ -234,7 +240,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               condition={isPhaseActive(phase)}
                               wrap={(child) => <b>{child}</b>}
                             >
-                              <>{phase.name} phase</>
+                              <>
+                                <Trans
+                                  i18nKey="gameStateColumn.phasee16825"
+                                  components={{ value0: <>{phase.name}</> }}
+                                />
+                              </>
                             </ConditionalWrap>
                           </div>
                         </Col>
@@ -287,7 +298,13 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     overlay={
                       <Tooltip id="round-tooltip">
                         <h5>
-                          Round {this.game.turn} / {this.game.maxTurns}
+                          <Trans
+                            i18nKey="common.round"
+                            components={{
+                              value0: <>{this.game.turn}</>,
+                              value1: <>{this.game.maxTurns}</>
+                            }}
+                          />
                         </h5>
                       </Tooltip>
                     }
@@ -413,7 +430,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             <>
               <Row className="mt-0">
                 <Col>
-                  <h5 className="text-center">Next Westeros Cards</h5>
+                  <h5 className="text-center">
+                    {t("gameStateColumn.nextWesterosCards7700b4")}
+                  </h5>
                 </Col>
               </Row>
               <Row>
@@ -422,7 +441,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     key={"westeros-deck-" + i + "-header"}
                     className="text-center"
                   >
-                    <b>Deck {i + 1}</b>
+                    <b>
+                      <Trans
+                        i18nKey="gameStateColumn.deckdede0b"
+                        components={{ value0: <>{i + 1}</> }}
+                      />
+                    </b>
                   </Col>
                 ))}
               </Row>
@@ -454,7 +478,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
           )}
           <Row className={this.gameSettings.cokWesterosPhase ? "mt-4" : "mt-0"}>
             <Col>
-              <h5 className="text-center">Remaining Westeros Cards</h5>
+              <h5 className="text-center">
+                {t("gameStateColumn.remainingWesterosCards47a43b")}
+              </h5>
             </Col>
           </Row>
           <Row>
@@ -463,7 +489,12 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 key={"westeros-deck-" + i + "-header"}
                 className="text-center"
               >
-                <b>Deck {i + 1}</b>
+                <b>
+                  <Trans
+                    i18nKey="gameStateColumn.deckdede0b"
+                    components={{ value0: <>{i + 1}</> }}
+                  />
+                </b>
               </Col>
             ))}
           </Row>
@@ -516,7 +547,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
           {knowsWildlingCard && nextWildlingCard && (
             <>
               <Col xs={12} className="mt-0">
-                <h5 className="text-center">Top Wilding Card</h5>
+                <h5 className="text-center">
+                  {t("gameStateColumn.topWildingCard5070eb")}
+                </h5>
               </Col>
               <Col xs={12} className="mb-2">
                 <Row className="justify-content-center">
@@ -530,7 +563,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             </>
           )}
           <Col xs={12} className="mt-0">
-            <h5 className="text-center">The Wildling Deck</h5>
+            <h5 className="text-center">
+              {t("gameStateColumn.theWildlingDeck090e33")}
+            </h5>
           </Col>
           <Col xs={12}>
             <Row className="justify-content-center me-0 ms-0">
@@ -606,12 +641,16 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
     return (
       <Tooltip id="dragon-strength-tooltip">
         <div className="m-1 text-center">
-          <h5>Current Dragon Strength</h5>
+          <h5>{t("gameStateColumn.currentDragonStrengthed8478")}</h5>
           {roundsWhenIncreased.length > 0 && (
             <p>
-              Will increase in round
-              <br />
-              {joinNaturalLanguage(roundsWhenIncreased)}
+              <Trans
+                i18nKey="gameStateColumn.willIncreaseInRound7dd1c1"
+                components={{
+                  element0: <br />,
+                  value1: <>{joinNaturalLanguage(roundsWhenIncreased)}</>
+                }}
+              />
             </p>
           )}
         </div>

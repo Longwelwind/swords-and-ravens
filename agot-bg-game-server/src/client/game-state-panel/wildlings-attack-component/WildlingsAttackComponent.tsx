@@ -1,3 +1,4 @@
+import { t, Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, default as React, ReactNode } from "react";
 import WildlingsAttackGameState from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/WildlingsAttackGameState";
@@ -59,15 +60,17 @@ export default class WildlingsAttackComponent extends Component<
         {!this.props.gameState.biddingResults && (
           <Row className="justify-content-center mt-2 mb-1">
             <img src={mammothImage} width="40px" className="me-2" />
-            <h4 className="mt-2">Wildlings Attack</h4>
+            <h4 className="mt-2">
+              {t("wildlingsAttack.wildlingsAttackebb672")}
+            </h4>
             <img src={mammothImage} width="40px" className="ms-2" />
           </Row>
         )}
         {this.props.gameState.biddingResults && (
           <h5 className="text-center mt-1">
             {this.props.gameState.nightsWatchWon
-              ? "Night's Watch Victory"
-              : "Wildling Victory"}
+              ? t("wildlingsAttack.nightSWatchVictory7535c0")
+              : t("wildlingsAttack.wildlingVictory8641ea")}
           </h5>
         )}
         {wildlingCardType && (
@@ -84,29 +87,49 @@ export default class WildlingsAttackComponent extends Component<
         <Row>
           {this.props.gameState.childGameState instanceof BiddingGameState ? (
             <Col xs={12} className="text-center mb-3">
-              <b>All player houses</b>
-              {this.props.gameState.excludedHouses.length > 0 && (
-                <>
-                  {" "}
-                  except{" "}
-                  {joinReactNodes(
-                    this.props.gameState.excludedHouses.map((h) => (
-                      <b key={`wildling_excluded-house_${h.id}`}>{h.name}</b>
-                    )),
-                    ", "
-                  )}
-                </>
-              )}{" "}
-              bid Power tokens to overcome the Wildlings, which are attacking
-              with a strength of{" "}
-              <b style={{ fontSize: "2rem" }}>
-                {this.props.gameState.wildlingStrength}
-              </b>
-              !
+              <Trans
+                i18nKey="wildlingsAttack.allPlayerHousesBidPowerTokensToOvercomeTheef377f"
+                components={{
+                  element0: <b />,
+                  value1: (
+                    <>
+                      {this.props.gameState.excludedHouses.length > 0 && (
+                        <>
+                          <Trans
+                            i18nKey="wildlingsAttack.excepta66c96"
+                            components={{
+                              value0: (
+                                <>
+                                  {joinReactNodes(
+                                    this.props.gameState.excludedHouses.map(
+                                      (h) => (
+                                        <b
+                                          key={`wildling_excluded-house_${h.id}`}
+                                        >
+                                          {h.name}
+                                        </b>
+                                      )
+                                    ),
+                                    ", "
+                                  )}
+                                </>
+                              )
+                            }}
+                          />
+                        </>
+                      )}
+                    </>
+                  ),
+                  element2: <b style={{ fontSize: "2rem" }} />,
+                  value3: <>{this.props.gameState.wildlingStrength}</>
+                }}
+              />
             </Col>
           ) : results ? (
             <Col xs={12} className="no-space-around">
-              <div className="text-center mb-1">Bidding results:</div>
+              <div className="text-center mb-1">
+                {t("common.biddingResults")}
+              </div>
               <div className="d-flex justify-content-center">
                 <HouseNumberResultsComponent
                   results={results}
@@ -120,20 +143,38 @@ export default class WildlingsAttackComponent extends Component<
           {this.props.gameState._highestBidder && (
             <Col xs={12} className="justify-content-center">
               <div className="text-center mt-1">
-                Highest Bidder:{" "}
-                <b style={{ color: this.props.gameState._highestBidder.color }}>
-                  {this.props.gameState._highestBidder.name}
-                </b>
+                <Trans
+                  i18nKey="common.highestBidder"
+                  components={{
+                    element0: (
+                      <b
+                        style={{
+                          color: this.props.gameState._highestBidder.color
+                        }}
+                      />
+                    ),
+                    value1: <>{this.props.gameState._highestBidder.name}</>
+                  }}
+                />
               </div>
             </Col>
           )}
           {this.props.gameState._lowestBidder && (
             <Col xs={12} className="justify-content-center">
               <div className="text-center mt-1">
-                Lowest Bidder:{" "}
-                <b style={{ color: this.props.gameState._lowestBidder.color }}>
-                  {this.props.gameState._lowestBidder.name}
-                </b>
+                <Trans
+                  i18nKey="common.lowestBidder"
+                  components={{
+                    element0: (
+                      <b
+                        style={{
+                          color: this.props.gameState._lowestBidder.color
+                        }}
+                      />
+                    ),
+                    value1: <>{this.props.gameState._lowestBidder.name}</>
+                  }}
+                />
               </div>
             </Col>
           )}

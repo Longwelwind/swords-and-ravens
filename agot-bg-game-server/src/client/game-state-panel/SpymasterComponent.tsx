@@ -1,3 +1,4 @@
+import { Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import React from "react";
 import { observer } from "mobx-react";
@@ -29,7 +30,10 @@ export default class SpymasterComponent extends Component<
       </>
     ) : (
       <Col xs={12} className="text-center">
-        Waiting for {this.house.name}...
+        <Trans
+          i18nKey="common.waitingFor"
+          components={{ houses: <>{this.house.name}</> }}
+        />
       </Col>
     );
   }

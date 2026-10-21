@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import SeeTopWildlingCardGameState from "../../common/ingame-game-state/action-game-state/use-raven-game-state/see-top-wildling-card-game-state/SeeTopWildlingCardGameState";
@@ -17,9 +18,9 @@ export default class SeeTopWildlingCardComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          The holder of the Messenger Raven sees the card at the top of the
-          Wildling deck and may choose to either leave it at the top, or put it
-          at the bottom of the deck.
+          {t(
+            "seeTopWildlingCard.theHolderOfTheMessengerRavenSeesTheCarde24e41"
+          )}
         </Col>
         <Col xs={12}>
           {this.props.gameState.topWildlingCard && (
@@ -50,7 +51,7 @@ export default class SeeTopWildlingCardComponent extends Component<
                     this.choose(SeeTopWildlingCardAction.LEAVE_AT_THE_TOP)
                   }
                 >
-                  Keep at the Top
+                  {t("seeTopWildlingCard.keepAtTheTop0f17eb")}
                 </Button>
               </Col>
               <Col xs="auto">
@@ -60,13 +61,18 @@ export default class SeeTopWildlingCardComponent extends Component<
                     this.choose(SeeTopWildlingCardAction.PUT_AT_BOTTOM)
                   }
                 >
-                  Put at the Bottom
+                  {t("seeTopWildlingCard.putAtTheBottom79c80f")}
                 </Button>
               </Col>
             </Row>
           ) : (
             <Col xs={12} className="text-center">
-              Waiting for {this.props.gameState.ravenHolder.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{
+                  houses: <>{this.props.gameState.ravenHolder.name}</>
+                }}
+              />
             </Col>
           )}
         </Col>

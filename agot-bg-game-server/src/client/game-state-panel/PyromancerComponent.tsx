@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import React from "react";
 import { observer } from "mobx-react";
@@ -30,7 +31,7 @@ export default class PyromancerComponent extends Component<
       <>
         {this.selectRegion && (
           <Col xs={12} className="text-center">
-            Select the castle to degrade.
+            {t("pyromancer.selectTheCastleToDegrade519b9b")}
           </Col>
         )}
         {renderChildGameState(this.props, [
@@ -40,7 +41,10 @@ export default class PyromancerComponent extends Component<
       </>
     ) : (
       <Col xs={12} className="text-center">
-        Waiting for {this.house.name}...
+        <Trans
+          i18nKey="common.waitingFor"
+          components={{ houses: <>{this.house.name}</> }}
+        />
       </Col>
     );
   }

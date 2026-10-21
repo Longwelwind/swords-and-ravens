@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import * as React from "react";
@@ -50,13 +51,16 @@ export default class SelectWesterosCardComponent extends Component<
                   onClick={() => this.confirm()}
                   disabled={this.selectedWesterosCard == null}
                 >
-                  Confirm
+                  {t("common.confirm")}
                 </Button>
               </Col>
             </Row>
           ) : (
             <div className="text-center">
-              Waiting for {this.props.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.props.gameState.house.name}</> }}
+              />
             </div>
           )}
         </Col>

@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "../i18n";
 import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -39,19 +40,45 @@ export default class SelectOrdersComponent extends Component<
               {this.selectedRegions.length > 0 && (
                 <Row className="justify-content-center">
                   <p className="text-center">
-                    Selected Order token
-                    {this.selectedRegions.length != 1 ? "s" : ""}:<br />
-                    {joinReactNodes(
-                      this.selectedRegions.map((r) => (
-                        <span key={`select-order_${r.id}`}>
-                          <b>
-                            {this.getOrderInRegion(r)?.type.name ?? "Unknown"}
-                          </b>{" "}
-                          in <b>{r.name}</b>
-                        </span>
-                      )),
-                      ", "
-                    )}
+                    <Trans
+                      i18nKey="selectOrders.selectedOrder13dece"
+                      components={{
+                        value0: (
+                          <>
+                            {t("common.token", {
+                              count: this.selectedRegions.length
+                            })}
+                          </>
+                        ),
+                        element1: <br />,
+                        value2: (
+                          <>
+                            {joinReactNodes(
+                              this.selectedRegions.map((r) => (
+                                <span key={`select-order_${r.id}`}>
+                                  <Trans
+                                    i18nKey="common.in89ff9d"
+                                    components={{
+                                      element0: <b />,
+                                      value1: (
+                                        <>
+                                          {translateGameText(
+                                            this.getOrderInRegion(r)?.type.name
+                                          ) ?? t("common.unknown")}
+                                        </>
+                                      ),
+                                      element2: <b />,
+                                      value3: <>{r.name}</>
+                                    }}
+                                  />
+                                </span>
+                              )),
+                              ", "
+                            )}
+                          </>
+                        )
+                      }}
+                    />
                   </p>
                 </Row>
               )}
@@ -65,7 +92,7 @@ export default class SelectOrdersComponent extends Component<
                       this.selectedRegions.length != this.props.gameState.count
                     }
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -75,14 +102,17 @@ export default class SelectOrdersComponent extends Component<
                     variant="danger"
                     disabled={this.selectedRegions.length == 0}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
             </>
           ) : (
             <div className="text-center">
-              Waiting for {this.props.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.props.gameState.house.name}</> }}
+              />
             </div>
           )}
         </Col>

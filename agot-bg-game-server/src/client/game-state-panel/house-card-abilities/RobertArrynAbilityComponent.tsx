@@ -1,3 +1,4 @@
+import { Trans, t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -43,21 +44,37 @@ export default class RobertArrynAbilityComponent extends Component<
       <>
         {this.simpleChoice && (
           <Col xs={12} className="text-center">
-            <b>Robert Arryn</b>: House <b>{this.house.name}</b> may remove{" "}
-            <b>Robert Arryn</b> and{" "}
-            {joinReactNodes(
-              possibleHouseCardToRemove.map((hc) => (
-                <b key={`robert-arryn_${hc.id}`}>{hc.name}</b>
-              )),
-              " or "
-            )}{" "}
-            from the game.
+            <Trans
+              i18nKey="robertArrynAbility.robertArrynHouseMayRemoveRobertArrynAndFrom7f91f9"
+              components={{
+                element0: <b />,
+                element1: <b />,
+                value2: <>{this.house.name}</>,
+                element3: <b />,
+                value4: (
+                  <>
+                    {joinReactNodes(
+                      possibleHouseCardToRemove.map((hc) => (
+                        <b key={`robert-arryn_${hc.id}`}>{hc.name}</b>
+                      )),
+                      t("robertArrynAbility.ore1a3e7")
+                    )}
+                  </>
+                )
+              }}
+            />
           </Col>
         )}
         {this.selectHouseCard && (
           <Col xs={12} className="text-center">
-            <b>Robert Arryn</b>: House <b>{this.house.name}</b> has to decide
-            which House card to remove from the game.
+            <Trans
+              i18nKey="robertArrynAbility.robertArrynHouseHasToDecideWhichHouseCard2f8b3b"
+              components={{
+                element0: <b />,
+                element1: <b />,
+                value2: <>{this.house.name}</>
+              }}
+            />
           </Col>
         )}
         {renderChildGameState(this.props, [

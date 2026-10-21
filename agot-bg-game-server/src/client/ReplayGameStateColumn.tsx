@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import React, { Component, ReactNode } from "react";
 
 import {
@@ -100,7 +101,13 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                 overlay={
                   <Tooltip id="round-tooltip">
                     <h5>
-                      Round {gameSnapshot?.round} / {ingame.game.maxTurns}
+                      <Trans
+                        i18nKey="common.round"
+                        components={{
+                          value0: <>{gameSnapshot?.round}</>,
+                          value1: <>{ingame.game.maxTurns}</>
+                        }}
+                      />
                     </h5>
                   </Tooltip>
                 }
@@ -207,7 +214,11 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               <Nav.Item>
                 <Nav.Link eventKey="game-logs">
                   <OverlayTrigger
-                    overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                    overlay={
+                      <Tooltip id="logs-tooltip">
+                        {t("common.gameLogs")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -226,7 +237,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="iron-bank-tooltip">
-                            The Iron Bank
+                            {t("gameTabs.theIronBank59437a")}
                           </Tooltip>
                         }
                         placement="top"
@@ -244,7 +255,11 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               <Nav.Item>
                 <Nav.Link eventKey="settings">
                   <OverlayTrigger
-                    overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                    overlay={
+                      <Tooltip id="settings-tooltip">
+                        {t("common.settings")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -330,7 +345,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               </Nav.Item>
               <Dropdown className="ms-auto mt-1">
                 <Dropdown.Toggle variant="secondary" size="sm">
-                  Jump to
+                  {t("common.jumpTo")}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>{this.roundDropDownItems}</Dropdown.Menu>
               </Dropdown>
@@ -407,7 +422,10 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
             });
           }}
         >
-          Round {round}
+          <Trans
+            i18nKey="gameTabs.round6f8874"
+            components={{ value0: <>{round}</> }}
+          />
         </Dropdown.Item>
       );
     });

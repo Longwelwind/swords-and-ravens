@@ -1,3 +1,4 @@
+import { t, Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -26,19 +27,31 @@ export default class CrowKillersWildlingVictoryComponent extends Component<
         {this.props.gameState.childGameState instanceof SelectUnitsGameState &&
           (this.props.gameState.step == CrowKillersStep.DEGRADING_KNIGHTS ? (
             <Col xs={12}>
-              <b>{this.props.gameState.childGameState.house.name}</b> replaces{" "}
-              {this.props.gameState.childGameState.count} of their Knights with
-              available Footmen.
+              <Trans
+                i18nKey="crowKillersWildlingVictory.replacesOfTheirKnightsWithAvailableFootmen4d49fb"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.props.gameState.childGameState.house.name}</>,
+                  value2: <>{this.props.gameState.childGameState.count}</>
+                }}
+              />
             </Col>
           ) : this.props.gameState.step ==
             CrowKillersStep.DESTROYING_KNIGHTS ? (
             <Col xs={12}>
-              <b>{this.props.gameState.childGameState.house.name}</b> has to
-              destroy {this.props.gameState.childGameState.count} of their
-              Knights before the rest can be replaced with Footmen.
+              <Trans
+                i18nKey="crowKillersWildlingVictory.hasToDestroyOfTheirKnightsBeforeTheRest0b5212"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.props.gameState.childGameState.house.name}</>,
+                  value2: <>{this.props.gameState.childGameState.count}</>
+                }}
+              />
             </Col>
           ) : (
-            <Col xs={12}>Invalid CrowKillersStep!</Col>
+            <Col xs={12}>
+              {t("crowKillersWildlingVictory.invalidCrowkillersstepe082ca")}
+            </Col>
           ))}
         {renderChildGameState(this.props, [
           [SelectUnitsGameState, SelectUnitsComponent],

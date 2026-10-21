@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,11 +19,14 @@ export default class QyburnAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Qyburn</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may discard
-          two of available Power tokens to choose a House card in any
-          player&apos;s discard pile. Qyburn gains the printed combat strength
-          and combat icons of that card, ignoring its text ability.
+          <Trans
+            i18nKey="qyburnAbility.qyburnHouseMayDiscardTwoOfAvailablePowerTokense542fb"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

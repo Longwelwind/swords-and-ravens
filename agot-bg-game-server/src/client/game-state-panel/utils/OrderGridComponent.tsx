@@ -1,3 +1,4 @@
+import { Trans, translateGameText } from "../../i18n";
 import React, { Component } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -5,6 +6,7 @@ import orderImages from "../../orderImages";
 import classNames from "classnames";
 import Order from "../../../common/ingame-game-state/game-data-structure/Order";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { observer } from "mobx-react";
 
 interface OrderGridProps {
   orders: Order[];
@@ -14,6 +16,7 @@ interface OrderGridProps {
   onOrderClick: (order: Order) => void;
 }
 
+@observer
 export default class OrderGridComponent extends Component<OrderGridProps> {
   render(): React.JSX.Element {
     return (
@@ -29,13 +32,13 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                 placement="right"
                 overlay={
                   <Tooltip id={"order-tooltip-" + o.id}>
-                    <b>{o.type.name}</b>
+                    <b>{translateGameText(o.type.name)}</b>
                     {this.props.restrictedOrders.includes(o) && (
                       <>
-                        <br />
-                        You are not allowed to place this order but it can be
-                        placed as dummy order token and will be removed after
-                        the messenger raven has been used.
+                        <Trans
+                          i18nKey="orderGrid.youAreNotAllowedToPlaceThisOrderButd60452"
+                          components={{ element0: <br /> }}
+                        />
                       </>
                     )}
                   </Tooltip>

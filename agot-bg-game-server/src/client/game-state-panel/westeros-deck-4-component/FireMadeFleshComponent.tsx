@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -20,8 +21,13 @@ export default class FireMadeFleshComponent extends Component<
         {this.props.gameState.childGameState instanceof
           SelectUnitsGameState && (
           <Col className="text-center">
-            House <b>{this.props.gameState.childGameState.house.name}</b> must
-            select a dragon to destroy.
+            <Trans
+              i18nKey="fireMadeFlesh.houseMustSelectADragonToDestroyee15e5"
+              components={{
+                element0: <b />,
+                value1: <>{this.props.gameState.childGameState.house.name}</>
+              }}
+            />
           </Col>
         )}
         {renderChildGameState(this.props, [

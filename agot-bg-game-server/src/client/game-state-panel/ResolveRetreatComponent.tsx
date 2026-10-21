@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -31,28 +32,63 @@ export default class ResolveRetreatComponent extends Component<
         SelectRegionGameState ? (
           <>
             <Col xs={12} className="text-center">
-              House <b>{this.props.gameState.childGameState.house.name}</b> must
-              choose the retreat location of the defeated army.
+              <Trans
+                i18nKey="resolveRetreat.houseMustChooseTheRetreatLocationOfTheDefeated39c8d3"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.props.gameState.childGameState.house.name}</>
+                }}
+              />
             </Col>
             {unitCountToBeDestroyed > 0 &&
               this.selectRegionComponent &&
               this.selectRegionComponent.selectedRegion && (
                 <Col xs={12} className="text-center">
-                  <b>{unitCountToBeDestroyed}</b> unit
-                  {unitCountToBeDestroyed > 1 ? "s" : ""} must be destroyed if
-                  you retreat to{" "}
-                  <b>{this.selectRegionComponent.selectedRegion.name}</b>.
+                  <Trans
+                    i18nKey="resolveRetreat.mustBeDestroyedIfYouRetreatToc07ed8"
+                    components={{
+                      element0: <b />,
+                      value1: <>{unitCountToBeDestroyed}</>,
+                      value2: (
+                        <>
+                          {t("common.unit", { count: unitCountToBeDestroyed })}
+                        </>
+                      ),
+                      element3: <b />,
+                      value4: (
+                        <>{this.selectRegionComponent.selectedRegion.name}</>
+                      )
+                    }}
+                  />
                 </Col>
               )}
           </>
         ) : this.props.gameState.childGameState instanceof
           SelectUnitsGameState ? (
           <Col xs={12} className="text-center">
-            House <b>{this.props.gameState.childGameState.house.name}</b> must
-            choose <b>{this.props.gameState.childGameState.count}</b> unit
-            {this.props.gameState.childGameState.count > 1 ? "s" : ""} as
-            casualties, for remaining units to retreat to{" "}
-            <b>{this.props.gameState.retreatRegion?.name ?? "Unknown"}</b>.
+            <Trans
+              i18nKey="resolveRetreat.houseMustChooseAsCasualtiesForRemainingUnitsTo0a572b"
+              components={{
+                element0: <b />,
+                value1: <>{this.props.gameState.childGameState.house.name}</>,
+                element2: <b />,
+                value3: <>{this.props.gameState.childGameState.count}</>,
+                value4: (
+                  <>
+                    {t("common.unit", {
+                      count: this.props.gameState.childGameState.count
+                    })}
+                  </>
+                ),
+                element5: <b />,
+                value6: (
+                  <>
+                    {this.props.gameState.retreatRegion?.name ??
+                      t("common.unknown")}
+                  </>
+                )
+              }}
+            />
           </Col>
         ) : null}
         {renderChildGameState(

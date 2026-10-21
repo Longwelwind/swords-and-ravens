@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "./i18n";
 import { Component, ReactNode } from "react";
 import GameClient from "./GameClient";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
@@ -443,15 +444,19 @@ export default class MapComponent extends Component<MapComponentProps> {
                   overlay={
                     <Tooltip id={"power-token-" + r.id}>
                       <div className="text-center">
-                        <b>Printed Power token</b>
+                        <b>{t("map.printedPowerTokenda7a13")}</b>
                         <small>
-                          {" "}
-                          of{" "}
-                          <b>
-                            {r.overwrittenSuperControlPowerToken.name}
-                            <br />
-                            {r.name}
-                          </b>
+                          <Trans
+                            i18nKey="map.ofda0760"
+                            components={{
+                              element0: <b />,
+                              value1: (
+                                <>{r.overwrittenSuperControlPowerToken.name}</>
+                              ),
+                              element2: <br />,
+                              value3: <>{r.name}</>
+                            }}
+                          />
                         </small>
                       </div>
                     </Tooltip>
@@ -476,15 +481,17 @@ export default class MapComponent extends Component<MapComponentProps> {
                   overlay={
                     <Tooltip id={"power-token-" + r.id}>
                       <div className="text-center">
-                        <b>Power token</b>
+                        <b>{t("map.powerTokene4ee18")}</b>
                         <small>
-                          {" "}
-                          of{" "}
-                          <b>
-                            {r.controlPowerToken.name}
-                            <br />
-                            {r.name}
-                          </b>
+                          <Trans
+                            i18nKey="map.ofda0760"
+                            components={{
+                              element0: <b />,
+                              value1: <>{r.controlPowerToken.name}</>,
+                              element2: <br />,
+                              value3: <>{r.name}</>
+                            }}
+                          />
                         </small>
                       </div>
                     </Tooltip>
@@ -793,11 +800,11 @@ export default class MapComponent extends Component<MapComponentProps> {
       return dragonStrength <= -1 ? (
         <></>
       ) : dragonStrength <= 1 ? (
-        <>Baby </>
+        <>{t("map.baby7ad646")}</>
       ) : dragonStrength <= 3 ? (
         <></>
       ) : dragonStrength <= 5 ? (
-        <>Monster </>
+        <>{t("map.monster4baa1d")}</>
       ) : (
         <></>
       );
@@ -890,13 +897,21 @@ export default class MapComponent extends Component<MapComponentProps> {
                       <div className="text-center">
                         <b>
                           {getDragonPrefix(dragonStrength)}
-                          {u.type.name}
+                          {translateGameText(u.type.name)}
                         </b>
                         <small>
-                          {" "}
-                          of <b>{controller?.name ?? "Unknown"}</b>
-                          <br />
-                          <b>{r.name}</b>
+                          <Trans
+                            i18nKey="map.of4fba64"
+                            components={{
+                              element0: <b />,
+                              value1: (
+                                <>{controller?.name ?? t("common.unknown")}</>
+                              ),
+                              element2: <br />,
+                              element3: <b />,
+                              value4: <>{r.name}</>
+                            }}
+                          />
                         </small>
                       </div>
                     </Tooltip>
@@ -981,17 +996,23 @@ export default class MapComponent extends Component<MapComponentProps> {
                 <Tooltip id={"garrison-tooltip-" + r.id}>
                   <div className="text-center">
                     {this.allRegionsWithControllers.get(r) == null ? (
-                      <b>Neutral Force token</b>
+                      <b>{t("map.neutralForceTokenbd93e6")}</b>
                     ) : (
                       <>
-                        <b>Garrison</b>
+                        <b>{t("common.garrison")}</b>
                         <small>
-                          {" "}
-                          of{" "}
-                          <b>
-                            {this.allRegionsWithControllers.get(r)?.name ??
-                              "Unknown"}
-                          </b>
+                          <Trans
+                            i18nKey="common.of"
+                            components={{
+                              element0: <b />,
+                              value1: (
+                                <>
+                                  {this.allRegionsWithControllers.get(r)
+                                    ?.name ?? t("common.unknown")}
+                                </>
+                              )
+                            }}
+                          />
                         </small>
                       </>
                     )}
@@ -1039,7 +1060,7 @@ export default class MapComponent extends Component<MapComponentProps> {
               overlay={
                 <Tooltip id={"loyalty-tooltip-" + r.id}>
                   <div className="text-center">
-                    <b>Loyalty token</b>
+                    <b>{t("map.loyaltyToken6c646e")}</b>
                     <br />
                     <small>
                       <b>{r.name}</b>
@@ -1349,15 +1370,21 @@ export default class MapComponent extends Component<MapComponentProps> {
     return (
       <Tooltip id={"order-info"} className="tooltip-w-100">
         <div className="text-center">
-          <b>{order ? order.type.name : "Order token"}</b>
+          <b>
+            {order
+              ? translateGameText(order.type.name)
+              : t("map.orderToken1f66da")}
+          </b>
           <small>
-            {" "}
-            of{" "}
-            <b>
-              {controller?.name ?? "Unknown"}
-              <br />
-              {region.name}
-            </b>
+            <Trans
+              i18nKey="map.ofda0760"
+              components={{
+                element0: <b />,
+                value1: <>{controller?.name ?? t("common.unknown")}</>,
+                element2: <br />,
+                value3: <>{region.name}</>
+              }}
+            />
           </small>
         </div>
       </Tooltip>

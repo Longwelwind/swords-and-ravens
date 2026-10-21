@@ -1,3 +1,4 @@
+import { Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import CancelledGameState from "../../common/cancelled-game-state/CancelledGameState";
 import * as React from "react";
@@ -18,17 +19,24 @@ export default class IngameCancelledComponent extends Component<
         <Row>
           {this.props.gameState.ingame?.childGameStateBeforeCancellation ? (
             <Col className="text-center">
-              <FontAwesomeIcon icon={faTimes} size="3x" />
-              <br />
-              This game has been cancelled by a moderator.
-              <br />
-              Only the site administrator could restore it.
+              <Trans
+                i18nKey="ingameCancelled.thisGameHasBeenCancelledByAModeratorOnly517bf0"
+                components={{
+                  element0: <FontAwesomeIcon icon={faTimes} size="3x" />,
+                  element1: <br />,
+                  element2: <br />
+                }}
+              />
             </Col>
           ) : (
             <Col className="text-center">
-              <FontAwesomeIcon icon={faTimes} size="3x" />
-              <br />
-              This game has been cancelled by vote
+              <Trans
+                i18nKey="ingameCancelled.thisGameHasBeenCancelledByVote6045ef"
+                components={{
+                  element0: <FontAwesomeIcon icon={faTimes} size="3x" />,
+                  element1: <br />
+                }}
+              />
             </Col>
           )}
         </Row>

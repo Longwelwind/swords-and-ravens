@@ -1,3 +1,4 @@
+import { Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import renderChildGameState from "../utils/renderChildGameState";
@@ -16,15 +17,29 @@ export default class ChooseInitialObjectivesComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          Each house chooses 3 out of 5 objective cards.
-          {this.props.gameState.entireGame.gameSettings.addPortToTheEyrie && (
-            <>
-              <br />
-              <b>Note:</b> Due to the custom port in The Eyrie, House Arryn
-              scores only 1 victory point for <i>Mercantile Ventures</i>{" "}
-              <small>(the objective about ports)</small>!
-            </>
-          )}
+          <Trans
+            i18nKey="chooseInitialObjectives.eachHouseChooses3OutOf5ObjectiveCards5332ec"
+            components={{
+              value0: (
+                <>
+                  {this.props.gameState.entireGame.gameSettings
+                    .addPortToTheEyrie && (
+                    <>
+                      <Trans
+                        i18nKey="chooseInitialObjectives.noteDueToTheCustomPortInTheEyrie48f169"
+                        components={{
+                          element0: <br />,
+                          element1: <b />,
+                          element2: <i />,
+                          element3: <small />
+                        }}
+                      />
+                    </>
+                  )}
+                </>
+              )
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectObjectiveCardsGameState, SelectObjectiveCardsComponent]

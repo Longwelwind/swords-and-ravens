@@ -1,3 +1,5 @@
+import { t, Trans } from "../i18n";
+import joinNaturalLanguage from "../utils/joinNaturalLanguage";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Component } from "react";
@@ -89,7 +91,7 @@ export default class ChooseHouseCardComponent extends Component<
     ) : (
       <>
         <Col xs={12} className="text-center">
-          The attacker and the defender must choose a House&nbsp;card
+          {t("chooseHouseCard.theAttackerAndTheDefenderMustChooseAHouse2c46fa")}
         </Col>
         {this.shouldChooseHouseCard() && (
           <>
@@ -133,19 +135,20 @@ export default class ChooseHouseCardComponent extends Component<
                           <OverlayTrigger
                             overlay={
                               <Tooltip id="donst-skip-vsb-tooltip">
-                                In case the +1 bonus won&apos;t affect the
-                                outcome of the battle, the game usually will
-                                skip the question of whether to use the blade or
-                                not.
-                                <br />
-                                In case you might want to be asked anyway, you
-                                can pre-mark it here.
-                                <br />
+                                <Trans
+                                  i18nKey="chooseHouseCard.inCaseThe1BonusWonTAffectTheb02ea3"
+                                  components={{
+                                    element0: <br />,
+                                    element1: <br />
+                                  }}
+                                />
                               </Tooltip>
                             }
                           >
                             <label htmlFor="dont-skip-vsb-question">
-                              Don&apos;t skip VSB bonus question
+                              {t(
+                                "chooseHouseCard.donTSkipVsbBonusQuestion56dd52"
+                              )}
                             </label>
                           </OverlayTrigger>
                         }
@@ -166,7 +169,7 @@ export default class ChooseHouseCardComponent extends Component<
                     onClick={() => this.chooseHouseCard()}
                     disabled={!this.dirty || this.selectedHouseCard == null}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
               </Row>
@@ -181,14 +184,16 @@ export default class ChooseHouseCardComponent extends Component<
                           onClick={() => {
                             if (
                               window.confirm(
-                                "Are you sure you want to refuse all the support you have received?"
+                                t(
+                                  "chooseHouseCard.areYouSureYouWantToRefuseAllThe14713d"
+                                )
                               )
                             ) {
                               this.props.gameState.refuseSupport();
                             }
                           }}
                         >
-                          Refuse ALL received support
+                          {t("chooseHouseCard.refuseAllReceivedSupportd59ddf")}
                         </Button>
                       </Col>
                     )}
@@ -204,8 +209,12 @@ export default class ChooseHouseCardComponent extends Component<
                             if (
                               window.confirm(
                                 commandedHouse == supportingHouse
-                                  ? "Are you sure you want to refuse your own support?"
-                                  : `Are you sure you want to refuse the support you have received from House ${supportingHouse.name}?`
+                                  ? t(
+                                      "chooseHouseCard.areYouSureYouWantToRefuseYourOwn97bdc7"
+                                    )
+                                  : t("chooseHouseCard.confirmRefuseSupport", {
+                                      house: supportingHouse.name
+                                    })
                               )
                             ) {
                               this.props.gameState.refuseSupport(
@@ -215,8 +224,10 @@ export default class ChooseHouseCardComponent extends Component<
                           }}
                         >
                           {commandedHouse == supportingHouse
-                            ? "Refuse own support"
-                            : `Refuse support from ${supportingHouse.name}`}
+                            ? t("chooseHouseCard.refuseOwnSupport6e9b1f")
+                            : t("chooseHouseCard.refuseSupportFrom3f7482", {
+                                value0: supportingHouse.name
+                              })}
                         </Button>
                       </Col>
                     ))}
@@ -227,15 +238,27 @@ export default class ChooseHouseCardComponent extends Component<
         )}
         <Col xs={12} className="text-center">
           <div>
-            Waiting for{" "}
-            {waitingFor
-              .map(
-                (h) =>
-                  this.combat.ingameGameState.getControllerOfHouse(h).house.name
-              )
-              .join(" and ")}{" "}
-            to choose their House&nbsp;card{waitingFor.length != 1 ? "s" : ""}
-            ...
+            <Trans
+              i18nKey="chooseHouseCard.waitingForToChooseTheir05a4e8"
+              components={{
+                value0: (
+                  <>
+                    {joinNaturalLanguage(
+                      waitingFor.map(
+                        (h) =>
+                          this.combat.ingameGameState.getControllerOfHouse(h)
+                            .house.name
+                      )
+                    )}
+                  </>
+                ),
+                value1: (
+                  <>
+                    {t("common.HousecardLabel", { count: waitingFor.length })}
+                  </>
+                )
+              }}
+            />
           </div>
         </Col>
       </>

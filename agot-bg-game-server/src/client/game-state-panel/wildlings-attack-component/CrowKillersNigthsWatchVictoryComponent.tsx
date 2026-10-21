@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import React, { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -15,9 +16,14 @@ export default class CrowKillersNigthsWatchVictoryComponent extends Component<
     return (
       <>
         <Col xs={12}>
-          <b>{this.props.gameState.childGameState.house.name}</b> may
-          immediately replace up to {this.props.gameState.childGameState.count}{" "}
-          of his Footmen with Knights.
+          <Trans
+            i18nKey="crowKillersNigthsWatchVictory.mayImmediatelyReplaceUpToOfHisFootmenWith97e56a"
+            components={{
+              element0: <b />,
+              value1: <>{this.props.gameState.childGameState.house.name}</>,
+              value2: <>{this.props.gameState.childGameState.count}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectUnitsGameState, SelectUnitsComponent]

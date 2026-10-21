@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "../i18n";
 import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -57,14 +58,25 @@ export default class ResolveSinglePayDebtComponent extends Component<
         />
         <Col xs={12} className="text-center">
           <p>
-            The holder of the Valyrian Steel Blade destroys one unit for each
-            unpaid interest Power&nbsp;token.
+            {t(
+              "resolveSinglePayDebt.theHolderOfTheValyrianSteelBladeDestroysOnee4005a"
+            )}
           </p>
           <p>
-            <b>{this.resolver.name}</b> must destroy{" "}
-            <b>{this.props.gameState.debt}</b> unit
-            {this.props.gameState.debt != 1 ? "s" : ""} of House{" "}
-            <b>{this.house.name}</b>.
+            <Trans
+              i18nKey="resolveSinglePayDebt.mustDestroyOfHouse802a9b"
+              components={{
+                element0: <b />,
+                value1: <>{this.resolver.name}</>,
+                element2: <b />,
+                value3: <>{this.props.gameState.debt}</>,
+                value4: (
+                  <>{t("common.unit", { count: this.props.gameState.debt })}</>
+                ),
+                element5: <b />,
+                value6: <>{this.house.name}</>
+              }}
+            />
           </p>
         </Col>
         {this.props.gameClient.doesControlHouse(this.resolver) ? (
@@ -77,15 +89,27 @@ export default class ResolveSinglePayDebtComponent extends Component<
                 <ul>
                   {this.unitsToRemove.entries.map(([region, units]) => (
                     <li key={`pay-single-debt_${region.id}`}>
-                      {joinReactNodes(
-                        units.map((u, i) => (
-                          <b key={`pay-single-debt_${region.id}_${u.id}_${i}`}>
-                            {u.type.name}
-                          </b>
-                        )),
-                        ", "
-                      )}{" "}
-                      in <b>{region.name}</b>
+                      <Trans
+                        i18nKey="common.in"
+                        components={{
+                          value0: (
+                            <>
+                              {joinReactNodes(
+                                units.map((u, i) => (
+                                  <b
+                                    key={`pay-single-debt_${region.id}_${u.id}_${i}`}
+                                  >
+                                    {translateGameText(u.type.name)}
+                                  </b>
+                                )),
+                                ", "
+                              )}
+                            </>
+                          ),
+                          element1: <b />,
+                          value2: <>{region.name}</>
+                        }}
+                      />
                     </li>
                   ))}
                 </ul>
@@ -98,7 +122,7 @@ export default class ResolveSinglePayDebtComponent extends Component<
                     disabled={notEnough}
                     onClick={() => this.confirm()}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -108,7 +132,7 @@ export default class ResolveSinglePayDebtComponent extends Component<
                     disabled={this.unitsToRemove.size == 0}
                     onClick={() => this.reset()}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
@@ -116,7 +140,10 @@ export default class ResolveSinglePayDebtComponent extends Component<
           </>
         ) : (
           <Col xs={12} className="text-center">
-            Waiting for {this.resolver.name}...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{ houses: <>{this.resolver.name}</> }}
+            />
           </Col>
         )}
       </Row>

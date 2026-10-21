@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { action } from "mobx";
 import MapContribution, { wrapMapElement } from "../MapContribution";
 import { Component, ReactNode } from "react";
@@ -100,13 +101,27 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
             <>
-              House <b>{this.house.name}</b> must now place orders for
-              {houses.length == 1 ? (
-                <> House {houses[0]}</>
-              ) : (
-                <> {joinNaturalLanguage(houses)}</>
-              )}
-              .
+              <Trans
+                i18nKey="resolveSinglePlaceOrdersForVassals.houseMustNowPlaceOrdersForb23e23"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.house.name}</>,
+                  value2: (
+                    <>
+                      {houses.length == 1 ? (
+                        <>
+                          <Trans
+                            i18nKey="resolveSinglePlaceOrdersForVassals.house275ad0"
+                            components={{ value0: <>{houses[0]}</> }}
+                          />
+                        </>
+                      ) : (
+                        <> {joinNaturalLanguage(houses)}</>
+                      )}
+                    </>
+                  )
+                }}
+              />
             </>
           </Col>
           {this.singlePlaceOrders.planningGameState.planningRestrictions
@@ -144,14 +159,17 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
                       onClick={() => this.onSubmitClick()}
                       variant="success"
                     >
-                      Submit
+                      {t("common.submit")}
                     </Button>
                   </Col>
                 </Row>
               )}
             <Row>
               <Col xs={12} className="text-center mt-3">
-                Waiting for {this.house.name}...
+                <Trans
+                  i18nKey="common.waitingFor"
+                  components={{ houses: <>{this.house.name}</> }}
+                />
               </Col>
             </Row>
           </Col>
@@ -293,7 +311,9 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
     if (readyState.reason == "not-all-regions-filled") {
       if (
         !window.confirm(
-          "You may place up to two order tokens per vassal. Are you sure you want to continue with fewer?"
+          t(
+            "resolveSinglePlaceOrdersForVassals.youMayPlaceUpToTwoOrderTokensPer0f8f73"
+          )
         )
       ) {
         return;

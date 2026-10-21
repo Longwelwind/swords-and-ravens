@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,10 +19,14 @@ export default class RodrikTheReaderAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Rodrik The Reader</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may search any
-          Westeros deck for a card of his choice and place the chosen card
-          facedown on top of the deck.
+          <Trans
+            i18nKey="rodrikTheReaderAbility.rodrikTheReaderHouseMaySearchAnyWesterosDeckd28985"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

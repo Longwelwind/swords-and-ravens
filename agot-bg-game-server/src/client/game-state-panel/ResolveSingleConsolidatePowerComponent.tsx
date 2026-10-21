@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import MapContribution, { wrapMapElement } from "../MapContribution";
 import { observer } from "mobx-react";
 import React, { Component, ReactNode } from "react";
@@ -70,26 +71,47 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
         <Col xs={12} className="text-center">
           {this.gameState.ingame.isVassalHouse(this.house) ? (
             <>
-              Vassal house <b>{this.house.name}</b> must resolve their
-              Muster&nbsp;order
-              {this.defenseMusterOrderRegion && (
-                <>
-                  {" "}
-                  in <b>{this.defenseMusterOrderRegion.name}</b>
-                </>
-              )}
-              .
+              <Trans
+                i18nKey="resolveSingleConsolidatePower.vassalHouseMustResolveTheirMusterOrder4ea409"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.house.name}</>,
+                  value2: (
+                    <>
+                      {this.defenseMusterOrderRegion && (
+                        <>
+                          <Trans
+                            i18nKey="resolveSingleConsolidatePower.in567ab8"
+                            components={{
+                              element0: <b />,
+                              value1: <>{this.defenseMusterOrderRegion.name}</>
+                            }}
+                          />
+                        </>
+                      )}
+                    </>
+                  )
+                }}
+              />
             </>
           ) : (
             <>
-              House <b>{this.house.name}</b> must resolve one of its
-              Consolidate&nbsp;Power
-              {availableOrders.values.some(
-                (ot) => ot instanceof IronBankOrderType
-              )
-                ? " or Iron\xa0Bank"
-                : ""}{" "}
-              orders.
+              <Trans
+                i18nKey="resolveSingleConsolidatePower.houseMustResolveOneOfItsConsolidatePowerOrdersd2abe9"
+                components={{
+                  element0: <b />,
+                  value1: <>{this.house.name}</>,
+                  value2: (
+                    <>
+                      {availableOrders.values.some(
+                        (ot) => ot instanceof IronBankOrderType
+                      )
+                        ? t("resolveSingleConsolidatePower.orIronBankd17b1f")
+                        : ""}
+                    </>
+                  )
+                }}
+              />
             </>
           )}
         </Col>
@@ -102,7 +124,11 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
               )
             ) : (
               <Col xs={12} className="text-center">
-                <p>Click the order you want to resolve.</p>
+                <p>
+                  {t(
+                    "resolveSingleConsolidatePower.clickTheOrderYouWantToResolve7b4c93"
+                  )}
+                </p>
               </Col>
             )}
             <Col xs={12} className="d-flex justify-content-center">
@@ -111,15 +137,25 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                 variant="danger"
                 onClick={() => this.reset()}
               >
-                Reset
+                {t("common.reset")}
               </Button>
             </Col>
           </>
         ) : (
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {this.gameState.ingame.getControllerOfHouse(this.house).house.name}
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{
+                houses: (
+                  <>
+                    {
+                      this.gameState.ingame.getControllerOfHouse(this.house)
+                        .house.name
+                    }
+                  </>
+                )
+              }}
+            />
           </Col>
         )}
       </>
@@ -135,7 +171,15 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
       <>
         <Col xs={12} className="text-center">
           <p>
-            <b>{orderType.name}</b> in <b>{orderRegion.name}</b>
+            <Trans
+              i18nKey="common.in89ff9d"
+              components={{
+                element0: <b />,
+                value1: <>{orderType.name}</>,
+                element2: <b />,
+                value3: <>{orderRegion.name}</>
+              }}
+            />
           </p>
         </Col>
         <Col xs={12}>
@@ -151,7 +195,10 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                       this.reset();
                     }}
                   >
-                    Muster in {orderRegion.name}
+                    <Trans
+                      i18nKey="resolveSingleConsolidatePower.musterIn709abb"
+                      components={{ value0: <>{orderRegion.name}</> }}
+                    />
                   </Button>
                 </Col>
                 <Col xs={12} className="d-flex justify-content-center">
@@ -163,7 +210,9 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                       this.reset();
                     }}
                   >
-                    Ignore and remove order
+                    {t(
+                      "resolveSingleConsolidatePower.ignoreAndRemoveOrderf800df"
+                    )}
                   </Button>
                 </Col>
               </>
@@ -180,7 +229,10 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                         this.reset();
                       }}
                     >
-                      Muster in {orderRegion.name}
+                      <Trans
+                        i18nKey="resolveSingleConsolidatePower.musterIn709abb"
+                        components={{ value0: <>{orderRegion.name}</> }}
+                      />
                     </Button>
                   </Col>
                 )}
@@ -225,9 +277,20 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                           this.reset();
                         }}
                       >
-                        Pay {purchasable.costs} Power token
-                        {purchasable.costs != 1 ? "s" : ""} to purchase{" "}
-                        {purchasable.loan.name}
+                        <Trans
+                          i18nKey="resolveSingleConsolidatePower.payToPurchase679165"
+                          components={{
+                            value0: <>{purchasable.costs}</>,
+                            value1: (
+                              <>
+                                {t("common.PowertokenLabel", {
+                                  count: purchasable.costs
+                                })}
+                              </>
+                            ),
+                            value2: <>{purchasable.loan.name}</>
+                          }}
+                        />
                       </Button>
                     </Col>
                   ))}
@@ -240,7 +303,9 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                       this.reset();
                     }}
                   >
-                    Ignore and remove order
+                    {t(
+                      "resolveSingleConsolidatePower.ignoreAndRemoveOrderf800df"
+                    )}
                   </Button>
                 </Col>
               </>
@@ -252,7 +317,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
   }
 
   private getPowerTokenButtonText(powerTokenCount: number): string {
-    return `Gain ${powerTokenCount} Power token${powerTokenCount != 1 ? "s" : ""}`;
+    return t("common.gainPowerTokens", { count: powerTokenCount });
   }
 
   private modifyOrdersOnMap(): [

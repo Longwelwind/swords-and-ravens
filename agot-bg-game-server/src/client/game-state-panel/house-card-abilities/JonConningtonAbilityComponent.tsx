@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,9 +17,14 @@ export default class JonConningtonAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Jon Connington</b>: Vassal house{" "}
-          <b>{this.props.gameState.house.name}</b> may muster one knight either
-          in the area it retreated to or its home area.
+          <Trans
+            i18nKey="jonConningtonAbility.jonConningtonVassalHouseMayMusterOneKnightEither9345fb"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { observer } from "mobx-react";
 import { Component, default as React, ReactNode } from "react";
 import EntireGame from "../common/EntireGame";
@@ -53,9 +54,9 @@ export default class ClockComponent extends Component<ClockComponentProps> {
             placement="bottom"
             overlay={
               <Tooltip id="game-resumes-tooltip">
-                <b>Countdown until game resumes</b>{" "}
+                <b>{t("clock.countdownUntilGameResumes2e0b93")}</b>{" "}
                 <small>
-                  <i>(hh:mm:ss)</i>
+                  <i>{t("clock.hhMmSsc2ddc5")}</i>
                 </small>
               </Tooltip>
             }
@@ -100,9 +101,9 @@ export default class ClockComponent extends Component<ClockComponentProps> {
               placement="bottom"
               overlay={
                 <Tooltip id="total-playing-time-tooltip">
-                  <b>Total playing time</b>{" "}
+                  <b>{t("clock.totalPlayingTime083e1d")}</b>{" "}
                   <small>
-                    <i>(hh:mm)</i>
+                    <i>{t("clock.hhMm8dac7b")}</i>
                   </small>
                 </Tooltip>
               }
@@ -128,7 +129,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
             placement="bottom"
             overlay={
               <Tooltip id="ready-check-countdown-tooltip">
-                <b>Countdown for Ready Check</b>
+                <b>{t("clock.countdownForReadyCheck770dbd")}</b>
               </Tooltip>
             }
             popperConfig={{ modifiers: [preventOverflow] }}
@@ -146,9 +147,9 @@ export default class ClockComponent extends Component<ClockComponentProps> {
             placement="bottom"
             overlay={
               <Tooltip id="westeros-time-tooltip">
-                <b>Current UTC time</b>{" "}
+                <b>{t("clock.currentUtcTimeeb691c")}</b>{" "}
                 <small>
-                  <i>(hh:mm)</i>
+                  <i>{t("clock.hhMm8dac7b")}</i>
                 </small>
               </Tooltip>
             }

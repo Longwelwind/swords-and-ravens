@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -37,15 +38,16 @@ export default class MoveLoyaltyTokensComponent extends Component<
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="accept-all-movements-switch-tooltip">
-                      If this option is enabled, all loyalty token movements
-                      will be accepted automatically.
+                      {t(
+                        "moveLoyaltyTokens.ifThisOptionIsEnabledAllLoyaltyTokenMovements9660fa"
+                      )}
                     </Tooltip>
                   }
                   placement="auto"
                   delay={{ show: 250, hide: 100 }}
                 >
                   <label htmlFor="accept-all-movements-switch">
-                    Accept all movements
+                    {t("moveLoyaltyTokens.acceptAllMovements4f4ba4")}
                   </label>
                 </OverlayTrigger>
               }

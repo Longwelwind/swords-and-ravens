@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { Component, default as React, ReactNode } from "react";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
@@ -53,7 +54,9 @@ export default class DebouncedPasswordComponent extends Component<DebouncedPassw
         <OverlayTrigger
           overlay={
             <Tooltip id="show-hide-pw-tooltip">
-              {this.revealed ? "Hide password" : "Show password"}
+              {this.revealed
+                ? t("debouncedPassword.hidePassworda60a56")
+                : t("debouncedPassword.showPassword6aeaa6")}
             </Tooltip>
           }
           placement="top"

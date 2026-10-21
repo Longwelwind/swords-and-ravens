@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import React from "react";
 import { observer } from "mobx-react";
@@ -21,7 +22,7 @@ export default class SavvyStewardComponent extends Component<
     return this.props.gameClient.doesControlHouse(this.house) ? (
       <>
         <Col xs={12} className="text-center">
-          Select an area to blace a Barrel there.
+          {t("savvySteward.selectAnAreaToBlaceABarrelThere507b76")}
         </Col>
         {renderChildGameState(this.props, [
           [SelectRegionGameState, SelectRegionComponent]
@@ -29,7 +30,10 @@ export default class SavvyStewardComponent extends Component<
       </>
     ) : (
       <Col xs={12} className="text-center">
-        Waiting for {this.house.name}...
+        <Trans
+          i18nKey="common.waitingFor"
+          components={{ houses: <>{this.house.name}</> }}
+        />
       </Col>
     );
   }

@@ -1,3 +1,4 @@
+import { Trans } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import ChooseCasualtiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/choose-casualties-game-state/ChooseCasualtiesGameState";
@@ -16,9 +17,15 @@ export default class ChooseCasualtiesComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          House <b>{this.props.gameState.childGameState.house.name}</b> must
-          choose <b>{this.props.gameState.childGameState.count}</b> of their
-          units as casualties of the fight.
+          <Trans
+            i18nKey="chooseCasualties.houseMustChooseOfTheirUnitsAsCasualtiesOf8d30b4"
+            components={{
+              element0: <b />,
+              value1: <>{this.props.gameState.childGameState.house.name}</>,
+              element2: <b />,
+              value3: <>{this.props.gameState.childGameState.count}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectUnitsGameState, SelectUnitsComponent]

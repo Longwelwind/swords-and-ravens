@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { observer } from "mobx-react";
 import DeclareSupportGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/declare-support-game-state/DeclareSupportGameState";
 import { Component, ReactNode } from "react";
@@ -19,8 +20,10 @@ export default class DeclareSupportComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          {this.props.gameState.house.name} may support one belligerent of the
-          fight
+          <Trans
+            i18nKey="declareSupport.maySupportOneBelligerentOfTheFight0f1430"
+            components={{ value0: <>{this.props.gameState.house.name}</> }}
+          />
         </Col>
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(
@@ -36,8 +39,9 @@ export default class DeclareSupportComponent extends Component<
                         <OverlayTrigger
                           overlay={
                             <Tooltip id="support-choice-restricted">
-                              You can&apos;t support the enemy in a combat you
-                              are involved.
+                              {t(
+                                "declareSupport.youCanTSupportTheEnemyInACombatdc401c"
+                              )}
                             </Tooltip>
                           }
                         >
@@ -52,8 +56,8 @@ export default class DeclareSupportComponent extends Component<
                       >
                         {h.name} (
                         {h == this.props.gameState.combatGameState.attacker
-                          ? "Attacker"
-                          : "Defender"}
+                          ? t("declareSupport.attacker2969c6")
+                          : t("declareSupport.defender157ddc")}
                         )
                       </Button>
                     </ConditionalWrap>
@@ -66,19 +70,26 @@ export default class DeclareSupportComponent extends Component<
                   variant="danger"
                   onClick={() => this.choose(null)}
                 >
-                  None
+                  {t("declareSupport.nonedc937b")}
                 </Button>
               </Col>
             </Row>
           ) : (
             <div className="text-center">
-              Waiting for{" "}
-              {
-                this.props.gameState.ingameGameState.getControllerOfHouse(
-                  this.props.gameState.house
-                ).house.name
-              }{" "}
-              to declare its support...
+              <Trans
+                i18nKey="declareSupport.waitingForToDeclareItsSupport0029a4"
+                components={{
+                  value0: (
+                    <>
+                      {
+                        this.props.gameState.ingameGameState.getControllerOfHouse(
+                          this.props.gameState.house
+                        ).house.name
+                      }
+                    </>
+                  )
+                }}
+              />
             </div>
           )}
         </Col>

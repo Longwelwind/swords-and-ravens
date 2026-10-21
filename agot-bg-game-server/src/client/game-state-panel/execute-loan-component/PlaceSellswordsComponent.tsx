@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "../../i18n";
 import MapContribution, { wrapMapElement } from "../../MapContribution";
 import { observer } from "mobx-react";
 import React, { Component, ReactNode } from "react";
@@ -54,7 +55,9 @@ export default class PlaceSellswordsComponent extends Component<
             {this.placedSellswords.size > 0 && (
               <Col xs={12}>
                 <>
-                  {this.placedSellswords.size > 0 && <p>Your placements:</p>}
+                  {this.placedSellswords.size > 0 && (
+                    <p>{t("placeSellswords.yourPlacements5abb57")}</p>
+                  )}
                   {this.placedSellswords.entries.map(([r, placements]) => (
                     <div key={`sellsword-placements_${r.id}`}>
                       <b>{r.name}</b>
@@ -64,7 +67,7 @@ export default class PlaceSellswordsComponent extends Component<
                             onClick={() => this.removePlacement(placements, i)}
                             key={`sellsword-placements_${r.id}_${i}`}
                           >
-                            {unit.type.name}
+                            {translateGameText(unit.type.name)}
                           </li>
                         ))}
                       </ul>
@@ -79,11 +82,20 @@ export default class PlaceSellswordsComponent extends Component<
               <Col xs={12} className="text-center">
                 {this.props.gameState.regions.length == 1 ? (
                   <>
-                    Click into <b>{this.props.gameState.regions[0].name}</b> to
-                    place a sellsword there.
+                    <Trans
+                      i18nKey="placeSellswords.clickIntoToPlaceASellswordThere876165"
+                      components={{
+                        element0: <b />,
+                        value1: <>{this.props.gameState.regions[0].name}</>
+                      }}
+                    />
                   </>
                 ) : (
-                  <>Click on a area to place a sellsword there.</>
+                  <>
+                    {t(
+                      "placeSellswords.clickOnAAreaToPlaceASellswordTherecb1e61"
+                    )}
+                  </>
                 )}
               </Col>
             )}
@@ -96,7 +108,7 @@ export default class PlaceSellswordsComponent extends Component<
                     disabled={!this.canSubmit()}
                     onClick={() => this.submit()}
                   >
-                    Submit
+                    {t("common.submit")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -106,7 +118,7 @@ export default class PlaceSellswordsComponent extends Component<
                     disabled={this.placedSellswords.size == 0}
                     onClick={() => this.reset()}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
@@ -116,7 +128,10 @@ export default class PlaceSellswordsComponent extends Component<
         {(!this.doesControlCurrentHouse ||
           this.props.gameState.ingame.isVassalHouse(this.house)) && (
           <Col xs={12} className="text-center">
-            Waiting for {this.house.name}...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{ houses: <>{this.house.name}</> }}
+            />
           </Col>
         )}
       </>
@@ -151,7 +166,9 @@ export default class PlaceSellswordsComponent extends Component<
   submit(): void {
     if (this.props.gameState.anyPlacementPossible(this.placedSellswordTypes)) {
       if (
-        !confirm("You have not placed all of your sellswords. Continue anyway?")
+        !confirm(
+          t("placeSellswords.youHaveNotPlacedAllOfYourSellswordsContinue2bc53c")
+        )
       ) {
         return;
       }

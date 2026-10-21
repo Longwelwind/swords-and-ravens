@@ -52,7 +52,6 @@ export function getClassNameForDragonStrength(
     return "";
   }
 }
-
 interface WorldSnapshotComponentProps {
   ingameGameState: IngameGameState;
 }

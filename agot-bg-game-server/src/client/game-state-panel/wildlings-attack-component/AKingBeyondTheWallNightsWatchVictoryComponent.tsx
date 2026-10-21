@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,8 +17,9 @@ export default class AKingBeyondTheWallNightsWatchVictoryComponent extends Compo
     return (
       <>
         <Col xs={12} className="text-center">
-          The highest bidder moves their token to the top of one Influence track
-          of their choice.
+          {t(
+            "aKingBeyondTheWallNightsWatchVictory.theHighestBidderMovesTheirTokenToTheTop92b06f"
+          )}
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

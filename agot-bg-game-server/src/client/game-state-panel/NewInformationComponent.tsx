@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import * as React from "react";
@@ -16,8 +17,9 @@ export default class NewInformationComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          Each house draws one Objective card and then chooses one Objective
-          card in their hand and shuffles it back into the objective deck.
+          {t(
+            "newInformation.eachHouseDrawsOneObjectiveCardAndThenChooses71a20f"
+          )}
         </Col>
         {renderChildGameState(this.props, [
           [SelectObjectiveCardsGameState, SelectObjectiveCardsComponent]

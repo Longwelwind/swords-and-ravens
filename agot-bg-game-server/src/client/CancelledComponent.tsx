@@ -1,3 +1,4 @@
+import { Trans } from "./i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameClient from "./GameClient";
@@ -24,9 +25,13 @@ export default class CancelledComponent extends Component<CancelledComponentProp
           <Col className="text-center">
             <Card border="danger" bg="danger">
               <Card.Body className="text-center">
-                <FontAwesomeIcon icon={faTimes} size="3x" />
-                <br />
-                This game has been cancelled
+                <Trans
+                  i18nKey="cancelled.thisGameHasBeenCancelled821d2e"
+                  components={{
+                    element0: <FontAwesomeIcon icon={faTimes} size="3x" />,
+                    element1: <br />
+                  }}
+                />
               </Card.Body>
             </Card>
           </Col>

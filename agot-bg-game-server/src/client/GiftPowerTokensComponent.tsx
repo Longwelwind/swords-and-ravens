@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import { Component, ReactNode } from "react";
 import React from "react";
 import presentImage from "../../public/images/icons/present.svg";
@@ -49,9 +50,14 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
               <OverlayTrigger
                 overlay={
                   <Tooltip id="gift-power-tokens-tooltip">
-                    Gift Power tokens to
-                    <br />
-                    House <b>{this.toHouse.name}</b>
+                    <Trans
+                      i18nKey="giftPowerTokens.giftPowerTokensToHouse15c7a9"
+                      components={{
+                        element0: <br />,
+                        element1: <b />,
+                        value2: <>{this.toHouse.name}</>
+                      }}
+                    />
                   </Tooltip>
                 }
                 popperConfig={{ modifiers: [preventOverflow] }}
@@ -102,7 +108,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                 disabled={!this.canGiftPowerTokens()}
                 variant="success"
               >
-                Confirm
+                {t("common.confirm")}
               </Button>
             </Col>
           </Row>

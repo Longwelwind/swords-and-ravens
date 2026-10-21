@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
@@ -19,12 +20,15 @@ export default class PreemptiveRaidWildlingVictoryComponent extends Component<
       <>
         {this.props.gameState.childGameState instanceof SelectUnitsGameState ? (
           <Col xs={12} className="text-center">
-            The lowest bidder destroys 2 units anywhere.
+            {t(
+              "preemptiveRaidWildlingVictory.theLowestBidderDestroys2UnitsAnywhereef263f"
+            )}
           </Col>
         ) : (
           <Col xs={12} className="text-center">
-            The lowest bidder destroys 2 units or is reduced 2 positions on
-            their highest influence track.
+            {t(
+              "preemptiveRaidWildlingVictory.theLowestBidderDestroys2UnitsOrIsReduced60cb1e"
+            )}
           </Col>
         )}
         {renderChildGameState(this.props, [

@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,17 +19,24 @@ export default class CerseiLannisterAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Cersei Lannister:</b> House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> can choose to
-          remove one order of House{" "}
-          <b>
-            {
-              this.props.gameState.combatGameState.getEnemy(
-                this.props.gameState.childGameState.house
-              ).name
-            }
-          </b>
-          .
+          <Trans
+            i18nKey="cerseiLannisterAbility.cerseiLannisterHouseCanChooseToRemoveOneOrderc0990c"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>,
+              element3: <b />,
+              value4: (
+                <>
+                  {
+                    this.props.gameState.combatGameState.getEnemy(
+                      this.props.gameState.childGameState.house
+                    ).name
+                  }
+                </>
+              )
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

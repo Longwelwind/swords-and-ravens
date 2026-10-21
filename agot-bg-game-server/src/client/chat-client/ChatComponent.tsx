@@ -1,3 +1,4 @@
+import { t, getLanguage } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameClient from "../GameClient";
@@ -27,7 +28,7 @@ import EmojiPicker, {
 } from "emoji-picker-react";
 import { isMobile } from "react-device-detect";
 import classNames from "classnames";
-import moment from "moment";
+import { formatRelativeTime } from "../i18n/formatting";
 import ConditionalWrap from "../utils/ConditionalWrap";
 import { getTimeDeltaInSeconds } from "../../utils/getElapsedSeconds";
 import houseIconImages from "../houseIconImages";
@@ -309,7 +310,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                 <OverlayTrigger
                   overlay={
                     <Tooltip id="close-chat-tooltip">
-                      <>Close chat</>
+                      <>{t("chat.closeChat3b14c5")}</>
                     </Tooltip>
                   }
                 >
@@ -331,9 +332,9 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                   overlay={
                     <Tooltip id="load-more-tooltip">
                       {this.noMoreMessages ? (
-                        <>There are no more messages</>
+                        <>{t("chat.thereAreNoMoreMessagesd76f44")}</>
                       ) : (
-                        <>Load more messages</>
+                        <>{t("chat.loadMoreMessagesbc1c7d")}</>
                       )}
                     </Tooltip>
                   }
@@ -347,8 +348,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         {!this.channel.connected ? (
           <div className="flex-nowrap justify-content-center">
             <Alert variant="warning" className="text-center">
-              This chat is not connected. Please wait until the connection is
-              established or reload the page.
+              {t("chat.thisChatIsNotConnectedPleaseWaitUntilThe28f8e6")}
             </Alert>
           </div>
         ) : (
@@ -473,7 +473,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
                     e.preventDefault();
                   }}
                 >
-                  Send
+                  {t("chat.sendf6f468")}
                 </Button>
               </Col>
             </Row>
@@ -533,7 +533,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         <OverlayTrigger
           overlay={
             <Tooltip id={"current-message-date-" + currentMessage.id}>
-              {currentMessage.createdAt.toLocaleString()}
+              {currentMessage.createdAt.toLocaleString(getLanguage())}
             </Tooltip>
           }
           placement="auto"
@@ -628,10 +628,14 @@ export default class ChatComponent extends Component<ChatComponentProps> {
 
     const result =
       diffH <= 12
-        ? moment(message.createdAt).from(now)
+        ? formatRelativeTime(message.createdAt, now)
         : diffDays <= 5
-          ? moment(message.createdAt).calendar(now)
-          : message.createdAt.toLocaleString();
+          ? message.createdAt.toLocaleString(getLanguage(), {
+              weekday: "long",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : message.createdAt.toLocaleString(getLanguage());
 
     return (
       <ConditionalWrap
@@ -640,7 +644,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
           <OverlayTrigger
             overlay={
               <Tooltip id={"message-date-" + message.id}>
-                {message.createdAt.toLocaleString()}
+                {message.createdAt.toLocaleString(getLanguage())}
               </Tooltip>
             }
             placement="auto"

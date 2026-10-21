@@ -1,3 +1,4 @@
+import { Trans } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -17,8 +18,16 @@ export default class CallForSupportAgainstNeutralForcesComponent extends Compone
       <>
         <Col xs={12} className="text-center">
           <p>
-            House <b>{this.props.gameState.houseThatResolvesMarchOrder.name}</b>{" "}
-            calls for support against <b>Neutral Forces</b>.
+            <Trans
+              i18nKey="callForSupportAgainstNeutralForces.houseCallsForSupportAgainstNeutralForces17fabf"
+              components={{
+                element0: <b />,
+                value1: (
+                  <>{this.props.gameState.houseThatResolvesMarchOrder.name}</>
+                ),
+                element2: <b />
+              }}
+            />
           </p>
         </Col>
         {renderChildGameState(this.props, [

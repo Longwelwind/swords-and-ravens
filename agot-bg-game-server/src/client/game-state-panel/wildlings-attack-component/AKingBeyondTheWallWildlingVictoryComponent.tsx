@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,8 +17,9 @@ export default class AKingBeyondTheWallWildlingVictoryComponent extends Componen
     return (
       <>
         <Col xs={12} className="text-center">
-          Houses decide between Fiefdoms and King&apos;s Court Influence track
-          and move their token to the lowest position on that track.
+          {t(
+            "aKingBeyondTheWallWildlingVictory.housesDecideBetweenFiefdomsAndKingSCourtInfluence9f5b49"
+          )}
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,11 +19,14 @@ export default class MelisandreAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Melisandre</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may return any
-          House card from their discard pile (including this card) by discarding
-          a number of available Power tokens equal to the printed combat
-          strength of that card.
+          <Trans
+            i18nKey="melisandreAbility.melisandreHouseMayReturnAnyHouseCardFromTheird44928"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

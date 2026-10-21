@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "./i18n";
 import GameClient from "./GameClient";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -108,13 +109,18 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
               {isVassal &&
                 (this.suzerainHouse ? (
                   <>
-                    Commanded by{" "}
-                    <span style={{ color: this.suzerainHouse.color }}>
-                      {this.suzerainHouse.name}
-                    </span>
+                    <Trans
+                      i18nKey="houseRow.commandedBy467f37"
+                      components={{
+                        element0: (
+                          <span style={{ color: this.suzerainHouse.color }} />
+                        ),
+                        value1: <>{this.suzerainHouse.name}</>
+                      }}
+                    />
                   </>
                 ) : (
-                  <>Up for grab</>
+                  <>{t("houseRow.upForGrab1625c7")}</>
                 ))}
             </Col>
             <Col>
@@ -228,9 +234,9 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
   private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
     return (
       <Tooltip id={unitType.id + "-tooltip"}>
-        <b>{unitType.name}</b>
+        <b>{translateGameText(unitType.name)}</b>
         <br />
-        {unitType.description}
+        {translateGameText(unitType.description)}
       </Tooltip>
     );
   }

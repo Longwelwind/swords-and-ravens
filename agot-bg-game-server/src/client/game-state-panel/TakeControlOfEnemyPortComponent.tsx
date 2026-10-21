@@ -1,3 +1,4 @@
+import { Trans } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -17,9 +18,15 @@ export default class TakeControlOfEnemyPortComponent extends Component<
       <>
         <Col xs={12} className="text-center">
           <p>
-            House <b>{this.props.gameState.newController.name}</b> has to choose
-            the amount of ships to convert in{" "}
-            <b>{this.props.gameState.port.name}</b>.
+            <Trans
+              i18nKey="takeControlOfEnemyPort.houseHasToChooseTheAmountOfShipsTo96a595"
+              components={{
+                element0: <b />,
+                value1: <>{this.props.gameState.newController.name}</>,
+                element2: <b />,
+                value3: <>{this.props.gameState.port.name}</>
+              }}
+            />
           </p>
         </Col>
         {renderChildGameState(this.props, [

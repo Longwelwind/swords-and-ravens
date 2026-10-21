@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import React, { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -18,9 +19,18 @@ export default class ClaimVassalComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>{this.props.gameState.house.name}</b> may command{" "}
-          <b>{this.props.gameState.count}</b> Vassal house
-          {this.props.gameState.count != 1 ? "s" : ""} this turn.
+          <Trans
+            i18nKey="claimVassal.mayCommandVassalThisTurnea8432"
+            components={{
+              element0: <b />,
+              value1: <>{this.props.gameState.house.name}</>,
+              element2: <b />,
+              value3: <>{this.props.gameState.count}</>,
+              value4: (
+                <>{t("common.house", { count: this.props.gameState.count })}</>
+              )
+            }}
+          />
         </Col>
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(
@@ -49,7 +59,7 @@ export default class ClaimVassalComponent extends Component<
                       disabled={this.selectedVassals.length == 0}
                       onClick={() => this.onClaimClick()}
                     >
-                      Claim
+                      {t("claimVassal.claim4ca41d")}
                     </Button>
                   </Col>
                   <Col xs="auto">
@@ -58,7 +68,7 @@ export default class ClaimVassalComponent extends Component<
                       variant="danger"
                       onClick={() => this.onPassClick()}
                     >
-                      Pass
+                      {t("common.pass")}
                     </Button>
                   </Col>
                 </Row>
@@ -66,7 +76,10 @@ export default class ClaimVassalComponent extends Component<
             </Row>
           ) : (
             <Col xs={12} className="text-center">
-              Waiting for {this.props.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.props.gameState.house.name}</> }}
+              />
             </Col>
           )}
         </Col>

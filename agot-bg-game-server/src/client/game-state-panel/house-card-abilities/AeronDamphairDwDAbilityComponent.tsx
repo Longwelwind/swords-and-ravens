@@ -1,3 +1,4 @@
+import { t, Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -24,18 +25,25 @@ export default class AeronDamphairAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           {!this.props.gameState.nerfed ? (
             <>
-              <b>Aeron Damphair:</b> House{" "}
-              <b>{this.props.gameState.house.name}</b> may discard any number of
-              available Power tokens to increase the combat strength of their
-              card by the number of Power tokens discarded.
+              <Trans
+                i18nKey="aeronDamphairDwDAbility.aeronDamphairHouseMayDiscardAnyNumberOfAvailableff5c60"
+                components={{
+                  element0: <b />,
+                  element1: <b />,
+                  value2: <>{this.props.gameState.house.name}</>
+                }}
+              />
             </>
           ) : (
             <>
-              <b>Aeron Damphair:</b> House{" "}
-              <b>{this.props.gameState.house.name}</b> may discard one Power
-              token for each House card in their discard pile to increase the
-              combat strength of their card by the number of Power tokens
-              discarded.
+              <Trans
+                i18nKey="aeronDamphairDwDAbility.aeronDamphairHouseMayDiscardOnePowerTokenFor20ec76"
+                components={{
+                  element0: <b />,
+                  element1: <b />,
+                  value2: <>{this.props.gameState.house.name}</>
+                }}
+              />
             </>
           )}
         </Col>
@@ -72,13 +80,16 @@ export default class AeronDamphairAbilityComponent extends Component<
                     this.props.gameState.sendPowerTokens(this.powerTokens)
                   }
                 >
-                  Confirm
+                  {t("common.confirm")}
                 </Button>
               </Col>
             </>
           )}
         <Col xs={12} className="text-center">
-          Waiting for {this.props.gameState.house.name} ...
+          <Trans
+            i18nKey="common.waitingFor"
+            components={{ houses: <>{this.props.gameState.house.name}</> }}
+          />
         </Col>
       </>
     );

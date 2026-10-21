@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,9 +17,15 @@ export default class BronnAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Bronn</b>: House <b>{this.props.gameState.enemy.name}</b> may
-          discard <b>2</b> of their available Power tokens to reduce
-          Bronn&apos;s combat strength to 0.
+          <Trans
+            i18nKey="bronnAbility.bronnHouseMayDiscard2OfTheirAvailablePowerfd7257"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.enemy.name}</>,
+              element3: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

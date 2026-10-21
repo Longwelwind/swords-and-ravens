@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,10 +19,14 @@ export default class ViserysTargaryenAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Viserys Targaryen</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may discard a
-          House card from their hand to add its printed combat strength to
-          Viserys Targaryens&apos;s combat strength.
+          <Trans
+            i18nKey="viserysTargaryenAbility.viserysTargaryenHouseMayDiscardAHouseCardFrom457bba"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

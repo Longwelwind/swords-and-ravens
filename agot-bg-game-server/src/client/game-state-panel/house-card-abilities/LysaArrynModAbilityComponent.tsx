@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,9 +17,14 @@ export default class LysaArrynFfcAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Lysa Arryn</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may return
-          Lysa Arryn to their hand.
+          <Trans
+            i18nKey="lysaArrynModAbility.lysaArrynHouseMayReturnLysaArrynToTheird69534"
+            components={{
+              element0: <b />,
+              element1: <b />,
+              value2: <>{this.props.gameState.childGameState.house.name}</>
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

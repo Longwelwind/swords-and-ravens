@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,8 +19,9 @@ export default class MammothRidersNightsWatchVictoryComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          The highest bidder may retrieve one House card of their choice from
-          their House card discard pile.
+          {t(
+            "mammothRidersNightsWatchVictory.theHighestBidderMayRetrieveOneHouseCardOf8a69c4"
+          )}
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

@@ -1,3 +1,4 @@
+import { Trans, translateGameText } from "../i18n";
 import { Component } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
@@ -15,7 +16,7 @@ export default class SimpleChoiceComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center" style={{ whiteSpace: "pre-line" }}>
-          {this.props.gameState.description}
+          {translateGameText(this.props.gameState.description)}
         </Col>
         <Col xs={12} className="text-center">
           {this.props.gameClient.doesControlHouse(
@@ -36,7 +37,7 @@ export default class SimpleChoiceComponent extends Component<
                       variant={variant}
                       onClick={() => this.choose(i)}
                     >
-                      {s}
+                      {translateGameText(s)}
                     </Button>
                   </Col>
                 );
@@ -44,13 +45,20 @@ export default class SimpleChoiceComponent extends Component<
             </Row>
           ) : (
             <>
-              Waiting for{" "}
-              {
-                this.props.gameState.parentGameState.ingame.getControllerOfHouse(
-                  this.props.gameState.house
-                ).house.name
-              }
-              ...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{
+                  houses: (
+                    <>
+                      {
+                        this.props.gameState.parentGameState.ingame.getControllerOfHouse(
+                          this.props.gameState.house
+                        ).house.name
+                      }
+                    </>
+                  )
+                }}
+              />
             </>
           )}
         </Col>

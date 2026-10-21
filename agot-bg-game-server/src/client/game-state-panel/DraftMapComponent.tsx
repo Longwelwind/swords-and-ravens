@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import MapContribution, { wrapMapElement } from "../MapContribution";
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Component, ReactNode } from "react";
@@ -52,15 +53,13 @@ export default class DraftMapComponent extends Component<
         />
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            All players can add and remove pieces according to their unit and
-            supply limits.
+            {t("draftMap.allPlayersCanAddAndRemovePiecesAccordingTo1625aa")}
           </Col>
         </Row>
         {this.isParticipatingInDraft && this.player != null && (
           <Row className="justify-content-center">
             <Col xs="12" className="text-center text-normal">
-              Click on a piece to remove it, or click on a highlighted region to
-              add pieces.
+              {t("draftMap.clickOnAPieceToRemoveItOrClick7ec9ab")}
             </Col>
             <Col xs="auto">
               <Button
@@ -71,7 +70,7 @@ export default class DraftMapComponent extends Component<
                 onClick={() => this.props.gameState.setReady()}
                 variant="success"
               >
-                Ready
+                {t("common.ready")}
               </Button>
             </Col>
             <Col xs="auto">
@@ -83,19 +82,26 @@ export default class DraftMapComponent extends Component<
                 onClick={() => this.props.gameState.setUnready()}
                 variant="danger"
               >
-                Unready
+                {t("common.unready")}
               </Button>
             </Col>
           </Row>
         )}
         <Row className="mt-3 justify-content-center">
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {this.props.gameState
-              .getNotReadyPlayers()
-              .map((p) => p.house.name)
-              .join(", ")}
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{
+                houses: (
+                  <>
+                    {this.props.gameState
+                      .getNotReadyPlayers()
+                      .map((p) => p.house.name)
+                      .join(", ")}
+                  </>
+                )
+              }}
+            />
           </Col>
         </Row>
       </>
@@ -233,7 +239,7 @@ export default class DraftMapComponent extends Component<
                   type="button"
                   onClick={() => this.props.gameState.removePowerToken(region)}
                 >
-                  Remove Power token
+                  {t("draftMap.removePowerTokenf3a7c8")}
                 </Button>
               </Col>
             </Row>
@@ -279,7 +285,7 @@ export default class DraftMapComponent extends Component<
                   type="button"
                   onClick={() => this.props.gameState.removeGarrison(region)}
                 >
-                  Remove Garrison
+                  {t("draftMap.removeGarrison9caf41")}
                 </Button>
               </Col>
             </Row>

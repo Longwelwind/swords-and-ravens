@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import MapContribution from "../MapContribution";
 import GameClient from "../GameClient";
 import { Component, ReactNode } from "react";
@@ -132,7 +133,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<
           regions={this.modifyRegionsOnMap()}
         />
         <Col xs={12} className="text-center">
-          House <b>{this.house.name}</b> must resolve one of its March Orders.
+          <Trans
+            i18nKey="resolveSingleMarchOrder.houseMustResolveOneOfItsMarchOrdersb059a2"
+            components={{ element0: <b />, value1: <>{this.house.name}</> }}
+          />
         </Col>
         {this.gameClient.doesControlHouse(this.house) ? (
           <>
@@ -141,43 +145,69 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                 <Col xs={10} className="text-center">
                   {this.selectedMarchOrderRegion == null ? (
                     <>
-                      Click on one of your March Orders.
-                      <br />
-                      Double-click the order to select all units in that area.
+                      <Trans
+                        i18nKey="resolveSingleMarchOrder.clickOnOneOfYourMarchOrdersDoubleClick3422b5"
+                        components={{ element0: <br /> }}
+                      />
                     </>
                   ) : this.selectedUnits.length == 0 &&
                     !allUnitsWillLeaveStartingRegion ? (
                     <>
-                      Click on a subset of the troops in{" "}
-                      <b>{this.selectedMarchOrderRegion.name}</b>.
-                      <br />
-                      Double-click the march order to select all units in that
-                      area.
+                      <Trans
+                        i18nKey="resolveSingleMarchOrder.clickOnASubsetOfTheTroopsInDouble64b0c6"
+                        components={{
+                          element0: <b />,
+                          value1: <>{this.selectedMarchOrderRegion.name}</>,
+                          element2: <br />
+                        }}
+                      />
                     </>
                   ) : this.selectedUnits.length != 0 &&
                     this.validTargetRegions.length == 0 &&
                     this.usedButStillValidTargetRegions.length == 0 ? (
                     <>
-                      There are no valid target areas for your current
-                      selection!
+                      {t(
+                        "resolveSingleMarchOrder.thereAreNoValidTargetAreasForYourCurrent9cad41"
+                      )}
                     </>
                   ) : !allUnitsWillLeaveStartingRegion ? (
                     <>
-                      Click on a neighbouring area
-                      {!allUnitsSelected && (
-                        <>
-                          , or click on other units in{" "}
-                          <b>{this.selectedMarchOrderRegion.name}</b>
-                        </>
-                      )}
-                      .
-                      {!allUnitsSelected && (
-                        <>
-                          <br />
-                          Double-click the march order to select all units in
-                          that area.
-                        </>
-                      )}
+                      <Trans
+                        i18nKey="resolveSingleMarchOrder.clickOnANeighbouringAread7198d"
+                        components={{
+                          value0: (
+                            <>
+                              {!allUnitsSelected && (
+                                <>
+                                  <Trans
+                                    i18nKey="resolveSingleMarchOrder.orClickOnOtherUnitsInce9c04"
+                                    components={{
+                                      element0: <b />,
+                                      value1: (
+                                        <>
+                                          {this.selectedMarchOrderRegion.name}
+                                        </>
+                                      )
+                                    }}
+                                  />
+                                </>
+                              )}
+                            </>
+                          ),
+                          value1: (
+                            <>
+                              {!allUnitsSelected && (
+                                <>
+                                  <Trans
+                                    i18nKey="resolveSingleMarchOrder.doubleClickTheMarchOrderToSelectAllUnitsc3464f"
+                                    components={{ element0: <br /> }}
+                                  />
+                                </>
+                              )}
+                            </>
+                          )
+                        }}
+                      />
                     </>
                   ) : (
                     <></>
@@ -205,8 +235,13 @@ export default class ResolveSingleMarchOrderComponent extends Component<
               <Col xs={12} className="mt-2">
                 <div>
                   <div style={{ marginBottom: "20px" }}>
-                    Planned moves from{" "}
-                    <b>{this.selectedMarchOrderRegion.name}</b>:
+                    <Trans
+                      i18nKey="resolveSingleMarchOrder.plannedMovesFrom8ec31b"
+                      components={{
+                        element0: <b />,
+                        value1: <>{this.selectedMarchOrderRegion.name}</>
+                      }}
+                    />
                   </div>
                   {this.plannedMoves.entries.map(([region, units]) => (
                     <div
@@ -250,7 +285,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                         onClick={() => this.confirm()}
                         disabled={this.leavePowerToken == undefined}
                       >
-                        Confirm
+                        {t("common.confirm")}
                       </Button>
                     </Col>
                     <Col xs="auto">
@@ -259,7 +294,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                         variant="danger"
                         onClick={() => this.reset()}
                       >
-                        Reset
+                        {t("common.reset")}
                       </Button>
                     </Col>
                   </Row>
@@ -279,7 +314,9 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                           this.callForSupportAgainstNeutralForces()
                         }
                       >
-                        Call for Support against Neutral Forces
+                        {t(
+                          "resolveSingleMarchOrder.callForSupportAgainstNeutralForces5db9be"
+                        )}
                       </Button>
                     </Col>
                   </Row>
@@ -288,9 +325,19 @@ export default class ResolveSingleMarchOrderComponent extends Component<
           </>
         ) : (
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {this.gameState.ingame.getControllerOfHouse(this.house).house.name}
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{
+                houses: (
+                  <>
+                    {
+                      this.gameState.ingame.getControllerOfHouse(this.house)
+                        .house.name
+                    }
+                  </>
+                )
+              }}
+            />
           </Col>
         )}
       </>
@@ -301,15 +348,24 @@ export default class ResolveSingleMarchOrderComponent extends Component<
     return (
       <Tooltip id={`color-legend-tooltip`} className="tooltip-w-100">
         <Col>
-          <h6>Highlighted units legend</h6>
+          <h6>{t("resolveSingleMarchOrder.highlightedUnitsLegend45d54a")}</h6>
           <div>
-            <b>White</b>: Selectable
+            <Trans
+              i18nKey="resolveSingleMarchOrder.whiteSelectabled13318"
+              components={{ element0: <b /> }}
+            />
           </div>
           <div>
-            <b style={{ color: "yellow" }}>Yellow</b>: Selected
+            <Trans
+              i18nKey="resolveSingleMarchOrder.yellowSelected7c96d2"
+              components={{ element0: <b style={{ color: "yellow" }} /> }}
+            />
           </div>
           <div>
-            <b style={{ color: "red" }}>Red</b>: Attacking
+            <Trans
+              i18nKey="resolveSingleMarchOrder.redAttacking78ab70"
+              components={{ element0: <b style={{ color: "red" }} /> }}
+            />
           </div>
         </Col>
       </Tooltip>
@@ -367,8 +423,10 @@ export default class ResolveSingleMarchOrderComponent extends Component<
       portRegion != null &&
       hasShipsInPort ? (
         <small>
-          If you do not leave a token, the ships in <b>{portRegion.name}</b>{" "}
-          will be destroyed.
+          <Trans
+            i18nKey="resolveSingleMarchOrder.ifYouDoNotLeaveATokenTheShips19c3e9"
+            components={{ element0: <b />, value1: <>{portRegion.name}</> }}
+          />
         </small>
       ) : moveWillLoseControlOverRegion &&
         superTokenOwner != null &&
@@ -376,9 +434,17 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         portRegion != null &&
         hasShipsInPort ? (
         <small>
-          If you do not leave a token, <b>{superTokenOwnerName}</b> will regain
-          control of <b>{startingRegion.name}</b> and capture your ships in{" "}
-          <b>{portRegion.name}</b>.
+          <Trans
+            i18nKey="resolveSingleMarchOrder.ifYouDoNotLeaveATokenWillRegainf919b9"
+            components={{
+              element0: <b />,
+              value1: <>{superTokenOwnerName}</>,
+              element2: <b />,
+              value3: <>{startingRegion.name}</>,
+              element4: <b />,
+              value5: <>{portRegion.name}</>
+            }}
+          />
         </small>
       ) : moveWillLoseControlOverRegion &&
         superTokenOwner != null &&
@@ -386,8 +452,15 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         portRegion != null &&
         !hasShipsInPort ? (
         <small>
-          If you do not leave a token, <b>{superTokenOwnerName}</b> will regain
-          control of <b>{startingRegion.name}</b>.
+          <Trans
+            i18nKey="resolveSingleMarchOrder.ifYouDoNotLeaveATokenWillRegain928856"
+            components={{
+              element0: <b />,
+              value1: <>{superTokenOwnerName}</>,
+              element2: <b />,
+              value3: <>{startingRegion.name}</>
+            }}
+          />
         </small>
       ) : null;
 
@@ -403,8 +476,13 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                   <>
                     <Col xs={12} className="mb-0 pb-0">
                       <Form.Label>
-                        Do you want to leave a Power token in{" "}
-                        <b>{startingRegion.name}</b> to keep control?
+                        <Trans
+                          i18nKey="resolveSingleMarchOrder.doYouWantToLeaveAPowerTokenIn620e98"
+                          components={{
+                            element0: <b />,
+                            value1: <>{startingRegion.name}</>
+                          }}
+                        />
                       </Form.Label>
                     </Col>
                     <Col xs={12} className="mt-0 pt-0">
@@ -413,7 +491,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                         name="leave-pt-radios"
                         inline
                         type="radio"
-                        label="Yes"
+                        label={t("resolveSingleMarchOrder.yes85a39a")}
                         checked={this.leavePowerToken}
                         onChange={() => this.onLeavePowerTokenChange(true)}
                       />
@@ -422,7 +500,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                         name="leave-pt-radios"
                         inline
                         type="radio"
-                        label="No"
+                        label={t("resolveSingleMarchOrder.no1ea442")}
                         checked={this.leavePowerToken == false}
                         onChange={() => this.onLeavePowerTokenChange(false)}
                       />
@@ -432,15 +510,22 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                   "vassals-always-leave-power-token" ? (
                   <Col xs={12} className="text-center mb-0 pb-0">
                     <small>
-                      Vassals automatically leave a Power token behind to
-                      maintain control of <b>{startingRegion.name}</b>.
+                      <Trans
+                        i18nKey="resolveSingleMarchOrder.vassalsAutomaticallyLeaveAPowerTokenBehindToMaintain0bfef5"
+                        components={{
+                          element0: <b />,
+                          value1: <>{startingRegion.name}</>
+                        }}
+                      />
                     </small>
                   </Col>
                 ) : this.canLeavePowerTokenReason ==
                   "no-power-token-available" ? (
                   <Col xs={12} className="text-center mb-0 pb-0">
-                    You don&apos;t have any Power tokens left and will lose
-                    control over {startingRegion.name}!
+                    <Trans
+                      i18nKey="resolveSingleMarchOrder.youDonTHaveAnyPowerTokensLeftAnd919e6b"
+                      components={{ value0: <>{startingRegion.name}</> }}
+                    />
                   </Col>
                 ) : (
                   <></>
@@ -562,7 +647,11 @@ export default class ResolveSingleMarchOrderComponent extends Component<
     }
 
     if (this.plannedMoves.size == 0) {
-      if (!confirm("Do you want to remove your March Order?")) {
+      if (
+        !confirm(
+          t("resolveSingleMarchOrder.doYouWantToRemoveYourMarchOrder3097e1")
+        )
+      ) {
         return;
       }
     }

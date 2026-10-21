@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import * as React from "react";
 import User from "../../server/User";
 import ConditionalWrap from "./ConditionalWrap";
@@ -7,7 +8,9 @@ import EntireGame from "../../common/EntireGame";
 function banUser(user: User, entireGame: EntireGame): void {
   if (
     !window.confirm(
-      "Are you sure you want to ban '" + user.name + "' from your game?"
+      t("getIngameUserLinkOrLabel.areYouSureYouWantToBanFrom23e4ed", {
+        value0: user.name
+      })
     )
   ) {
     return;
@@ -36,7 +39,7 @@ export default function getUserLinkOrLabel(
           <OverlayTrigger
             overlay={
               <Tooltip id="user-is-spectator-tooltip">
-                This user does not participate in the game
+                {t("common.thisUserDoesNotParticipateInTheGame")}
               </Tooltip>
             }
             placement="auto"
@@ -68,7 +71,7 @@ export default function getUserLinkOrLabel(
         <OverlayTrigger
           overlay={
             <Tooltip id={`ban-user-${user.id}-tooltip`}>
-              Ban this user from your game.
+              {t("getIngameUserLinkOrLabel.banThisUserFromYourGameac90fc")}
             </Tooltip>
           }
           placement="auto"

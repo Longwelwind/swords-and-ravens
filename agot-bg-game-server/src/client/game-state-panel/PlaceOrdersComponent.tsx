@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { action } from "mobx";
 import MapContribution, { wrapMapElement } from "../MapContribution";
 import { Component, ReactNode } from "react";
@@ -88,8 +89,7 @@ export default class PlaceOrdersComponent extends Component<
         />
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            Players must now place orders in every area where they have at least
-            one unit.
+            {t("placeOrders.playersMustNowPlaceOrdersInEveryAreaWherec9f5ae")}
           </Col>
           {this.placeOrders.parentGameState.planningRestrictions
             .map((pr) => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
@@ -125,7 +125,7 @@ export default class PlaceOrdersComponent extends Component<
                     onClick={() => this.onReadyClick()}
                     variant="success"
                   >
-                    Ready
+                    {t("common.ready")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -139,19 +139,26 @@ export default class PlaceOrdersComponent extends Component<
                     onClick={() => this.onUnreadyClick()}
                     variant="danger"
                   >
-                    Unready
+                    {t("common.unready")}
                   </Button>
                 </Col>
               </Row>
             )}
             <Row>
               <Col xs={12} className="text-center" style={{ marginTop: 10 }}>
-                Waiting for{" "}
-                {this.placeOrders
-                  .getNotReadyPlayers()
-                  .map((p) => p.house.name)
-                  .join(", ")}
-                ...
+                <Trans
+                  i18nKey="common.waitingFor"
+                  components={{
+                    houses: (
+                      <>
+                        {this.placeOrders
+                          .getNotReadyPlayers()
+                          .map((p) => p.house.name)
+                          .join(", ")}
+                      </>
+                    )
+                  }}
+                />
               </Col>
             </Row>
           </Col>
@@ -294,7 +301,7 @@ export default class PlaceOrdersComponent extends Component<
     ) {
       if (
         !window.confirm(
-          "You have placed restricted orders. They will be removed after the messenger raven has been used. Do you want to continue?"
+          t("placeOrders.youHavePlacedRestrictedOrdersTheyWillBeRemovedf19cfa")
         )
       ) {
         return;

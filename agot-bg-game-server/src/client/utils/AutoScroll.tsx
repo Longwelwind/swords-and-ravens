@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n";
 import React, { ReactNode } from "react";
 import classNames from "classnames";
 import { useStickToBottom } from "use-stick-to-bottom";
@@ -15,6 +16,7 @@ export default function AutoScroll({
   scrollViewClassName,
   initialScrollBehavior = "smooth"
 }: AutoScrollProps): React.JSX.Element {
+  const { t } = useTranslation();
   const { scrollRef, contentRef, isAtBottom, scrollToBottom } =
     useStickToBottom({
       initial: initialScrollBehavior === "auto" ? "instant" : "smooth",
@@ -33,7 +35,7 @@ export default function AutoScroll({
         <button
           type="button"
           className="auto-scroll-follow btn btn-secondary rounded-circle"
-          aria-label="Scroll to latest"
+          aria-label={t("autoScroll.scrollToLatest60df3c")}
           onClick={() => void scrollToBottom()}
         >
           <span aria-hidden="true">&#8595;</span>

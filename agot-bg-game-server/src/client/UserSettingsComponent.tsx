@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { Component, ReactNode } from "react";
 import * as React from "react";
 import FormCheck from "react-bootstrap/FormCheck";
@@ -35,13 +36,14 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="chat-house-names-tooltip">
-                            Show house names instead of user names in chat
-                            windows.
+                            {t(
+                              "userSettings.showHouseNamesInsteadOfUserNamesInChat39166c"
+                            )}
                           </Tooltip>
                         }
                       >
                         <label htmlFor="chat-house-names-setting">
-                          House names for chat
+                          {t("userSettings.houseNamesForChat3f6aa0")}
                         </label>
                       </OverlayTrigger>
                     }
@@ -64,15 +66,14 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="map-scrollbar-tooltip">
-                            Enables a fixed game map with a scrollbar. The map
-                            height then resizes with the actual window height.
-                            Keeping it activated won&apos;t affect the mobile
-                            experience.
+                            {t(
+                              "userSettings.enablesAFixedGameMapWithAScrollbarTheab9619"
+                            )}
                           </Tooltip>
                         }
                       >
                         <label htmlFor="map-scrollbar-setting">
-                          Map scrollbar (Desktop only)
+                          {t("userSettings.mapScrollbarDesktopOnlye10676")}
                         </label>
                       </OverlayTrigger>
                     }
@@ -95,14 +96,14 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="game-state-column-right-setting-tooltip">
-                            This setting swaps the houses column with the game
-                            state column, so that the game state column is
-                            displayed to the right of the map.
+                            {t(
+                              "userSettings.thisSettingSwapsTheHousesColumnWithTheGamef7fbda"
+                            )}
                           </Tooltip>
                         }
                       >
                         <label htmlFor="game-state-column-right-setting">
-                          Game state column on the right
+                          {t("userSettings.gameStateColumnOnTheRight623f5d")}
                         </label>
                       </OverlayTrigger>
                     }
@@ -122,7 +123,7 @@ export default class UserSettingsComponent extends Component<UserSettingsCompone
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  FAQ
+                  {t("common.faq")}
                 </a>
               </Row>
             </div>

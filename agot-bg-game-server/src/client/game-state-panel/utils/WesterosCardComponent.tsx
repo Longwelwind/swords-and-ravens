@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { Component, ReactNode } from "react";
 import classNames from "classnames";
 import React from "react";
@@ -68,7 +69,10 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
             <OverlayTrigger
               overlay={
                 <Tooltip id={`was-reshuffled-${this.props.westerosDeckI}`}>
-                  Drawn after <b>Winter&nbsp;is&nbsp;Coming</b> was executed
+                  <Trans
+                    i18nKey="westerosCard.drawnAfterWinterIsComingWasExecuted33f22c"
+                    components={{ element0: <b /> }}
+                  />
                 </Tooltip>
               }
               popperConfig={{ modifiers: [preventOverflow] }}

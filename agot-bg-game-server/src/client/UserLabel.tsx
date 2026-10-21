@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Component, ReactNode } from "react";
 import User from "../server/User";
@@ -59,7 +60,9 @@ export default class UserLabel extends Component<UserLabelProps> {
             <OverlayTrigger
               overlay={
                 <Tooltip id={`${this.user.id}-connection-tooltip`}>
-                  {this.user.connected ? "Connected" : "Disconnected"}
+                  {this.user.connected
+                    ? t("userLabel.connected229655")
+                    : t("userLabel.disconnected04dfac")}
                 </Tooltip>
               }
             >
@@ -76,7 +79,16 @@ export default class UserLabel extends Component<UserLabelProps> {
                 <OverlayTrigger
                   overlay={
                     <Tooltip id={`${this.user.id}-owner-tooltip`}>
-                      Game host{!isRealOwner ? " deputy" : ""}
+                      <Trans
+                        i18nKey="userLabel.gameHost8c6ec6"
+                        components={{
+                          value0: (
+                            <>
+                              {!isRealOwner ? t("userLabel.deputy2cadf4") : ""}
+                            </>
+                          )
+                        }}
+                      />
                     </Tooltip>
                   }
                 >
@@ -119,8 +131,12 @@ export default class UserLabel extends Component<UserLabelProps> {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Show profile of
-                  {this.renderNameAndTimeElapsedDropDownItem()}
+                  <Trans
+                    i18nKey="userLabel.showProfileOff6cf26"
+                    components={{
+                      value0: <>{this.renderNameAndTimeElapsedDropDownItem()}</>
+                    }}
+                  />
                 </NavDropdown.Item>
               )}
               {this.renderIngameDropdownItems()}
@@ -144,7 +160,10 @@ export default class UserLabel extends Component<UserLabelProps> {
               overlay={
                 <Tooltip id={`waiting-for-user-${this.user.id}-action-tooltip`}>
                   <small>
-                    Time elapsed since waiting for player action <i>(hh:mm)</i>
+                    <Trans
+                      i18nKey="userLabel.timeElapsedSinceWaitingForPlayerActionHhMm386b38"
+                      components={{ element0: <i /> }}
+                    />
                   </small>
                 </Tooltip>
               }
@@ -170,13 +189,30 @@ export default class UserLabel extends Component<UserLabelProps> {
         placement="auto"
         overlay={
           <Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
-            These users {this.ingame ? "play" : "joined"} from the same network
-            as {this.user.name}:
-            <br />
-            <br />
-            {Array.from(this.user.otherUsersFromSameNetwork).map((usr) => (
-              <div key={`same-network-user_${usr}`}>{usr}</div>
-            ))}
+            <Trans
+              i18nKey="userLabel.theseUsersFromTheSameNetworkAs5f4ff5"
+              components={{
+                value0: (
+                  <>
+                    {this.ingame
+                      ? t("userLabel.playaba4cc")
+                      : t("userLabel.joined6b963c")}
+                  </>
+                ),
+                value1: <>{this.user.name}</>,
+                element2: <br />,
+                element3: <br />,
+                value4: (
+                  <>
+                    {Array.from(this.user.otherUsersFromSameNetwork).map(
+                      (usr) => (
+                        <div key={`same-network-user_${usr}`}>{usr}</div>
+                      )
+                    )}
+                  </>
+                )
+              }}
+            />
           </Tooltip>
         }
       >
@@ -233,19 +269,21 @@ export default class UserLabel extends Component<UserLabelProps> {
               overlay={
                 <Tooltip id="replace-player-tooltip">
                   {canLaunchReplacePlayerVoteReason == "already-playing"
-                    ? "You are already playing in this game"
+                    ? t("common.alreadyPlaying")
                     : canLaunchReplacePlayerVoteReason == "ongoing-vote"
-                      ? "A vote is already ongoing"
+                      ? t("common.voteOngoing")
                       : canLaunchReplacePlayerVoteReason == "game-cancelled"
-                        ? "The game has been cancelled"
+                        ? t("common.gameCancelled")
                         : canLaunchReplacePlayerVoteReason == "game-ended"
-                          ? "The game has ended"
+                          ? t("common.gameEnded")
                           : canLaunchReplacePlayerVoteReason == "game-paused"
-                            ? "The game must be resumed first"
+                            ? t("common.resumeFirst")
                             : canLaunchReplacePlayerVoteReason ==
                                 "forbidden-in-tournament-mode"
-                              ? "Replacing players is not allowed in tournaments"
-                              : "Vote not possible"}
+                              ? t(
+                                  "userLabel.replacingPlayersIsNotAllowedInTournaments753fd5"
+                                )
+                              : t("common.voteNotPossible")}
                 </Tooltip>
               }
               placement="auto"
@@ -260,7 +298,7 @@ export default class UserLabel extends Component<UserLabelProps> {
               onClick={() => this.onLaunchReplacePlayerVoteClick()}
               disabled={!canLaunchReplacePlayerVote}
             >
-              Offer to replace this player
+              {t("userLabel.offerToReplaceThisPlayer7fa696")}
             </NavDropdown.Item>
           </div>
         </ConditionalWrap>
@@ -272,31 +310,37 @@ export default class UserLabel extends Component<UserLabelProps> {
               overlay={
                 <Tooltip id="replace-player-by-vassal-tooltip">
                   {canLaunchReplacePlayerByVassalVoteReason == "ongoing-vote"
-                    ? "A vote is already ongoing"
+                    ? t("common.voteOngoing")
                     : canLaunchReplacePlayerByVassalVoteReason ==
                         "game-cancelled"
-                      ? "The game has been cancelled"
+                      ? t("common.gameCancelled")
                       : canLaunchReplacePlayerByVassalVoteReason == "game-ended"
-                        ? "The game has ended"
+                        ? t("common.gameEnded")
                         : canLaunchReplacePlayerByVassalVoteReason ==
                             "only-players-can-vote"
-                          ? "Only players can vote"
+                          ? t("userLabel.onlyPlayersCanVote98b5bf")
                           : canLaunchReplacePlayerByVassalVoteReason ==
                               "game-paused"
-                            ? "The game must be resumed first"
+                            ? t("common.resumeFirst")
                             : canLaunchReplacePlayerByVassalVoteReason ==
                                 "min-player-count-reached"
-                              ? "Minimum player count reached"
+                              ? t("userLabel.minimumPlayerCountReachedc2dd9b")
                               : canLaunchReplacePlayerByVassalVoteReason ==
                                   "vassalizing-yourself-is-forbidden"
-                                ? "To avoid abuse you can no longer vassalize yourself"
+                                ? t(
+                                    "userLabel.toAvoidAbuseYouCanNoLongerVassalizeYourselfd7162d"
+                                  )
                                 : canLaunchReplacePlayerByVassalVoteReason ==
                                     "only-possible-when-defeated"
-                                  ? "Vassal replacement is allowed only when the house is considered defeated"
+                                  ? t(
+                                      "userLabel.vassalReplacementIsAllowedOnlyWhenTheHouseIs159cf1"
+                                    )
                                   : canLaunchReplacePlayerByVassalVoteReason ==
                                       "ongoing-draft"
-                                    ? "During draft mode players cannot be replaced by vassals"
-                                    : "Vote not possible"}
+                                    ? t(
+                                        "userLabel.duringDraftModePlayersCannotBeReplacedByVassalsab148b"
+                                      )
+                                    : t("common.voteNotPossible")}
                 </Tooltip>
               }
               placement="auto"
@@ -311,7 +355,7 @@ export default class UserLabel extends Component<UserLabelProps> {
               onClick={() => this.onLaunchReplacePlayerByVassalVoteClick()}
               disabled={!canLaunchReplacePlayerByVassalVote}
             >
-              Launch a vote to replace this player by a vassal
+              {t("userLabel.launchAVoteToReplaceThisPlayerByA73142f")}
             </NavDropdown.Item>
           </div>
         </ConditionalWrap>
@@ -323,24 +367,30 @@ export default class UserLabel extends Component<UserLabelProps> {
               overlay={
                 <Tooltip id="swap-houses-tooltip">
                   {canLaunchSwapHousesVoteReason == "ongoing-vote"
-                    ? "A vote is already ongoing"
+                    ? t("common.voteOngoing")
                     : canLaunchSwapHousesVoteReason == "game-cancelled"
-                      ? "The game has been cancelled"
+                      ? t("common.gameCancelled")
                       : canLaunchSwapHousesVoteReason == "game-ended"
-                        ? "The game has ended"
+                        ? t("common.gameEnded")
                         : canLaunchSwapHousesVoteReason ==
                             "only-players-can-vote"
-                          ? "Only players can vote"
+                          ? t("userLabel.onlyPlayersCanVote98b5bf")
                           : canLaunchSwapHousesVoteReason ==
                               "cannot-swap-with-yourself"
-                            ? "You cannot swap houses with yourself"
+                            ? t(
+                                "userLabel.youCannotSwapHousesWithYourself5db098"
+                              )
                             : canLaunchSwapHousesVoteReason ==
                                 "secret-objectives-chosen"
-                              ? `You or ${this.player!.user.name} has already chosen their secret objectives`
+                              ? t("userLabel.secretObjectivesAlreadyChosen", {
+                                  player: this.player!.user.name
+                                })
                               : canLaunchSwapHousesVoteReason ==
                                   "forbidden-in-tournament-mode"
-                                ? "Swapping houses is not allowed in tournaments"
-                                : "Vote not possible"}
+                                ? t(
+                                    "userLabel.swappingHousesIsNotAllowedInTournaments0b4056"
+                                  )
+                                : t("common.voteNotPossible")}
                 </Tooltip>
               }
               placement="auto"
@@ -355,7 +405,7 @@ export default class UserLabel extends Component<UserLabelProps> {
               onClick={() => this.onLaunchSwapHousesVoteClick()}
               disabled={!canLaunchSwapHousesVote}
             >
-              Launch a vote to swap houses with this player
+              {t("userLabel.launchAVoteToSwapHousesWithThisPlayer8ce596")}
             </NavDropdown.Item>
           </div>
         </ConditionalWrap>
@@ -367,18 +417,20 @@ export default class UserLabel extends Component<UserLabelProps> {
               overlay={
                 <Tooltip id="declare-winner-tooltip">
                   {canLaunchDeclareWinnerVoteReason == "ongoing-vote"
-                    ? "A vote is already ongoing"
+                    ? t("common.voteOngoing")
                     : canLaunchDeclareWinnerVoteReason == "game-cancelled"
-                      ? "The game has been cancelled"
+                      ? t("common.gameCancelled")
                       : canLaunchDeclareWinnerVoteReason == "game-ended"
-                        ? "The game has ended"
+                        ? t("common.gameEnded")
                         : canLaunchDeclareWinnerVoteReason ==
                             "only-players-can-vote"
-                          ? "Only players can vote"
+                          ? t("userLabel.onlyPlayersCanVote98b5bf")
                           : canLaunchDeclareWinnerVoteReason ==
                               "forbidden-in-tournament-mode"
-                            ? "Declaring a winner is not allowed in tournaments"
-                            : "Vote not possible"}
+                            ? t(
+                                "userLabel.declaringAWinnerIsNotAllowedInTournamentsd8ee2a"
+                              )
+                            : t("common.voteNotPossible")}
                 </Tooltip>
               }
               placement="auto"
@@ -393,7 +445,10 @@ export default class UserLabel extends Component<UserLabelProps> {
               onClick={() => this.onLaunchDeclareWinnerClick()}
               disabled={!canLaunchDeclareWinnerVote}
             >
-              Launch a vote to declare {this.player!.house.name} the winner
+              <Trans
+                i18nKey="userLabel.launchAVoteToDeclareTheWinner77ca8c"
+                components={{ value0: <>{this.player!.house.name}</> }}
+              />
             </NavDropdown.Item>
           </div>
         </ConditionalWrap>
@@ -410,7 +465,10 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     if (
       window.confirm(
-        `Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name}?`
+        t("userLabel.doYouWantToLaunchAVoteToReplacece2ed7", {
+          value0: this.player!.user.name,
+          value1: this.player!.house.name
+        })
       )
     ) {
       this.ingame.launchReplacePlayerVote(this.player!);
@@ -426,7 +484,10 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     if (
       window.confirm(
-        `Do you want to launch a vote to replace ${this.player!.user.name} who controls house ${this.player!.house.name} by a vassal?`
+        t("userLabel.doYouWantToLaunchAVoteToReplace1838ba", {
+          value0: this.player!.user.name,
+          value1: this.player!.house.name
+        })
       )
     ) {
       this.ingame.launchReplacePlayerByVassalVote(this.player!);
@@ -442,7 +503,10 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     if (
       window.confirm(
-        `Do you want to launch a vote to swap houses with ${this.player!.user.name} who controls house ${this.player!.house.name}?`
+        t("userLabel.doYouWantToLaunchAVoteToSwap4ecc84", {
+          value0: this.player!.user.name,
+          value1: this.player!.house.name
+        })
       )
     ) {
       this.ingame.launchSwapHousesVote(this.player!);
@@ -458,7 +522,9 @@ export default class UserLabel extends Component<UserLabelProps> {
 
     if (
       window.confirm(
-        `Do you want to launch a vote to declare House ${this.player!.house.name} the winner?`
+        t("userLabel.doYouWantToLaunchAVoteToDeclared1d231", {
+          value0: this.player!.house.name
+        })
       )
     ) {
       this.ingame.launchDeclareWinnerVote(this.player!.house);

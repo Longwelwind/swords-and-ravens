@@ -1,3 +1,4 @@
+import { Trans, t, translateGameText } from "./i18n";
 import _ from "lodash";
 import React from "react";
 import { Tooltip } from "react-bootstrap";
@@ -23,7 +24,9 @@ export function renderRegionTooltip(
           {region.staticRegion.castleLevel > 0 && (
             <>
               <br />
-              {region.staticRegion.castleLevel == 1 ? "Castle" : "Stronghold"}
+              {region.staticRegion.castleLevel == 1
+                ? t("regionTooltip.castle419fb3")
+                : t("regionTooltip.strongholdf3fec0")}
             </>
           )}
           <div className="d-flex flex-row justify-content-center mt-2">
@@ -64,33 +67,63 @@ export function renderRegionTooltip(
         <b>{region.name}</b>
         {controller && (
           <small>
-            {" "}
-            of <b>{controller.name}</b>
+            <Trans
+              i18nKey="common.of"
+              components={{ element0: <b />, value1: <>{controller.name}</> }}
+            />
           </small>
         )}
         {region.castleLevel > 0 && (
           <>
             <br />
-            {region.castleLevel == 1 ? "Castle" : "Stronghold"}
+            {region.castleLevel == 1
+              ? t("regionTooltip.castle419fb3")
+              : t("regionTooltip.strongholdf3fec0")}
           </>
         )}
         {region.superControlPowerToken &&
         region.superControlPowerToken == controller ? (
           <>
-            <br />
-            Capital
-            {region.garrison > 0 && (
-              <>
-                &nbsp;with&nbsp;Garrison&nbsp;of&nbsp;<b>{region.garrison}</b>
-              </>
-            )}
+            <Trans
+              i18nKey="regionTooltip.capital59fab3"
+              components={{
+                element0: <br />,
+                value1: (
+                  <>
+                    {region.garrison > 0 && (
+                      <>
+                        <Trans
+                          i18nKey="regionTooltip.withGarrisonOf5aa47b"
+                          components={{
+                            element0: <b />,
+                            value1: <>{region.garrison}</>
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            />
           </>
         ) : (
           region.garrison > 0 && (
             <>
-              <br />
-              {!controller ? "Neutral\xa0force" : "Garrison"}&nbsp;of&nbsp;
-              <b>{region.garrison}</b>
+              <Trans
+                i18nKey="regionTooltip.ofab5d26"
+                components={{
+                  element0: <br />,
+                  value1: (
+                    <>
+                      {!controller
+                        ? t("regionTooltip.neutralForceeeb1ae")
+                        : t("common.garrison")}
+                    </>
+                  ),
+                  element2: <b />,
+                  value3: <>{region.garrison}</>
+                }}
+              />
             </>
           )
         )}
@@ -143,11 +176,11 @@ export function renderRegionTooltip(
               region.units.values.map((u, i) =>
                 u.wounded ? (
                   <span key={`region-tooltip_wounded_${u.id}_${i}`}>
-                    <s>{u.type.name}</s>
+                    <s>{translateGameText(u.type.name)}</s>
                   </span>
                 ) : (
                   <span key={`region-tooltip_unit_${u.id}_${i}`}>
-                    {u.type.name}
+                    {translateGameText(u.type.name)}
                   </span>
                 )
               ),

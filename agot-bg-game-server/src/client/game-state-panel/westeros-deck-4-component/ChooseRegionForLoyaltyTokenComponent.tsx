@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -20,8 +21,13 @@ export default class ChooseRegionForLoyaltyTokenComponent extends Component<
         {this.props.gameState.childGameState instanceof
           SelectRegionGameState && (
           <Col className="text-center">
-            House <b>{this.props.gameState.childGameState.house.name}</b> must
-            choose an area to place a loyalty&nbsp;token.
+            <Trans
+              i18nKey="common.houseMustChooseAnAreaToPlaceALoyalty"
+              components={{
+                element0: <b />,
+                value1: <>{this.props.gameState.childGameState.house.name}</>
+              }}
+            />
           </Col>
         )}
         {renderChildGameState(this.props, [

@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import React from "react";
@@ -51,7 +52,7 @@ export default class GameEndedComponent extends Component<
           <Row className="justify-content-center">
             <Col xs="12" className="d-flex justify-content-center">
               <h3>
-                <b>Game has ended!</b>
+                <b>{t("gameEnded.gameHasEndedc5678c")}</b>
               </h3>
             </Col>
             <Col
@@ -74,7 +75,10 @@ export default class GameEndedComponent extends Component<
             </Col>
             <Col xs="12" className="d-flex justify-content-center">
               <h5>
-                House <b>{winner.name}</b> has won this Game of Thrones.
+                <Trans
+                  i18nKey="gameEnded.houseHasWonThisGameOfThronesa1b8be"
+                  components={{ element0: <b />, value1: <>{winner.name}</> }}
+                />
               </h5>
             </Col>
           </Row>

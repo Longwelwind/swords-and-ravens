@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import * as React from "react";
@@ -31,9 +32,10 @@ export default class ResolveSpymasterComponent extends Component<
               <Col xs="12">
                 <Row className="justify-content-center">
                   <Col xs={12} className="text-center">
-                    Select the card(s) to put on bottom of the deck:
-                    <br />
-                    <small>(Don&apos;t select any to put them on top)</small>
+                    <Trans
+                      i18nKey="resolveSpymaster.selectTheCardSToPutOnBottomOf3a608f"
+                      components={{ element0: <br />, element1: <small /> }}
+                    />
                   </Col>
                 </Row>
                 <Row className="justify-content-center mt-1">
@@ -80,7 +82,9 @@ export default class ResolveSpymasterComponent extends Component<
                       variant="success"
                       onClick={() => this.confirm()}
                     >
-                      Put selected cards to bottom of the deck
+                      {t(
+                        "resolveSpymaster.putSelectedCardsToBottomOfTheDeck7aef25"
+                      )}
                     </Button>
                   </Col>
                 </Row>
@@ -88,7 +92,10 @@ export default class ResolveSpymasterComponent extends Component<
             </Row>
           ) : (
             <div className="text-center">
-              Waiting for {this.props.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                components={{ houses: <>{this.props.gameState.house.name}</> }}
+              />
             </div>
           )}
         </Col>

@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -57,14 +58,28 @@ export default class TyrionLannisterAbilityComponent extends Component<
       <>
         {this.simpleChoice && (
           <Col xs={12} className="text-center">
-            <b>Tyrion Lannister</b>: House <b>{this.house.name}</b> may cancel
-            House <b>{this.enemy.name}&apos;s</b> House card.
+            <Trans
+              i18nKey="tyrionLannisterAbility.tyrionLannisterHouseMayCancelHouseSHouseCarde92300"
+              components={{
+                element0: <b />,
+                element1: <b />,
+                value2: <>{this.house.name}</>,
+                element3: <b />,
+                value4: <>{this.enemy.name}</>
+              }}
+            />
           </Col>
         )}
         {this.selectHouseCards && (
           <Col xs={12} className="text-center">
-            <b>Tyrion Lannister</b>: House <b>{this.enemy.name}</b> has to
-            choose a new House card.
+            <Trans
+              i18nKey="tyrionLannisterAbility.tyrionLannisterHouseHasToChooseANewHousebcedd8"
+              components={{
+                element0: <b />,
+                element1: <b />,
+                value2: <>{this.enemy.name}</>
+              }}
+            />
           </Col>
         )}
         {renderChildGameState(this.props, [

@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,7 +17,9 @@ export default class MassingOnTheMilkwaterWildlingVictoryComponent extends Compo
     return (
       <>
         <Col xs={12} className="text-center">
-          Houses choose their House cards to discard.
+          {t(
+            "massingOnTheMilkwaterWildlingVictory.housesChooseTheirHouseCardsToDiscardfcf3ae"
+          )}
         </Col>
         {renderChildGameState(this.props, [
           [SelectHouseCardGameState, SelectHouseCardComponent]

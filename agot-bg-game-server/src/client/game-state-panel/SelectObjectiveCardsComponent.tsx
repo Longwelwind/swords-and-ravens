@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import * as React from "react";
@@ -76,15 +77,23 @@ export default class SelectObjectiveCardsComponent extends Component<
                     this.selectedObjectiveCards.length > this.gameState.count
                   }
                 >
-                  Confirm
+                  {t("common.confirm")}
                 </Button>
               </Col>
             </Row>
           </Col>
         )}
         <Col xs={12} className="text-center">
-          Waiting for{" "}
-          {this.gameState.notReadyHouses.map((h) => h.name).join(", ")}
+          <Trans
+            i18nKey="common.waitingFor"
+            components={{
+              houses: (
+                <>
+                  {this.gameState.notReadyHouses.map((h) => h.name).join(", ")}
+                </>
+              )
+            }}
+          />
         </Col>
       </>
     );
@@ -105,7 +114,7 @@ export default class SelectObjectiveCardsComponent extends Component<
     ) {
       if (
         !window.confirm(
-          "Are you sure you don't want to score an Objective card?"
+          t("selectObjectiveCards.areYouSureYouDonTWantToScoree71258")
         )
       ) {
         return;

@@ -1,3 +1,4 @@
+import { Trans, t } from "../i18n";
 import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
@@ -153,8 +154,18 @@ export default class CombatComponent extends Component<
         <Col xs={12}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <h5>
-              Battle {this.combatStats.length > 0 && "results "} for{" "}
-              <b>{this.combat.defendingRegion.name}</b>
+              <Trans
+                i18nKey="combat.battleFordaa1d7"
+                components={{
+                  value0: (
+                    <>
+                      {this.combatStats.length > 0 && t("combat.results9709ae")}
+                    </>
+                  ),
+                  element1: <b />,
+                  value2: <>{this.combat.defendingRegion.name}</>
+                }}
+              />
             </h5>
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -163,7 +174,13 @@ export default class CombatComponent extends Component<
         </Col>
         {winner && (
           <Col xs={12} className="text-center">
-            Winner: <b style={{ color: winner.color }}>{winner.name}</b>
+            <Trans
+              i18nKey="common.winner"
+              components={{
+                element0: <b style={{ color: winner.color }} />,
+                value1: <>{winner.name}</>
+              }}
+            />
           </Col>
         )}
         {renderChildGameState(this.props, [

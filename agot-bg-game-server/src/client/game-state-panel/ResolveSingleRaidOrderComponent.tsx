@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
@@ -45,32 +46,62 @@ export default class ResolveSingleRaidOrderComponent extends Component<
           orders={this.modifyOrdersOnMap()}
         />
         <Col xs={12} className="text-center">
-          House <b>{this.house.name}</b> must resolve one of its Raid Orders.
+          <Trans
+            i18nKey="resolveSingleRaidOrder.houseMustResolveOneOfItsRaidOrdersafcaf3"
+            components={{ element0: <b />, value1: <>{this.house.name}</> }}
+          />
         </Col>
         {this.props.gameClient.doesControlHouse(this.house) ? (
           this.selectedOrderRegion == null ? (
             <Col xs={12} className="text-center">
-              Select a Raid Order token to resolve it.
+              {t(
+                "resolveSingleRaidOrder.selectARaidOrderTokenToResolveIt80410a"
+              )}
             </Col>
           ) : (
             <>
               <Col xs={12} className="text-center">
                 <p>
-                  Chosen Raid order: <b>{this.selectedOrderRegion.name}</b>
+                  <Trans
+                    i18nKey="resolveSingleRaidOrder.chosenRaidOrderd3858c"
+                    components={{
+                      element0: <b />,
+                      value1: <>{this.selectedOrderRegion.name}</>
+                    }}
+                  />
                 </p>
                 {this.selectedTargetRegion == null ? (
                   <>
                     <p>
-                      Click the target order to raid it, or click on{" "}
-                      <b>Confirm</b> to{" "}
-                      {this.orderInOrderRegion instanceof RaidSupportOrderType
-                        ? "use the order as Support+1 order"
-                        : "remove your Raid order"}
-                      .
+                      <Trans
+                        i18nKey="resolveSingleRaidOrder.clickTheTargetOrderToRaidItOrClickaed65f"
+                        components={{
+                          element0: <b />,
+                          value1: (
+                            <>
+                              {this.orderInOrderRegion instanceof
+                              RaidSupportOrderType
+                                ? t(
+                                    "resolveSingleRaidOrder.useTheOrderAsSupport1Orderb16954"
+                                  )
+                                : t(
+                                    "resolveSingleRaidOrder.removeYourRaidOrderc36902"
+                                  )}
+                            </>
+                          )
+                        }}
+                      />
                     </p>
                   </>
                 ) : (
-                  <>Target: {this.selectedTargetRegion.name}</>
+                  <>
+                    <Trans
+                      i18nKey="resolveSingleRaidOrder.target2e5c89"
+                      components={{
+                        value0: <>{this.selectedTargetRegion.name}</>
+                      }}
+                    />
+                  </>
                 )}
               </Col>
               <Col xs={12}>
@@ -81,7 +112,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<
                       variant="success"
                       onClick={() => this.confirm()}
                     >
-                      Confirm
+                      {t("common.confirm")}
                     </Button>
                   </Col>
                   <Col xs="auto">
@@ -90,7 +121,7 @@ export default class ResolveSingleRaidOrderComponent extends Component<
                       variant="danger"
                       onClick={() => this.reset()}
                     >
-                      Reset
+                      {t("common.reset")}
                     </Button>
                   </Col>
                 </Row>
@@ -99,13 +130,20 @@ export default class ResolveSingleRaidOrderComponent extends Component<
           )
         ) : (
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {
-              this.props.gameState.ingameGameState.getControllerOfHouse(
-                this.house
-              ).house.name
-            }
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              components={{
+                houses: (
+                  <>
+                    {
+                      this.props.gameState.ingameGameState.getControllerOfHouse(
+                        this.house
+                      ).house.name
+                    }
+                  </>
+                )
+              }}
+            />
           </Col>
         )}
       </>
@@ -116,7 +154,11 @@ export default class ResolveSingleRaidOrderComponent extends Component<
   confirm(): void {
     if (this.selectedOrderRegion) {
       if (!this.selectedTargetRegion) {
-        if (!window.confirm("Are you sure not to use your Raid order?")) {
+        if (
+          !window.confirm(
+            t("resolveSingleRaidOrder.areYouSureNotToUseYourRaidOrder13ca73")
+          )
+        ) {
           return;
         }
       }

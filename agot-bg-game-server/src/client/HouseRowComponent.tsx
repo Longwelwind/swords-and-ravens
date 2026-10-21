@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText } from "./i18n";
 import MapContribution from "./MapContribution";
 import GameClient from "./GameClient";
 import { Component, ReactNode } from "react";
@@ -162,13 +163,16 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
 
     const vassalTitle = this.suzerainHouse ? (
       <>
-        Commanded by{" "}
-        <span style={{ color: this.suzerainHouse.color }}>
-          {this.suzerainHouse.name}
-        </span>
+        <Trans
+          i18nKey="houseRow.commandedBy467f37"
+          components={{
+            element0: <span style={{ color: this.suzerainHouse.color }} />,
+            value1: <>{this.suzerainHouse.name}</>
+          }}
+        />
       </>
     ) : (
-      <>Up for grab</>
+      <>{t("houseRow.upForGrab1625c7")}</>
     );
 
     const victoryImage = this.props.ingame.entireGame.isFeastForCrows
@@ -265,10 +269,10 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                   placement="right"
                   overlay={
                     <Tooltip id={"vassal-house-" + this.house.id}>
-                      <b>Vassal</b>
-                      <br />
-                      At the beginning of the Planning Phase, each player, in
-                      order, can pick a vassal to command this turn.
+                      <Trans
+                        i18nKey="houseRow.vassalAtTheBeginningOfThePlanningPhaseEach3ff25f"
+                        components={{ element0: <b />, element1: <br /> }}
+                      />
                     </Tooltip>
                   }
                 >
@@ -482,7 +486,13 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     placement="right"
                     overlay={
                       <Tooltip id={"knows-things-house-" + this.house.id}>
-                        <b>{this.house.name}</b> knows things.
+                        <Trans
+                          i18nKey="houseRow.knowsThingsd3ec18"
+                          components={{
+                            element0: <b />,
+                            value1: <>{this.house.name}</>
+                          }}
+                        />
                       </Tooltip>
                     }
                   >
@@ -554,7 +564,10 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
           <Card.Body className="d-flex align-items-center">
             <img src={stopwatchImage} width={64} className="dye-critical" />
             <h4 className="d-inline ms-3" style={{ color: "white" }}>
-              {getUserLinkOrLabel(player.user)} is running out of time!
+              <Trans
+                i18nKey="houseRow.isRunningOutOfTime7ff506"
+                components={{ value0: <>{getUserLinkOrLabel(player.user)}</> }}
+              />
             </h4>
           </Card.Body>
         </Card>
@@ -647,23 +660,27 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               overlay={
                 <Tooltip id="replace-player-tooltip">
                   {reason == "game-paused"
-                    ? "The game must be resumed first"
+                    ? t("common.resumeFirst")
                     : reason == "house-timed-out"
-                      ? "The timer of this vassal house has run out and therefore it can no longer be replaced by a player"
+                      ? t("houseRow.theTimerOfThisVassalHouseHasRunOutb05075")
                       : reason == "already-playing"
-                        ? "You are already playing in this game"
+                        ? t("common.alreadyPlaying")
                         : reason == "ongoing-vote"
-                          ? "A vote is already ongoing"
+                          ? t("common.voteOngoing")
                           : reason == "game-cancelled"
-                            ? "The game has been cancelled"
+                            ? t("common.gameCancelled")
                             : reason == "game-ended"
-                              ? "The game has ended"
+                              ? t("common.gameEnded")
                               : reason == "not-a-vassal" ||
                                   reason == "not-a-replaced-vassal"
-                                ? "Only vassals who have replaced a player can be replaced by a player again"
+                                ? t(
+                                    "houseRow.onlyVassalsWhoHaveReplacedAPlayerCanBec4f4b1"
+                                  )
                                 : reason == "forbidden-in-tournament-mode"
-                                  ? "Undoing vassal replacement is not allowed in tournaments"
-                                  : "Vote not possible"}
+                                  ? t(
+                                      "houseRow.undoingVassalReplacementIsNotAllowedInTournamentsf28909"
+                                    )
+                                  : t("common.voteNotPossible")}
                 </Tooltip>
               }
               placement="auto"
@@ -677,7 +694,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               onClick={() => this.onLaunchReplaceVassalVoteClick()}
               disabled={!result}
             >
-              Offer to replace this vassal
+              {t("houseRow.offerToReplaceThisVassal697b86")}
             </NavDropdown.Item>
           </div>
         </ConditionalWrap>
@@ -689,7 +706,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
   onLaunchReplaceVassalVoteClick(): void {
     if (
       window.confirm(
-        `Do you want to launch a vote to replace Vassal house ${this.house.name}?`
+        t("houseRow.doYouWantToLaunchAVoteToReplaceca3d9c", {
+          value0: this.house.name
+        })
       )
     ) {
       this.props.ingame.launchReplaceVassalByPlayerVote(this.house);
@@ -764,9 +783,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
   private renderUnitTypeTooltip(unitType: UnitType): OverlayChildren {
     return (
       <Tooltip id={unitType.id + "-tooltip"}>
-        <b>{unitType.name}</b>
+        <b>{translateGameText(unitType.name)}</b>
         <br />
-        {unitType.description}
+        {translateGameText(unitType.description)}
       </Tooltip>
     );
   }
@@ -787,7 +806,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         id={this.house.id + "-victory-tooltip"}
         className="tooltip-w-100"
       >
-        <h5 className="text-center mx-2">Total Land Areas</h5>
+        <h5 className="text-center mx-2">
+          {t("houseRow.totalLandAreas806676")}
+        </h5>
         <h4 className="text-center">
           <b>{this.getTotalControlledLandRegions()}</b>
         </h4>
@@ -795,65 +816,111 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
           <>
             <br />
             <h5 className="text-center">
-              Additional Information
-              <br />
-              <small>
-                &nbsp;&nbsp;(Does not count in case of a tie)&nbsp;&nbsp;
-              </small>
+              <Trans
+                i18nKey="houseRow.additionalInformationDoesNotCountInCaseOfAf77645"
+                components={{ element0: <br />, element1: <small /> }}
+              />
             </h5>
             <br />
             <h5 className="text-center">
-              Castles:{" "}
-              <b>
-                {
-                  regions.filter(
-                    (r) => r.castleLevel == 1 && r.getController() == this.house
-                  ).length
-                }
-              </b>
+              <Trans
+                i18nKey="houseRow.castles93e2d1"
+                components={{
+                  element0: <b />,
+                  value1: (
+                    <>
+                      {
+                        regions.filter(
+                          (r) =>
+                            r.castleLevel == 1 &&
+                            r.getController() == this.house
+                        ).length
+                      }
+                    </>
+                  )
+                }}
+              />
             </h5>
             <h5 className="text-center">
-              Strongholds:{" "}
-              <b>
-                {
-                  regions.filter(
-                    (r) => r.castleLevel == 2 && r.getController() == this.house
-                  ).length
-                }
-              </b>
+              <Trans
+                i18nKey="houseRow.strongholdsca5286"
+                components={{
+                  element0: <b />,
+                  value1: (
+                    <>
+                      {
+                        regions.filter(
+                          (r) =>
+                            r.castleLevel == 2 &&
+                            r.getController() == this.house
+                        ).length
+                      }
+                    </>
+                  )
+                }}
+              />
             </h5>
             <h5 className="text-center">
-              Sea Areas:{" "}
-              <b>
-                {
-                  regions.filter(
-                    (r) => r.type == sea && r.getController() == this.house
-                  ).length
-                }
-              </b>
+              <Trans
+                i18nKey="houseRow.seaAreasdea370"
+                components={{
+                  element0: <b />,
+                  value1: (
+                    <>
+                      {
+                        regions.filter(
+                          (r) =>
+                            r.type == sea && r.getController() == this.house
+                        ).length
+                      }
+                    </>
+                  )
+                }}
+              />
             </h5>
             <h5 className="text-center">
-              Ports:{" "}
-              <b>
-                {
-                  regions.filter(
-                    (r) => r.type == port && r.getController() == this.house
-                  ).length
-                }
-              </b>
+              <Trans
+                i18nKey="houseRow.ports071004"
+                components={{
+                  element0: <b />,
+                  value1: (
+                    <>
+                      {
+                        regions.filter(
+                          (r) =>
+                            r.type == port && r.getController() == this.house
+                        ).length
+                      }
+                    </>
+                  )
+                }}
+              />
             </h5>
           </>
         )}
         {this.house == this.game.targaryen && (
           <div className="text-center">
             <br />
-            <h5>Loyalty tokens</h5>
+            <h5>{t("houseRow.loyaltyTokens69e00e")}</h5>
             <h6>
-              On the board: <b>{loyaltyTokensOnBoardCount}</b>
+              <Trans
+                i18nKey="houseRow.onTheBoard438042"
+                components={{
+                  element0: <b />,
+                  value1: <>{loyaltyTokensOnBoardCount}</>
+                }}
+              />
             </h6>
             <h6>
-              Loyalty Pool:{" "}
-              <b>{MAX_LOYALTY_TOKEN_COUNT - loyaltyTokensOnBoardCount}</b>
+              <Trans
+                i18nKey="houseRow.loyaltyPoolfe90cb"
+                components={{
+                  element0: <b />,
+                  value1: (
+                    <>{MAX_LOYALTY_TOKEN_COUNT - loyaltyTokensOnBoardCount}</>
+                  )
+                }}
+              />
             </h6>
           </div>
         )}
@@ -870,18 +937,26 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
       <Popover id={this.house.id + "-power-popover"} className="px-3 pt-2">
         <Col>
           <Row className="justify-content-center">
-            <h4>{this.house.name}&apos;s Power</h4>
+            <h4>
+              <Trans
+                i18nKey="houseRow.sPower26fd93"
+                components={{ value0: <>{this.house.name}</> }}
+              />
+            </h4>
           </Row>
           <Row className="justify-content-center">
             <Col xs="auto">
               <h5>
-                <small>Available:</small> <b>{availablePower}</b>
+                <small>{t("houseRow.available72074a")}</small>{" "}
+                <b>{availablePower}</b>
               </h5>
               <h5>
-                <small>On the board:</small> <b>{powerTokensOnBoard}</b>
+                <small>{t("houseRow.onTheBoardb43fc1")}</small>{" "}
+                <b>{powerTokensOnBoard}</b>
               </h5>
               <h5>
-                <small>Power Pool:</small> <b>{powerInPool}</b>
+                <small>{t("houseRow.powerPool3a9195")}</small>{" "}
+                <b>{powerInPool}</b>
               </h5>
             </Col>
           </Row>
@@ -912,16 +987,23 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
   ): OverlayChildren {
     return (
       <Tooltip id={this.house.id + "-power-tooltip"} className="tooltip-w-100">
-        <h4>{this.house.name}&apos;s Power</h4>
+        <h4>
+          <Trans
+            i18nKey="houseRow.sPower26fd93"
+            components={{ value0: <>{this.house.name}</> }}
+          />
+        </h4>
         <div className="text-center">
           <h5>
-            <small>Available:</small> <b>{availablePower}</b>
+            <small>{t("houseRow.available72074a")}</small>{" "}
+            <b>{availablePower}</b>
           </h5>
           <h5>
-            <small>On the board:</small> <b>{powerTokensOnBoard}</b>
+            <small>{t("houseRow.onTheBoardb43fc1")}</small>{" "}
+            <b>{powerTokensOnBoard}</b>
           </h5>
           <h5>
-            <small>Power Pool:</small> <b>{powerInPool}</b>
+            <small>{t("houseRow.powerPool3a9195")}</small> <b>{powerInPool}</b>
           </h5>
         </div>
       </Tooltip>

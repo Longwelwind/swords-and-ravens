@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -29,28 +30,37 @@ export default class ScoreSpecialObjectivesComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          Each house may choose to score their Special Objective card if the
-          criterion described is fulfilled.
+          {t(
+            "scoreSpecialObjectives.eachHouseMayChooseToScoreTheirSpecialObjective3df447"
+          )}
         </Col>
         {this.authenticatedPlayer && this.mustChoose && (
           <Col xs={12}>
             <Row className="justify-content-center">
               <Col xs="auto">
                 <Button type="button" onClick={() => this.choose(true)}>
-                  Score
+                  {t("scoreSpecialObjectives.score38e5a4")}
                 </Button>
               </Col>
               <Col xs="auto">
                 <Button type="button" onClick={() => this.choose(false)}>
-                  Don&apos;t score
+                  {t("scoreSpecialObjectives.donTScore2bfeb2")}
                 </Button>
               </Col>
             </Row>
           </Col>
         )}
         <Col xs={12} className="text-center">
-          Waiting for{" "}
-          {this.gameState.notReadyHouses.map((h) => h.name).join(", ")}
+          <Trans
+            i18nKey="common.waitingFor"
+            components={{
+              houses: (
+                <>
+                  {this.gameState.notReadyHouses.map((h) => h.name).join(", ")}
+                </>
+              )
+            }}
+          />
         </Col>
       </>
     );
@@ -59,7 +69,11 @@ export default class ScoreSpecialObjectivesComponent extends Component<
   choose(score: boolean): void {
     if (
       score == false &&
-      !window.confirm("Are you sure not to score your Special Objective card?")
+      !window.confirm(
+        t(
+          "scoreSpecialObjectives.areYouSureNotToScoreYourSpecialObjective542cd8"
+        )
+      )
     ) {
       return;
     }
