@@ -48,7 +48,7 @@ export default class ClashOfKingsComponent extends Component<
             {renderChildGameState(this.props, [
               [BiddingGameState, BiddingComponent],
               [ResolveTiesGameState, ResolveTiesComponent],
-              [DistributePowerTokensGameState, DistributePowerTokensComponent],
+              [DistributePowerTokensGameState, DistributePowerTokensComponent]
             ])}
           </Fragment>
         </Row>

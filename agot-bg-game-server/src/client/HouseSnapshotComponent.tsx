@@ -8,7 +8,7 @@ import classNames from "classnames";
 import housePowerTokensImages from "./housePowerTokensImages";
 import _ from "lodash";
 import HouseCard, {
-  HouseCardState,
+  HouseCardState
 } from "../common/ingame-game-state/game-data-structure/house-card/HouseCard";
 import HouseCardComponent from "./game-state-panel/utils/HouseCardComponent";
 import HouseCardBackComponent from "./game-state-panel/utils/HouseCardBackComponent";
@@ -86,7 +86,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
             paddingLeft: "8px",
             paddingRight: "10px",
             paddingTop: "12px",
-            paddingBottom: "12px",
+            paddingBottom: "12px"
           }}
         >
           <Row className="align-items-center flex-nowrap">
@@ -96,7 +96,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 width={32}
                 style={{
                   margin: "-4px",
-                  visibility: isVassal ? "visible" : "hidden",
+                  visibility: isVassal ? "visible" : "hidden"
                 }}
               />
             </Col>
@@ -122,7 +122,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 <Col
                   xs="auto"
                   className={classNames("d-flex align-items-center", {
-                    invisible: isVassal,
+                    invisible: isVassal
                   })}
                 >
                   <div
@@ -132,7 +132,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                         ? "#F39C12"
                         : victoryPointsCritical
                           ? "#FF0000"
-                          : undefined,
+                          : undefined
                     }}
                   >
                     <b>{victoryPoints}</b>
@@ -150,7 +150,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 <Col xs="auto" className="d-flex align-items-center">
                   <b
                     style={{
-                      fontSize: "1.125rem",
+                      fontSize: "1.125rem"
                     }}
                   >
                     {this.house.landAreaCount}
@@ -160,7 +160,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                 <Col
                   xs="auto"
                   className={classNames("d-flex align-items-center", {
-                    invisible: isVassal,
+                    invisible: isVassal
                   })}
                 >
                   <b style={{ fontSize: "1.125rem" }}>
@@ -170,7 +170,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                     <div
                       className="house-power-token"
                       style={{
-                        backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`,
+                        backgroundImage: `url(${housePowerTokensImages.get(this.house.id)})`
                       }}
                     />
                   </div>
@@ -186,7 +186,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                       [allKnownHouseCards.get(hc.id)!, hc.state] as [
                         HouseCard,
-                        HouseCardState,
+                        HouseCardState
                       ]
                   ),
                   ([card, _]) => card.combatStrength

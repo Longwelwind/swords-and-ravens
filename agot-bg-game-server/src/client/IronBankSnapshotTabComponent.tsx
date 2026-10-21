@@ -46,7 +46,7 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
                       style={{
                         backgroundImage: lc
                           ? `url(${loanCardImages.get(lc)})`
-                          : "none",
+                          : "none"
                       }}
                     />
                   }
@@ -61,7 +61,7 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
                         style={{
                           backgroundImage: lc
                             ? `url(${loanCardImages.get(lc)})`
-                            : "none",
+                            : "none"
                         }}
                       />
                     ) : (
@@ -79,7 +79,7 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
                   style={{
                     fontSize: "1.125rem",
                     marginTop: "10px",
-                    marginLeft: "35px",
+                    marginLeft: "35px"
                   }}
                 >
                   {this.ingame.game.theIronBank.loanCosts.slice().reverse()[i]}
@@ -90,7 +90,7 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
             <div
               className="vertical-game-card smedium"
               style={{
-                backgroundImage: `url(${loanCardImages.get("back")})`,
+                backgroundImage: `url(${loanCardImages.get("back")})`
               }}
             />
           </Col>

@@ -7,7 +7,7 @@ import EntireGame from "../../common/EntireGame";
 function banUser(user: User, entireGame: EntireGame): void {
   if (
     !window.confirm(
-      "Are you sure you want to ban '" + user.name + "' from your game?",
+      "Are you sure you want to ban '" + user.name + "' from your game?"
     )
   ) {
     return;
@@ -15,14 +15,14 @@ function banUser(user: User, entireGame: EntireGame): void {
 
   entireGame.sendMessageToServer({
     type: "ban-user",
-    userId: user.id,
+    userId: user.id
   });
 }
 
 export default function getUserLinkOrLabel(
   user: User,
   houseNames?: boolean,
-  showBanButton?: boolean,
+  showBanButton?: boolean
 ): JSX.Element {
   const entireGame = user.entireGame;
   const player = entireGame.ingameGameState?.players.tryGet(user, null) ?? null;

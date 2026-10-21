@@ -72,7 +72,7 @@ export default class App extends Component<AppProps> {
           paddingLeft: "3rem",
           maxWidth: !this.isFullScreen ? "2800px" : "auto",
           minWidth: minWidth,
-          overflowX: "hidden",
+          overflowX: "hidden"
         }}
       >
         <Row className="justify-content-center">

@@ -50,7 +50,7 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
             style={{
               opacity: backgroundOpacity,
               height: "100%",
-              width: "auto",
+              width: "auto"
             }}
           />
           <Card.ImgOverlay style={{ padding: 16, paddingBottom: 8 }}>

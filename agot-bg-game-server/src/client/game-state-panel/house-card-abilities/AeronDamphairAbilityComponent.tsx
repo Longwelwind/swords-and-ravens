@@ -49,7 +49,7 @@ export default class AeronDamphairAbilityComponent extends Component<
         )}
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],
-          [SelectHouseCardGameState, SelectHouseCardComponent],
+          [SelectHouseCardGameState, SelectHouseCardComponent]
         ])}
       </>
     );
