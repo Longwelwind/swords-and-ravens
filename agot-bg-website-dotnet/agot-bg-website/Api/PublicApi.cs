@@ -53,6 +53,7 @@ public static class PublicApi
                             g.Name,
                             g.State,
                             g.ViewOfGame,
+                            g.LastActiveAt,
                         })
                         .FirstOrDefaultAsync();
                     if (game is null)
@@ -61,7 +62,13 @@ public static class PublicApi
                     }
 
                     return Results.Text(
-                        BuildResponse(game.Id, game.Name, game.State, game.ViewOfGame)
+                        BuildResponse(
+                                game.Id,
+                                game.Name,
+                                game.State,
+                                game.ViewOfGame,
+                                game.LastActiveAt
+                            )
                             .ToJsonString(),
                         "application/json"
                     );
@@ -72,7 +79,8 @@ public static class PublicApi
             .WithDescription(
                 "Returns the same denormalized view of a game shown in the browser client, with "
                     + "server-only fields (replacer/old-player/waiting-for ids, the internal chat room id, "
-                    + "timeout tracking) stripped and \"turn\" renamed to \"round\". Anonymous/unauthenticated "
+                    + "timeout tracking) stripped and \"turn\" renamed to \"round\", plus \"last_active_at\": the last "
+                    + "time a player acted in the game (votes and chat don't count). Anonymous/unauthenticated "
                     + "— no session cookie or credentials required; see api/PUBLIC_API.md."
             )
             .Produces(StatusCodes.Status200OK, contentType: "application/json")
@@ -85,7 +93,8 @@ public static class PublicApi
         Guid id,
         string name,
         GameState state,
-        JsonDocument? viewOfGame
+        JsonDocument? viewOfGame,
+        DateTimeOffset lastActiveAt
     )
     {
         JsonNode? sanitizedView = null;
@@ -115,6 +124,7 @@ public static class PublicApi
             ["name"] = name,
             ["view_of_game"] = sanitizedView,
             ["state"] = ToLegacyState(state),
+            ["last_active_at"] = lastActiveAt.UtcDateTime,
         };
     }
 
