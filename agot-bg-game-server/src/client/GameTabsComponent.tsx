@@ -8,8 +8,7 @@ import {
   Nav,
   Dropdown
 } from "react-bootstrap";
-// @ts-expect-error Somehow this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import AutoScroll from "./utils/AutoScroll";
 
 import classNames from "classnames";
 import { observable, runInAction } from "mobx";
@@ -109,7 +108,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
         }}
         className={classNames(
           { "flex-fill-remaining": this.gameClient.isMapScrollbarSet },
-          "text-large"
+          "text-large game-tabs"
         )}
       >
         <Tab.Container
@@ -324,7 +323,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   </Nav.Item>
                 ))}
               {this.currentOpenedTab == "game-logs" && (
-                <Dropdown className="ml-auto mt-1">
+                <Dropdown className="ms-auto mt-1">
                   <Dropdown.Toggle variant="secondary" size="sm">
                     Jump to
                   </Dropdown.Toggle>
@@ -333,7 +332,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               )}
               {isMobile && !this.logChatFullScreen && (
                 <button
-                  className="btn btn-secondary ml-auto"
+                  className="btn btn-secondary ms-auto"
                   onClick={() => {
                     this.logChatFullScreen = true;
                   }}
@@ -366,7 +365,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               </Tab.Pane>
               {this.ingame.votes.size > 0 && (
                 <Tab.Pane eventKey="votes" className="h-100">
-                  <ScrollToBottom
+                  <AutoScroll
                     className="h-100"
                     scrollViewClassName="overflow-x-hidden"
                   >
@@ -374,13 +373,13 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                       gameClient={this.gameClient}
                       ingame={this.ingame}
                     />
-                  </ScrollToBottom>
+                  </AutoScroll>
                 </Tab.Pane>
               )}
               <Tab.Pane eventKey="game-logs" className="h-100">
                 {this.currentOpenedTab == "game-logs" || !isMobile ? (
                   <div className="d-flex flex-column h-100">
-                    <ScrollToBottom
+                    <AutoScroll
                       className="flex-fill-remaining"
                       scrollViewClassName="overflow-x-hidden"
                       initialScrollBehavior="auto"
@@ -390,7 +389,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                         gameClient={this.gameClient}
                         currentlyViewed={this.currentOpenedTab == "game-logs"}
                       />
-                    </ScrollToBottom>
+                    </AutoScroll>
                   </div>
                 ) : null}
               </Tab.Pane>
@@ -589,7 +588,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
       '*[id^="gamelog-round-"]'
     );
 
-    const result: JSX.Element[] = [];
+    const result: React.JSX.Element[] = [];
 
     gameRoundElements.forEach((gameRoundElem) => {
       const round = gameRoundElem.id.replace("gamelog-round-", "");

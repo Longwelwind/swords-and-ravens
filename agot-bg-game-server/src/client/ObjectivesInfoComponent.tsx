@@ -17,7 +17,7 @@ import {
   faBookReader,
   faQuestionCircle
 } from "@fortawesome/free-solid-svg-icons";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 interface ObjectivesInfoComponentProps {
   ingame: IngameGameState;

@@ -22,7 +22,7 @@ import {
 } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import { renderRegionTooltip } from "../regionTooltip";
 import {
   faArrowRight,

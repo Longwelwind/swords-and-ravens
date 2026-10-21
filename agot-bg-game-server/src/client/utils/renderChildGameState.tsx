@@ -27,7 +27,9 @@ export default function renderChildGameState<E extends GameState<any, any>>(
       gameClient={props.gameClient}
       mapControls={props.mapControls}
       gameState={props.gameState.childGameState}
-      ref={(c: any) => (c ? ref(c) : null)}
+      ref={(c: Component | null) => {
+        if (c) ref(c);
+      }}
     />
   );
 }

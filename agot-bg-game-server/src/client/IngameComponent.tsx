@@ -62,7 +62,7 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
@@ -269,7 +269,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           }}
         >
           <Col
-            xs={{ order: columnOrder.gameStateColumn }}
+            xs={{ span: true, order: columnOrder.gameStateColumn }}
             className={this.columnSwapAnimationClassName}
             ref={this.gameStateColumnRef as any}
             style={{
@@ -326,7 +326,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               maxWidth: "600px"
             }}
             className={classNames(this.columnSwapAnimationClassName, {
-              "d-none d-xl-block":
+              "houses-column-responsive":
                 !isMobile && this.gameSettings.playerCount < 8,
               "d-none d-xxl-block":
                 !isMobile && this.gameSettings.playerCount >= 8
@@ -383,7 +383,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           rootClose
         >
           <div
-            className="clickable btn btn-sm btn-secondary"
+            className="clickable btn btn-sm btn-secondary w-auto"
             style={{
               position: "fixed",
               right: this.user?.settings.gameStateColumnRight ? "auto" : "4px",
@@ -398,7 +398,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </OverlayTrigger>
         <button
           type="button"
-          className="btn btn-sm btn-secondary"
+          className="btn btn-sm btn-secondary w-auto"
           onClick={() => (this.gameClient.muted = !this.gameClient.muted)}
           style={{
             position: "fixed",
@@ -477,7 +477,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             <Col>
               <button
                 type="button"
-                className="close"
+                className="icon-button"
                 onClick={() => {
                   runInAction(() => {
                     this.tracksPopoverVisible = false;
@@ -502,11 +502,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         show={this.tracksPopoverVisible}
       >
         <div
-          className={classNames("clickable btn btn-sm btn-secondary p-1", {
-            "d-xl-none d-xxl-none":
-              !isMobile && this.gameSettings.playerCount < 8,
-            "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
-          })}
+          className={classNames(
+            "clickable btn btn-sm btn-secondary p-1 w-auto",
+            {
+              "tracks-shortcut-responsive":
+                !isMobile && this.gameSettings.playerCount < 8,
+              "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
+            }
+          )}
           onClick={() => {
             runInAction(() => {
               this.tracksPopoverVisible = !this.tracksPopoverVisible;
@@ -1118,7 +1121,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <Card>
             <Card.Body className="d-flex align-items-center">
               <img src={stopwatchImage} width={64} />
-              <h4 className="d-inline ml-3" style={{ color: "white" }}>
+              <h4 className="d-inline ms-3" style={{ color: "white" }}>
                 Game has been paused!
               </h4>
             </Card.Body>
@@ -1138,7 +1141,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <Card>
             <Card.Body className="d-flex align-items-center">
               <img src={stopwatchImage} width={64} />
-              <h4 className="d-inline ml-3" style={{ color: "white" }}>
+              <h4 className="d-inline ms-3" style={{ color: "white" }}>
                 Game has resumed!
               </h4>
             </Card.Body>

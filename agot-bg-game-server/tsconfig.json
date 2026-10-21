@@ -13,7 +13,7 @@
     "lib": ["es2024", "ESNext.Collection", "DOM"],
     "module": "commonjs",
     "target": "es2016",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,

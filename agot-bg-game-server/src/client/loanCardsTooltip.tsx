@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React from "react";
 import { Col, Row, Tooltip } from "react-bootstrap";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import IronBank from "../common/ingame-game-state/game-data-structure/IronBank";
 
 export default function renderLoanCardsToolTip(

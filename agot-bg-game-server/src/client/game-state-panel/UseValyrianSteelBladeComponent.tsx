@@ -54,7 +54,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     <Col xs="auto">
                       <Alert
                         variant="warning"
-                        className="text-center pl-2 pt-1 pr-2 pb-2"
+                        className="text-center ps-2 pt-1 pe-2 pb-2"
                       >
                         <small>
                           <b>Warning:</b> Using the Valyrian Steel Blade
@@ -70,7 +70,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     <Col xs="auto">
                       <Alert
                         variant="warning"
-                        className="text-center pl-2 pt-1 pr-2 pb-2"
+                        className="text-center ps-2 pt-1 pe-2 pb-2"
                       >
                         <small>
                           <b>Warning:</b> The Valyrian Steel Blade decision is

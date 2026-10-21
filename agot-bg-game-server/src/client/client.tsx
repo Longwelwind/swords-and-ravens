@@ -1,5 +1,6 @@
 import App from "./App";
-import * as ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import * as React from "react";
 import "react-toastify/dist/ReactToastify.css";
 import "./style/custom.scss";
@@ -46,10 +47,16 @@ const authData = getAuthData();
 
 const gameClient = new GameClient(authData);
 
-ReactDOM.render(
-  <App gameClient={gameClient} />,
-  document.getElementById("root")
-);
+const container = document.getElementById("root");
+if (!container) {
+  throw new Error("Game client root element is missing");
+}
+
+const root = createRoot(container);
+// Preserve the legacy synchronous initial mount before connecting.
+flushSync(() => {
+  root.render(<App gameClient={gameClient} />);
+});
 
 gameClient.start();
 

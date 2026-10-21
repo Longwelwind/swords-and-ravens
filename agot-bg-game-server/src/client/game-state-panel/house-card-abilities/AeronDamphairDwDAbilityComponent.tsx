@@ -49,7 +49,7 @@ export default class AeronDamphairAbilityComponent extends Component<
                   <Col xs="auto">
                     <input
                       type="range"
-                      className="custom-range"
+                      className="w-100"
                       min={0}
                       max={this.props.gameState.maxAllowedPowerTokens}
                       value={this.powerTokens}

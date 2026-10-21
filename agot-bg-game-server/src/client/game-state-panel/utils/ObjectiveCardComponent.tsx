@@ -2,7 +2,7 @@ import { Component, default as React, ReactNode } from "react";
 import { observer } from "mobx-react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import classNames from "classnames";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import { preventOverflow } from "@popperjs/core";
 import objectiveCardImages from "../../objectiveCardImages";
 import {

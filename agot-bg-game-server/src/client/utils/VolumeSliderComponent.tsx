@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
-import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import {
   faVolumeLow,
   faVolumeUp,
@@ -21,8 +20,11 @@ interface VolumeSliderComponentProps {
 class VolumeSliderComponent extends Component<VolumeSliderComponentProps> {
   @observable accessor volume = Math.floor(this.props.volume);
 
-  handleVolumeChange = (e: any): void => {
-    const newVolume = typeof e === "number" ? e : parseInt(e.target.value);
+  @action
+  handleVolumeChange = (
+    e: number | React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const newVolume = typeof e === "number" ? e : parseInt(e.target.value, 10);
     this.volume = newVolume;
     if (this.props.onVolumeChange) {
       this.props.onVolumeChange(newVolume);
@@ -56,7 +58,7 @@ class VolumeSliderComponent extends Component<VolumeSliderComponentProps> {
             )}
           </Col>
           <Col xs="auto">
-            <Form.Control
+            <input
               type="range"
               value={this.volume}
               onChange={this.handleVolumeChange}

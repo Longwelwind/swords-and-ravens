@@ -59,7 +59,7 @@ export default class BiddingComponent<
                   <Col xs="auto">
                     <input
                       type="range"
-                      className="custom-range"
+                      className="w-100"
                       min={0}
                       max={this.authenticatedPlayer.house.powerTokens}
                       value={this.powerTokensToBid}

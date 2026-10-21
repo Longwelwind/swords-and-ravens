@@ -24,7 +24,7 @@ import UnitIconComponent from "../UnitIconComponent";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 @observer
 export default class ResolveSingleMarchOrderComponent extends Component<
@@ -398,7 +398,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         <Col xs={12} className="text-center">
           <Form>
             <fieldset>
-              <Form.Group>
+              <Form.Group className="mb-3">
                 {showLeavePowerTokenPrompt ? (
                   <>
                     <Col xs={12} className="mb-0 pb-0">

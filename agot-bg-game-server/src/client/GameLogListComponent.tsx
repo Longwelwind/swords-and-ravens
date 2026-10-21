@@ -136,7 +136,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           </Row>
         )}
         <Row>
-          <Col xs="auto" className="text-muted px-0 ml-2">
+          <Col xs="auto" className="text-muted px-0 ms-2">
             <OverlayTrigger
               placement="auto"
               overlay={
@@ -175,7 +175,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               </OverlayTrigger>
             </Col>
           )}
-          <Col className="mr-2">
+          <Col className="me-2">
             <div
               id={`game-log-content-${i}`}
               className={classNames("game-log-content", {
@@ -1063,7 +1063,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               Final order of{" "}
               <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
             </p>
-            <Row className="mb-2 mt-1 ml-2">
+            <Row className="mb-2 mt-1 ms-2">
               {finalOrder.map((h) => (
                 <Col xs="auto" key={`cok_final_${data.trackerI}_${h.id}`}>
                   <SimpleInfluenceIconComponent house={h} />
@@ -1099,7 +1099,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               </p>
             )}
 
-            <Row className="mb-1 mt-2 ml-2">
+            <Row className="mb-1 mt-2 ms-2">
               <HouseNumberResultsComponent
                 results={bids}
                 keyPrefix={`cok_${data.trackerI}`}

@@ -195,7 +195,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
         style={{ height: gameClient.isMapScrollbarSet ? "auto" : "800px" }}
         className={classNames(
           { "flex-fill-remaining": gameClient.isMapScrollbarSet },
-          "text-large"
+          "text-large game-tabs"
         )}
       >
         <Tab.Container
@@ -328,7 +328,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               <Nav.Item>
                 <div className="dropdown-divider"></div>
               </Nav.Item>
-              <Dropdown className="ml-auto mt-1">
+              <Dropdown className="ms-auto mt-1">
                 <Dropdown.Toggle variant="secondary" size="sm">
                   Jump to
                 </Dropdown.Toggle>
@@ -336,7 +336,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
               </Dropdown>
             </Nav>
           </Card.Header>
-          <Card.Body id="game-log-panel" className="h-100 px-1">
+          <Card.Body id="game-log-panel" className="px-1">
             <Tab.Content className="h-100">
               <Tab.Pane
                 eventKey="game-logs"

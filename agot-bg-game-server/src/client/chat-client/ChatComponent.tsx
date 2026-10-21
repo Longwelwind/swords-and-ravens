@@ -9,8 +9,7 @@ import Form from "react-bootstrap/Form";
 import { observable } from "mobx";
 import ChatClient, { Channel, Message } from "./ChatClient";
 import EntireGame from "../../common/EntireGame";
-// @ts-expect-error Somehow ts complains that this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import AutoScroll from "../utils/AutoScroll";
 import { Alert, OverlayTrigger, Popover, Tooltip } from "react-bootstrap";
 import User from "../../server/User";
 import { preventOverflow } from "@popperjs/core";
@@ -252,11 +251,9 @@ export default class ChatComponent extends Component<ChatComponentProps> {
     } */
     return (
       <div ref={this.chatContainerRef} className="d-flex flex-column h-100">
-        {/* Setting a fixed height seems to be the only solution to make ScrollToBottom work */}
-        <ScrollToBottom
+        <AutoScroll
           className="mb-2 flex-fill-remaining"
           scrollViewClassName="overflow-x-auto"
-          style={{ height: 300 }}
         >
           {/* In case there's no messages yet, inject with no messages as arguments */}
           {messages.length == 0 && (
@@ -302,7 +299,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             {this.isPrivateChannel && (
               <button
                 type="button"
-                className="close mx-1"
+                className="icon-button mx-1"
                 onClick={(e: any) => {
                   e.currentTarget.blur();
                   this.closeChat();
@@ -323,7 +320,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
             {!this.noMoreMessages && (
               <button
                 type="button"
-                className="close"
+                className="icon-button"
                 onClick={(e: any) => {
                   e.currentTarget.blur();
                   this.loadMoreMessages();
@@ -346,7 +343,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
               </button>
             )}
           </div>
-        </ScrollToBottom>
+        </AutoScroll>
         {!this.channel.connected ? (
           <div className="flex-nowrap justify-content-center">
             <Alert variant="warning" className="text-center">
@@ -517,8 +514,8 @@ export default class ChatComponent extends Component<ChatComponentProps> {
         >
           <div
             style={{ width: "fit-content" }}
-            className={classNames("p-1 pl-2", {
-              "float-right":
+            className={classNames("p-1 ps-2", {
+              "float-end":
                 this.props.gameClient.authenticatedUser == currentMessage.user,
               "own-message":
                 this.props.gameClient.authenticatedUser == currentMessage.user,
@@ -554,7 +551,7 @@ export default class ChatComponent extends Component<ChatComponentProps> {
               style={{ width: "fit-content", overflowWrap: "anywhere" }}
               className={classNames("p-1 px-2", {
                 "make-emojis-large": onlyEmojis,
-                "float-right":
+                "float-end":
                   this.props.gameClient.authenticatedUser ==
                   currentMessage.user,
                 "own-message":

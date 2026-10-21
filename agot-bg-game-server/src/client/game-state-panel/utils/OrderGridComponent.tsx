@@ -15,7 +15,7 @@ interface OrderGridProps {
 }
 
 export default class OrderGridComponent extends Component<OrderGridProps> {
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     return (
       <Row className="justify-content-center">
         <Col xs="auto">

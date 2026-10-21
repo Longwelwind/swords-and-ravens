@@ -9,7 +9,7 @@ import House from "../common/ingame-game-state/game-data-structure/House";
 import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
 import braavosInitialLoanCostReduceImage from "../../public/images/garrisons/braavos-initial-loan-cost-reduce.png";
 import ironBankImage from "../../public/images/ironBank.jpg";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 interface IronBankInfosComponentProps {
   ingame: IngameGameState;
@@ -61,7 +61,7 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
   renderIronBankInfos(
     braavosController: House | null,
     interestCosts: [House, number][]
-  ): JSX.Element {
+  ): React.JSX.Element {
     return (
       <Row style={{ height: "100%" }} className="align-items-center">
         <Col xs={12}>

@@ -62,7 +62,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
             popperConfig={{ modifiers: [preventOverflow] }}
           >
             <h4>
-              <Badge variant="secondary">{countdown}</Badge>
+              <Badge bg="secondary">{countdown}</Badge>
             </h4>
           </OverlayTrigger>
         </Col>
@@ -109,7 +109,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
               popperConfig={{ modifiers: [preventOverflow] }}
             >
               <h4>
-                <Badge variant="secondary">{totalPlayingTime}</Badge>
+                <Badge bg="secondary">{totalPlayingTime}</Badge>
               </h4>
             </OverlayTrigger>
           </Col>
@@ -134,7 +134,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
             popperConfig={{ modifiers: [preventOverflow] }}
           >
             <h4>
-              <Badge variant="secondary">{countdown}</Badge>
+              <Badge bg="secondary">{countdown}</Badge>
             </h4>
           </OverlayTrigger>
         </Col>
@@ -155,7 +155,7 @@ export default class ClockComponent extends Component<ClockComponentProps> {
             popperConfig={{ modifiers: [preventOverflow] }}
           >
             <h4>
-              <Badge variant="secondary">
+              <Badge bg="secondary">
                 {this.now.toISOString().slice(11, 16)}
               </Badge>
             </h4>

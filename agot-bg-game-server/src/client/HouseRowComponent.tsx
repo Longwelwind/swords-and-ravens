@@ -38,7 +38,7 @@ import UserLabel from "./UserLabel";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
 import GiftPowerTokensComponent from "./GiftPowerTokensComponent";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import MapControls, { RegionOnMapProperties } from "./MapControls";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import PartialRecursive from "../utils/PartialRecursive";
@@ -245,7 +245,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
           <Row className="align-items-center flex-nowrap">
             <Col
               xs="auto"
-              className="pr-0"
+              className="pe-0"
               style={{ width: "32px" }}
               onMouseEnter={() => this.setHighlightedRegions()}
               onMouseLeave={() => this.clearHighlightedRegions()}
@@ -283,7 +283,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <Col
               onMouseEnter={() => this.setHighlightedRegions()}
               onMouseLeave={() => this.clearHighlightedRegions()}
-              className="pr-0"
+              className="pe-0"
             >
               <h5 style={{ margin: 0, padding: 0 }}>
                 <b style={{ color: this.house.color }}>{this.house.name}</b>
@@ -304,7 +304,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <Nav className="no-space-around">
                       <NavDropdown
                         id={`vassal-nav-dropdown-${this.house.id}`}
-                        className="no-gutters"
+                        className="g-0"
                         title={<span className="userlabel">{vassalTitle}</span>}
                       >
                         {this.renderVassalDropDownItems()}
@@ -325,7 +325,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                   (type) =>
                     this.game.getUnitLimitOfType(this.house, type) > 0 && (
                       <Col xs={6} key={type.id}>
-                        <Row className="justify-content-center no-gutters align-items-center">
+                        <Row className="justify-content-center g-0 align-items-center">
                           <Col xs="auto">
                             {this.game.getAvailableUnitsOfType(
                               this.house,
@@ -366,7 +366,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               >
                 <Col
                   xs="auto"
-                  className="d-flex align-items-center pl-1"
+                  className="d-flex align-items-center ps-1"
                   onMouseEnter={() =>
                     this.setHighlightedRegions(
                       this.house == this.game.targaryen
@@ -390,7 +390,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                   </div>
                   <img
                     className={classNames(
-                      "ml-1",
+                      "ms-1",
                       { "dye-warning": victoryPointsWarning },
                       { "dye-critical": victoryPointsCritical }
                     )}
@@ -438,7 +438,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                 trigger="click"
                 rootClose
               >
-                <div className="clickable btn btn-sm btn-secondary ml-1 p-1">
+                <div className="clickable btn btn-sm btn-secondary ms-1 p-1">
                   <div
                     className="house-power-token"
                     style={{
@@ -553,7 +553,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         <Card>
           <Card.Body className="d-flex align-items-center">
             <img src={stopwatchImage} width={64} className="dye-critical" />
-            <h4 className="d-inline ml-3" style={{ color: "white" }}>
+            <h4 className="d-inline ms-3" style={{ color: "white" }}>
               {getUserLinkOrLabel(player.user)} is running out of time!
             </h4>
           </Card.Body>

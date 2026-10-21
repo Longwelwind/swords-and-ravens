@@ -30,11 +30,10 @@ import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
-// @ts-expect-error Somehow ts complains that this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import AutoScroll from "./utils/AutoScroll";
 import _ from "lodash";
 import VolumeSliderComponent from "./utils/VolumeSliderComponent";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 interface LobbyComponentProps {
   gameClient: GameClient;
@@ -161,13 +160,13 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             </Col>
             {connectedSpectators.length > 0 && (
               <Col className="no-space-around">
-                <Card className="ml-2">
+                <Card className="ms-2">
                   <Card.Body
                     style={{ height: this.chatHeight, padding: "1rem" }}
                   >
                     <div className="d-flex flex-column h-100">
                       <span>Spectators:</span>
-                      <ScrollToBottom
+                      <AutoScroll
                         className="mb-2 flex-fill-remaining"
                         scrollViewClassName="overflow-x-hidden"
                       >
@@ -176,7 +175,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                             <b>{getUserLinkOrLabel(u)}</b>
                           </div>
                         ))}
-                      </ScrollToBottom>
+                      </AutoScroll>
                     </div>
                   </Card.Body>
                 </Card>
@@ -205,7 +204,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                   <Col>
                     <Button
                       type="button"
-                      block
+                      className="w-100"
                       onClick={() => this.lobby.start()}
                       disabled={!canStartGame || this.readyCheckOngoing}
                     >
@@ -408,7 +407,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
       }
       return this.lobby.readyUsers.includes(this.lobby.players.get(h)) ? (
         <Col xs="auto">
-          <Badge variant="success">
+          <Badge bg="success">
             <FontAwesomeIcon icon={faCheck} size="sm" />
           </Badge>
         </Col>
@@ -423,7 +422,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             Ready
           </Button>
           <Spinner
-            className="ml-3"
+            className="ms-3"
             size="sm"
             animation="border"
             variant="info"

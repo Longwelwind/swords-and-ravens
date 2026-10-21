@@ -17,7 +17,7 @@ import GameClient from "./GameClient";
 import MapControls from "./MapControls";
 import User from "../server/User";
 import { InfluenceTrackDetails } from "./IngameComponent";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 
@@ -125,7 +125,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                   mapControls={this.props.mapControls}
                 />
               ))}
-              <ListGroupItem className="font-italic">
+              <ListGroupItem className="fst-italic">
                 {connectedSpectators.length > 0 ? (
                   <>
                     <Row className="justify-content-center">
@@ -155,7 +155,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                 )}
               </ListGroupItem>
               {bannedUsers.length > 0 && (
-                <ListGroupItem className="font-italic">
+                <ListGroupItem className="fst-italic">
                   <Row className="justify-content-center">
                     <Col xs="auto">Banned users:</Col>
                   </Row>
@@ -169,7 +169,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                         {this.gameClient.canActAsOwner() && (
                           <button
                             type="button"
-                            className="close ml-1"
+                            className="icon-button ms-1"
                             style={{ float: "none" }}
                             onClick={() => this.unbanUser(u)}
                           >

@@ -36,7 +36,7 @@ export default class AeronDamphairAbilityComponent extends Component<
               <Col xs="auto">
                 <Alert
                   variant="danger"
-                  className="text-center pl-2 pt-1 pr-2 pb-2"
+                  className="text-center ps-2 pt-1 pe-2 pb-2"
                 >
                   <small>
                     <b>Warning:</b> This card&apos;s ability will have no effect

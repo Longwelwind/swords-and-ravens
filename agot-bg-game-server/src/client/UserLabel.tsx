@@ -97,7 +97,7 @@ export default class UserLabel extends Component<UserLabelProps> {
             <NavDropdown
               id={`nav-dropdown-${this.user.id}`}
               style={{ position: "static" }}
-              className="no-gutters"
+              className="g-0"
               title={
                 <span
                   className={classNames("userlabel", {

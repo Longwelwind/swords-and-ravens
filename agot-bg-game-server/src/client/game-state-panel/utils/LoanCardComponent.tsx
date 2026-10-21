@@ -2,7 +2,7 @@ import { Component, default as React, ReactNode } from "react";
 import { observer } from "mobx-react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { preventOverflow } from "@popperjs/core";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import LoanCardType from "../../../common/ingame-game-state/game-data-structure/loan-card/LoanCardType";
 import loanCardImages from "../../loanCardImages";
 import ImagePopover from "../../utils/ImagePopover";

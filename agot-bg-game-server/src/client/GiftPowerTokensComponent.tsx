@@ -69,7 +69,7 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
             <Col xs="auto">
               <input
                 type="range"
-                className="custom-range"
+                className="w-100"
                 min={0}
                 max={Math.min(
                   this.house.powerTokens,

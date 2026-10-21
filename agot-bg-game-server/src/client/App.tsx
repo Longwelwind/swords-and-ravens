@@ -120,7 +120,7 @@ export default class App extends Component<AppProps> {
                     }}
                   >
                     <FontAwesomeIcon icon={faRotateRight} size="lg" />
-                    <h5 className="ml-2 d-inline">Reload</h5>
+                    <h5 className="ms-2 d-inline">Reload</h5>
                   </button>
                 </Alert>
               </Col>

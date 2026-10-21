@@ -438,7 +438,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
   renderLobbySettings(): ReactNode {
     return (
       <Row className="mt-2 justify-content-center">
-        <Col xs="auto" id="base-settings-col" className="no-gutters">
+        <Col xs="auto" id="base-settings-col" className="g-0">
           <OverlayTrigger
             overlay={
               <Tooltip id="game-setups-tooltip" className="tooltip-w-100">
@@ -450,7 +450,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
           >
             <Col xs="12">
               <select
-                className="custom-select"
+                className="form-select"
                 id="game-setups"
                 name="setups"
                 value={this.gameSettings.setupId}
@@ -462,7 +462,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             </Col>
           </OverlayTrigger>
           <Col xs="auto" className="d-flex justify-content-between">
-            <div className="mr-2">
+            <div className="me-2">
               <select
                 id="player-count"
                 name="playerCount"
@@ -726,10 +726,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             />
             {this.gameSettings.houseCardsEvolution && (
               <div>
-                <span className="ml-1">- Round:</span>
+                <span className="ms-1">- Round:</span>
                 <select
                   id="decks-evolution-setting-round"
-                  className="ml-2"
+                  className="ms-2"
                   value={this.gameSettings.houseCardsEvolutionRound}
                   onChange={(e) =>
                     this.onHouseCardsEvolutionRoundChange(e.target.value)
@@ -821,7 +821,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             </Col>
           )}
         </Col>
-        <Col xs="6" lg="auto" id="mod-settings-col" className="no-gutters">
+        <Col xs="6" lg="auto" id="mod-settings-col" className="g-0">
           <Col xs="12">
             <FormCheck
               id="vassals-setting"
@@ -1016,12 +1016,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             />
           </Col>
         </Col>
-        <Col
-          xs="6"
-          lg="auto"
-          id="extended-base-settings-col"
-          className="no-gutters"
-        >
+        <Col xs="6" lg="auto" id="extended-base-settings-col" className="g-0">
           <Col xs="12">
             <FormCheck
               id="random-houses-setting"
@@ -1175,7 +1170,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             />
           </Col>
         </Col>
-        <Col xs="6" lg="auto" id="custom-settings-col" className="no-gutters">
+        <Col xs="6" lg="auto" id="custom-settings-col" className="g-0">
           <Col xs="12">
             <FormCheck
               id="mixed-wd1-setting"
@@ -1350,7 +1345,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             />
           </Col>
         </Col>
-        <Col xs="6" lg="auto" id="custom-settings-2-col" className="no-gutters">
+        <Col xs="6" lg="auto" id="custom-settings-2-col" className="g-0">
           <Col xs="12">
             <FormCheck
               id="preceding-mustering-setting"
@@ -1494,7 +1489,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             />
           </Col>
         </Col>
-        <Col xs="6" lg="auto" id="draft-settings-col" className="no-gutters">
+        <Col xs="6" lg="auto" id="draft-settings-col" className="g-0">
           <Col xs="12">
             <FormCheck
               id="draft-house-cards-settings"
@@ -1663,12 +1658,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
           </Col>
         </Col>
         {this.gameSettings.draftHouseCards && (
-          <Col
-            xs="6"
-            lg="auto"
-            id="draft-decks-settings-col"
-            className="no-gutters"
-          >
+          <Col xs="6" lg="auto" id="draft-decks-settings-col" className="g-0">
             <Col xs="12">
               <FormCheck
                 id="draft-tracks-settings"
@@ -1914,7 +1904,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
   }
 
   createSetupItems(): ReactNode {
-    const items: JSX.Element[] = [];
+    const items: React.JSX.Element[] = [];
 
     allGameSetups.forEach((setupData, setupId) => {
       items.push(
@@ -1928,7 +1918,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
   }
 
   createPlayerCountItems(): ReactNode {
-    const items: JSX.Element[] = [];
+    const items: React.JSX.Element[] = [];
 
     const playerSetups = getGameSetupContainer(
       this.gameSettings.setupId

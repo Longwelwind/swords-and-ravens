@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React from "react";
 import { Tooltip } from "react-bootstrap";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
 import joinReactNodes from "./utils/joinReactNodes";
 import barrelImage from "../../public/images/region-modifications/Barrel.png";
@@ -31,7 +31,7 @@ export function renderRegionTooltip(
               return (
                 <div
                   key={`barrel-icon-${region.id}-${i}`}
-                  className="unit-icon medium mr-1"
+                  className="unit-icon medium me-1"
                   style={{ backgroundImage: `url(${barrelImage})` }}
                 />
               );
@@ -40,7 +40,7 @@ export function renderRegionTooltip(
               return (
                 <div
                   key={`crown-icon-${region.id}-${i}`}
-                  className="unit-icon medium mr-1"
+                  className="unit-icon medium me-1"
                   style={{ backgroundImage: `url(${crownImage})` }}
                 />
               );
@@ -99,7 +99,7 @@ export function renderRegionTooltip(
             return (
               <div
                 key={`barrel-icon-${region.id}-${i}`}
-                className="unit-icon medium mr-1"
+                className="unit-icon medium me-1"
                 style={{ backgroundImage: `url(${barrelImage})` }}
               />
             );
@@ -108,14 +108,14 @@ export function renderRegionTooltip(
             return (
               <div
                 key={`crown-icon-${region.id}-${i}`}
-                className="unit-icon medium mr-1"
+                className="unit-icon medium me-1"
                 style={{ backgroundImage: `url(${crownImage})` }}
               />
             );
           })}
           {region.controlPowerToken && (
             <div
-              className="tooltip-power-token mr-1"
+              className="tooltip-power-token me-1"
               style={{
                 backgroundImage: `url(${housePowerTokensImages.get(region.controlPowerToken.id)})`
               }}

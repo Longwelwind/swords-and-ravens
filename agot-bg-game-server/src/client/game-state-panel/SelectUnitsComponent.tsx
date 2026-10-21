@@ -39,7 +39,7 @@ export default class SelectUnitsComponent extends Component<
                 <Row className="mx-2 justify-content-center">
                   <div>
                     <div className="mb-2 text-center">Selected units:</div>
-                    <ul className="pl-0">
+                    <ul className="ps-0">
                       {this.selectedUnits.entries.map(([region, units]) => (
                         <li key={`select-units_${region.id}`}>
                           {joinReactNodes(

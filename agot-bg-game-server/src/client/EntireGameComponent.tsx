@@ -300,7 +300,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
     ) : (
       <Col xs="auto">
         <h4>
-          <Badge variant="primary">PRIVATE</Badge>
+          <Badge bg="primary">PRIVATE</Badge>
         </h4>
       </Col>
     );
@@ -318,7 +318,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             }
             placement="bottom"
           >
-            <Badge variant="danger">
+            <Badge bg="danger">
               <FontAwesomeIcon icon={faLock} size="sm" />
             </Badge>
           </OverlayTrigger>
@@ -342,10 +342,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
               }
               placement="bottom"
             >
-              <Badge variant="primary">PBEM</Badge>
+              <Badge bg="primary">PBEM</Badge>
             </OverlayTrigger>
           ) : (
-            <Badge variant="success">Live</Badge>
+            <Badge bg="success">Live</Badge>
           )}
         </h4>
       </Col>
@@ -358,7 +358,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         {this.entireGame.ingameGameState?.paused && (
           <Col xs="auto">
             <h4>
-              <Badge variant="danger">PAUSED</Badge>
+              <Badge bg="danger">PAUSED</Badge>
             </h4>
           </Col>
         )}
@@ -455,7 +455,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
         {false && (
           <Col xs="auto">
             <h4>
-              <Badge variant="warning">BETA</Badge>
+              <Badge bg="warning">BETA</Badge>
             </h4>
           </Col>
         )}
@@ -528,7 +528,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
           type="switch"
           label={
             <label htmlFor="replay-mode-switch">
-              <Badge variant="warning">REPLAY MODE</Badge>
+              <Badge bg="warning">REPLAY MODE</Badge>
             </label>
           }
           style={{ marginTop: "-6px" }}
@@ -586,7 +586,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   house={player.house}
                   size={100}
                 ></HouseIconComponent>
-                <h2 className="d-inline ml-3" style={{ color: "white" }}>
+                <h2 className="d-inline ms-3" style={{ color: "white" }}>
                   It&apos;s your turn!
                 </h2>
               </Card.Body>

@@ -58,9 +58,9 @@ export default class WildlingsAttackComponent extends Component<
       <>
         {!this.props.gameState.biddingResults && (
           <Row className="justify-content-center mt-2 mb-1">
-            <img src={mammothImage} width="40px" className="mr-2" />
+            <img src={mammothImage} width="40px" className="me-2" />
             <h4 className="mt-2">Wildlings Attack</h4>
-            <img src={mammothImage} width="40px" className="ml-2" />
+            <img src={mammothImage} width="40px" className="ms-2" />
           </Row>
         )}
         {this.props.gameState.biddingResults && (

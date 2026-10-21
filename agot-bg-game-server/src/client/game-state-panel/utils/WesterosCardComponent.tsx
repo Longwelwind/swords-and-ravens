@@ -7,7 +7,7 @@ import WesterosCardType from "../../../common/ingame-game-state/game-data-struct
 import westerosCardImages from "../../westerosCardImages";
 import ConditionalWrap from "../../../client/utils/ConditionalWrap";
 import { preventOverflow } from "@popperjs/core";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import ImagePopover from "../../utils/ImagePopover";
 import trageImage from "../../../../public/images/icons/trade.svg";
 import { Tooltip } from "react-bootstrap";

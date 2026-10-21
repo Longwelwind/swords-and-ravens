@@ -32,7 +32,7 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
                 className="d-flex flex-column align-items-center"
               >
                 <div>
-                  <Badge variant="secondary" style={{ fontSize: "1rem" }}>
+                  <Badge bg="secondary" style={{ fontSize: "1rem" }}>
                     {i}
                   </Badge>
                 </div>

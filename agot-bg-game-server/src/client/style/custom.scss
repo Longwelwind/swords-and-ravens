@@ -51,16 +51,146 @@ strong {
   font-weight: bold;
 }
 
+label {
+  margin-bottom: 0.5rem;
+}
+
+.form-check-label {
+  margin-bottom: 0;
+  vertical-align: top;
+}
+
+.form-check-input {
+  margin-top: math.div(
+    $font-size-base * $line-height-base - $form-check-input-width,
+    2
+  );
+}
+
+.form-control[readonly] {
+  background-color: $input-disabled-bg;
+}
+
+.form-select {
+  display: inline-block;
+}
+
 .row {
   margin-top: -0.5rem;
   margin-bottom: -0.5rem;
 }
 
+// Some panels nest rows directly, rather than wrapping them in a column.
+.row > .row {
+  flex-shrink: 1;
+  width: auto;
+  max-width: none;
+  padding-right: 0;
+  padding-left: 0;
+}
+
 .col,
 .col-auto,
 .col-12 {
+  position: relative;
+  padding-right: math.div($grid-gutter-width, 2);
+  padding-left: math.div($grid-gutter-width, 2);
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+}
+
+// Columns outside a row still need the positioning and gutters used by the map.
+@each $breakpoint in map-keys($grid-breakpoints) {
+  $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  .col#{$infix}-auto {
+    position: relative;
+    padding-right: math.div($grid-gutter-width, 2);
+    padding-left: math.div($grid-gutter-width, 2);
+  }
+  @for $size from 1 through $grid-columns {
+    .col#{$infix}-#{$size} {
+      position: relative;
+      padding-right: math.div($grid-gutter-width, 2);
+      padding-left: math.div($grid-gutter-width, 2);
+    }
+  }
+}
+
+.g-0 > [class*="col"] {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.houses-column-responsive {
+  display: none;
+}
+
+// Leave room for the map, the minimum state-panel width, and outer gutters.
+@media (min-width: 1900px) {
+  .houses-column-responsive {
+    display: block;
+  }
+
+  .tracks-shortcut-responsive {
+    display: none;
+  }
+}
+
+.icon-button {
+  float: right;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  color: $white;
+  font-size: $font-size-base * 1.5;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  opacity: 0.5;
+
+  &:hover {
+    color: $white;
+    text-decoration: none;
+  }
+
+  &:not(:disabled):not(.disabled) {
+    &:hover,
+    &:focus {
+      opacity: 0.75;
+    }
+  }
+}
+
+.auto-scroll,
+.auto-scroll.flex-fill-remaining {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.game-tabs.flex-fill-remaining {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.game-tabs > .card-body {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.auto-scroll-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.auto-scroll-follow {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  box-shadow: 0 0.125rem 0.25rem rgba(black, 0.3);
 }
 
 .stackable {
@@ -796,16 +926,25 @@ div.disconnected {
   opacity: 1;
 }
 
+// Bootstrap 5 leaves positioning to Popper's inline styles, so overlays briefly join the
+// document flow on their first frame and toggle the page scrollbar. Restore Bootstrap 4's rules.
+.tooltip,
+.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .no-space-around {
   padding: 0 !important;
   margin: 0 !important;
 }
 
-.no-gutters,
-.no-gutters .col,
-.no-gutters .col-auto,
-.no-gutters .col-12,
-.no-gutters .nav-link {
+.g-0,
+.g-0 .col,
+.g-0 .col-auto,
+.g-0 .col-12,
+.g-0 .nav-link {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   margin-top: 0 !important;

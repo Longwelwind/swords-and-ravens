@@ -44,7 +44,7 @@ import UseRavenGameState from "../common/ingame-game-state/action-game-state/use
 import { renderRegionTooltip } from "./regionTooltip";
 import getGarrisonToken from "./garrisonTokens";
 import { ship } from "../common/ingame-game-state/game-data-structure/unitTypes";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import loyaltyTokenImage from "../../public/images/power-tokens/Loyalty.png";
 import loanCardImages from "./loanCardImages";
 import StaticIronBankView from "../common/ingame-game-state/game-data-structure/static-data-structure/StaticIronBankView";

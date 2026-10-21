@@ -101,7 +101,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             )}
           </div>
 
-          <div style={{ gridRow: "1", gridColumn: "2" }} className="text-right">
+          <div style={{ gridRow: "1", gridColumn: "2" }} className="text-end">
             {this.defender.isWinner && (
               <img
                 src={knightBannerImage}

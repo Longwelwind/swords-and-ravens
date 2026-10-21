@@ -66,7 +66,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
         }}
       >
         <Col
-          xs={{ order: columnOrders.gameStateColumn }}
+          xs={{ span: true, order: columnOrders.gameStateColumn }}
           className={this.columnSwapAnimationClassName}
           style={{
             maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",

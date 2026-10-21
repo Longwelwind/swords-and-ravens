@@ -4,7 +4,7 @@ import { TidesOfBattleCard } from "../../../common/ingame-game-state/game-data-s
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import tidesOfBattleImages from "../../../client/tidesOfBattleImages";
 import { preventOverflow } from "@popperjs/core";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import ImagePopover from "../../utils/ImagePopover";
 
 interface TidesOfBattleCardComponentProps {

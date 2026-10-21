@@ -79,7 +79,7 @@ export default class ChooseHouseCardComponent extends Component<
     );
   }
 
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     const waitingFor = this.props.gameState.getWaitingForHouses();
     const commandedHouse = this.tryGetCommandedHouseInCombat();
     const supportingHouses =

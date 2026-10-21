@@ -14,7 +14,7 @@ import {
   Spinner,
   Popover
 } from "react-bootstrap";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 import { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-structure/Game";
 
@@ -178,7 +178,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             maxHeight: "65%",
             paddingRight: "2px",
             borderWidth: "3px",
-            overflowY: "scroll"
+            overflowY: "scroll",
+            overflowX: "hidden"
           }}
         >
           <Row className="no-space-around">
@@ -278,7 +279,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 className="px-0 text-center"
               >
                 <Row
-                  className="mb-3 mx-0"
+                  className="mb-3 g-0"
                   onMouseEnter={() => this.highlightRegionsOfHouses()}
                   onMouseLeave={() => this.clearHighlightedRegions()}
                 >
@@ -315,8 +316,8 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     </div>
                   </OverlayTrigger>
                 </Row>
-                <Row className="mr-0">
-                  <div>
+                <Row className="g-0">
+                  <div className="d-flex flex-column align-items-center">
                     <OverlayTrigger
                       overlay={this.renderWildlingDeckPopover(
                         knowsWildlingCard,
@@ -354,7 +355,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 </Row>
                 {this.game.dragonStrengthTokens.length > 0 && (
                   <Row
-                    className="mx-0 mt-3"
+                    className="mt-3 g-0"
                     onMouseEnter={() => this.highlightRegionsWithDragons()}
                     onMouseLeave={() => this.clearHighlightedRegions()}
                   >
@@ -478,7 +479,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                       {count > 1 ? count : <>&nbsp;</>}
                     </Col>
                     <Col
-                      className="pl-0"
+                      className="ps-0"
                       style={{ width: "150px", maxWidth: "150px" }}
                     >
                       <WesterosCardComponent
@@ -532,7 +533,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             <h5 className="text-center">The Wildling Deck</h5>
           </Col>
           <Col xs={12}>
-            <Row className="justify-content-center mr-0 ml-0">
+            <Row className="justify-content-center me-0 ms-0">
               {wildlingDeck.map((wc) => (
                 <Col
                   xs="auto"

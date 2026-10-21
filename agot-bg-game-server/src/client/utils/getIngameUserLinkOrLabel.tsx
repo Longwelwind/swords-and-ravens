@@ -23,7 +23,7 @@ export default function getUserLinkOrLabel(
   user: User,
   houseNames?: boolean,
   showBanButton?: boolean
-): JSX.Element {
+): React.JSX.Element {
   const entireGame = user.entireGame;
   const player = entireGame.ingameGameState?.players.tryGet(user, null) ?? null;
   const displayName = !houseNames || !player ? user.name : player.house.name;
@@ -76,7 +76,7 @@ export default function getUserLinkOrLabel(
         >
           <button
             type="button"
-            className="close ml-1"
+            className="icon-button ms-1"
             style={{ float: "none" }}
             onClick={() => banUser(user, entireGame)}
           >

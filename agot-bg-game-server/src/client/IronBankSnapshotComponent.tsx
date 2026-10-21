@@ -64,7 +64,7 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
   renderIronBankInfos(
     braavosController: House | null,
     interestCosts: [House, number][]
-  ): JSX.Element {
+  ): React.JSX.Element {
     return (
       <Row style={{ height: "100%" }} className="align-items-center">
         <Col xs={12}>

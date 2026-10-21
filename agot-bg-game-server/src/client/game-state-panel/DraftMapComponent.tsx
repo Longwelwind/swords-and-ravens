@@ -10,7 +10,7 @@ import { Button, Col, OverlayTrigger, Popover } from "react-bootstrap";
 import DraftMapGameState from "../../common/ingame-game-state/draft-game-state/draft-map-game-state/DraftMapGameState";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import PartialRecursive from "../../utils/PartialRecursive";

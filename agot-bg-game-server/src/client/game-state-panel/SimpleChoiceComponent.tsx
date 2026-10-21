@@ -11,7 +11,7 @@ import Col from "react-bootstrap/Col";
 export default class SimpleChoiceComponent extends Component<
   GameStateComponentProps<SimpleChoiceGameState>
 > {
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     return (
       <>
         <Col xs={12} className="text-center" style={{ whiteSpace: "pre-line" }}>

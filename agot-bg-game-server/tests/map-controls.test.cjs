@@ -1,7 +1,8 @@
+require("./dom-setup.cjs");
 const assert = require("node:assert/strict");
-const { test, beforeEach } = require("node:test");
+const { test, beforeEach, afterEach } = require("node:test");
 const React = require("react");
-const { act, create } = require("react-test-renderer");
+const { act, render, fireEvent, cleanup } = require("@testing-library/react");
 const { autorun, observable, runInAction } = require("mobx");
 const { observer } = require("mobx-react");
 const MapControls = require("../src/client/MapControls").default;
@@ -10,11 +11,6 @@ const BetterMap = require("../src/utils/BetterMap").default;
 const SelectRegion =
   require("../src/client/game-state-panel/SelectRegionComponent").default;
 
-for (const extension of [".png", ".jpg", ".svg"]) {
-  require.extensions[extension] = (module, filename) => {
-    module.exports = filename;
-  };
-}
 require("../src/common/EntireGame");
 const GameState = require("../src/common/GameState").default;
 const March =
@@ -36,6 +32,8 @@ beforeEach((context) => {
     warn(...args);
   });
 });
+
+afterEach(cleanup);
 
 function fixture() {
   const root = new GameState(null);
@@ -238,12 +236,9 @@ function mapView(root, regions, controls) {
 }
 
 function mapButton(renderer, kind, id) {
-  return renderer.root
-    .findAllByType("button")
-    .find(
-      (button) =>
-        button.props["data-map"] === kind && button.props["data-id"] === id
-    );
+  return renderer.container.querySelector(
+    `button[data-map="${kind}"][data-id="${id}"]`
+  );
 }
 
 test("real region selection republishes on click, reset, and React prop replacement", () => {
@@ -265,28 +260,25 @@ test("real region selection republishes on click, reset, and React prop replacem
     );
   let renderer;
   act(() => {
-    renderer = create(tree(child));
+    renderer = render(tree(child));
   });
   assert.equal(
-    mapButton(renderer, "regions", regions[1].id).props["data-active"],
-    true
+    mapButton(renderer, "regions", regions[1].id).dataset.active,
+    "true"
   );
   act(() => {
-    mapButton(renderer, "regions", regions[0].id).props.onClick();
+    fireEvent.click(mapButton(renderer, "regions", regions[0].id));
   });
   assert.equal(
-    mapButton(renderer, "regions", regions[1].id).props["data-active"],
-    false
+    mapButton(renderer, "regions", regions[1].id).dataset.active,
+    "false"
   );
   act(() => {
-    renderer.root
-      .findAllByType("button")
-      .find((button) => button.children.includes("Reset"))
-      .props.onClick();
+    fireEvent.click(renderer.getByRole("button", { name: "Reset" }));
   });
   assert.equal(
-    mapButton(renderer, "regions", regions[1].id).props["data-active"],
-    true
+    mapButton(renderer, "regions", regions[1].id).dataset.active,
+    "true"
   );
   const replacement = Object.assign(new GameState(parent), {
     house,
@@ -297,15 +289,15 @@ test("real region selection republishes on click, reset, and React prop replacem
     runInAction(() => {
       parent.childGameState = replacement;
     });
-    renderer.update(tree(replacement));
+    renderer.rerender(tree(replacement));
   });
   assert.equal(
-    mapButton(renderer, "regions", regions[0].id).props["data-active"],
-    false
+    mapButton(renderer, "regions", regions[0].id).dataset.active,
+    "false"
   );
   assert.equal(
-    mapButton(renderer, "regions", regions[1].id).props["data-active"],
-    true
+    mapButton(renderer, "regions", regions[1].id).dataset.active,
+    "true"
   );
   act(() => {
     renderer.unmount();
@@ -330,10 +322,10 @@ test("publisher moves between stores and StrictMode remounts leave no stale laye
     );
   let renderer;
   act(() => {
-    renderer = create(tree(controls));
+    renderer = render(tree(controls));
   });
   act(() => {
-    renderer.update(tree(other));
+    renderer.rerender(tree(other));
   });
   assert.equal(
     controls.resolve(root, regions).regions.get(regions[0]).highlight.active,
@@ -347,7 +339,7 @@ test("publisher moves between stores and StrictMode remounts leave no stale laye
     renderer.unmount();
   });
   act(() => {
-    renderer = create(tree(other));
+    renderer = render(tree(other));
   });
   act(() => {
     renderer.unmount();
@@ -395,7 +387,7 @@ test("real march controls update orders, selected units and valid destinations",
   const View = mapView(root, regions, controls);
   let renderer;
   act(() => {
-    renderer = create(
+    renderer = render(
       React.createElement(
         React.Fragment,
         null,
@@ -408,41 +400,23 @@ test("real march controls update orders, selected units and valid destinations",
       )
     );
   });
-  assert.equal(
-    mapButton(renderer, "orders", from.id).props["data-active"],
-    true
-  );
+  assert.equal(mapButton(renderer, "orders", from.id).dataset.active, "true");
   act(() => {
-    mapButton(renderer, "orders", from.id).props.onClick({ detail: 1 });
+    fireEvent.click(mapButton(renderer, "orders", from.id), { detail: 1 });
   });
-  assert.equal(
-    mapButton(renderer, "orders", from.id).props["data-color"],
-    "yellow"
-  );
-  assert.equal(
-    mapButton(renderer, "units", unit.id).props["data-active"],
-    true
-  );
+  assert.equal(mapButton(renderer, "orders", from.id).dataset.color, "yellow");
+  assert.equal(mapButton(renderer, "units", unit.id).dataset.active, "true");
   act(() => {
-    mapButton(renderer, "units", unit.id).props.onClick();
+    fireEvent.click(mapButton(renderer, "units", unit.id));
   });
-  assert.equal(
-    mapButton(renderer, "units", unit.id).props["data-color"],
-    "yellow"
-  );
-  assert.equal(
-    mapButton(renderer, "regions", to.id).props["data-active"],
-    true
-  );
+  assert.equal(mapButton(renderer, "units", unit.id).dataset.color, "yellow");
+  assert.equal(mapButton(renderer, "regions", to.id).dataset.active, "true");
   act(() => {
     runInAction(() => {
       targets.set([]);
     });
   });
-  assert.equal(
-    mapButton(renderer, "regions", to.id).props["data-active"],
-    false
-  );
+  assert.equal(mapButton(renderer, "regions", to.id).dataset.active, "false");
   act(() => {
     renderer.unmount();
   });
@@ -469,7 +443,7 @@ test("mustering popover values are tracked by their owner, not the map reaction"
   });
   let renderer;
   act(() => {
-    renderer = create(
+    renderer = render(
       React.createElement(Mustering, {
         gameState: child,
         gameClient: { doesControlHouse: () => true },
@@ -534,7 +508,7 @@ test("real supply hover masks selection and leaving restores the latest state", 
   const View = mapView(root, regions, controls);
   let renderer;
   act(() => {
-    renderer = create(
+    renderer = render(
       React.createElement(
         React.Fragment,
         null,
@@ -549,39 +523,37 @@ test("real supply hover masks selection and leaving restores the latest state", 
       )
     );
   });
-  const icon = renderer.root
-    .findAllByType("div")
-    .find(
-      (element) => element.props.className === "supply-icon hover-weak-outline"
-    );
+  const icon = renderer.container.querySelector(
+    ".supply-icon.hover-weak-outline"
+  );
   act(() => {
-    icon.props.onMouseEnter();
+    fireEvent.mouseEnter(icon);
   });
   assert.equal(
-    mapButton(renderer, "regions", supplyRegion.id).props["data-color"],
+    mapButton(renderer, "regions", supplyRegion.id).dataset.color,
     "blue"
   );
   assert.equal(
-    mapButton(renderer, "regions", selectedRegion.id).props["data-active"],
-    false
+    mapButton(renderer, "regions", selectedRegion.id).dataset.active,
+    "false"
   );
   assert.equal(
-    typeof mapButton(renderer, "regions", selectedRegion.id).props.onClick,
+    typeof controls.resolve(root, regions).regions.get(selectedRegion).onClick,
     "function"
   );
   act(() => {
     controls.setLayer(stateOwner, selection("green"));
   });
   act(() => {
-    icon.props.onMouseLeave();
+    fireEvent.mouseLeave(icon);
   });
   assert.equal(
-    mapButton(renderer, "regions", selectedRegion.id).props["data-color"],
+    mapButton(renderer, "regions", selectedRegion.id).dataset.color,
     "green"
   );
   assert.equal(
-    mapButton(renderer, "regions", supplyRegion.id).props["data-active"],
-    false
+    mapButton(renderer, "regions", supplyRegion.id).dataset.active,
+    "false"
   );
   act(() => {
     renderer.unmount();
@@ -599,13 +571,13 @@ test("conditional state panels keep player controls hidden from spectators", () 
     });
   let renderer;
   act(() => {
-    renderer = create(tree(false));
+    renderer = render(tree(false));
   });
-  assert.equal(renderer.root.findAllByType("button").length, 0);
+  assert.equal(renderer.queryAllByRole("button").length, 0);
   act(() => {
-    renderer.update(tree(true));
+    renderer.rerender(tree(true));
   });
-  assert.equal(renderer.root.findAllByType("button").length, 2);
+  assert.equal(renderer.queryAllByRole("button").length, 2);
   act(() => {
     renderer.unmount();
   });

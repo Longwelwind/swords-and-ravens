@@ -5,7 +5,7 @@ import hidePasswordImage from "../../../public/images/icons/hide-password.svg";
 import showPasswordImage from "../../../public/images/icons/show-password.svg";
 import _ from "lodash";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import ConditionalWrap from "./ConditionalWrap";
 
 interface DebouncedPasswordComponentProps {

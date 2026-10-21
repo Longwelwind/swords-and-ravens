@@ -20,7 +20,7 @@ import laurelCrownImage from "../../public/images/icons/laurel-crown.svg";
 import worldImage from "../../public/images/icons/world.svg";
 import UnitType from "../common/ingame-game-state/game-data-structure/UnitType";
 import { observer } from "mobx-react";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import HouseSnapshot from "./game-replay/HouseSnapshot";
 import allKnownHouseCards from "./utils/houseCardHelper";
 
@@ -139,7 +139,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                   </div>
                   <img
                     className={classNames(
-                      "ml-2",
+                      "ms-2",
                       { "dye-warning": victoryPointsWarning },
                       { "dye-critical": victoryPointsCritical }
                     )}
@@ -155,7 +155,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                   >
                     {this.house.landAreaCount}
                   </b>
-                  <img className="ml-2" src={worldImage} width={24} />
+                  <img className="ms-2" src={worldImage} width={24} />
                 </Col>
                 <Col
                   xs="auto"
@@ -166,7 +166,7 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                   <b style={{ fontSize: "1.125rem" }}>
                     {this.house.powerTokens}
                   </b>
-                  <div className="ml-2 p-1">
+                  <div className="ms-2 p-1">
                     <div
                       className="house-power-token"
                       style={{
