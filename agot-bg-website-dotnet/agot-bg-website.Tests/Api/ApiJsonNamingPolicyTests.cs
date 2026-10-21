@@ -85,7 +85,13 @@ public class ApiJsonNamingPolicyTests
 
         var lastActiveAt = new DateTimeOffset(2026, 10, 21, 12, 34, 56, TimeSpan.Zero);
 
-        var response = PublicApi.BuildResponse(gameId, "A game", GameState.InLobby, viewOfGame, lastActiveAt);
+        var response = PublicApi.BuildResponse(
+            gameId,
+            "A game",
+            GameState.InLobby,
+            viewOfGame,
+            lastActiveAt
+        );
 
         Assert.Equal(gameId, response["id"]!.GetValue<Guid>());
         Assert.Equal("A game", response["name"]!.GetValue<string>());

@@ -62,7 +62,13 @@ public static class PublicApi
                     }
 
                     return Results.Text(
-                        BuildResponse(game.Id, game.Name, game.State, game.ViewOfGame, game.LastActiveAt)
+                        BuildResponse(
+                                game.Id,
+                                game.Name,
+                                game.State,
+                                game.ViewOfGame,
+                                game.LastActiveAt
+                            )
                             .ToJsonString(),
                         "application/json"
                     );
