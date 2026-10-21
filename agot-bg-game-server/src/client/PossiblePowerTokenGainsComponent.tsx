@@ -5,28 +5,30 @@ import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import HouseNumberResultsComponent from "./HouseNumberResultsComponent";
 
 interface PossiblePowerTokenGainsComponentProps {
-    ingame: IngameGameState;
+  ingame: IngameGameState;
 }
 
 export default class PossiblePowerTokenGainsComponent extends Component<PossiblePowerTokenGainsComponentProps> {
-    get ingame(): IngameGameState {
-        return this.props.ingame;
-    }
+  get ingame(): IngameGameState {
+    return this.props.ingame;
+  }
 
-    render(): ReactNode {
-        const gains = this.ingame.calculatePossibleGainsForGameOfThrones();
-        gains.entries.forEach(([h, gain]) => {
-            const realGain = this.ingame.assumeChangePowerTokens(h, gain);
-            gains.set(h, realGain);
-        });
+  render(): ReactNode {
+    const gains = this.ingame.calculatePossibleGainsForGameOfThrones();
+    gains.entries.forEach(([h, gain]) => {
+      const realGain = this.ingame.assumeChangePowerTokens(h, gain);
+      gains.set(h, realGain);
+    });
 
-        return <>
-            <Col xs="12" className="text-center">
-                Possible gains for choosing Game of Thrones
-            </Col>
-            <Col xs="auto">
-                <HouseNumberResultsComponent results={gains.entries} />
-            </Col>
-        </>;
-    }
+    return (
+      <>
+        <Col xs="12" className="text-center">
+          Possible gains for choosing Game of Thrones
+        </Col>
+        <Col xs="auto">
+          <HouseNumberResultsComponent results={gains.entries} />
+        </Col>
+      </>
+    );
+  }
 }

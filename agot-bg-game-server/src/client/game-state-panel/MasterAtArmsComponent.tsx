@@ -9,27 +9,28 @@ import SelectRegionGameState from "../../common/ingame-game-state/select-region-
 import SelectRegionComponent from "./SelectRegionComponent";
 import MasterAtArmsGameState from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/master-at-arms-game-state/MasterAtArmsGameState";
 
-
 @observer
-export default class MasterAtArmsComponent extends Component<GameStateComponentProps<MasterAtArmsGameState>> {
-    get house(): House {
-        return this.props.gameState.childGameState.house;
-    }
+export default class MasterAtArmsComponent extends Component<
+  GameStateComponentProps<MasterAtArmsGameState>
+> {
+  get house(): House {
+    return this.props.gameState.childGameState.house;
+  }
 
-    render(): ReactNode {
-        return (
-            this.props.gameClient.doesControlHouse(this.house) ? (
-                <>
-                    <Col xs={12} className="text-center">
-                        Select a castle to be upgraded into a stronghold.
-                    </Col>
-                    {renderChildGameState(this.props, [
-                        [SelectRegionGameState, SelectRegionComponent]
-                    ])}
-            </>
-            ) : (
-                <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
-            )
-        );
-    }
+  render(): ReactNode {
+    return this.props.gameClient.doesControlHouse(this.house) ? (
+      <>
+        <Col xs={12} className="text-center">
+          Select a castle to be upgraded into a stronghold.
+        </Col>
+        {renderChildGameState(this.props, [
+          [SelectRegionGameState, SelectRegionComponent]
+        ])}
+      </>
+    ) : (
+      <Col xs={12} className="text-center">
+        Waiting for {this.house.name}...
+      </Col>
+    );
+  }
 }

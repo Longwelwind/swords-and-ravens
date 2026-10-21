@@ -27,44 +27,51 @@ import TakeControlOfEnemyPortGameState from "../../../common/ingame-game-state/t
 import TakeControlOfEnemyPortComponent from "../TakeControlOfEnemyPortComponent";
 
 @observer
-export default class ExecuteLoanComponent extends Component<GameStateComponentProps<ExecuteLoanGameState>> {
-    get house(): House {
-        if (this.props.gameState.childGameState instanceof PlaceSellswordsGameState ||
-            this.props.gameState.childGameState instanceof TheFacelessMenGameState) {
-                return this.props.gameState.childGameState.house;
-        } else {
-            return this.props.gameState.childGameState.childGameState.house;
-        }
+export default class ExecuteLoanComponent extends Component<
+  GameStateComponentProps<ExecuteLoanGameState>
+> {
+  get house(): House {
+    if (
+      this.props.gameState.childGameState instanceof PlaceSellswordsGameState ||
+      this.props.gameState.childGameState instanceof TheFacelessMenGameState
+    ) {
+      return this.props.gameState.childGameState.house;
+    } else {
+      return this.props.gameState.childGameState.childGameState.house;
     }
-    render(): ReactNode {
-        return <Col xs={12}>
-            <Row className="justify-content-center align-items-center">
-                <Col xs="auto">
-                    <img src={buyCardImage} height={100} />
-                </Col>
-                <Col xs="auto">
-                    <LoanCardComponent loanCard={this.props.gameState.loanCardType} />
-                </Col>
-            </Row>
-            {this.props.gameClient.doesControlHouse(this.house) &&
-            <Row className="justify-content-center">
-                <Col xs="auto" className="text-center">
-                    {this.props.gameState.loanCardType.description}
-                </Col>
-            </Row>}
-            <Row>
-                {renderChildGameState<ExecuteLoanGameState>(this.props, [
-                    [PlaceSellswordsGameState, PlaceSellswordsComponent],
-                    [TheFacelessMenGameState, TheFacelessMenComponent],
-                    [PyromancerGameState, PyromancerComponent],
-                    [ExpertArtificerGameState, ExpertArtificerComponent],
-                    [LoyalMaesterGameState, LoyalMaesterComponent],
-                    [MasterAtArmsGameState, MasterAtArmsComponent],
-                    [SavvyStewardGameState, SavvyStewardComponent],
-                    [SpymasterGameState, SpymasterComponent],
-                    [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent]
-                ])}
-            </Row>
-        </Col>;
-    }
+  }
+  render(): ReactNode {
+    return (
+      <Col xs={12}>
+        <Row className="justify-content-center align-items-center">
+          <Col xs="auto">
+            <img src={buyCardImage} height={100} />
+          </Col>
+          <Col xs="auto">
+            <LoanCardComponent loanCard={this.props.gameState.loanCardType} />
+          </Col>
+        </Row>
+        {this.props.gameClient.doesControlHouse(this.house) && (
+          <Row className="justify-content-center">
+            <Col xs="auto" className="text-center">
+              {this.props.gameState.loanCardType.description}
+            </Col>
+          </Row>
+        )}
+        <Row>
+          {renderChildGameState<ExecuteLoanGameState>(this.props, [
+            [PlaceSellswordsGameState, PlaceSellswordsComponent],
+            [TheFacelessMenGameState, TheFacelessMenComponent],
+            [PyromancerGameState, PyromancerComponent],
+            [ExpertArtificerGameState, ExpertArtificerComponent],
+            [LoyalMaesterGameState, LoyalMaesterComponent],
+            [MasterAtArmsGameState, MasterAtArmsComponent],
+            [SavvyStewardGameState, SavvyStewardComponent],
+            [SpymasterGameState, SpymasterComponent],
+            [TakeControlOfEnemyPortGameState, TakeControlOfEnemyPortComponent]
+          ])}
+        </Row>
+      </Col>
+    );
+  }
 }

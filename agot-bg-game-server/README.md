@@ -4,8 +4,8 @@ The game is architectured around a state-synchronization paradigm. The server an
 
 The `src/` contains the code of the game server and is split into 5 folders:
 
-* `client/` contains the code ran exclusively on the client. This includes `GameClient` which manages the connection to the game server and the UI that is rendered in the browser based on the state of the game.
-* `server/` contains the code ran exclusively on the server. This includes the code that manages user connections and messages and communicating with the website.
-* `common/` contains the code shared by both the client and the server. This includes the core logic of the game.
-* `messages/` contains the definition of the JSON messages sent by the client and the server.
-* `utils/` contains util functions and classes.
+- `client/` contains the code ran exclusively on the client. This includes `GameClient` which manages the connection to the game server and the UI that is rendered in the browser based on the state of the game.
+- `server/` contains the code ran exclusively on the server. This includes the code that manages user connections and messages and communicating with the website.
+- `common/` contains the code shared by both the client and the server. This includes the core logic of the game.
+- `messages/` contains the definition of the JSON messages sent by the client and the server.
+- `utils/` contains util functions and classes.

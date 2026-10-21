@@ -1,5 +1,5 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import GameClient from "./GameClient";
 import * as React from "react";
 import Row from "react-bootstrap/Row";
@@ -7,47 +7,55 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import ChatComponent from "./chat-client/ChatComponent";
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
-import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
+import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-
 interface CancelledComponentProps {
-    gameClient: GameClient;
-    gameState: CancelledGameState;
+  gameClient: GameClient;
+  gameState: CancelledGameState;
 }
 
 @observer
 export default class CancelledComponent extends Component<CancelledComponentProps> {
-    render(): ReactNode {
-        return (
-            <Col xs={12} sm={10} md={8} lg={6}>
-                <Row>
-                    <Col className="text-center">
-                        <Card border="danger" bg="danger">
-                            <Card.Body className="text-center">
-                                <FontAwesomeIcon icon={faTimes} size="3x"/><br/>
-                                This game has been cancelled
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Card>
-                            <Card.Body style={{height: "500px"}}>
-                                <ChatComponent gameClient={this.props.gameClient}
-                                    entireGame={this.props.gameState.entireGame}
-                                    roomId={this.props.gameState.entireGame.publicChatRoomId}
-                                    currentlyViewed={true}
-                                    getUserDisplayName={u =>
-                                        <a href={`/user/${u.id}`} target="_blank" rel="noopener noreferrer" style={{ color: "white" }}><b>{u.name}</b></a>
-                                    }
-                                />
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            </Col>
-        );
-    }
+  render(): ReactNode {
+    return (
+      <Col xs={12} sm={10} md={8} lg={6}>
+        <Row>
+          <Col className="text-center">
+            <Card border="danger" bg="danger">
+              <Card.Body className="text-center">
+                <FontAwesomeIcon icon={faTimes} size="3x" />
+                <br />
+                This game has been cancelled
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Card>
+              <Card.Body style={{ height: "500px" }}>
+                <ChatComponent
+                  gameClient={this.props.gameClient}
+                  entireGame={this.props.gameState.entireGame}
+                  roomId={this.props.gameState.entireGame.publicChatRoomId}
+                  currentlyViewed={true}
+                  getUserDisplayName={(u) => (
+                    <a
+                      href={`/user/${u.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "white" }}
+                    >
+                      <b>{u.name}</b>
+                    </a>
+                  )}
+                />
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Col>
+    );
+  }
 }

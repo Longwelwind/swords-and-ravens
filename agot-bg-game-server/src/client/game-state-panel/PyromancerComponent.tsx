@@ -11,34 +11,37 @@ import SelectRegionGameState from "../../common/ingame-game-state/select-region-
 import SimpleChoiceComponent from "./SimpleChoiceComponent";
 import SelectRegionComponent from "./SelectRegionComponent";
 
-
 @observer
-export default class PyromancerComponent extends Component<GameStateComponentProps<PyromancerGameState>> {
-    get house(): House {
-        return this.props.gameState.childGameState.house;
-    }
+export default class PyromancerComponent extends Component<
+  GameStateComponentProps<PyromancerGameState>
+> {
+  get house(): House {
+    return this.props.gameState.childGameState.house;
+  }
 
-    get selectRegion(): SelectRegionGameState<PyromancerGameState> | null {
-        return this.props.gameState.childGameState instanceof SelectRegionGameState ? this.props.gameState.childGameState : null;
-    }
+  get selectRegion(): SelectRegionGameState<PyromancerGameState> | null {
+    return this.props.gameState.childGameState instanceof SelectRegionGameState
+      ? this.props.gameState.childGameState
+      : null;
+  }
 
-    render(): ReactNode {
-        return (
-            this.props.gameClient.doesControlHouse(this.house) ? (
-                <>
-                    {this.selectRegion && (
-                        <Col xs={12} className="text-center">
-                            Select the castle to degrade.
-                        </Col>
-                    )}
-                    {renderChildGameState(this.props, [
-                        [SimpleChoiceGameState, SimpleChoiceComponent],
-                        [SelectRegionGameState, SelectRegionComponent]
-                    ])}
-            </>
-            ) : (
-                <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
-            )
-        );
-    }
+  render(): ReactNode {
+    return this.props.gameClient.doesControlHouse(this.house) ? (
+      <>
+        {this.selectRegion && (
+          <Col xs={12} className="text-center">
+            Select the castle to degrade.
+          </Col>
+        )}
+        {renderChildGameState(this.props, [
+          [SimpleChoiceGameState, SimpleChoiceComponent],
+          [SelectRegionGameState, SelectRegionComponent]
+        ])}
+      </>
+    ) : (
+      <Col xs={12} className="text-center">
+        Waiting for {this.house.name}...
+      </Col>
+    );
+  }
 }

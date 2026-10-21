@@ -1,5 +1,5 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import React from "react";
@@ -13,44 +13,58 @@ import joinReactNodes from "../../../client/utils/joinReactNodes";
 import House from "../../../common/ingame-game-state/game-data-structure/House";
 
 @observer
-export default class RobertArrynAbilityComponent extends Component<GameStateComponentProps<RobertArrynAbilityGameState>> {
-    get gameState(): RobertArrynAbilityGameState {
-        return this.props.gameState;
-    }
+export default class RobertArrynAbilityComponent extends Component<
+  GameStateComponentProps<RobertArrynAbilityGameState>
+> {
+  get gameState(): RobertArrynAbilityGameState {
+    return this.props.gameState;
+  }
 
-    get house(): House {
-        return this.gameState.childGameState.house;
-    }
+  get house(): House {
+    return this.gameState.childGameState.house;
+  }
 
-    get simpleChoice(): SimpleChoiceGameState | null {
-        return this.gameState.childGameState instanceof SimpleChoiceGameState ? this.gameState.childGameState : null;
-    }
+  get simpleChoice(): SimpleChoiceGameState | null {
+    return this.gameState.childGameState instanceof SimpleChoiceGameState
+      ? this.gameState.childGameState
+      : null;
+  }
 
-    get selectHouseCard(): SelectHouseCardGameState<RobertArrynAbilityGameState> | null {
-        return this.gameState.childGameState instanceof SelectHouseCardGameState ? this.gameState.childGameState : null;
-    }
+  get selectHouseCard(): SelectHouseCardGameState<RobertArrynAbilityGameState> | null {
+    return this.gameState.childGameState instanceof SelectHouseCardGameState
+      ? this.gameState.childGameState
+      : null;
+  }
 
-    render(): ReactNode {
-        const possibleHouseCardToRemove = this.props.gameState.possibleEnemyHouseCards;
-        return (
-            <>
-                {this.simpleChoice && (
-                    <Col xs={12} className="text-center">
-                        <b>Robert Arryn</b>: House <b>{this.house.name}</b> may
-                        remove <b>Robert Arryn</b> and {joinReactNodes(possibleHouseCardToRemove.map(hc => <b key={`robert-arryn_${hc.id}`}>{hc.name}</b>), " or ")} from
-                        the game.
-                    </Col>
-                )}
-                {this.selectHouseCard && (
-                    <Col xs={12} className="text-center">
-                        <b>Robert Arryn</b>: House <b>{this.house.name}</b> has to decide which House card to remove from the game.
-                    </Col>
-                )}
-                {renderChildGameState(this.props, [
-                    [SimpleChoiceGameState, SimpleChoiceComponent],
-                    [SelectHouseCardGameState, SelectHouseCardComponent]
-                ])}
-            </>
-        );
-    }
+  render(): ReactNode {
+    const possibleHouseCardToRemove =
+      this.props.gameState.possibleEnemyHouseCards;
+    return (
+      <>
+        {this.simpleChoice && (
+          <Col xs={12} className="text-center">
+            <b>Robert Arryn</b>: House <b>{this.house.name}</b> may remove{" "}
+            <b>Robert Arryn</b> and{" "}
+            {joinReactNodes(
+              possibleHouseCardToRemove.map((hc) => (
+                <b key={`robert-arryn_${hc.id}`}>{hc.name}</b>
+              )),
+              " or "
+            )}{" "}
+            from the game.
+          </Col>
+        )}
+        {this.selectHouseCard && (
+          <Col xs={12} className="text-center">
+            <b>Robert Arryn</b>: House <b>{this.house.name}</b> has to decide
+            which House card to remove from the game.
+          </Col>
+        )}
+        {renderChildGameState(this.props, [
+          [SimpleChoiceGameState, SimpleChoiceComponent],
+          [SelectHouseCardGameState, SelectHouseCardComponent]
+        ])}
+      </>
+    );
+  }
 }

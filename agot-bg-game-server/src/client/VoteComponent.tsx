@@ -42,7 +42,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
       this.vote.type instanceof ReplacePlayer &&
       this.vote.state != VoteState.ONGOING &&
       !this.vote.ingame.players.keys.some(
-        (p) => p.id === this.vote.initiator.id,
+        (p) => p.id === this.vote.initiator.id
       ) &&
       this.props.gameClient.canActAsOwner();
 
@@ -99,7 +99,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
               className={classNames({
                 "display-none":
                   state != VoteState.ONGOING ||
-                  this.props.gameClient.authenticatedPlayer == null,
+                  this.props.gameClient.authenticatedPlayer == null
               })}
             >
               <Button
@@ -168,7 +168,7 @@ export default class VoteComponent extends Component<VoteComponentProps> {
   wrapVoteButtons(
     button: ReactElement,
     disabled: boolean,
-    reason: string,
+    reason: string
   ): ReactNode {
     return (
       <ConditionalWrap

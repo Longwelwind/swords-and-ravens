@@ -11,25 +11,26 @@ import SpymasterGameState from "../../common/ingame-game-state/action-game-state
 import ResolveSpymasterGameState from "../../common/ingame-game-state/action-game-state/resolve-consolidate-power-game-state/execute-loan-game-state/spymaster-game-state/resolve-spymaster-game-state/ResolveSpymasterGameState";
 import ResolveSpymasterComponent from "./ResolveSpymasterComponent";
 
-
 @observer
-export default class SpymasterComponent extends Component<GameStateComponentProps<SpymasterGameState>> {
-    get house(): House {
-        return this.props.gameState.childGameState.house;
-    }
+export default class SpymasterComponent extends Component<
+  GameStateComponentProps<SpymasterGameState>
+> {
+  get house(): House {
+    return this.props.gameState.childGameState.house;
+  }
 
-    render(): ReactNode {
-        return (
-            this.props.gameClient.doesControlHouse(this.house) ? (
-                <>
-                    {renderChildGameState(this.props, [
-                        [SimpleChoiceGameState, SimpleChoiceComponent],
-                        [ResolveSpymasterGameState, ResolveSpymasterComponent],
-                    ])}
-            </>
-            ) : (
-                <Col xs={12} className="text-center">Waiting for {this.house.name}...</Col>
-            )
-        );
-    }
+  render(): ReactNode {
+    return this.props.gameClient.doesControlHouse(this.house) ? (
+      <>
+        {renderChildGameState(this.props, [
+          [SimpleChoiceGameState, SimpleChoiceComponent],
+          [ResolveSpymasterGameState, ResolveSpymasterComponent]
+        ])}
+      </>
+    ) : (
+      <Col xs={12} className="text-center">
+        Waiting for {this.house.name}...
+      </Col>
+    );
+  }
 }

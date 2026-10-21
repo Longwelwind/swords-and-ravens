@@ -1,5 +1,5 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import React from "react";
@@ -11,18 +11,24 @@ import SelectRegionComponent from "../SelectRegionComponent";
 import { Col } from "react-bootstrap";
 
 @observer
-export default class ChooseRegionForLoyaltyTokenComponent extends Component<GameStateComponentProps<ChooseRegionForLoyaltyTokenGameState>> {
-    render(): ReactNode {
-        return (
-            <>
-                {this.props.gameState.childGameState instanceof SelectRegionGameState && <Col className="text-center">
-                    House <b>{this.props.gameState.childGameState.house.name}</b> must choose an area to place a loyalty&nbsp;token.
-                </Col>}
-                {renderChildGameState(this.props, [
-                    [SimpleChoiceGameState, SimpleChoiceComponent],
-                    [SelectRegionGameState, SelectRegionComponent]
-                ])}
-            </>
-        );
-    }
+export default class ChooseRegionForLoyaltyTokenComponent extends Component<
+  GameStateComponentProps<ChooseRegionForLoyaltyTokenGameState>
+> {
+  render(): ReactNode {
+    return (
+      <>
+        {this.props.gameState.childGameState instanceof
+          SelectRegionGameState && (
+          <Col className="text-center">
+            House <b>{this.props.gameState.childGameState.house.name}</b> must
+            choose an area to place a loyalty&nbsp;token.
+          </Col>
+        )}
+        {renderChildGameState(this.props, [
+          [SimpleChoiceGameState, SimpleChoiceComponent],
+          [SelectRegionGameState, SelectRegionComponent]
+        ])}
+      </>
+    );
+  }
 }
