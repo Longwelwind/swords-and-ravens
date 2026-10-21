@@ -83,11 +83,14 @@ public class ApiJsonNamingPolicyTests
             """
         );
 
-        var response = PublicApi.BuildResponse(gameId, "A game", GameState.InLobby, viewOfGame);
+        var lastActiveAt = new DateTimeOffset(2026, 10, 21, 12, 34, 56, TimeSpan.Zero);
+
+        var response = PublicApi.BuildResponse(gameId, "A game", GameState.InLobby, viewOfGame, lastActiveAt);
 
         Assert.Equal(gameId, response["id"]!.GetValue<Guid>());
         Assert.Equal("A game", response["name"]!.GetValue<string>());
         Assert.Equal("IN_LOBBY", response["state"]!.GetValue<string>());
+        Assert.Equal("2026-10-21T12:34:56Z", response["last_active_at"].Deserialize<string>());
         Assert.Equal(4, response["view_of_game"]!["round"]!.GetValue<int>());
         Assert.Equal("House Stark", response["view_of_game"]!["waitingFor"]!.GetValue<string>());
         Assert.Null(response["view_of_game"]!["publicChatRoomId"]);

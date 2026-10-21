@@ -42,7 +42,8 @@ Retrieve the `view_of_game` JSON data for a specific game.
     "winner": null,
     "replacePlayerVoteOngoing": false
   },
-  "state": "ONGOING"
+  "state": "ONGOING",
+  "last_active_at": "2026-10-21T12:34:56.789012Z"
 }
 ```
 
