@@ -22,7 +22,7 @@
   "clock": {
     "hhMm8dac7b": "(hh:mm)",
     "currentUtcTimeeb691c": "Aktuelle UTC-Zeit",
-    "countdownForReadyCheck770dbd": "Countdown zur Bereitschaftsabfrage",
+    "countdownForReadyCheck770dbd": "Ready-Check Countdown",
     "totalPlayingTime083e1d": "Gesamte Spielzeit",
     "hhMmSsc2ddc5": "(hh:mm:ss)",
     "countdownUntilGameResumes2e0b93": "Countdown bis zur Spielfortsetzung"
@@ -30,14 +30,14 @@
   "combatInfo": {
     "totalc9b3c3": "Gesamt",
     "valyrianSteelBlade6c78a8": "Valyrische<element0/>Stahlklinge",
-    "tidesOfBattle5287f6": "Tides<element0/>of Battle",
+    "tidesOfBattle5287f6": "Schlachten-<element0/>glück",
     "houseCard359d9d": "Hauskarte",
     "supportbe9194": "Unterstützung",
     "army99b3c4": "Armee"
   },
   "entireGame": {
     "itSYourTurnae6a42": "Du bist am Zug!",
-    "replayMode4231bb": "WIEDERGABEMODUS",
+    "replayMode4231bb": "Replay-Modus",
     "showMap9166a7": "Karte anzeigen",
     "thisIsATournamentGamef4045b": "Dies ist ein Turnierspiel",
     "theLastRemainingNonDragonLandUnitOfA775972": "Die letzte verbliebene Landeinheit eines besiegten Hauses, die kein Drache ist, verwandelt sich in einen Drachen!",
@@ -50,12 +50,12 @@
     "pLayBYEMAil7dae07": "<element0>P</element0>lay <element1>B</element1>y <element2>E</element2>-<element3>M</element3>ail",
     "thisGameIsPasswordProtectedb43e52": "Dieses Spiel ist passwortgeschützt",
     "private7109ec": "PRIVAT",
-    "fromRoundOnwardsEachHouseReceivesItsAlternativeDeck0f2244": "Ab Runde <element0><value1/></element0> erhält jedes Haus seinen alternativen Kartensatz, sobald seine letzte Hauskarte gespielt wurde.",
-    "whenAPlayerPlaysTheirLastHouseCardThey0829f1": "Wenn ein Spieler seine letzte Hauskarte spielt,<element0/>erhält er einen neuen Satz zufälliger Hauskarten.",
+    "fromRoundOnwardsEachHouseReceivesItsAlternativeDeck0f2244": "Ab Runde <element0><value1/></element0> erhält jedes Haus sein zweites Kartendeck, sobald seine letzte Hauskarte gespielt wurde.",
+    "whenAPlayerPlaysTheirLastHouseCardThey0829f1": "Nachdem ein Spieler seine letzte Hauskarte gespielt hat,<element0/>erhält er einen neues Kartendeck aus zufälligen Hauskarten.",
     "no3sa390e1": "Keine 3er",
     "noSkulls94c957": "Keine Totenköpfe",
     "onlyTwo2sfe35c3": "Nur zwei 2er",
-    "tidesOfBattleaa351e": "Tides of Battle<value0/><value1/><value2/>"
+    "tidesOfBattleaa351e": "Schlachtenglück<value0/><value1/><value2/>"
   },
   "agreeOnGameStart": {
     "disagree2f4482": "Ablehnen",
@@ -119,7 +119,7 @@
     "unmute": "Stummschaltung aufheben",
     "settings": "Einstellungen",
     "jumpTo": "Springen zu",
-    "gameLogs": "Spielprotokoll",
+    "gameLogs": "Spielverlauf",
     "spectators": "Zuschauer:",
     "voteNotPossible": "Abstimmung nicht möglich",
     "resumeFirst": "Das Spiel muss zuerst fortgesetzt werden",
@@ -133,11 +133,11 @@
     "notifications": "Benachrichtigungen",
     "music": "Musik",
     "soundEffects": "Soundeffekte",
-    "dragonRevenge": "Dragon Revenge",
-    "dragonWar": "Dragon War",
+    "dragonRevenge": "Drachen Revanche",
+    "dragonWar": "Krieg der Drachen",
     "live": "Live",
     "winner": "Sieger: <element0><value1/></element0>",
-    "biddingResults": "Gebotsergebnisse:",
+    "biddingResults": "Gebote:",
     "filterByHouseCardNameOrStrength": "Nach Hauskartenname oder Stärke filtern",
     "theseAreAllRemainingHouseCards": "Dies sind alle verbleibenden Hauskarten:",
     "noteAllHouseCardsWorkInAGenericWay": "<element0>Hinweis</element0>: Alle Hauskarten funktionieren unabhängig vom gewählten Haus!<element1/>Fähigkeiten, die sich auf bestimmte Häuser beziehen (z. B. Salladhor), stehen also jedem Haus zur Verfügung.<element2/>Verweise auf Charaktere gelten für die Karte mit derselben Stärke auf deiner Hand (z. B. Reek und eine beliebige Karte mit Stärke 3).<element3/>Verweise auf Hauptstädte beziehen sich stets auf das Heimatgebiet deines Hauses (z. B. Littlefinger).",
@@ -146,7 +146,7 @@
     "in89ff9d": "<element0><value1/></element0> in <element2><value3/></element2>",
     "pleaseSelectAHouseCard": "Bitte wähle eine Hauskarte aus:",
     "increaseTheirCombatStrengthBy1": "seine Kampfstärke um 1 erhöhen",
-    "drawANewTidesOfBattleCard": "eine neue Tides-of-Battle-Karte ziehen",
+    "drawANewTidesOfBattleCard": "eine neue Schlachtenglück-Karte ziehen",
     "supply": "Versorgung",
     "houseMustChooseAnAreaToPlaceALoyalty": "Haus <element0><value1/></element0> muss ein Gebiet für die Platzierung eines Loyalitätsmarkers auswählen.",
     "housesMustDestroyUnits": "Die Häuser müssen Einheiten vernichten.",
@@ -169,7 +169,7 @@
     "areYouSureYouWantToRefuseYourOwn97bdc7": "Möchtest du deine eigene Unterstützung wirklich ablehnen?",
     "refuseAllReceivedSupportd59ddf": "ALLE erhaltene Unterstützung ablehnen",
     "areYouSureYouWantToRefuseAllThe14713d": "Möchtest du wirklich jede erhaltene Unterstützung ablehnen?",
-    "donTSkipVsbBonusQuestion56dd52": "Frage nach dem Klingenbonus nicht überspringen",
+    "donTSkipVsbBonusQuestion56dd52": "Frage nach Valyrischer Klinge nicht überspringen",
     "inCaseThe1BonusWonTAffectTheb02ea3": "Wenn der Bonus von +1 den Kampfausgang nicht beeinflusst, wird normalerweise nicht nach dem Einsatz der Klinge gefragt.<element0/>Falls du trotzdem gefragt werden möchtest, kannst du das hier vorab festlegen.<element1/>",
     "theAttackerAndTheDefenderMustChooseAHouse2c46fa": "Angreifer und Verteidiger müssen eine Hauskarte auswählen",
     "refuseOwnSupport6e9b1f": "Eigene Unterstützung ablehnen"
@@ -184,7 +184,7 @@
   },
   "clashOfKings": {
     "housesBidForTheTracka3f008": "Die Häuser bieten um Positionen auf der Leiste <element0><value1/></element0>.",
-    "clashOfKings2fb1fa": "Clash of Kings"
+    "clashOfKings2fb1fa": "Königsfehde"
   },
   "combat": {
     "battleFordaa1d7": "Kampf <value0/> um <element1><value2/></element1>",
@@ -195,7 +195,7 @@
     "nonedc937b": "Niemanden",
     "defender157ddc": "Verteidiger",
     "attacker2969c6": "Angreifer",
-    "youCanTSupportTheEnemyInACombatdc401c": "Du kannst in einem Kampf, an dem du beteiligt bist, nicht den Gegner unterstützen.",
+    "youCanTSupportTheEnemyInACombatdc401c": "Du kannst deinen Gegner im Kampf nicht unterstützen.",
     "maySupportOneBelligerentOfTheFight0f1430": "<value0/> darf eine der beiden Kampfparteien unterstützen"
   },
   "distributePowerTokens": {
@@ -208,7 +208,7 @@
     "theseAreTheNextHouses551e40": "Diese Häuser sind als Nächstes an der Reihe: <value0/>",
     "houseMustChooseAnInfluenceTrackefe933": "Haus <element0><value1/></element0> muss eine Einflussleiste auswählen.",
     "houseMustSelectAHouseCard58199e": "Haus <element0><value1/></element0> muss eine Hauskarte auswählen.",
-    "houseMustDecideWhetherToSelectAHouseCard0540ce": "Haus <element0><value1/></element0> muss zwischen einer Hauskarte und einer Position auf einer Einflussleiste wählen."
+    "houseMustDecideWhetherToSelectAHouseCard0540ce": "Haus <element0><value1/></element0> muss zwischen einer Hauskarte oder der Positionierung auf einer Einflussleiste wählen."
   },
   "draftMap": {
     "removeGarrison9caf41": "Garnison entfernen",
@@ -230,7 +230,7 @@
     "gameHasEndedc5678c": "Das Spiel ist beendet!"
   },
   "aeronDamphairAbility": {
-    "warningThisCardSAbilityWillHaveNoEffectcab05e": "<element0>Achtung:</element0> Die Fähigkeit dieser Karte bleibt wirkungslos, da die Annullierungsphase bereits vorbei ist!",
+    "warningThisCardSAbilityWillHaveNoEffectcab05e": "<element0>Achtung:</element0> Die Fähigkeit dieser Karte bleibt wirkungslos, da die Cancel-Phase bereits vorbei ist!",
     "aeronDamphairHouseMayDiscard2PowerTokensTo6499aa": "<element0>Aeron Damphair:</element0> Haus <element1><value2/></element1> darf 2 Machtmarker abgeben, um seine Hauskarte zu wechseln."
   },
   "aeronDamphairDwDAbility": {
@@ -388,7 +388,7 @@
     "selectTheCastleToDegrade519b9b": "Wähle die Burg, die herabgestuft werden soll."
   },
   "replaceOrder": {
-    "yourReplacedOrderIsRestrictedAndWillBeRemoved747ba6": "Dein Ersatzbefehl ist verboten und wird anschließend entfernt. Möchtest du fortfahren?",
+    "yourReplacedOrderIsRestrictedAndWillBeRemoved747ba6": "Dein gewählter Befehl ist verboten und wird anschließend entfernt. Möchtest du fortfahren?",
     "lookAtTheTopWildlingCardInsteade2a4e9": "Stattdessen die oberste Wildlingskarte ansehen",
     "confirmOrderTokenReplacement411d63": "Austausch des Befehlsmarkers bestätigen",
     "chooseWhichOrderTokenToPlaceOn8932a6": "Wähle, welchen Befehlsmarker du in <element0><value1/></element0> platzieren möchtest:<element2/><element3/>",
@@ -803,10 +803,10 @@
     "forbidMarch1OrdersFromBeingPlayedDuringThis352c9f": " <element0>Marschbefehle +1</element0> in dieser Planungsphase zu verbieten.",
     "houseHolderOfTheValyrianSteelBladeTokenChose75df2b": "Haus <element0><value1/></element0>, Besitzer der Valyrischen Stahlklinge, entschied sich,<value2/>",
     "triggerNothing938c4b": " nichts auszulösen.",
-    "triggerAGameOfThrones4f1f2c": " Game of Thrones auszulösen.",
-    "triggerAClashOfKingse1cab5": " Clash of Kings auszulösen.",
+    "triggerAGameOfThrones4f1f2c": " Spiel der Throne auszulösen.",
+    "triggerAClashOfKingse1cab5": " Königsfehde auszulösen.",
     "houseHolderOfTheMessengerRavenTokenChoseTo2fabef": "Haus <element0><value1/></element0>, Besitzer des Botenraben, entschied sich,<value2/>",
-    "triggerAMusteringeda291": " Mustering auszulösen.",
+    "triggerAMusteringeda291": " Rekrutierung auszulösen.",
     "reduceTheWildlingTrackToThe0Position1690f3": " die Wildlingsleiste auf „0“ zu senken.",
     "houseHolderOfTheIronThroneTokenChoseTo537053": "Haus <element0><value1/></element0>, Besitzer des Eisernen Throns, entschied sich,<value2/>",
     "triggerASupply6c6ad3": " Supply auszulösen.",
@@ -1010,9 +1010,9 @@
   "gameStateColumn": {
     "willIncreaseInRound7dd1c1": "Steigt in Runde<element0/><value1/>",
     "currentDragonStrengthed8478": "Aktuelle Drachenstärke",
-    "theWildlingDeck090e33": "Der Wildlingsstapel",
+    "theWildlingDeck090e33": "Das Wildlings-Deck",
     "topWildingCard5070eb": "Oberste Wildlingskarte",
-    "deckdede0b": "Stapel <value0/>",
+    "deckdede0b": "Deck <value0/>",
     "remainingWesterosCards47a43b": "Verbleibende Westeros-Karten",
     "nextWesterosCards7700b4": "Nächste Westeros-Karten",
     "phasee16825": "<value0/>phase",
@@ -1057,8 +1057,8 @@
     "totalLandAreas806676": "Landgebiete insgesamt",
     "doYouWantToLaunchAVoteToReplaceca3d9c": "Möchtest du eine Abstimmung starten, um Vasallenhaus {{value0}} zu ersetzen?",
     "offerToReplaceThisVassal697b86": "Anbieten, diesen Vasallen zu ersetzen",
-    "isRunningOutOfTime7ff506": "<value0/> läuft die Zeit davon!",
-    "knowsThingsd3ec18": "<element0><value1/></element0> weiß Bescheid.",
+    "isRunningOutOfTime7ff506": "<value0/> hat kaum noch Zeit!",
+    "knowsThingsd3ec18": "<element0><value1/></element0> weiß Dinge.",
     "vassalAtTheBeginningOfThePlanningPhaseEach3ff25f": "<element0>Vasall</element0><element1/>Zu Beginn der Planungsphase darf jeder Spieler in Zugreihenfolge einen Vasallen auswählen, den er in dieser Runde befehligt.",
     "upForGrab1625c7": "Verfügbar",
     "commandedBy467f37": "Befehligt von <element0><value1/></element0>",
@@ -1070,7 +1070,7 @@
     "gameHasResumed367404": "Das Spiel wurde fortgesetzt!",
     "gameHasBeenPaused8bed51": "Das Spiel wurde pausiert!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Haus <element0><value1/></element0> führte einen Befehl der <element2>Eisernen Bank</element2> in <element3><value4/></element3> aus<element5/>und zahlte <element6><value7/></element6> Machtmarker für <element8>Customs Officer</element8>.<element9/>Es erhielt <element10><value11/></element10> <value12/>.",
-    "customsOfficerPurchased66bdce": "Customs Officer gekauft",
+    "customsOfficerPurchased66bdce": "Customs Officer erworben",
     "wildlingVictoryc8da84": "Sieg der Wildlinge",
     "nightSWatchVictorya3bde0": "Sieg der Nachtwache",
     "battleResultsFor11fa2e": "Kampfergebnisse für <element0><value1/></element0>",
@@ -1101,25 +1101,25 @@
   },
   "ironBankInfos": {
     "theIronBankOfBraavos47e011": "Die Eiserne Bank von Braavos",
-    "purchasingLoans9325fa": "Darlehen aufnehmen",
-    "thePlayerResolvesTheEffectOfTheirChosenLoan8ca811": "Der Spieler führt den Effekt seines gewählten Darlehens aus.<element0/><element1>(Klicke auf den Darlehensstapel, um alle Darlehenseffekte anzusehen.)</element1>",
+    "purchasingLoans9325fa": "Kredit aufnehmen",
+    "thePlayerResolvesTheEffectOfTheirChosenLoan8ca811": "Der Spieler führt den Effekt seines gewählten Kredits aus.<element0/><element1>(Klicke auf den Kreditstapel, um alle Krediteffekte anzusehen.)</element1>",
     "below8ada24": "unterhalb",
     "above88c7f0": "oberhalb",
-    "thePlayerPaysTheLoanSInitialCostBy2bde6e": "Der Spieler bezahlt die <element0>Anfangskosten</element0> des Darlehens, indem er so viele verfügbare<element1/>Machtmarker abgibt, wie <value2/> des aktuellen Feldes dieser Darlehenskarte angegeben sind.",
-    "thePlayerChoosesAFaceupLoanFromOneOf4e6754": "Der Spieler wählt ein offenes Darlehen von einem der drei Felder der Eisernen Bank.",
+    "thePlayerPaysTheLoanSInitialCostBy2bde6e": "Der Spieler bezahlt die <element0>Anfangskosten</element0> des Kredits, indem er so viele verfügbare<element1/>Machtmarker abgibt, wie <value2/> des aktuellen Feldes dieser Kreditkarte angegeben sind.",
+    "thePlayerChoosesAFaceupLoanFromOneOf4e6754": "Der Spieler wählt ein offenes Kredit von einem der drei Felder der Eisernen Bank.",
     "payingInterestd21db4": "Zinsen zahlen",
     "controllingBraavosd7b7ff": "Braavos kontrollieren",
-    "thoughNoEasyTaskItIsPossibleToGain17b043": "<element0/><element1/>Es ist zwar nicht leicht, aber wer die Stadt der Eisernen Bank kontrolliert,<element2/>kann sich einen Verhandlungsvorteil verschaffen. Der erste Spieler, der den neutralen Streitkräftemarker mit Stärke 5<element3/>in Braavos besiegt, legt diesen verdeckt vor sich ab. Solange ein Spieler diesen Marker besitzt,<element4/>erinnert er daran, dass der Spieler <element5>−1</element5> auf die <element6>Anfangskosten</element6> eines Darlehens erhält<element7/>(nicht jedoch auf die Zinsen).<element8/>Übernimmt ein anderer Spieler die Kontrolle über Braavos, erhält er sofort den neutralen Streitkräftemarker von Braavos.",
-    "nestledInASeeminglyImpenetrableNorthernBayTheFree7573dd": "<element0/>In einer scheinbar uneinnehmbaren Bucht im Norden liegt die freie Stadt Braavos, Sitz<element1/>einer der mächtigsten Institutionen der bekannten Welt: der Eisernen Bank von Braavos.<element2/><element3/><element4/>Die Eiserne Bank bietet den Fürsten von Westeros günstige Darlehen an.<element5/>Mit jedem Darlehen kann ein Fürst nützliche Unterstützung für seine Sache erwerben.<element6/>Beim Ausführen des besonderen Seebefehls der Eisernen Bank im Schritt <element7>Machtzuwachsbefehle ausführen</element7><element8/>darf ein Spieler ein Darlehen aufnehmen.<element9/><element10>Der Befehlsmarker der Eisernen Bank kann überfallen werden, erlaubt dem angreifenden Spieler aber nicht,<element11/>einen Machtmarker zu stehlen (Plündern).</element10><element12/><element13/>Um ein Darlehen aufzunehmen, führt ein Spieler diese Schritte aus:<element14/><element15/><element16/><element17/>Die gewieften Geldverleiher der Eisernen Bank erlassen Schulden nicht so leicht.<element18/>Nach der Aufnahme eines Darlehens muss ein Haus für den Rest des Spiels Zinsen an die Eiserne Bank<element19/>zahlen. Zu Beginn der Westeros-Phase muss jeder Spieler mit Darlehen in Zugreihenfolge<element20/>für jedes aufgenommene Darlehen einen verfügbaren Machtmarker abgeben.<element21/>Kann er nicht genügend Machtmarker abgeben, wählt für jeden fehlenden Machtmarker<element22/>der Besitzer der Valyrischen Stahlklinge eine beliebige Einheit dieses Spielers aus<element23/>und vernichtet sie. Ist der zahlungsunfähige Spieler selbst der Besitzer der Klinge,<element24/>trifft der nächsthöhere Spieler auf dieser Leiste die Wahl.<element25/><value26/>",
+    "thoughNoEasyTaskItIsPossibleToGain17b043": "<element0/><element1/>Es ist zwar nicht leicht, aber wer die Stadt der Eisernen Bank kontrolliert,<element2/>kann sich einen Verhandlungsvorteil verschaffen. Der erste Spieler, der den neutralen Streitkräftemarker mit Stärke 5<element3/>in Braavos besiegt, legt diesen verdeckt vor sich ab. Solange ein Spieler diesen Marker besitzt,<element4/>erinnert er daran, dass der Spieler <element5>−1</element5> auf die <element6>Anfangskosten</element6> eines Kredits erhält<element7/>(nicht jedoch auf die Zinsen).<element8/>Übernimmt ein anderer Spieler die Kontrolle über Braavos, erhält er sofort den neutralen Streitkräftemarker von Braavos.",
+    "nestledInASeeminglyImpenetrableNorthernBayTheFree7573dd": "<element0/>In einer scheinbar uneinnehmbaren Bucht im Norden liegt die freie Stadt Braavos, Sitz<element1/>einer der mächtigsten Institutionen der bekannten Welt: der Eisernen Bank von Braavos.<element2/><element3/><element4/>Die Eiserne Bank bietet den Fürsten von Westeros günstige Kredit an.<element5/>Mit jedem Kredit kann ein Fürst nützliche Unterstützung für seine Sache erwerben.<element6/>Beim Ausführen des besonderen Seebefehls der Eisernen Bank im Schritt <element7>Machtzuwachsbefehle ausführen</element7><element8/>darf ein Spieler ein Kredit aufnehmen.<element9/><element10>Der Befehlsmarker der Eisernen Bank kann überfallen werden, erlaubt dem angreifenden Spieler aber nicht,<element11/>einen Machtmarker zu stehlen (Plündern).</element10><element12/><element13/>Um ein Kredit aufzunehmen, führt ein Spieler diese Schritte aus:<element14/><element15/><element16/><element17/>Die gewieften Geldverleiher der Eisernen Bank erlassen Schulden nicht so leicht.<element18/>Nach der Aufnahme eines Kredits muss ein Haus für den Rest des Spiels Zinsen an die Eiserne Bank<element19/>zahlen. Zu Beginn der Westeros-Phase muss jeder Spieler mit Kredit in Zugreihenfolge<element20/>für jedes aufgenommene Kredit einen verfügbaren Machtmarker abgeben.<element21/>Kann er nicht genügend Machtmarker abgeben, wählt für jeden fehlenden Machtmarker<element22/>der Besitzer der Valyrischen Stahlklinge eine beliebige Einheit dieses Spielers aus<element23/>und vernichtet sie. Ist der zahlungsunfähige Spieler selbst der Besitzer der Klinge,<element24/>trifft der nächsthöhere Spieler auf dieser Leiste die Wahl.<element25/><value26/>",
     "interestPerRound0ec415": "Zinsen pro Runde",
-    "atTheBeginningOfTheWesterosPhaseAnyPlayer34f1e3": "Zu Beginn der Westeros-Phase müssen alle Spieler mit Darlehen<element0/>in Zugreihenfolge einen Machtmarker pro Darlehen als Zinsen bezahlen.<element1/>Für jeden Machtmarker, den ein Spieler nicht bezahlen kann, vernichtet der Besitzer der Valyrischen Stahlklinge<element2/>eine beliebige Einheit dieses Spielers auf dem Spielplan.<element3/>Besitzt der zahlungspflichtige Spieler selbst die Valyrische Stahlklinge, trifft der nächsthöhere Spieler<element4/>auf der Lehenleiste diese Wahl.",
-    "theControllerOfBraavosReceivesA1ToThe1dea8a": "Wer Braavos kontrolliert, erhält <element0>-1</element0> auf die <element1>Anfangskosten</element1> eines Darlehens."
+    "atTheBeginningOfTheWesterosPhaseAnyPlayer34f1e3": "Zu Beginn der Westeros-Phase müssen alle Spieler mit Kredit<element0/>in Zugreihenfolge einen Machtmarker pro Kredit als Zinsen bezahlen.<element1/>Für jeden Machtmarker, den ein Spieler nicht bezahlen kann, vernichtet der Besitzer der Valyrischen Stahlklinge<element2/>eine beliebige Einheit dieses Spielers auf dem Spielplan.<element3/>Besitzt der zahlungspflichtige Spieler selbst die Valyrische Stahlklinge, trifft der nächsthöhere Spieler<element4/>auf der Lehenleiste diese Wahl.",
+    "theControllerOfBraavosReceivesA1ToThe1dea8a": "Wer Braavos kontrolliert, erhält <element0>-1</element0> auf die <element1>Anfangskosten</element1> eines Kredits."
   },
   "loanCardsTooltip": {
-    "discardedLoansb48546": "Abgelegte Darlehen",
-    "purchasedLoansc0832b": "Aufgenommene Darlehen",
-    "availableLoans0c3ce6": "Verfügbare Darlehen",
-    "loanSlots6c819a": "Darlehensfelder"
+    "discardedLoansb48546": "Abgelegte Kreditkarten",
+    "purchasedLoansc0832b": "Aufgenommene Kredite",
+    "availableLoans0c3ce6": "Verfügbare Kredite",
+    "loanSlots6c819a": "Kreditfelder"
   },
   "lobby": {
     "areYouSureYouWantToCancelTheGamec7f270": "Möchtest du das Spiel wirklich abbrechen?",
@@ -1168,7 +1168,7 @@
     "yourSecretObjectives487261": "Deine geheimen Ziele"
   },
   "possiblePowerTokenGains": {
-    "possibleGainsForChoosingGameOfThrones3e6bd4": "Möglicher Ertrag bei Wahl von Game of Thrones"
+    "possibleGainsForChoosingGameOfThrones3e6bd4": "Möglicher Ertrag bei Wahl von Spiel der Throne"
   },
   "regionTooltip": {
     "ofab5d26": "<element0/><value1/> von <element2><value3/></element2>",
@@ -1280,9 +1280,9 @@
     "ship40970c": "Schiff",
     "adds05CombatStrengthInBattleDependingdeec88": "Bringt je nach aktueller Position des Drachenstärkemarkers 0–5 Kampfstärke im Kampf. Drachen sind äußerst selten und können nicht wie normale Einheiten rekrutiert werden. Stattdessen sind sie von Spielbeginn an im Spiel.",
     "dragonbbe963": "Drache",
-    "theHolderOfTheMessengerRavenTokenCan20759a": "Der Besitzer des Botenraben darf zwischen Clash of Kings, Game of Thrones und keinem Effekt wählen.",
-    "clashOfKings2fb1fa": "Clash of Kings",
-    "gameOfThrones9695de": "Game of Thrones",
+    "theHolderOfTheMessengerRavenTokenCan20759a": "Der Besitzer des Botenraben darf zwischen Königsfehde, Spiel der Throne und keinem Effekt wählen.",
+    "clashOfKings2fb1fa": "Königsfehde",
+    "gameOfThrones9695de": "Spiel der Throne",
     "nothing67e1bc": "Nichts",
     "theHolderOfTheValyrianSteelBladeCan660c80": "Der Besitzer der Valyrischen Stahlklinge darf wählen: keine Marschbefehle +1, keine Verteidigungsbefehle oder keine Einschränkungen.",
     "noMarch1Orders473ee1": "Keine Marschbefehle +1",

@@ -180,7 +180,7 @@
   },
   "claimVassal": {
     "claim4ca41d": "Claim",
-    "mayCommandVassalThisTurnea8432": "<element0><value1/></element0> may command <element2><value3/></element2> Vassal <value4/>this turn."
+    "mayCommandVassalThisTurnea8432": "<element0><value1/></element0> may command <element2><value3/></element2> Vassal <value4/> this turn."
   },
   "clashOfKings": {
     "housesBidForTheTracka3f008": "Houses bid for the <element0><value1/></element0> track.",
@@ -396,13 +396,13 @@
     "theHolderOfTheRavenTokenMayNowChoose2ef071": "The holder of the Raven token may now choose to replace one of its Order tokens or to look at the top card of the Wildling deck."
   },
   "resolveRetreat": {
-    "houseMustChooseAsCasualtiesForRemainingUnitsTo0a572b": "House <element0><value1/></element0> must choose <element2><value3/></element2>  <value4/>as casualties, for remaining units to retreat to <element5><value6/></element5>.",
-    "mustBeDestroyedIfYouRetreatToc07ed8": "<element0><value1/></element0>  <value2/>must be destroyed if you retreat to <element3><value4/></element3>.",
+    "houseMustChooseAsCasualtiesForRemainingUnitsTo0a572b": "House <element0><value1/></element0> must choose <element2><value3/></element2>  <value4/> as casualties, for remaining units to retreat to <element5><value6/></element5>.",
+    "mustBeDestroyedIfYouRetreatToc07ed8": "<element0><value1/></element0>  <value2/> must be destroyed if you retreat to <element3><value4/></element3>.",
     "houseMustChooseTheRetreatLocationOfTheDefeated39c8d3": "House <element0><value1/></element0> must choose the retreat location of the defeated army."
   },
   "resolveSingleConsolidatePower": {
     "ignoreAndRemoveOrderf800df": "Ignore and remove order",
-    "payToPurchase679165": "Pay <value0/>  <value1/>to purchase <value2/>",
+    "payToPurchase679165": "Pay <value0/>  <value1/> to purchase <value2/>",
     "musterIn709abb": "Muster in <value0/>",
     "clickTheOrderYouWantToResolve7b4c93": "Click the order you want to resolve.",
     "orIronBankd17b1f": " or Iron Bank",
@@ -435,7 +435,7 @@
     "houseMustResolveOneOfItsMarchOrdersb059a2": "House <element0><value1/></element0> must resolve one of its March Orders."
   },
   "resolveSinglePayDebt": {
-    "mustDestroyOfHouse802a9b": "<element0><value1/></element0> must destroy <element2><value3/></element2>  <value4/>of House <element5><value6/></element5>.",
+    "mustDestroyOfHouse802a9b": "<element0><value1/></element0> must destroy <element2><value3/></element2>  <value4/> of House <element5><value6/></element5>.",
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "The holder of the Valyrian Steel Blade destroys one unit for each unpaid interest Power token."
   },
   "resolveSinglePlaceOrdersForVassals": {
@@ -634,13 +634,13 @@
     "shiftingAmbitionsHousePutOneObjectiveCardToThe875ea2": "<element0>Shifting Ambitions</element0>: House <element1><value2/></element1> put one Objective card to the pool.",
     "ironbornRaidHouseWasReducedOnePositionOnThe498fd2": "<element0>Ironborn Raid</element0>: House <element1><value2/></element1> was reduced one position on the Victory track and now has a total of <element3><value4/></element3> victory points.",
     "houseDidNotScoreAnObjectiveCard35f40e": "House <element0><value1/></element0> did not score an Objective card.",
-    "houseScoredAwardedAndNowHasATotalOf3fda08": "House <element0><value1/></element0> scored <element2><value3/></element2>, awarded <element4><value5/></element4> <value6/>and now has a total of <element7><value8/></element7> victory points.",
+    "houseScoredAwardedAndNowHasATotalOf3fda08": "House <element0><value1/></element0> scored <element2><value3/></element2>, awarded <element4><value5/></element4> <value6/> and now has a total of <element7><value8/></element7> victory points.",
     "didNotScoreTheirSpecialObjective9c0836": "did not score their Special Objective",
     "scoredTheirSpecialObjectiveAndNowHasATotal936d92": "scored their Special Objective and now has a total of <element0><value1/></element0> victory points",
     "housec2c96c": "House <element0><value1/></element0> <value2/>.",
     "houseDrewANewObjectiveCard3e68aa": "House <element0><value1/></element0> drew a new Objective card.",
     "houseHasChosenTheir3Objectivesd246e6": "House <element0><value1/></element0> has chosen their 3 objectives.",
-    "spymasterHouseChoseWesterosDeckAndPutOnTop9133c9": "<element0>Spymaster</element0>: House <element1><value2/></element1> chose Westeros deck <element3><value4/></element3> and put <element5><value6/></element5>  <value7/>on top of the deck and <element8><value9/></element8>  <value10/>to the bottom of the deck.",
+    "spymasterHouseChoseWesterosDeckAndPutOnTop9133c9": "<element0>Spymaster</element0>: House <element1><value2/></element1> chose Westeros deck <element3><value4/></element3> and put <element5><value6/></element5>  <value7/> on top of the deck and <element8><value9/></element8>  <value10/> to the bottom of the deck.",
     "savvyStewardHouseChoseToPlaceABarrelIn130a30": "<element0>Savvy Steward</element0>: House <element1><value2/></element1> chose to place a <element3>Barrel</element3> in <element4><value5/></element4>. Their new supply level is <element6><value7/></element6>.",
     "masterAtArmsHouseChoseToUpgradeTheCastlesdc6ab9": "<element0>Master-at-Arms</element0>: House <element1><value2/></element1> chose to upgrade the castles in <value3/>.",
     "loyalMaesterHouseChoseToPlaceABarrelIn41a769": "<element0>Loyal Maester</element0>: House <element1><value2/></element1> chose to place a <element3>Barrel</element3> in <value4/>.",
@@ -658,12 +658,12 @@
     "houseChoseToDestroyOfHouse6b6511": "House <element0><value1/></element0> chose to destroy <value2/> of House <element3><value4/></element3>.",
     "debtsToTheIronBank6b9aef": "Debts to the Iron Bank",
     "interestDebtCouldNotBePaidec5ed0": " <element0><value1/></element0> interest debt could not be paid.",
-    "housePaidAnInterestOfToTheIronBank182461": "House <element0><value1/></element0> paid an interest of <element2><value3/></element2>  <value4/>to the Iron Bank.<value5/>",
+    "housePaidAnInterestOfToTheIronBank182461": "House <element0><value1/></element0> paid an interest of <element2><value3/></element2>  <value4/> to the Iron Bank.<value5/>",
     "aOrderHasBeenRemovedFrom18490d": "A <element0><value1/></element0> order has been removed from <element2><value3/></element2>.",
     "houseRemovedTheirOrderIn5e8d7e": "House <element0><value1/></element0> removed their <element2><value3/></element2> order in <element4><value5/></element4>.",
-    "houseResolvedAnIronBankOrderInAndPaideec19e": "House <element0><value1/></element0> resolved an <element2>Iron Bank</element2> order in <element3><value4/></element3> and paid <element5><value6/></element5>  <value7/>for",
+    "houseResolvedAnIronBankOrderInAndPaideec19e": "House <element0><value1/></element0> resolved an <element2>Iron Bank</element2> order in <element3><value4/></element3> and paid <element5><value6/></element5>  <value7/> for",
     "houseMovedALoyaltyTokenFromToa7bfb7": "House <element0><value1/></element0> moved a loyalty token from <element2><value3/></element2> to <element4><value5/></element4>.",
-    "houseDiscardedToCancelThePreviousMovementab47e0": "House <element0><value1/></element0> discarded <element2><value3/></element2> <value4/>to cancel the previous movement.",
+    "houseDiscardedToCancelThePreviousMovementab47e0": "House <element0><value1/></element0> discarded <element2><value3/></element2> <value4/> to cancel the previous movement.",
     "houseChoseNotToCancelThePreviousMovement0b771b": "House <element0><value1/></element0> chose not to cancel the previous movement.",
     "theLongPlanHouseChoseHouseToPlace281faf1": "<element0>The Long Plan</element0>: House <element1><value2/></element1> chose House <element3><value4/></element3> to place 2 loyalty tokens.",
     "playingWithFireHouseChoseToPlaceAIn9ac2d9": "<element0>Playing with Fire</element0>: House <element1><value2/></element1> chose to place a <element3><value4/></element3> in <element5><value6/></element5>.",
@@ -713,7 +713,7 @@
     "skinchangerScoutHouseGetsBack1a8b48": "<element0>Skinchanger Scout</element0>: House <element1><value2/></element1> gets back <element3><value4/></element3>  <value5/>.",
     "crowKillersHouseWasNotAbleToReplaceAny4d6046": "<element0>Crow Killers</element0>: House <element1><value2/></element1> was not able to replace any Footman with Knights.",
     "crowKillersHouseReplacedWithKnights546e5c": "<element0>Crow Killers</element0>: House <element1><value2/></element1> replaced <value3/> with Knights.",
-    "in08e815": "<element0><value1/></element0>  <value2/>in <element3><value4/></element3>",
+    "in08e815": "<element0><value1/></element0>  <value2/> in <element3><value4/></element3>",
     "crowKillersHouseHadToDestroy30fd1c": "<element0>Crow Killers</element0>: House <element1><value2/></element1> had to destroy <value3/>.",
     "crowKillersHouseHadNoKnightsToReplaceWithc7e161": "<element0>Crow Killers</element0>: House <element1><value2/></element1> had no Knights to replace with Footmen.",
     "crowKillersHouseReplacedWithFootmene0239a": "<element0>Crow Killers</element0>: House <element1><value2/></element1> replaced <value3/> with Footmen.",
@@ -739,9 +739,9 @@
     "preemptiveRaidHouseChoseToReduce2PositionsOn6ca3c6": "<element0>Preemptive Raid</element0>: House <element1><value2/></element1> chose to reduce 2 positions on their highest Influence track.",
     "preemptiveRaidHouseChoseToDestroy2OfTheir160e51": "<element0>Preemptive Raid</element0>: House <element1><value2/></element1> chose to destroy 2 of their units.",
     "silenceAtTheWallNothingHappened24542a": "<element0>Silence at the Wall</element0>: Nothing happened.",
-    "houseLostInBecauseIsEmptyNowa251d6": "House <element0><value1/></element0> lost <value2/>  <value3/>in <element4><value5/></element4> because <element6><value7/></element6> is empty now.",
+    "houseLostInBecauseIsEmptyNowa251d6": "House <element0><value1/></element0> lost <value2/>  <value3/> in <element4><value5/></element4> because <element6><value7/></element6> is empty now.",
     "houseDestroyedAllShipsIn0487d2": "House <element0><value1/></element0> destroyed all <element2><value3/></element2> ships in <element4><value5/></element4>.",
-    "houseConvertedFromHouseIn21f41b": "House <element0><value1/></element0> converted <value2/>  <value3/>from House <element4><value5/></element4> in <element6><value7/></element6>.",
+    "houseConvertedFromHouseIn21f41b": "House <element0><value1/></element0> converted <value2/>  <value3/> from House <element4><value5/></element4> in <element6><value7/></element6>.",
     "houseSufferedCasualtiesFromTheRetreatAndChoseThesebab2bd": "House <element0><value1/></element0> suffered casualties from the retreat and chose these units to be destroyed: <element2/>.",
     "houseWasNotAbleToRetreatc1de6a": "House <element0><value1/></element0> was not able to retreat <value2/> <element3><value4/></element3>.",
     "houseRetreatsFromToa1d19f": "House <element0><value1/></element0> retreats from <element2><value3/></element2> to <element4><value5/></element4>.",
@@ -776,7 +776,7 @@
     "doranMartellHouseDecidedToMoveHouseToThe273941": "<element0>Doran Martell</element0>: House <element1><value2/></element1> decided to move House <element3><value4/></element3> to the bottom of the <element5><value6/></element5> track<value7/>.",
     "causingHouseSTurnToBeSkippedUntilThea4b1dd": ", causing House <element0><value1/></element0>'s turn to be skipped until the next pass of the <element2>Iron Throne</element2> track",
     "jonSnowHouseDecidedToTheWildlingTrackBy0a275e": "<element0>Jon Snow</element0>: House <element1><value2/></element1> decided to <element3><value4/></element3> the Wildling track by one space.",
-    "melisandreHouseDiscardedToReturnToHanda3d42d": "<element0>Melisandre</element0>: House <element1><value2/></element1> discarded <element3><value4/></element3>  <value5/>to return <element6><value7/></element6> to hand.",
+    "melisandreHouseDiscardedToReturnToHanda3d42d": "<element0>Melisandre</element0>: House <element1><value2/></element1> discarded <element3><value4/></element3>  <value5/> to return <element6><value7/></element6> to hand.",
     "patchfaceHouseDecidedToDiscardFromHouse91e36f": "<element0>Patchface</element0>: House <element1><value2/></element1> decided to discard <element3><value4/></element3> from House <element5><value6/></element5>.",
     "houseDidNotUseSAbility02ccbb": "House <element0><value1/></element0> did not use <element2><value3/>'s</element2> ability.",
     "houseReconciledTheirArmiesByDestroyingba8e39": "House <element0><value1/></element0> reconciled their armies by destroying:",
@@ -1225,7 +1225,7 @@
   "vote": {
     "refuse263134": "Refuse",
     "accept89713b": "Accept",
-    "initiatedAVoteToMustAcceptToPassThe69a13a": "<element0><value1/></element0> initiated a vote to <element2><value3/></element2>. <value4/> <value5/>must accept to pass the vote.<element6/>",
+    "initiatedAVoteToMustAcceptToPassThe69a13a": "<element0><value1/></element0> initiated a vote to <element2><value3/></element2>. <value4/> <value5/> must accept to pass the vote.<element6/>",
     "votingIsCurrentlyNotPossible7026e4": "Voting is currently not possible",
     "youCannotVoteBecauseTheHousesToBeSwappedb5f256": "You cannot vote because the houses to be swapped have already placed orders",
     "youCannotVoteDuringBiddingPhased9fe47": "You cannot vote during bidding phase",
