@@ -69,7 +69,7 @@ class GameViewSerializer(ModelSerializer):
     
     class Meta:
         model = Game
-        fields = ['id', 'name', 'view_of_game', 'state']
+        fields = ['id', 'name', 'view_of_game', 'state', 'last_active_at']
     
     def get_view_of_game(self, obj):
         """Return sanitized view_of_game with sensitive data removed"""
