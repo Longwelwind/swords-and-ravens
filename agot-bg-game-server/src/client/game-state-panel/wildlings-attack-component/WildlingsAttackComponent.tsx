@@ -58,12 +58,18 @@ export default class WildlingsAttackComponent extends Component<
     return (
       <>
         {!this.props.gameState.biddingResults && (
-          <Row className="justify-content-center mt-2 mb-1">
-            <img src={mammothImage} width="40px" className="me-2" />
-            <h4 className="mt-2">
-              {t("wildlingsAttack.wildlingsAttackebb672")}
-            </h4>
-            <img src={mammothImage} width="40px" className="ms-2" />
+          <Row className="justify-content-center align-items-center mt-2 mb-1">
+            <Col xs="auto" className="p-0">
+              <img src={mammothImage} width="40px" className="me-2" />
+            </Col>
+            <Col xs="auto" className="p-0">
+              <h4 className="mt-2">
+                {t("wildlingsAttack.wildlingsAttackebb672")}
+              </h4>
+            </Col>
+            <Col xs="auto" className="p-0">
+              <img src={mammothImage} width="40px" className="ms-2" />
+            </Col>
           </Row>
         )}
         {this.props.gameState.biddingResults && (

@@ -454,28 +454,32 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             </Col>
           </Row>
           {clock != null && (
-            <Row className="justify-content-center mb-2">
-              <img
-                src={stopwatchImage}
-                width={24}
-                className={classNames(
-                  { "dye-warning": clockWarning },
-                  { "dye-critical": clockCritical }
-                )}
-              />
-              <div
-                style={{
-                  fontSize: "1.125rem",
-                  color: clockWarning
-                    ? "#F39C12"
-                    : clockCritical
-                      ? "#FF0000"
-                      : undefined,
-                  marginLeft: "4px"
-                }}
-              >
-                <b>{new Date(clock * 1000).toISOString().slice(12, 19)}</b>
-              </div>
+            <Row className="justify-content-center align-items-center mb-2">
+              <Col xs="auto" className="p-0">
+                <img
+                  src={stopwatchImage}
+                  width={24}
+                  className={classNames(
+                    { "dye-warning": clockWarning },
+                    { "dye-critical": clockCritical }
+                  )}
+                />
+              </Col>
+              <Col xs="auto" className="p-0">
+                <div
+                  style={{
+                    fontSize: "1.125rem",
+                    color: clockWarning
+                      ? "#F39C12"
+                      : clockCritical
+                        ? "#FF0000"
+                        : undefined,
+                    marginLeft: "4px"
+                  }}
+                >
+                  <b>{new Date(clock * 1000).toISOString().slice(12, 19)}</b>
+                </div>
+              </Col>
             </Row>
           )}
           <Row className="justify-content-around align-items-center">
@@ -937,12 +941,14 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
       <Popover id={this.house.id + "-power-popover"} className="px-3 pt-2">
         <Col>
           <Row className="justify-content-center">
-            <h4>
-              <Trans
-                i18nKey="houseRow.sPower26fd93"
-                components={{ value0: <>{this.house.name}</> }}
-              />
-            </h4>
+            <Col xs="auto" className="p-0">
+              <h4>
+                <Trans
+                  i18nKey="houseRow.sPower26fd93"
+                  components={{ value0: <>{this.house.name}</> }}
+                />
+              </h4>
+            </Col>
           </Row>
           <Row className="justify-content-center">
             <Col xs="auto">

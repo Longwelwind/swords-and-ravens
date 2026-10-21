@@ -43,6 +43,123 @@ beforeEach((context) => {
 
 afterEach(cleanup);
 
+function addBootstrapStyles(context) {
+  const style = document.createElement("style");
+  style.textContent = require("node:fs").readFileSync(
+    require.resolve("bootstrap/dist/css/bootstrap.css"),
+    "utf8"
+  );
+  document.head.append(style);
+  context.after(() => style.remove());
+}
+
+function assertCompactCentered(element) {
+  const row = element.closest(".row");
+  assert.ok(row);
+  let item = element;
+  while (item.parentElement !== row) {
+    item = item.parentElement;
+  }
+  const rowStyle = getComputedStyle(row);
+  assert.equal(rowStyle.display, "flex");
+  assert.equal(rowStyle.justifyContent, "center");
+  assert.equal(rowStyle.flexWrap, "wrap");
+  const itemStyle = getComputedStyle(item);
+  assert.notEqual(itemStyle.width, "100%");
+  assert.equal(itemStyle.padding, "0px");
+}
+
+for (const [name, componentPath] of [
+  ["Clash of Kings", "../src/client/game-state-panel/ClashOfKingsComponent"],
+  [
+    "Wildlings Attack",
+    "../src/client/game-state-panel/wildlings-attack-component/WildlingsAttackComponent"
+  ]
+]) {
+  test(`${name} header keeps its icons compact and centered with Bootstrap 5`, (context) => {
+    const Header = require(componentPath).default;
+    const BiddingGameState =
+      require("../src/common/ingame-game-state/westeros-game-state/bidding-game-state/BiddingGameState").default;
+    addBootstrapStyles(context);
+    const bidding = new BiddingGameState(null);
+    bidding.participatingHouses = [];
+    const view = render(
+      React.createElement(Header, {
+        gameClient: { authenticatedPlayer: null },
+        gameState: {
+          currentTrackI: 2,
+          game: { getNameInfluenceTrack: () => "The King's Court" },
+          childGameState: bidding,
+          biddingResults: null,
+          wildlingCard: null,
+          excludedHouses: [],
+          wildlingStrength: 2
+        }
+      })
+    );
+    const heading = view.getByRole("heading", { level: 4 });
+    const header = heading.closest(".row");
+    assert.ok(header);
+    const icons = header.querySelectorAll("img");
+    assert.equal(icons.length, 2);
+    for (const element of [...icons, heading]) {
+      assertCompactCentered(element);
+    }
+  });
+}
+
+test("personal-settings FAQ stays content-sized and centered with Bootstrap 5", (context) => {
+  addBootstrapStyles(context);
+  const UserSettingsComponent =
+    require("../src/client/UserSettingsComponent").default;
+  const IngameGameState =
+    require("../src/common/ingame-game-state/IngameGameState").default;
+  const game = new EntireGame("fixture", "owner", "Settings game");
+  const user = new User("owner", "Owner", "Owner", game, new UserSettings());
+  runInAction(() => {
+    game.childGameState = new IngameGameState(game);
+  });
+  const view = render(
+    React.createElement(UserSettingsComponent, { entireGame: game, user })
+  );
+  const link = view.getByRole("link", { name: "FAQ" });
+  assertCompactCentered(link);
+});
+
+test("selected-unit summary stays content-sized and centered with Bootstrap 5", (context) => {
+  addBootstrapStyles(context);
+  const FacelessMen =
+    require("../src/client/game-state-panel/TheFacelessMenComponent").default;
+  const GameState = require("../src/common/GameState").default;
+  const MapControls = require("../src/client/MapControls").default;
+  const root = new GameState(null);
+  const state = new GameState(root);
+  const unit = {
+    region: { id: "winterfell", name: "Winterfell" },
+    type: { id: "footman", name: "Footman" },
+    allegiance: { name: "Stark" }
+  };
+  Object.assign(state, {
+    house: { name: "Stark" },
+    availableUnits: [unit]
+  });
+  runInAction(() => {
+    root.childGameState = state;
+  });
+  const ref = React.createRef();
+  const view = render(
+    React.createElement(FacelessMen, {
+      ref,
+      gameState: state,
+      gameClient: { doesControlHouse: () => true },
+      mapControls: new MapControls()
+    })
+  );
+  act(() => ref.current.onUnitClick(unit));
+  const summary = view.getByText("Winterfell").parentElement;
+  assertCompactCentered(summary);
+});
+
 function gameScreenFixture(context) {
   const game = new EntireGame("fixture", "owner", "Connected game");
   const user = new User("owner", "Owner", "Owner", game, new UserSettings());

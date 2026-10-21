@@ -38,7 +38,7 @@ export default class SelectUnitsComponent extends Component<
             <>
               {this.selectedUnits.size > 0 && (
                 <Row className="mx-2 justify-content-center">
-                  <div>
+                  <Col xs="auto" className="p-0">
                     <div className="mb-2 text-center">
                       {t("selectUnits.selectedUnits678ce1")}
                     </div>
@@ -69,7 +69,7 @@ export default class SelectUnitsComponent extends Component<
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </Col>
                 </Row>
               )}
               <Row className="justify-content-center">

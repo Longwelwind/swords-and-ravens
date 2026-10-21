@@ -32,10 +32,16 @@ export default class ClashOfKingsComponent extends Component<
 
     return (
       <>
-        <Row className="justify-content-center mt-2 mb-1">
-          <img src={image} width="40px" className="me-2" />
-          <h4 className="mt-2">{t("clashOfKings.clashOfKings2fb1fa")}</h4>
-          <img src={image} width="40px" className="ms-2" />
+        <Row className="justify-content-center align-items-center mt-2 mb-1">
+          <Col xs="auto" className="p-0">
+            <img src={image} width="40px" className="me-2" />
+          </Col>
+          <Col xs="auto" className="p-0">
+            <h4 className="mt-2">{t("clashOfKings.clashOfKings2fb1fa")}</h4>
+          </Col>
+          <Col xs="auto" className="p-0">
+            <img src={image} width="40px" className="ms-2" />
+          </Col>
         </Row>
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">

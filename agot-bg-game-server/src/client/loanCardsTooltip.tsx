@@ -67,7 +67,9 @@ export default function renderLoanCardsToolTip(
               {purchasedLoans.map((house, loans) => (
                 <Col xs={12} key={`purchased-loans_${house.id}`}>
                   <Row className="justify-content-center mb-2">
-                    <h5>{house.name}</h5>
+                    <Col xs="auto" className="p-0">
+                      <h5>{house.name}</h5>
+                    </Col>
                   </Row>
                   {loans.map((lc, i) => (
                     <Row key={`purchased-loan_${lc.type.id}-${i}`}>

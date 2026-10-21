@@ -64,7 +64,7 @@ export default class TheFacelessMenComponent extends Component<
                   className="justify-content-center"
                   style={{ paddingBottom: 10 }}
                 >
-                  <div>
+                  <Col xs="auto" className="p-0">
                     <Trans
                       i18nKey="theFacelessMen.ofInbc8f9f"
                       components={{
@@ -76,7 +76,7 @@ export default class TheFacelessMenComponent extends Component<
                         value5: <>{region.name}</>
                       }}
                     />
-                  </div>
+                  </Col>
                 </Row>
               ))}
               <Row className="justify-content-center mt-3">
