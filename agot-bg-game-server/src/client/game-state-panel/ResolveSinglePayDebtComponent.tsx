@@ -86,33 +86,35 @@ export default class ResolveSinglePayDebtComponent extends Component<
                 className="justify-content-center"
                 style={{ paddingBottom: 10 }}
               >
-                <ul>
-                  {this.unitsToRemove.entries.map(([region, units]) => (
-                    <li key={`pay-single-debt_${region.id}`}>
-                      <Trans
-                        i18nKey="common.in"
-                        components={{
-                          value0: (
-                            <>
-                              {joinReactNodes(
-                                units.map((u, i) => (
-                                  <b
-                                    key={`pay-single-debt_${region.id}_${u.id}_${i}`}
-                                  >
-                                    {translateGameText(u.type.name)}
-                                  </b>
-                                )),
-                                ", "
-                              )}
-                            </>
-                          ),
-                          element1: <b />,
-                          value2: <>{region.name}</>
-                        }}
-                      />
-                    </li>
-                  ))}
-                </ul>
+                <Col xs="auto" className="p-0">
+                  <ul>
+                    {this.unitsToRemove.entries.map(([region, units]) => (
+                      <li key={`pay-single-debt_${region.id}`}>
+                        <Trans
+                          i18nKey="common.in"
+                          components={{
+                            value0: (
+                              <>
+                                {joinReactNodes(
+                                  units.map((u, i) => (
+                                    <b
+                                      key={`pay-single-debt_${region.id}_${u.id}_${i}`}
+                                    >
+                                      {translateGameText(u.type.name)}
+                                    </b>
+                                  )),
+                                  ", "
+                                )}
+                              </>
+                            ),
+                            element1: <b />,
+                            value2: <>{region.name}</>
+                          }}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </Col>
               </Row>
               <Row className="justify-content-center">
                 <Col xs="auto">
