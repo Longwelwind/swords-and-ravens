@@ -177,8 +177,8 @@ export default class IngameGameState extends GameState<
 
   onVoteStarted: (() => void) | null = null;
   onPreemptiveRaidNewAttack:
-    | ((biddings: [number, House[]][], highestBidder: House) => void)
-    | null = null;
+    ((biddings: [number, House[]][], highestBidder: House) => void) | null =
+    null;
   onLogReceived: ((log: GameLogData) => void) | null = null;
   onGamePaused: (() => void) | null = null;
   onGameResumed: (() => void) | null = null;

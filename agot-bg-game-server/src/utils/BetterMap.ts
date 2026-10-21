@@ -68,11 +68,11 @@ export default class BetterMap<K, V> {
 
   mapOver<KP, VP>(
     mapKey: (k: K) => KP,
-    mapValue: (v: V, k: K) => VP,
+    mapValue: (v: V, k: K) => VP
   ): [KP, VP][] {
     return this.entries.map(([key, value]) => [
       mapKey(key),
-      mapValue(value, key),
+      mapValue(value, key)
     ]);
   }
 

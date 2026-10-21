@@ -18,7 +18,7 @@ export interface BiddingGameStateParent extends GameState<any, any> {
 }
 
 export default class BiddingGameState<
-  ParentGameState extends BiddingGameStateParent,
+  ParentGameState extends BiddingGameStateParent
 > extends GameState<ParentGameState> {
   participatingHouses: House[];
   // Client-side, this structure will only contain -1 as value.
@@ -51,20 +51,20 @@ export default class BiddingGameState<
         {
           type: "bid-done",
           houseId: player.house.id,
-          value: -1,
-        },
+          value: -1
+        }
       );
 
       player.user.send({
         type: "bid-done",
         houseId: player.house.id,
-        value: bid,
+        value: bid
       });
 
       this.ingame.log({
         type: "player-action",
         house: player.house.id,
-        action: PlayerActionType.BID_MADE,
+        action: PlayerActionType.BID_MADE
       });
 
       this.checkAndProceedEndOfBidding();
@@ -91,7 +91,7 @@ export default class BiddingGameState<
       this.entireGame.broadcastToClients({
         type: "change-power-token",
         houseId: house.id,
-        powerTokenCount: house.powerTokens,
+        powerTokenCount: house.powerTokens
       });
     });
 
@@ -121,7 +121,7 @@ export default class BiddingGameState<
   bid(powerTokens: number): void {
     this.entireGame.sendMessageToServer({
       type: "bid",
-      powerTokens: powerTokens,
+      powerTokens: powerTokens
     });
   }
 
@@ -131,7 +131,7 @@ export default class BiddingGameState<
 
   getWaitedUsers(): User[] {
     return this.getHousesLeftToBid().map(
-      (h) => this.parentGameState.ingame.getControllerOfHouse(h).user,
+      (h) => this.parentGameState.ingame.getControllerOfHouse(h).user
     );
   }
 
@@ -152,9 +152,9 @@ export default class BiddingGameState<
             {
               type: "player-action",
               house: h.id,
-              action: PlayerActionType.BID_MADE,
+              action: PlayerActionType.BID_MADE
             },
-            true,
+            true
           );
         }
       }
@@ -166,7 +166,7 @@ export default class BiddingGameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null,
+    player: Player | null
   ): SerializedBiddingGameState {
     return {
       type: "bidding",
@@ -179,21 +179,21 @@ export default class BiddingGameState<
         } else {
           return [house.id, -1];
         }
-      }),
+      })
     };
   }
 
   static deserializeFromServer<ParentGameState extends BiddingGameStateParent>(
     parent: ParentGameState,
-    data: SerializedBiddingGameState,
+    data: SerializedBiddingGameState
   ): BiddingGameState<ParentGameState> {
     const biddingGameState = new BiddingGameState(parent);
 
     biddingGameState.participatingHouses = data.participatingHouses.map((hid) =>
-      parent.game.houses.get(hid),
+      parent.game.houses.get(hid)
     );
     biddingGameState.bids = new BetterMap(
-      data.bids.map(([houseId, bid]) => [parent.game.houses.get(houseId), bid]),
+      data.bids.map(([houseId, bid]) => [parent.game.houses.get(houseId), bid])
     );
 
     return biddingGameState;
@@ -206,7 +206,7 @@ export default class BiddingGameState<
         type: "bid-done",
         houseId: newVassal.id,
         // We can reveal the value here as it's clear vassals bid 0
-        value: 0,
+        value: 0
       });
       this.checkAndProceedEndOfBidding();
     }

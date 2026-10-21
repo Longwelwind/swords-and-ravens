@@ -40,7 +40,7 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
                     style={{
                       width: "18px",
                       marginRight: "6px",
-                      marginTop: "10px",
+                      marginTop: "10px"
                     }}
                   >
                     {this.getHousesAtSupplyLevel(i).map((h) => (
@@ -49,7 +49,7 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
                         className="supply-icon hover-weak-outline"
                         style={{
                           backgroundImage: `url(${houseInfluenceImages.get(h.id)})`,
-                          marginTop: "-5px",
+                          marginTop: "-5px"
                         }}
                       ></div>
                     ))}

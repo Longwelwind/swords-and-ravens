@@ -32,7 +32,7 @@ export default class SelectHouseCardComponent extends Component<
         {this.props.gameClient.doesControlHouse(this.props.gameState.house) ? (
           <Col xs={12}>
             {this.props.gameState.entireGame.hasChildGameState(
-              DraftHouseCardsGameState,
+              DraftHouseCardsGameState
             ) && (
               <Row className="justify-content-center mb-2">
                 <input
@@ -50,7 +50,7 @@ export default class SelectHouseCardComponent extends Component<
                 <Row className="justify-content-center">
                   {_.sortBy(
                     this.props.gameState.houseCards,
-                    (hc) => hc.combatStrength,
+                    (hc) => hc.combatStrength
                   ).map(
                     (hc) =>
                       // The house argument is used to decide which card-back is used
@@ -74,7 +74,7 @@ export default class SelectHouseCardComponent extends Component<
                             }
                           />
                         </Col>
-                      ),
+                      )
                   )}
                 </Row>
               </Col>

@@ -126,9 +126,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
   private renderGameStateControls(
     orderRegion: Region,
     orderType:
-      | ConsolidatePowerOrderType
-      | IronBankOrderType
-      | DefenseMusterOrderType
+      ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType
   ): ReactNode {
     return (
       <>
@@ -295,9 +293,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
   private onOrderClick(
     region: Region,
     orderType:
-      | ConsolidatePowerOrderType
-      | IronBankOrderType
-      | DefenseMusterOrderType
+      ConsolidatePowerOrderType | IronBankOrderType | DefenseMusterOrderType
   ): void {
     if (this.selectedOrderRegion == region) {
       this.reset();

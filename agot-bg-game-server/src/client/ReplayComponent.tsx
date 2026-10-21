@@ -62,7 +62,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
       <Row
         className="justify-content-center"
         style={{
-          maxHeight: this.gameClient.isMapScrollbarSet ? "95vh" : "none",
+          maxHeight: this.gameClient.isMapScrollbarSet ? "95vh" : "none"
         }}
       >
         <Col
@@ -71,7 +71,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
           style={{
             maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
             minWidth: col1MinWidth,
-            maxWidth: "800px",
+            maxWidth: "800px"
           }}
         >
           <ReplayGameStateColumn
@@ -85,7 +85,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
         <Col
           xs={{ span: "auto", order: columnOrders.mapColumn }}
           style={{
-            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
+            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none"
           }}
         >
           <div
@@ -94,7 +94,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
               height: this.gameClient.isMapScrollbarSet ? "100%" : "auto",
               overflowY: "auto",
               overflowX: "hidden",
-              maxHeight: MAP_HEIGHT,
+              maxHeight: MAP_HEIGHT
             }}
           >
             <WorldSnapshotComponent ingameGameState={this.ingame} />
@@ -104,7 +104,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
           xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
           className={this.columnSwapAnimationClassName}
           style={{
-            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
+            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none"
           }}
         >
           <ReplayHouseInfoColumn

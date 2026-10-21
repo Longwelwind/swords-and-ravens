@@ -1,5 +1,5 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import React from "react";
 import Col from "react-bootstrap/Col";
@@ -9,66 +9,78 @@ import { Button, Row } from "react-bootstrap";
 import { observable } from "mobx";
 
 @observer
-export default class AeronDamphairAbilityComponent extends Component<GameStateComponentProps<AeronDamphairDwDAbilityGameState>> {
-    @observable powerTokens = 0;
+export default class AeronDamphairAbilityComponent extends Component<
+  GameStateComponentProps<AeronDamphairDwDAbilityGameState>
+> {
+  @observable powerTokens = 0;
 
-    get authenticatedPlayer(): Player | null {
-        return this.props.gameClient.authenticatedPlayer;
-    }
+  get authenticatedPlayer(): Player | null {
+    return this.props.gameClient.authenticatedPlayer;
+  }
 
-    render(): ReactNode {
-        return (
+  render(): ReactNode {
+    return (
+      <>
+        <Col xs={12} className="text-center">
+          {!this.props.gameState.nerfed ? (
             <>
-                <Col xs={12} className="text-center">
-                    {!this.props.gameState.nerfed
-                        ? <>
-                            <b>Aeron Damphair:</b> House <b>{this.props.gameState.house.name}</b> may discard any number of available Power tokens
-                            to increase the combat strength of their card by the number of Power tokens discarded.
-                        </>
-                        : <>
-                            <b>Aeron Damphair:</b> House <b>{this.props.gameState.house.name}</b> may discard one Power token for each House card
-                            in their discard pile to increase the combat strength of their card by the number of Power tokens discarded.
-                        </>
-                    }
-
-                </Col>
-                {this.authenticatedPlayer && this.props.gameClient.doesControlHouse(this.props.gameState.house) && (
-                    <>
-                        <Col xs={12}>
-                            <Row className="justify-content-center">
-                                <Col xs="auto">
-                                    <input
-                                        type="range"
-                                        className="custom-range"
-                                        min={0}
-                                        max={this.props.gameState.maxAllowedPowerTokens}
-                                        value={this.powerTokens}
-                                        onChange={e => {
-                                            this.powerTokens = parseInt(e.target.value);
-                                        }}
-                                        disabled={this.authenticatedPlayer.house.powerTokens==0}
-                                    />
-                                </Col>
-                                <Col xs="auto">
-                                    <div style={{marginLeft: "10px"}}>
-                                        {this.powerTokens}
-                                    </div>
-                                </Col>
-                            </Row>
-                        </Col>
-                        <Col xs={12} className="text-center">
-                            <Button type="button" variant="success"
-                                onClick={() => this.props.gameState.sendPowerTokens(this.powerTokens)}
-                            >
-                                Confirm
-                            </Button>
-                        </Col>
-                    </>
-                )}
-                <Col xs={12} className="text-center">
-                    Waiting for {this.props.gameState.house.name} ...
-                </Col>
+              <b>Aeron Damphair:</b> House{" "}
+              <b>{this.props.gameState.house.name}</b> may discard any number of
+              available Power tokens to increase the combat strength of their
+              card by the number of Power tokens discarded.
             </>
-        );
-    }
+          ) : (
+            <>
+              <b>Aeron Damphair:</b> House{" "}
+              <b>{this.props.gameState.house.name}</b> may discard one Power
+              token for each House card in their discard pile to increase the
+              combat strength of their card by the number of Power tokens
+              discarded.
+            </>
+          )}
+        </Col>
+        {this.authenticatedPlayer &&
+          this.props.gameClient.doesControlHouse(
+            this.props.gameState.house
+          ) && (
+            <>
+              <Col xs={12}>
+                <Row className="justify-content-center">
+                  <Col xs="auto">
+                    <input
+                      type="range"
+                      className="custom-range"
+                      min={0}
+                      max={this.props.gameState.maxAllowedPowerTokens}
+                      value={this.powerTokens}
+                      onChange={(e) => {
+                        this.powerTokens = parseInt(e.target.value);
+                      }}
+                      disabled={this.authenticatedPlayer.house.powerTokens == 0}
+                    />
+                  </Col>
+                  <Col xs="auto">
+                    <div style={{ marginLeft: "10px" }}>{this.powerTokens}</div>
+                  </Col>
+                </Row>
+              </Col>
+              <Col xs={12} className="text-center">
+                <Button
+                  type="button"
+                  variant="success"
+                  onClick={() =>
+                    this.props.gameState.sendPowerTokens(this.powerTokens)
+                  }
+                >
+                  Confirm
+                </Button>
+              </Col>
+            </>
+          )}
+        <Col xs={12} className="text-center">
+          Waiting for {this.props.gameState.house.name} ...
+        </Col>
+      </>
+    );
+  }
 }

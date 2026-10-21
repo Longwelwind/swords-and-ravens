@@ -318,7 +318,6 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
 export interface SerializedCrowKillersWildlingVictoryGameState {
   type: "crow-killers-wildling-victory";
   childGameState:
-    | SerializedSelectUnitsGameState
-    | SerializedTakeControlOfEnemyPortGameState;
+    SerializedSelectUnitsGameState | SerializedTakeControlOfEnemyPortGameState;
   step: CrowKillersStep;
 }

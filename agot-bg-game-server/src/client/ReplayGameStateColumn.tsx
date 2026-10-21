@@ -9,7 +9,7 @@ import {
   Spinner,
   Tab,
   Nav,
-  Dropdown,
+  Dropdown
 } from "react-bootstrap";
 import classNames from "classnames";
 
@@ -33,7 +33,7 @@ import {
   faBackward,
   faStepBackward,
   faStepForward,
-  faMap,
+  faMap
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
@@ -88,7 +88,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
           border={border}
           style={{
             maxHeight: gameClient.isMapScrollbarSet ? "70%" : "none",
-            borderWidth: "3px",
+            borderWidth: "3px"
           }}
         >
           <Row
@@ -121,7 +121,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                         ? "#F39C12"
                         : roundCritical
                           ? "#FF0000"
-                          : undefined,
+                          : undefined
                     }}
                   >
                     {gameSnapshot?.round}
@@ -144,7 +144,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                 <div
                   className={classNames({
                     "txt-warning": wildlingsWarning,
-                    "txt-critical": wildlingsCritical,
+                    "txt-critical": wildlingsCritical
                   })}
                 >
                   {gameSnapshot?.wildlingStrength}
@@ -403,7 +403,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
             const elemToScroll = document.getElementById(gameRoundElem.id);
             elemToScroll?.scrollIntoView({
               behavior: "smooth",
-              block: "center",
+              block: "center"
             });
           }}
         >

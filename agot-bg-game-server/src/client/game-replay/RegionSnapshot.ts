@@ -41,7 +41,7 @@ export default class RegionSnapshot implements IRegionSnapshot {
       barrelModifier: this.barrelModifier,
       crownModifier: this.crownModifier,
       order: this.order,
-      overwrittenSuperControlPowerToken: this.overwrittenSuperControlPowerToken,
+      overwrittenSuperControlPowerToken: this.overwrittenSuperControlPowerToken
     });
   }
 

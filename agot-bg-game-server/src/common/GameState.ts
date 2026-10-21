@@ -11,7 +11,7 @@ export type AnyGameState = GameState<any, any> | null;
 
 export default class GameState<
   ParentGameState extends AnyGameState,
-  ChildGameState extends AnyGameState = null,
+  ChildGameState extends AnyGameState = null
 > {
   @observable parentGameState: ParentGameState;
   @observable childGameState: ChildGameState;
@@ -44,7 +44,7 @@ export default class GameState<
         return this.childGameState.getChildGameState(gameState);
       } else {
         throw new Error(
-          `No childGameState of type ${gameState.constructor.name}`,
+          `No childGameState of type ${gameState.constructor.name}`
         );
       }
     }
@@ -75,7 +75,7 @@ export default class GameState<
   }
 
   setChildGameState<E extends Exclude<ChildGameState, null>>(
-    childGameState: E,
+    childGameState: E
   ): E {
     this.childGameState = childGameState;
     this.childGameState.needsToBeTransmittedToClient = true;
@@ -119,7 +119,7 @@ export default class GameState<
 
   deserializeChildGameState(_data: any): ChildGameState {
     throw new Error(
-      `"deserializeChildGameState" is not defined for class "${this.constructor.name}"`,
+      `"deserializeChildGameState" is not defined for class "${this.constructor.name}"`
     );
   }
 

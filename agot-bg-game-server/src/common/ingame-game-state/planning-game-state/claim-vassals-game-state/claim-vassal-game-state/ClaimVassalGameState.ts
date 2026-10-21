@@ -54,7 +54,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
         this.ingame.log({
           type: "vassals-claimed",
           house: player.house.id,
-          vassals: [],
+          vassals: []
         });
       }
 
@@ -69,7 +69,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
   choose(houses: House[]): void {
     this.ingame.entireGame.sendMessageToServer({
       type: "claim-vassal",
-      houses: houses.map((h) => h.id),
+      houses: houses.map((h) => h.id)
     });
   }
 
@@ -92,7 +92,7 @@ export default class ClaimVassalGameState extends GameState<ClaimVassalsGameStat
       type: "claim-vassal",
       house: this.house.id,
       count: this.count,
-      claimableVassals: this.claimableVassals.map((h) => h.id),
+      claimableVassals: this.claimableVassals.map((h) => h.id)
     };
   }
 

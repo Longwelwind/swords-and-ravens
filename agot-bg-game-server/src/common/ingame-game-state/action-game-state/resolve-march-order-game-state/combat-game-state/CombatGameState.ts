@@ -402,9 +402,7 @@ export default class CombatGameState extends GameState<
             // Take into account the possible support order bonus
             const supportOrder = this.actionGameState.ordersOnBoard.get(region);
             const supportOrderType:
-              | SupportOrderType
-              | RaidSupportOrderType
-              | null =
+              SupportOrderType | RaidSupportOrderType | null =
               supportOrder.type instanceof SupportOrderType
                 ? (supportOrder.type as SupportOrderType)
                 : supportOrder.type instanceof RaidSupportOrderType
