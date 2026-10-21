@@ -18,6 +18,7 @@ import unitTypes from "../../../../../common/ingame-game-state/game-data-structu
 import BetterMap from "../../../../../utils/BetterMap";
 import { land } from "../../../../../common/ingame-game-state/game-data-structure/regionTypes";
 import _ from "lodash";
+import { observable } from "mobx";
 
 enum PLAYING_WITH_FIRE_STEP {
   CHOOSE_ACTIVATE,
@@ -30,7 +31,7 @@ export default class PlayingWithFireGameState extends GameState<
   SelectRegionGameState<PlayingWithFireGameState> | SimpleChoiceGameState
 > {
   step: PLAYING_WITH_FIRE_STEP;
-  region: Region | null = null;
+  @observable accessor region: Region | null = null;
   get game(): Game {
     return this.parentGameState.game;
   }
@@ -148,6 +149,10 @@ export default class PlayingWithFireGameState extends GameState<
         this.getChoices(house).values[choice]
       );
       this.step = PLAYING_WITH_FIRE_STEP.CHOOSE_UNIT;
+      this.entireGame.broadcastToClients({
+        type: "sync-playing-with-fire",
+        region: this.region.id
+      });
       this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
         chosenHouse,
         `House ${chosenHouse.name} must choose a unit to place in ${this.region.name}.`,
@@ -195,7 +200,11 @@ export default class PlayingWithFireGameState extends GameState<
   }
 
   onServerMessage(message: ServerMessage): void {
-    this.childGameState.onServerMessage(message);
+    if (message.type == "sync-playing-with-fire") {
+      this.region = this.game.ingame.world.regions.get(message.region);
+    } else {
+      this.childGameState.onServerMessage(message);
+    }
   }
 
   serializeToClient(
