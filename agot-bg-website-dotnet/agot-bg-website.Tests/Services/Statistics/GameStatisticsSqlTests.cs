@@ -130,12 +130,4 @@ public class GameStatisticsSqlTests
         Assert.Contains("IS DISTINCT FROM {0}", query.Sql);
         Assert.Equal([ScenarioCatalog.TutorialSetupId], query.Parameters);
     }
-
-    [Fact]
-    public void Latest_HidesFacelessWinnersInSql()
-    {
-        var sql = GameStatisticsSql.Latest(Default, 0, 25).Sql;
-
-        Assert.Contains("CASE WHEN f.faceless THEN NULL ELSE u.\"UserName\" END", sql);
-    }
 }

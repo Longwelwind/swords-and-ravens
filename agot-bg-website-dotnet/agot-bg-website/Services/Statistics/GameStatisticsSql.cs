@@ -58,10 +58,7 @@ public static class GameStatisticsSql
         return new(sql, [.. parameters]);
     }
 
-    /// <summary>
-    /// One page of the newest matching games. Faceless games lose their winner's user inside SQL,
-    /// so it never reaches the page model.
-    /// </summary>
+    /// <summary>One page of the newest matching games.</summary>
     public static StatisticsSqlQuery Latest(GameStatisticsFilter filter, int offset, int limit)
     {
         var parameters = new List<object>();
@@ -79,9 +76,9 @@ public static class GameStatisticsSql
                        f.round::int AS "Round",
                        f."LastActiveAt" AS "FinishedAt",
                        w.house AS "WinnerHouse",
-                       CASE WHEN f.faceless THEN NULL ELSE w."UserId" END AS "WinnerUserId",
-                       CASE WHEN f.faceless THEN NULL ELSE u."UserName" END AS "WinnerUserName",
-                       CASE WHEN f.faceless THEN false ELSE COALESCE(u."IsDeleted", false) END AS "WinnerUserDeleted"
+                       w."UserId" AS "WinnerUserId",
+                       u."UserName" AS "WinnerUserName",
+                       COALESCE(u."IsDeleted", false) AS "WinnerUserDeleted"
                 FROM filtered f
                 LEFT JOIN LATERAL (
                     SELECT p."UserId", p."Data"->>'house' AS house
@@ -168,7 +165,6 @@ public static class GameStatisticsSql
             $"{Settings}->>'playerCount' AS player_count",
             $"{RoundExpression} AS round",
             $"COALESCE({Settings}->>'pbem', 'false') = 'true' AS is_pbem",
-            $"COALESCE({Settings}->>'faceless', 'false') = 'true' AS faceless",
         };
         if (includeWinnerFlag)
         {

@@ -27,7 +27,6 @@ public static class StatisticsSettingGroups
             "randomHouses",
             "randomChosenHouses",
             "tournamentMode",
-            "faceless",
             "private"
         ),
         Group(

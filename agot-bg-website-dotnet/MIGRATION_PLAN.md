@@ -1292,7 +1292,8 @@ Follow-up work after first getting the app running locally end-to-end:
   human-controlled seat count, final-round range, Any/No/Yes for allow-listed boolean settings). Queries are raw
   parameterized SQL over `ViewOfGame`/`PlayersInGame.Data` only (`Services/Statistics/
   GameStatisticsSql.cs`), never `SerializedGame`; ~100 ms per query on ~10k finished games, cached
-  10 min, no new indexes. Faceless winners are stripped in SQL; private games are
+  10 min, no new indexes. Faceless is not filtered or masked: the game server resets it when a
+  game ends, so finished games are never faceless. Private games are
   listed normally (as on profiles) and can be excluded via the Private game filter. Profiles
   gain a "Houses" card row (win rate per house, scenario selector) via `PlayerHouseStatsService`,
   using the same rules as `UserStatsService`; removals have no recorded house and are shown as a

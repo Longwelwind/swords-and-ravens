@@ -40,16 +40,11 @@ public class PlayerHouseStatsServiceTests : IDisposable
 
     private static JsonDocument Json(string json) => JsonDocument.Parse(json);
 
-    private static string View(
-        string setupId,
-        int playerCount,
-        bool faceless = false,
-        Guid? replacerId = null
-    ) =>
+    private static string View(string setupId, int playerCount, Guid? replacerId = null) =>
         $$"""
-            {"settings": {"setupId": "{{setupId}}", "playerCount": {{playerCount}}, "faceless": {{(
-                faceless ? "true" : "false"
-            )}}}, "replacerIds": [{{(replacerId is null ? "" : $"\"{replacerId}\"")}}]}
+            {"settings": {"setupId": "{{setupId}}", "playerCount": {{playerCount}}}, "replacerIds": [{{(
+                replacerId is null ? "" : $"\"{replacerId}\""
+            )}}]}
             """;
 
     private Game AddGame(GameState state, string viewOfGame)
@@ -141,11 +136,10 @@ public class PlayerHouseStatsServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task OnlyFinishedNonTutorialNonFacelessGamesWithOutcome_AreCounted()
+    public async Task OnlyFinishedNonTutorialGamesWithOutcome_AreCounted()
     {
         AddPlayed(GameState.Finished, View("base-game", 4), "stark", true);
         AddPlayed(GameState.Finished, View("learn-the-game", 2), "stark", true);
-        AddPlayed(GameState.Finished, View("base-game", 4, faceless: true), "stark", true);
         AddPlayed(GameState.Finished, View("base-game", 4), "stark", isWinner: null);
         AddPlayed(GameState.Ongoing, View("base-game", 4), "stark", false);
         AddPlayed(GameState.Cancelled, View("base-game", 4), "stark", false);
