@@ -9,10 +9,12 @@ namespace agot_bg_website.Services;
 /// <paramref name="FinishedGamesCount"/> only considers games actually in state Finished (minus
 /// faceless games, which the games list hides entirely too) - it deliberately excludes games left
 /// early (<paramref name="RemovedFromGameCount"/>) and never includes cancelled games, so it
-/// always reconciles with "Ongoing + Finished" on the profile's games list. <paramref
-/// name="RemovedFromGameCount"/> counts a removal as soon as it happens, whether the game has
-/// since finished or is still Ongoing - a player who was voted out/timed out doesn't get a pass
-/// just because nobody's won yet - except a removal from a game the user had joined as a replacer,
+/// always reconciles with "Ongoing + Finished" on the profile's games list.
+/// <paramref name="RemovedFromGameCount"/> counts a removal as soon as it happens, whether the game has
+/// since finished, is still Ongoing, or was later Cancelled - a player who was voted out/left
+/// doesn't get a pass just because nobody's won yet or the game got cancelled afterwards (only a
+/// clock-timeout removal from a Cancelled game is excluded) - except a removal from a game the
+/// user had joined as a replacer,
 /// which is excluded here too (same "no downside risk" rule as a still-seated replacer's loss),
 /// since <c>replacerIds</c> keeps naming a user even after they themselves get removed again - see
 /// <see cref="RecalculateAsync"/>. <paramref name="WinRate"/>'s denominator is the only place
@@ -135,8 +137,12 @@ public sealed class UserStatsService(ApplicationDbContext db)
 
         // A removal always counts as a loss regardless of whether the game has finished yet - a
         // player voted out/timed out of a still-Ongoing game doesn't get a pass just because
-        // nobody's declared a winner yet. Only Cancelled (and InLobby, though a removal can't
-        // happen there) games are excluded, per "cancelled games never affect any stat at all".
+        // nobody's declared a winner yet. A removal from a game that was later Cancelled counts
+        // too (e.g. a player rage-quits, gets vassalized by vote, and the remaining players then
+        // cancel the game) - leaving early must not be erased just because the game never
+        // finished. The one exception is a clock-timeout removal from a Cancelled game: a
+        // cancelled game counts for nobody else, so penalizing a timeout there would be unfair.
+        // InLobby games are excluded (a removal can't happen there anyway).
         // The tutorial variant is excluded here too, for the same reason it's excluded from the
         // win side above - a "learn the game" removal must not count as a loss either. A removal
         // from a game the user joined as a *pure* replacer (IsPureReplacer, same check as the
@@ -154,7 +160,14 @@ public sealed class UserStatsService(ApplicationDbContext db)
         var removedFromGameViewsOfGame = await db
             .PreviousPlayersInGame.Where(p =>
                 p.UserId == userId
-                && (p.Game!.State == GameState.Finished || p.Game.State == GameState.Ongoing)
+                && (
+                    p.Game!.State == GameState.Finished
+                    || p.Game.State == GameState.Ongoing
+                    || (
+                        p.Game.State == GameState.Cancelled
+                        && p.Reason != PlayerReplacementReason.ClockTimeout
+                    )
+                )
             )
             .Select(p => p.Game!.ViewOfGame)
             .ToListAsync(cancellationToken);

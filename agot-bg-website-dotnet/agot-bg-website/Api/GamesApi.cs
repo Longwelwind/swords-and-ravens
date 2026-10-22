@@ -210,10 +210,11 @@ public static class GamesApi
                         // backfill uses, see PreviousPlayerReasonResolver) - null only if the removed
                         // user appears in neither, which given gameWasInLobby above should no longer
                         // happen for a real mid-game removal (see PreviousPlayerCleanup's doc comment).
-                        // Not used for win-rate calculation either way (every PreviousPlayerInGame row
-                        // counts as a loss regardless of Reason — see MIGRATION_PLAN.md §10.2 -
-                        // except a row for a game the user had joined as a replacer, which
-                        // UserStatsService.RecalculateAsync excludes entirely).
+                        // Not used for win-rate calculation except for one case: a ClockTimeout
+                        // removal from a game that's later Cancelled doesn't count as a loss;
+                        // every other PreviousPlayerInGame row counts as a loss regardless of
+                        // Reason (see MIGRATION_PLAN.md §10.2 / UserStatsService.RecalculateAsync,
+                        // which also excludes a game the user had joined as a replacer).
                         db.PreviousPlayersInGame.AddRange(
                             toAdd.Select(userId => new PreviousPlayerInGame
                             {
@@ -239,14 +240,13 @@ public static class GamesApi
                 await db.SaveChangesAsync();
 
                 // Every current and former participant's cached win-rate stats become stale the
-                // moment a game they were part of finishes OR is cancelled - a PreviousPlayerInGame
-                // row only counts towards a user's cached "removed from game"/win-rate numbers
-                // while its game is Finished or Ongoing (see UserStatsService's doc comment), so a
-                // still-Ongoing game later being cancelled (e.g. a player voted/timed out earlier,
-                // then the remaining players vote to cancel the whole game) must trigger a refresh
-                // just as much as finishing does - otherwise a removed player's cached stats would
-                // keep counting that game as a loss forever, since nothing else would ever
-                // re-trigger their recalculation. Recompute in the background rather than on each
+                // moment a game they were part of finishes OR is cancelled - cancelling flips a
+                // clock-timeout PreviousPlayerInGame row from "counts as a loss" (Ongoing) to
+                // "doesn't count" (Cancelled), see UserStatsService's doc comment, so a
+                // still-Ongoing game later being cancelled must trigger a refresh just as much as
+                // finishing does - otherwise a timed-out player's cached stats would keep counting
+                // that game as a loss forever, since nothing else would ever re-trigger their
+                // recalculation. Recompute in the background rather than on each
                 // participant's next profile page view (see UserStatsService's doc comment).
                 if (JustFinishedOrCancelled(stateBeforePatch, game.State))
                 {
@@ -282,10 +282,10 @@ public static class GamesApi
     /// <summary>
     /// True when this save's state transition is the one time a game's cached win-rate stats need
     /// recomputing for everyone who ever played it: entering <see cref="GameState.Finished"/> (the
-    /// obvious case) or entering <see cref="GameState.Cancelled"/> (a <c>PreviousPlayerInGame</c>
-    /// row only counts towards a user's cached stats while its game is Finished or Ongoing - see
+    /// obvious case) or entering <see cref="GameState.Cancelled"/> (a clock-timeout
+    /// <c>PreviousPlayerInGame</c> row stops counting as a loss once its game is Cancelled - see
     /// <see cref="Services.UserStatsService"/>'s doc comment - so a still-Ongoing game later being
-    /// cancelled must refresh stats too, or a removed player's cached numbers would keep counting
+    /// cancelled must refresh stats too, or a timed-out player's cached numbers would keep counting
     /// it as a loss forever). False for every other transition, including the reverse ones (a game
     /// going back from Finished/Cancelled to something else can't currently happen, and no other
     /// transition changes anyone's win-rate facts) and staying in the same state.

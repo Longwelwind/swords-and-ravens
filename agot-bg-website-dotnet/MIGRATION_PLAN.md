@@ -921,8 +921,13 @@ user's profile page using their `PreviousPlayerInGame` rows (same way wins/losse
   instruction that being removed from a game should never count in your favor even if your former
   house went on to win without you. Since `House`/`WasWinner` aren't tracked at all (§4.4), there's
   no way (and no need) to special-case this either way.
-- `CANCELLED`/`IN_LOBBY`/`ONGOING` games contribute to neither wins nor losses, matching today's
-  Django behavior of only scoring `FINISHED` games.
+- `CANCELLED`/`IN_LOBBY`/`ONGOING` games contribute to neither wins nor losses for still-seated
+  players, matching today's Django behavior of only scoring `FINISHED` games.
+- **Removals are scored regardless of game end**: a `PreviousPlayerInGame` row counts as a loss
+  for `FINISHED`, `ONGOING`, **and later-`CANCELLED`** games (e.g. a player rage-quits, gets
+  vassalized, and the game is then cancelled). Sole exception: a `ClockTimeout` removal from a
+  `CANCELLED` game does not count - the cancelled game counts for nobody else, so penalizing a
+  timeout there would be unfair. Tutorial games and games joined as a pure replacer stay excluded.
 
 ## 11. Rollout plan
 
@@ -1275,6 +1280,12 @@ Follow-up work after first getting the app running locally end-to-end:
   Ongoing games only; sorted in memory for users with ≥1 game, SQL-paged for the rest). `/Users`
   and `/Admin/Users` now *redirect* when restoring their saved page/sort cookie, so the restored
   sort is in the querystring and survives the pager's prev/next links.
+- **Left-early losses in cancelled games**: `UserStatsService` now also counts a
+  `PreviousPlayerInGame` row from a later-`Cancelled` game as "Replaced / left early" and a win-rate
+  loss (a rage-quitter who got vassalized can no longer erase the loss by the game being
+  cancelled), except for `ClockTimeout` removals - see §10.2. Cached stats of affected users update
+  on their next recalculation; run admin "Recalculate stats" (bulk) after deploying to apply it to
+  historical games immediately.
 
 ## 15. Roadmap / follow-ups (as of 2026-09-16)
 

@@ -11,9 +11,10 @@ namespace agot_bg_website.Tests.Services;
 
 /// <summary>
 /// Pins the exact stats rules requested for the profile page (see Pages.UserModel and
-/// MIGRATION_PLAN.md §10.2): cancelled games never affect any cached stat at all, "finished
+/// MIGRATION_PLAN.md §10.2): cancelled games never count for still-seated players, "finished
 /// games" only counts games actually played to the end (never games left early), and games left
-/// early only fold into the win-rate percentage's denominator, always as a loss.
+/// early only fold into the win-rate percentage's denominator, always as a loss (even if the game
+/// was later cancelled - except a clock-timeout removal from a cancelled game).
 /// </summary>
 public class UserStatsServiceTests : IDisposable
 {
@@ -43,7 +44,7 @@ public class UserStatsServiceTests : IDisposable
     private static JsonDocument Json(string json) => JsonDocument.Parse(json);
 
     [Fact]
-    public async Task CancelledGames_NeverAffectAnyStat()
+    public async Task CancelledGames_DontCountForCurrentPlayers_ButLeavingEarlyStillCountsAsLoss()
     {
         var user = new ApplicationUser { UserName = "cancelled_guy", Email = "c@example.com" };
         await _userManager.CreateAsync(user);
@@ -58,7 +59,17 @@ public class UserStatsServiceTests : IDisposable
             State = GameState.Cancelled,
             ViewOfGame = Json("""{"settings": {"setupId": "base-game"}}"""),
         };
-        _db.Games.Add(cancelledGame);
+        // E.g. a player rage-quit, got vassalized by vote, and the game was then cancelled - the
+        // removal must still count as a loss.
+        var leftEarlyThenCancelledGame = new Game
+        {
+            Id = Guid.NewGuid(),
+            Name = "Left early, later cancelled",
+            OwnerUserId = user.Id,
+            State = GameState.Cancelled,
+            ViewOfGame = Json("""{"settings": {"setupId": "base-game"}}"""),
+        };
+        _db.Games.AddRange(cancelledGame, leftEarlyThenCancelledGame);
         _db.PlayersInGame.Add(
             new PlayerInGame
             {
@@ -68,15 +79,11 @@ public class UserStatsServiceTests : IDisposable
                 Data = Json("""{"house": "stark", "is_winner": false}"""),
             }
         );
-
-        // Removed early from a game that was later cancelled (rather than finished) - must not
-        // count towards RemovedFromGameCount either, per "cancelled games should not count to any
-        // stats at all".
         _db.PreviousPlayersInGame.Add(
             new PreviousPlayerInGame
             {
                 Id = Guid.NewGuid(),
-                GameId = cancelledGame.Id,
+                GameId = leftEarlyThenCancelledGame.Id,
                 UserId = user.Id,
                 Reason = PlayerReplacementReason.Vote,
             }
@@ -89,6 +96,40 @@ public class UserStatsServiceTests : IDisposable
         Assert.NotNull(result);
         Assert.Equal(0, result.WonGamesCount);
         Assert.Equal(0, result.FinishedGamesCount);
+        Assert.Equal(1, result.RemovedFromGameCount);
+        Assert.Equal(0.0, result.WinRate);
+    }
+
+    [Fact]
+    public async Task ClockTimeoutFromLaterCancelledGame_DoesNotCountAsLoss()
+    {
+        var user = new ApplicationUser { UserName = "timeout_guy", Email = "t@example.com" };
+        await _userManager.CreateAsync(user);
+
+        var cancelledGame = new Game
+        {
+            Id = Guid.NewGuid(),
+            Name = "Timed out, later cancelled",
+            OwnerUserId = user.Id,
+            State = GameState.Cancelled,
+            ViewOfGame = Json("""{"settings": {"setupId": "base-game"}}"""),
+        };
+        _db.Games.Add(cancelledGame);
+        _db.PreviousPlayersInGame.Add(
+            new PreviousPlayerInGame
+            {
+                Id = Guid.NewGuid(),
+                GameId = cancelledGame.Id,
+                UserId = user.Id,
+                Reason = PlayerReplacementReason.ClockTimeout,
+            }
+        );
+
+        await _db.SaveChangesAsync();
+
+        var result = await _sut.RecalculateAsync(user.Id);
+
+        Assert.NotNull(result);
         Assert.Equal(0, result.RemovedFromGameCount);
         Assert.Null(result.WinRate);
     }

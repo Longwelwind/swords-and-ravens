@@ -258,15 +258,9 @@ public class UserModel(
     private async Task LoadPreviouslyParticipatedGamesAsync(Guid userId)
     {
         // Deliberately NOT filtered the same way UserStatsService's RemovedFromGameCount/win-rate
-        // query is (Finished-or-Ongoing only, excluding Cancelled): those two concerns are
-        // intentionally decoupled. A removal must never count towards any stat once its game is
-        // cancelled (MIGRATION_PLAN.md §10.2) - UserStatsService's own query already enforces that
-        // on the stats side and doesn't need to change here. But a player who was voted out/timed
-        // out of a game that *later* got cancelled (e.g. the remaining players voted to cancel it
-        // afterwards) still genuinely got removed from something real - hiding that from their
-        // profile entirely (as excluding Cancelled here used to do) makes it look like it never
-        // happened, with nothing in "Games"/"Cancelled games" either, since they're no longer a
-        // current PlayerInGame by that point. Every row's Game.State is exposed on
+        // query is (which excludes a clock-timeout removal from a Cancelled game): those two
+        // concerns are intentionally decoupled. Every removal - including one whose game was later
+        // cancelled - is shown here for transparency, with Game.State exposed on
         // PreviouslyParticipatedGameRow.State so the page can badge cancelled entries distinctly.
         // Only excludes InLobby, since a removal can't happen before a game actually starts.
         var rows = await db

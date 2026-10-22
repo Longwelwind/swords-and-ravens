@@ -291,7 +291,14 @@
                                         <td class="text-center">
                                             @if (game.State == GameState.Cancelled)
                                             {
-                                                <span class="badge badge-neutral" title="This game was later cancelled - it never counted towards your stats.">Cancelled</span>
+                                                @if (game.Reason == PlayerReplacementReason.ClockTimeout || game.IsReplacer)
+                                                {
+                                                    <span class="badge badge-neutral" title="This game was later cancelled - it never counted towards your stats.">Cancelled</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-neutral" title="This game was later cancelled - leaving it early still counts as a loss.">Cancelled</span>
+                                                }
                                             }
                                         </td>
                                         <td class="whitespace-normal break-words">
