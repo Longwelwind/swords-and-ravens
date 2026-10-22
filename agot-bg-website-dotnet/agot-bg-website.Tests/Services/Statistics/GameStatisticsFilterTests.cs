@@ -64,12 +64,14 @@ public class GameStatisticsFilterTests
             ("s.ironBank", "any"),
             ("s.fogOfWar", "maybe"),
             ("s.setupId", "yes"),
+            ("s.noPrivateChats", "no"),
+            ("s.onlyLive", "yes"),
             ("s.x' OR '1'='1", "yes"),
             ("vassals", "yes")
         );
 
         Assert.Equal(
-            [KeyValuePair.Create("vassals", true), KeyValuePair.Create("tidesOfBattle", false)],
+            [KeyValuePair.Create("tidesOfBattle", false), KeyValuePair.Create("vassals", true)],
             filter.Settings
         );
         Assert.Equal(SettingFilterValue.Yes, filter.GetSetting("vassals"));
