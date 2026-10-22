@@ -147,7 +147,7 @@ public static class NotificationsApi
             }
         );
 
-        foreach (var (route, template) in Templates)
+        foreach (var route in Templates.Keys)
         {
             group.MapPost(
                 $"/{route}/{{gameId:guid}}",
@@ -159,65 +159,77 @@ public static class NotificationsApi
                     IEmailSender emailSender,
                     IConfiguration configuration
                 ) =>
-                {
-                    var game = await db
-                        .Games.AsNoTracking()
-                        .FirstOrDefaultAsync(g => g.Id == gameId);
-                    if (game is null)
-                    {
-                        return Results.NotFound();
-                    }
-
-                    var candidateUsers = db
-                        .Users.Where(u =>
-                            body.Users.Contains(u.Id)
-                            && u.EmailNotificationActive
-                            && u.Email != null
-                        );
-                    var eligibleUsers = template.Category switch
-                    {
-                        NotificationCategory.Game => candidateUsers.Where(u =>
-                            u.EmailGameNotificationsActive
-                        ),
-                        NotificationCategory.Combat => candidateUsers.Where(u =>
-                            u.EmailCombatNotificationsActive
-                        ),
-                        NotificationCategory.VoteGameEnd => candidateUsers.Where(u =>
-                            u.EmailVoteGameEndNotificationsActive
-                        ),
-                        _ => throw new InvalidOperationException(
-                            $"Unsupported notification category: {template.Category}"
-                        ),
-                    };
-                    var users = await eligibleUsers.ToListAsync();
-
-                    // This endpoint only ever runs on the private GameServerApi Kestrel endpoint
-                    // (see Program.cs's RequireLocalPort(gameServerApiPort)) - the TypeScript game
-                    // server dials that internal-only port/host directly, so ctx.Request.Host
-                    // here would be that internal address (e.g. "localhost:8001"), not the public
-                    // site humans actually browse to. Use the configured public site URL instead;
-                    // only fall back to the request's own host if it's not configured.
-                    var publicSiteUrl = (
-                        configuration["PublicSiteUrl"]
-                        ?? $"{ctx.Request.Scheme}://{ctx.Request.Host}"
-                    ).TrimEnd('/');
-                    var gameUrl = $"{publicSiteUrl}/play/{gameId}";
-                    var subject = template.Subject(game);
-
-                    foreach (var user in users)
-                    {
-                        await emailSender.SendEmailAsync(
-                            user.Email!,
-                            subject,
-                            template.Body(user, game, gameUrl)
-                        );
-                    }
-
-                    return Results.Ok(new { status = "ok" });
-                }
+                    await NotifyUsersAsync(
+                        route,
+                        gameId,
+                        body.Users,
+                        ctx,
+                        db,
+                        emailSender,
+                        configuration
+                    )
             );
         }
 
         return group;
+    }
+
+    internal static async Task<IResult> NotifyUsersAsync(
+        string route,
+        Guid gameId,
+        IReadOnlyCollection<Guid> userIds,
+        HttpContext context,
+        ApplicationDbContext db,
+        IEmailSender emailSender,
+        IConfiguration configuration
+    )
+    {
+        var template = Templates[route];
+        var game = await db.Games.AsNoTracking().FirstOrDefaultAsync(g => g.Id == gameId);
+        if (game is null)
+        {
+            return Results.NotFound();
+        }
+
+        var candidateUsers = db.Users.Where(u =>
+            userIds.Contains(u.Id) && u.EmailNotificationActive && u.Email != null
+        );
+        var eligibleUsers = template.Category switch
+        {
+            NotificationCategory.Game => candidateUsers.Where(u => u.EmailGameNotificationsActive),
+            NotificationCategory.Combat => candidateUsers.Where(u =>
+                u.EmailCombatNotificationsActive
+            ),
+            NotificationCategory.VoteGameEnd => candidateUsers.Where(u =>
+                u.EmailVoteGameEndNotificationsActive
+            ),
+            _ => throw new InvalidOperationException(
+                $"Unsupported notification category: {template.Category}"
+            ),
+        };
+        var users = await eligibleUsers.ToListAsync();
+
+        // This endpoint only ever runs on the private GameServerApi Kestrel endpoint
+        // (see Program.cs's RequireLocalPort(gameServerApiPort)) - the TypeScript game server
+        // dials that internal-only port/host directly, so ctx.Request.Host here would be that
+        // internal address (e.g. "localhost:8001"), not the public site humans actually browse
+        // to. Use the configured public site URL instead; only fall back to the request's own
+        // host if it's not configured.
+        var publicSiteUrl = (
+            configuration["PublicSiteUrl"] ?? $"{context.Request.Scheme}://{context.Request.Host}"
+        ).TrimEnd('/');
+        var gameUrl = $"{publicSiteUrl}/play/{gameId}";
+        var subject = template.Subject(game);
+
+        foreach (var user in users)
+        {
+            await emailSender.SendEmailAsync(
+                user.Email!,
+                subject,
+                template.Body(user, game, gameUrl)
+            );
+        }
+
+        return Results.Ok(new { status = "ok" });
     }
 }
