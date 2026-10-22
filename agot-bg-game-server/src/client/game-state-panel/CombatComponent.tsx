@@ -227,27 +227,54 @@ export default class CombatComponent extends Component<
   }
 
   modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-    // Highlight the embattled area in yellow
+    const postCombat =
+      this.combat.childGameState instanceof PostCombatGameState
+        ? this.combat.childGameState
+        : null;
+    const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState)
+      ? (this.combat.getChildGameState(
+          SelectUnitsGameState
+        ) as SelectUnitsGameState<any>)
+      : null;
+    const drawMarchMarker =
+      (!postCombat ||
+        (!postCombat.hasChildGameState(
+          AfterCombatHouseCardAbilitiesGameState
+        ) &&
+          postCombat.winner == this.combat.attacker)) &&
+      (!selectUnits ||
+        !this.props.gameClient.doesControlHouse(selectUnits.house)) &&
+      this.combat.attackingArmy.some(
+        (unit) => unit.region == this.combat.attackingRegion
+      );
+
     return [
       [
+        this.combat.attackingRegion,
+        {
+          marchMarker: drawMarchMarker
+            ? {
+                targetRegion: this.combat.defendingRegion,
+                color: this.combat.attacker.getHighlightColor()
+              }
+            : undefined
+        }
+      ],
+      [
         this.combat.defendingRegion,
-        { highlight: { active: true, color: "yellow" } }
+        {
+          highlight: {
+            active: true,
+            color: this.combat.attacker.getHighlightColor()
+          }
+        }
       ]
     ];
   }
 
   modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
     // Highlight the attacking army in red when game state tree does not contain SelectUnitsGameState
-    // or the user does not control the house to select units but never show march markers when attacker lost the combat
-    // (but post combat may be still active for abilties)
-    const postCombat =
-      this.combat.childGameState instanceof PostCombatGameState
-        ? this.combat.childGameState
-        : null;
-    const drawMarchMarkers =
-      !postCombat ||
-      (!postCombat.hasChildGameState(AfterCombatHouseCardAbilitiesGameState) &&
-        postCombat.winner == this.combat.attacker);
+    // or the user does not control the house to select units.
     const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState)
       ? (this.combat.getChildGameState(
           SelectUnitsGameState
@@ -261,23 +288,11 @@ export default class CombatComponent extends Component<
       return this.combat.attackingArmy.map((u) => [
         u,
         {
-          highlight: { active: true, color: "red" },
-          targetRegion: drawMarchMarkers
-            ? this.combat.defendingRegion
-            : undefined
+          highlight: { active: true, color: "red" }
         }
       ]);
-    } else if (this.props.gameClient.doesControlHouse(selectUnits.house)) {
-      return [];
     } else {
-      return this.combat.attackingArmy.map((u) => [
-        u,
-        {
-          targetRegion: drawMarchMarkers
-            ? this.combat.defendingRegion
-            : undefined
-        }
-      ]);
+      return [];
     }
   }
 

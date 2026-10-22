@@ -161,14 +161,6 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
                   }}
                 />
               )}
-              <div
-                id={`replay-march-markers-${r.id}`}
-                className="units-container disable-pointer-events v-hidden"
-                style={{
-                  left: regions.get(r.id).nameSlot.x,
-                  top: regions.get(r.id).nameSlot.y
-                }}
-              />
             </div>
           ))}
           {this.renderUnits(garrisons)}
@@ -390,6 +382,10 @@ export default class WorldSnapshotComponent extends Component<WorldSnapshotCompo
               }
             </div>
           )}
+          <div
+            id={`replay-march-markers-${r.id}`}
+            className="center-relative-to-parent disable-pointer-events v-hidden"
+          />
         </div>
       );
     });

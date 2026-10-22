@@ -762,7 +762,9 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         {
           highlight: {
             active: true,
-            color: combatRegions.includes(r) ? "yellow" : "white"
+            color: combatRegions.includes(r)
+              ? this.house.getHighlightColor()
+              : "white"
           },
           onClick:
             targetRegions.includes(r) ||

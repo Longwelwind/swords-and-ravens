@@ -17,6 +17,7 @@ interface HighlightProperties {
 
 export interface RegionOnMapProperties {
   highlight: HighlightProperties;
+  marchMarker?: { targetRegion: Region; color: string };
   onClick?: () => void;
   wrap?: (child: ReactElement) => ReactElement;
 }
@@ -24,7 +25,6 @@ export interface RegionOnMapProperties {
 export interface UnitOnMapProperties {
   highlight?: HighlightProperties;
   onClick?: () => void;
-  targetRegion?: Region;
   animateFadeIn?: boolean;
   animateFadeOut?: boolean;
   animateAttention?: boolean;
