@@ -71,7 +71,7 @@ export default class WesterosCardComponent extends Component<WesterosCardProps> 
                 <Tooltip id={`was-reshuffled-${this.props.westerosDeckI}`}>
                   <Trans
                     i18nKey="westerosCard.drawnAfterWinterIsComingWasExecuted33f22c"
-                    components={{ element0: <b /> }}
+                    components={{ bold: <b /> }}
                   />
                 </Tooltip>
               }

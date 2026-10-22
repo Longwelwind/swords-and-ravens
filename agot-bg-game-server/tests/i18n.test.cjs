@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { test, beforeEach, afterEach } = require("node:test");
 const React = require("react");
+const { renderToStaticMarkup } = require("react-dom/server");
 const {
   render,
   fireEvent,
@@ -76,6 +77,11 @@ test("all languages cover the catalog and preserve interpolation and rich-text c
     for (const [key, original] of Object.entries(source)) {
       assert.equal(typeof target[key], "string", `${code}: missing ${key}`);
       assert.ok(target[key].trim(), `${code}: empty ${key}`);
+      assert.doesNotMatch(
+        target[key],
+        /<\/?(?:value|element)\d+\b|\{\{value\d+}}/,
+        `${code}: positional placeholder in ${key}`
+      );
       const optionalSingularCount =
         key.endsWith("_one") &&
         !original.includes("{{count}}") &&
@@ -113,6 +119,164 @@ test("all languages cover the catalog and preserve interpolation and rich-text c
         `${code}: non-UI ${key}`
       );
     }
+  }
+});
+
+test("client translation call sites supply their named interpolation and component placeholders", () => {
+  const catalog = flatten(en);
+  const pluralSuffix = /_(zero|one|two|few|many|other)$/;
+  function translation(key) {
+    return catalog[key] ?? catalog[`${key}_other`];
+  }
+  function keys(expression) {
+    if (!expression) return [];
+    if (ts.isStringLiteral(expression)) return [expression.text];
+    if (ts.isJsxExpression(expression)) return keys(expression.expression);
+    if (ts.isConditionalExpression(expression))
+      return [...keys(expression.whenTrue), ...keys(expression.whenFalse)];
+    return [];
+  }
+  function inspect(file) {
+    const source = fs.readFileSync(file, "utf8");
+    const ast = ts.createSourceFile(
+      file,
+      source,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX
+    );
+    function propertyNames(object) {
+      return new Set(
+        object && ts.isObjectLiteralExpression(object)
+          ? object.properties.map((p) => p.name?.getText(ast)).filter(Boolean)
+          : []
+      );
+    }
+    function visit(node) {
+      if (
+        (ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) &&
+        node.tagName.getText(ast) === "Trans"
+      ) {
+        const attributes = new Map(
+          node.attributes.properties
+            .filter(ts.isJsxAttribute)
+            .map((a) => [a.name.getText(ast), a.initializer])
+        );
+        const values = propertyNames(attributes.get("values")?.expression);
+        const components = propertyNames(
+          attributes.get("components")?.expression
+        );
+        if (attributes.has("count")) values.add("count");
+        for (const key of keys(attributes.get("i18nKey"))) {
+          const message = translation(key);
+          assert.equal(typeof message, "string", `${file}: unknown ${key}`);
+          const variants = Object.entries(catalog).filter(
+            ([variant]) =>
+              variant === key || variant.replace(pluralSuffix, "") === key
+          );
+          for (const [variant, text] of variants) {
+            for (const [, name] of text.matchAll(/\{\{(\w+)}}/g)) {
+              assert.ok(
+                values.has(name),
+                `${file}: ${variant} missing value ${name}`
+              );
+            }
+            for (const [, name] of text.matchAll(/<\/?(\w+)\/?>/g)) {
+              assert.ok(
+                components.has(name),
+                `${file}: ${variant} missing component ${name}`
+              );
+            }
+          }
+          for (const name of values) {
+            if (name === "count") continue;
+            assert.ok(
+              variants.some(([, text]) => text.includes(`{{${name}}}`)),
+              `${file}: ${key} unused value ${name}`
+            );
+          }
+          for (const name of components) {
+            assert.ok(
+              variants.some(
+                ([, text]) =>
+                  text.includes(`<${name}/>`) || text.includes(`<${name}>`)
+              ),
+              `${file}: ${key} unused component ${name}`
+            );
+          }
+        }
+      }
+      if (ts.isCallExpression(node) && node.expression.getText(ast) === "t") {
+        const values = propertyNames(node.arguments[1]);
+        for (const key of keys(node.arguments[0])) {
+          const message = translation(key);
+          if (!message) continue;
+          for (const [, name] of message.matchAll(/\{\{(\w+)}}/g)) {
+            assert.ok(
+              values.has(name),
+              `${file}: ${key} missing value ${name}`
+            );
+          }
+        }
+      }
+      ts.forEachChild(node, visit);
+    }
+    visit(ast);
+  }
+  function walk(directory) {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const file = path.join(directory, entry.name);
+      if (entry.isDirectory()) walk(file);
+      else if (/\.tsx?$/.test(entry.name)) inspect(file);
+    }
+  }
+  walk(path.join(__dirname, "..", "src", "client"));
+});
+
+test("catalog interpolation and rich component placeholders survive rendering", () => {
+  const container = document.createElement("div");
+  for (const [key, text] of Object.entries(flatten(en))) {
+    const variables = [
+      ...new Set([...text.matchAll(/\{\{(\w+)}}/g)].map((m) => m[1]))
+    ];
+    const tags = [
+      ...new Set([...text.matchAll(/<\/?(\w+)\/?>/g)].map((m) => m[1]))
+    ];
+    if (!variables.length && !tags.length) continue;
+    const markers = variables.map((name) => `VALUE_${name}_END`);
+    container.innerHTML = renderToStaticMarkup(
+      React.createElement(Trans, {
+        i18nKey: key,
+        values: Object.fromEntries(
+          variables.map((name, index) => [name, markers[index]])
+        ),
+        ...(tags.length
+          ? {
+              components: Object.fromEntries(
+                tags.map((name) => [
+                  name,
+                  React.createElement("span", { "data-component": name })
+                ])
+              )
+            }
+          : {})
+      })
+    );
+    for (const marker of markers)
+      assert.ok(
+        container.textContent.includes(marker),
+        `${key}: missing ${marker}`
+      );
+    for (const tag of tags)
+      assert.ok(
+        container.querySelector(`[data-component="${tag}"]`),
+        `${key}: missing ${tag}`
+      );
+    assert.doesNotMatch(
+      container.textContent,
+      /\{\{/,
+      `${key}: unresolved interpolation`
+    );
   }
 });
 
@@ -249,35 +413,86 @@ test("the flagged language menu supports arrow keys, Escape and focus restoratio
   });
 });
 
-test("shared waiting messages preserve rich house labels and escape player-controlled text", async () => {
-  const maliciousName = '<img src=x onerror="alert(1)">';
+test("named interpolation preserves literal player-controlled text and stays reactive", async () => {
+  const maliciousName = '<bold>Stark</bold><img src=x onerror="alert(1)">';
   const view = render(
     React.createElement(Trans, {
       i18nKey: "common.waitingFor",
-      components: {
-        houses: React.createElement(
-          "b",
-          { "data-testid": "houses" },
-          `Stark, ${maliciousName}`
-        )
-      }
+      values: { houses: `Stark, ${maliciousName}` }
     })
   );
   assert.equal(
-    view.getByTestId("houses").textContent,
-    `Stark, ${maliciousName}`
+    view.container.textContent,
+    `Waiting for Stark, ${maliciousName}...`
   );
   assert.equal(view.container.querySelector("img"), null);
   assert.match(view.container.textContent, /Waiting for Stark,/);
   await act(async () => {
     await i18n.changeLanguage("de");
   });
-  assert.equal(
-    view.getByTestId("houses").textContent,
-    `Stark, ${maliciousName}`
-  );
+  assert.ok(view.container.textContent.includes(`Stark, ${maliciousName}`));
   assert.doesNotMatch(view.container.textContent, /Waiting for/);
   assert.equal(view.container.querySelector("img"), null);
+});
+
+test("interpolated values cannot become rich-text components or lose formatting", () => {
+  const name = "<bold>Not markup</bold> & <img src=x>";
+  const view = render(
+    React.createElement(Trans, {
+      i18nKey: "entireGame.requiredVictoryPoints72bc5d",
+      values: { victoryPoints: name },
+      components: { bold: React.createElement("b") }
+    })
+  );
+  assert.equal(view.container.querySelectorAll("b").length, 1);
+  assert.equal(view.container.querySelector("b").textContent, name);
+  assert.equal(view.container.querySelector("img"), null);
+});
+
+test("rich interpolation preserves numeric zero and plural-specific formatting", () => {
+  const view = render(
+    React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(Trans, {
+        i18nKey: "entireGame.requiredVictoryPoints72bc5d",
+        values: { victoryPoints: 0 },
+        components: { bold: React.createElement("b") }
+      }),
+      React.createElement(Trans, {
+        i18nKey: "gameLogList.raidPowerGained",
+        count: 1,
+        values: { raider: "Stark" },
+        components: { bold: React.createElement("b") }
+      })
+    )
+  );
+  assert.equal(view.container.querySelector("b").textContent, "0");
+  assert.match(view.container.textContent, /House Stark gained a Power token/);
+  assert.doesNotMatch(view.container.textContent, /\{\{|<\/?bold/);
+});
+
+test("translated unit labels no longer run into the following word", async () => {
+  for (const code of ["de", "es", "fr", "it", "ru"]) {
+    await i18n.changeLanguage(code);
+    const view = render(
+      React.createElement(Trans, {
+        i18nKey: "resolveRetreat.mustBeDestroyedIfYouRetreatToc07ed8",
+        values: {
+          unitCountToBeDestroyed: 2,
+          unit: "UNITS",
+          selectRegionComponentSelectedRegion: "Winterfell"
+        },
+        components: {
+          bold: React.createElement("b"),
+          bold2: React.createElement("b")
+        }
+      })
+    );
+    assert.match(view.container.textContent, /UNITS(?:\s|[.,!?])/u, code);
+    assert.doesNotMatch(view.container.textContent, /UNITS\p{L}/u, code);
+    view.unmount();
+  }
 });
 
 test("support refusal translates the confirmation while preserving house names and cancellation", async (context) => {
@@ -319,7 +534,9 @@ test("support refusal translates the confirmation while preserving house names a
     await i18n.changeLanguage("de");
   });
   const button = view.getByRole("button", {
-    name: t("chooseHouseCard.refuseSupportFrom3f7482", { value0: "Tyrell" })
+    name: t("chooseHouseCard.refuseSupportFrom3f7482", {
+      supportingHouse: "Tyrell"
+    })
   });
   fireEvent.click(button);
   assert.deepEqual(refused, []);
@@ -338,11 +555,11 @@ test("rich text retains nested formatting, dynamic values and interactive compon
   const clicked = [];
   const view = render(
     React.createElement(Trans, {
-      i18nKey:
-        "entireGame.fromRoundOnwardsEachHouseReceivesItsAlternativeDeck0f2244",
+      i18nKey: "gameLogList.isControlledBy9cf9a1",
       components: {
-        element0: React.createElement("b"),
-        value1: React.createElement(
+        house: React.createElement("span", null, "Stark"),
+        bold: React.createElement("b"),
+        user: React.createElement(
           "button",
           { onClick: () => clicked.push(true) },
           "4"
@@ -443,16 +660,16 @@ test("server-owned prompts and unit descriptions translate only for display, nev
   );
   for (const count of [1, 2, 21]) {
     const source = en.gameText.houseTargaryenMayDiscardPowerTokenToMove69b917
-      .replace("{{value0}}", count)
-      .replace("{{value1}}", count === 1 ? "" : "s")
-      .replace("{{value2}}", "Winterfell")
-      .replace("{{value3}}", "Dragonstone");
+      .replace("{{powerTokens}}", count)
+      .replace("{{tokenSuffix}}", count === 1 ? "" : "s")
+      .replace("{{fromRegion}}", "Winterfell")
+      .replace("{{toRegion}}", "Dragonstone");
     assert.equal(
       translateGameText(source),
       t("gameText.houseTargaryenMayDiscardPowerTokenToMove69b917", {
         count,
-        value2: "Winterfell",
-        value3: "Dragonstone"
+        fromRegion: "Winterfell",
+        toRegion: "Dragonstone"
       })
     );
     assert.notEqual(translateGameText(source), source);

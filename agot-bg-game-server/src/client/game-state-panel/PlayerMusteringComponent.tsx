@@ -73,15 +73,13 @@ export default class PlayerMusteringComponent extends Component<
             <>
               <Trans
                 i18nKey="playerMustering.houseCanResolveTheirSpecialConsolidatePowerOrderIn6c7652"
+                values={{
+                  house: this.house.name,
+                  region:
+                    this.props.gameState.regions[0]?.name ?? t("common.unknown")
+                }}
                 components={{
-                  element0: <b />,
-                  value1: <>{this.house.name}</>,
-                  value2: (
-                    <>
-                      {this.props.gameState.regions[0]?.name ??
-                        t("common.unknown")}
-                    </>
-                  )
+                  bold: <b />
                 }}
               />
             </>
@@ -91,9 +89,9 @@ export default class PlayerMusteringComponent extends Component<
               <>
                 <Trans
                   i18nKey="playerMustering.vassalHouseCanMusterUnitsInTheirHomeArea9124d8"
+                  values={{ house: this.house.name }}
                   components={{
-                    element0: <b />,
-                    value1: <>{this.house.name}</>
+                    bold: <b />
                   }}
                 />
               </>
@@ -109,7 +107,8 @@ export default class PlayerMusteringComponent extends Component<
             <>
               <Trans
                 i18nKey="playerMustering.houseCanMusterUnitsInOneOfTheirControlledc78cef"
-                components={{ element0: <b />, value1: <>{this.house.name}</> }}
+                values={{ house: this.house.name }}
+                components={{ bold: <b /> }}
               />
             </>
           ) : this.props.gameState.type ==
@@ -117,15 +116,13 @@ export default class PlayerMusteringComponent extends Component<
             <>
               <Trans
                 i18nKey="playerMustering.vassalHouseCanResolveTheirDefenseMusterOrderIn31fde9"
+                values={{
+                  house: this.house.name,
+                  region:
+                    this.props.gameState.regions[0]?.name ?? t("common.unknown")
+                }}
                 components={{
-                  element0: <b />,
-                  value1: <>{this.house.name}</>,
-                  value2: (
-                    <>
-                      {this.props.gameState.regions[0]?.name ??
-                        t("common.unknown")}
-                    </>
-                  )
+                  bold: <b />
                 }}
               />
             </>
@@ -152,10 +149,10 @@ export default class PlayerMusteringComponent extends Component<
                     <div key={`planned-recruitments_${r.id}`}>
                       <Trans
                         i18nKey="playerMustering.from72f2df"
+                        values={{ region: r.name }}
                         components={{
-                          element0: <b />,
-                          value1: <>{r.name}</>,
-                          element2: (
+                          bold: <b />,
+                          musterings: (
                             <ul>
                               {musterings.map(({ region, from, to }, i) => (
                                 <li
@@ -166,27 +163,17 @@ export default class PlayerMusteringComponent extends Component<
                                 >
                                   <Trans
                                     i18nKey="playerMustering.acff809"
-                                    components={{
-                                      value0: (
-                                        <>
-                                          {from
-                                            ? t(
-                                                "playerMustering.upgradingTo2578a5"
-                                              )
-                                            : t(
-                                                "playerMustering.recruiting0291f3"
-                                              )}
-                                        </>
-                                      ),
-                                      value1: <>{translateGameText(to.name)}</>,
-                                      value2: (
-                                        <>
-                                          {r != region &&
-                                            t("playerMustering.in2e716c", {
-                                              value0: region.name
-                                            })}
-                                        </>
-                                      )
+                                    values={{
+                                      recruitmentType: from
+                                        ? t("playerMustering.upgradingTo2578a5")
+                                        : t("playerMustering.recruiting0291f3"),
+                                      unitType: translateGameText(to.name),
+                                      region:
+                                        r != region
+                                          ? t("playerMustering.in2e716c", {
+                                              region: region.name
+                                            })
+                                          : ""
                                     }}
                                   />
                                 </li>
@@ -211,14 +198,15 @@ export default class PlayerMusteringComponent extends Component<
                   <>
                     <Trans
                       i18nKey="playerMustering.clickIntoToInitiateARecruitmentFromThere0b91db"
+                      values={{ regions: this.props.gameState.regions[0].name }}
                       components={{
-                        value0: (
+                        recruitmentOrders: (
                           <>
                             {this.isStarredConsolidatePowerMusteringType ? (
                               <>
                                 <Trans
                                   i18nKey="playerMustering.theSpecialConsolidatePowerOrderOr93d429"
-                                  components={{ element0: <b /> }}
+                                  components={{ bold: <b /> }}
                                 />
                               </>
                             ) : this.props.gameState.type ==
@@ -226,7 +214,7 @@ export default class PlayerMusteringComponent extends Component<
                               <>
                                 <Trans
                                   i18nKey="playerMustering.theDefenseMusterOrderOred843f"
-                                  components={{ element0: <b /> }}
+                                  components={{ bold: <b /> }}
                                 />
                               </>
                             ) : (
@@ -234,8 +222,7 @@ export default class PlayerMusteringComponent extends Component<
                             )}
                           </>
                         ),
-                        element1: <b />,
-                        value2: <>{this.props.gameState.regions[0].name}</>
+                        bold: <b />
                       }}
                     />
                   </>
@@ -289,16 +276,10 @@ export default class PlayerMusteringComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: (
-                  <>
-                    {
-                      this.props.gameState.ingame.getControllerOfHouse(
-                        this.house
-                      ).house.name
-                    }
-                  </>
-                )
+              values={{
+                houses: this.props.gameState.ingame.getControllerOfHouse(
+                  this.house
+                ).house.name
               }}
             />
           </Col>
@@ -591,7 +572,8 @@ export default class PlayerMusteringComponent extends Component<
           <>
             <Trans
               i18nKey="playerMustering.tobb94fd"
-              components={{ element0: <b />, value1: <>{rule.region.name}</> }}
+              values={{ ruleRegion: rule.region.name }}
+              components={{ bold: <b /> }}
             />
           </>
         )}

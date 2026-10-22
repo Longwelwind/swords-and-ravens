@@ -34,7 +34,7 @@ export default class ResolveSpymasterComponent extends Component<
                   <Col xs={12} className="text-center">
                     <Trans
                       i18nKey="resolveSpymaster.selectTheCardSToPutOnBottomOf3a608f"
-                      components={{ element0: <br />, element1: <small /> }}
+                      components={{ lineBreak: <br />, small: <small /> }}
                     />
                   </Col>
                 </Row>
@@ -94,7 +94,7 @@ export default class ResolveSpymasterComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{ houses: <>{this.props.gameState.house.name}</> }}
+                values={{ houses: this.props.gameState.house.name }}
               />
             </div>
           )}

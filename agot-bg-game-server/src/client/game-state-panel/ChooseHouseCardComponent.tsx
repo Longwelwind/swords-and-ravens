@@ -138,8 +138,8 @@ export default class ChooseHouseCardComponent extends Component<
                                 <Trans
                                   i18nKey="chooseHouseCard.inCaseThe1BonusWonTAffectTheb02ea3"
                                   components={{
-                                    element0: <br />,
-                                    element1: <br />
+                                    lineBreak: <br />,
+                                    lineBreak2: <br />
                                   }}
                                 />
                               </Tooltip>
@@ -226,7 +226,7 @@ export default class ChooseHouseCardComponent extends Component<
                           {commandedHouse == supportingHouse
                             ? t("chooseHouseCard.refuseOwnSupport6e9b1f")
                             : t("chooseHouseCard.refuseSupportFrom3f7482", {
-                                value0: supportingHouse.name
+                                supportingHouse: supportingHouse.name
                               })}
                         </Button>
                       </Col>
@@ -240,23 +240,17 @@ export default class ChooseHouseCardComponent extends Component<
           <div>
             <Trans
               i18nKey="chooseHouseCard.waitingForToChooseTheir05a4e8"
-              components={{
-                value0: (
-                  <>
-                    {joinNaturalLanguage(
-                      waitingFor.map(
-                        (h) =>
-                          this.combat.ingameGameState.getControllerOfHouse(h)
-                            .house.name
-                      )
-                    )}
-                  </>
+              values={{
+                houses: joinNaturalLanguage(
+                  waitingFor.map(
+                    (h) =>
+                      this.combat.ingameGameState.getControllerOfHouse(h).house
+                        .name
+                  )
                 ),
-                value1: (
-                  <>
-                    {t("common.HousecardLabel", { count: waitingFor.length })}
-                  </>
-                )
+                houseCardLabel: t("common.HousecardLabel", {
+                  count: waitingFor.length
+                })
               }}
             />
           </div>

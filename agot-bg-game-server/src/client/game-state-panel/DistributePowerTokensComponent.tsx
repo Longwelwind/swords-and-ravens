@@ -45,10 +45,12 @@ export default class ResolveTiesComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="distributePowerTokens.canDistributeTheirBidOfToOtherHousesa6b601"
+            values={{
+              house: this.props.gameState.house.name,
+              bidOfDistributor: this.props.gameState.bidOfDistributor
+            }}
             components={{
-              element0: <b />,
-              value1: <>{this.props.gameState.house.name}</>,
-              value2: <>{this.props.gameState.bidOfDistributor}</>
+              bold: <b />
             }}
           />
         </Col>
@@ -57,8 +59,9 @@ export default class ResolveTiesComponent extends Component<
             <Col xs={12} className="text-center">
               <Trans
                 i18nKey="distributePowerTokens.availablePowerTokens4d6905"
-                components={{
-                  value0: <>{this.availablePowerTokensForDistribution}</>
+                values={{
+                  availablePowerTokensForDistribution:
+                    this.availablePowerTokensForDistribution
                 }}
               />
             </Col>
@@ -138,7 +141,7 @@ export default class ResolveTiesComponent extends Component<
             <Col xs={12} className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{ houses: <>{this.props.gameState.house.name}</> }}
+                values={{ houses: this.props.gameState.house.name }}
               />
             </Col>
           </>

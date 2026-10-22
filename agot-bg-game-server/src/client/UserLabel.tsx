@@ -81,12 +81,10 @@ export default class UserLabel extends Component<UserLabelProps> {
                     <Tooltip id={`${this.user.id}-owner-tooltip`}>
                       <Trans
                         i18nKey="userLabel.gameHost8c6ec6"
-                        components={{
-                          value0: (
-                            <>
-                              {!isRealOwner ? t("userLabel.deputy2cadf4") : ""}
-                            </>
-                          )
+                        values={{
+                          deputyLabel: !isRealOwner
+                            ? t("userLabel.deputy2cadf4")
+                            : ""
                         }}
                       />
                     </Tooltip>
@@ -134,7 +132,9 @@ export default class UserLabel extends Component<UserLabelProps> {
                   <Trans
                     i18nKey="userLabel.showProfileOff6cf26"
                     components={{
-                      value0: <>{this.renderNameAndTimeElapsedDropDownItem()}</>
+                      userLabel: (
+                        <>{this.renderNameAndTimeElapsedDropDownItem()}</>
+                      )
                     }}
                   />
                 </NavDropdown.Item>
@@ -162,7 +162,7 @@ export default class UserLabel extends Component<UserLabelProps> {
                   <small>
                     <Trans
                       i18nKey="userLabel.timeElapsedSinceWaitingForPlayerActionHhMm386b38"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </small>
                 </Tooltip>
@@ -191,18 +191,16 @@ export default class UserLabel extends Component<UserLabelProps> {
           <Tooltip id={`${this.user.id}-other-users-with-same-ip-tooltip`}>
             <Trans
               i18nKey="userLabel.theseUsersFromTheSameNetworkAs5f4ff5"
+              values={{
+                activity: this.ingame
+                  ? t("userLabel.playaba4cc")
+                  : t("userLabel.joined6b963c"),
+                user: this.user.name
+              }}
               components={{
-                value0: (
-                  <>
-                    {this.ingame
-                      ? t("userLabel.playaba4cc")
-                      : t("userLabel.joined6b963c")}
-                  </>
-                ),
-                value1: <>{this.user.name}</>,
-                element2: <br />,
-                element3: <br />,
-                value4: (
+                lineBreak: <br />,
+                lineBreak2: <br />,
+                users: (
                   <>
                     {Array.from(this.user.otherUsersFromSameNetwork).map(
                       (usr) => (
@@ -447,7 +445,7 @@ export default class UserLabel extends Component<UserLabelProps> {
             >
               <Trans
                 i18nKey="userLabel.launchAVoteToDeclareTheWinner77ca8c"
-                components={{ value0: <>{this.player!.house.name}</> }}
+                values={{ playerHouse: this.player!.house.name }}
               />
             </NavDropdown.Item>
           </div>
@@ -466,8 +464,8 @@ export default class UserLabel extends Component<UserLabelProps> {
     if (
       window.confirm(
         t("userLabel.doYouWantToLaunchAVoteToReplacece2ed7", {
-          value0: this.player!.user.name,
-          value1: this.player!.house.name
+          playerUser: this.player!.user.name,
+          playerHouse: this.player!.house.name
         })
       )
     ) {
@@ -485,8 +483,8 @@ export default class UserLabel extends Component<UserLabelProps> {
     if (
       window.confirm(
         t("userLabel.doYouWantToLaunchAVoteToReplace1838ba", {
-          value0: this.player!.user.name,
-          value1: this.player!.house.name
+          playerUser: this.player!.user.name,
+          playerHouse: this.player!.house.name
         })
       )
     ) {
@@ -504,8 +502,8 @@ export default class UserLabel extends Component<UserLabelProps> {
     if (
       window.confirm(
         t("userLabel.doYouWantToLaunchAVoteToSwap4ecc84", {
-          value0: this.player!.user.name,
-          value1: this.player!.house.name
+          playerUser: this.player!.user.name,
+          playerHouse: this.player!.house.name
         })
       )
     ) {
@@ -523,7 +521,7 @@ export default class UserLabel extends Component<UserLabelProps> {
     if (
       window.confirm(
         t("userLabel.doYouWantToLaunchAVoteToDeclared1d231", {
-          value0: this.player!.house.name
+          playerHouse: this.player!.house.name
         })
       )
     ) {

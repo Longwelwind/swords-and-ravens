@@ -21,22 +21,20 @@ export default class AshaGreyjoy1stAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="ashaGreyjoy1stAbility.ashaGreyjoyHouseCanChooseToRemoveOneSupport68ca0b"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemyHouse: this.props.gameState.combat.getEnemy(
+                this.props.gameState.childGameState.house
+              ).name,
+              combatDefendingRegion:
+                this.props.gameState.combat.defendingRegion.name
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.childGameState.house.name}</>,
-              element3: <b />,
-              value4: (
-                <>
-                  {
-                    this.props.gameState.combat.getEnemy(
-                      this.props.gameState.childGameState.house
-                    ).name
-                  }
-                </>
-              ),
-              element5: <b />,
-              value6: <>{this.props.gameState.combat.defendingRegion.name}</>
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />,
+              bold4: <b />
             }}
           />
         </Col>

@@ -37,15 +37,11 @@ export default class UseValyrianSteelBladeComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="useValyrianSteelBlade.mayChooseToUseTheValyrianSteelBladeTo13a6db"
-            components={{
-              value0: <>{this.house.name}</>,
-              value1: (
-                <>
-                  {this.gameState.forNewTidesOfBattleCard
-                    ? t("common.drawANewTidesOfBattleCard")
-                    : t("common.increaseTheirCombatStrengthBy1")}
-                </>
-              )
+            values={{
+              house: this.house.name,
+              effect: this.gameState.forNewTidesOfBattleCard
+                ? t("common.drawANewTidesOfBattleCard")
+                : t("common.increaseTheirCombatStrengthBy1")
             }}
           />
         </Col>
@@ -68,7 +64,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
                         <small>
                           <Trans
                             i18nKey="useValyrianSteelBlade.warningUsingTheValyrianSteelBladeWonTChange46dca7"
-                            components={{ element0: <b /> }}
+                            components={{ bold: <b /> }}
                           />
                         </small>
                       </Alert>
@@ -86,7 +82,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
                         <small>
                           <Trans
                             i18nKey="useValyrianSteelBlade.warningTheValyrianSteelBladeDecisionIsForcedBy987e15"
-                            components={{ element0: <b />, element1: <br /> }}
+                            components={{ bold: <b />, lineBreak: <br /> }}
                           />
                         </small>
                       </Alert>
@@ -121,15 +117,9 @@ export default class UseValyrianSteelBladeComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{
-                  houses: (
-                    <>
-                      {
-                        this.gameState.ingame.getControllerOfHouse(this.house)
-                          .house.name
-                      }
-                    </>
-                  )
+                values={{
+                  houses: this.gameState.ingame.getControllerOfHouse(this.house)
+                    .house.name
                 }}
               />
             </div>

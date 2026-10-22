@@ -47,8 +47,9 @@ export default class SelectUnitsComponent extends Component<
                         <li key={`select-units_${region.id}`}>
                           <Trans
                             i18nKey="common.in"
+                            values={{ region: region.name }}
                             components={{
-                              value0: (
+                              units: (
                                 <>
                                   {joinReactNodes(
                                     units.map((u, i) => (
@@ -62,8 +63,7 @@ export default class SelectUnitsComponent extends Component<
                                   )}
                                 </>
                               ),
-                              element1: <b />,
-                              value2: <>{region.name}</>
+                              bold: <b />
                             }}
                           />
                         </li>
@@ -103,16 +103,10 @@ export default class SelectUnitsComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{
-                  houses: (
-                    <>
-                      {
-                        this.props.gameState.ingame.getControllerOfHouse(
-                          this.props.gameState.house
-                        ).house.name
-                      }
-                    </>
-                  )
+                values={{
+                  houses: this.props.gameState.ingame.getControllerOfHouse(
+                    this.props.gameState.house
+                  ).house.name
                 }}
               />
             </div>

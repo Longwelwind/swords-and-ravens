@@ -626,10 +626,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
             });
           }}
         >
-          <Trans
-            i18nKey="gameTabs.round6f8874"
-            components={{ value0: <>{round}</> }}
-          />
+          <Trans i18nKey="gameTabs.round6f8874" values={{ round: round }} />
         </Dropdown.Item>
       );
     });

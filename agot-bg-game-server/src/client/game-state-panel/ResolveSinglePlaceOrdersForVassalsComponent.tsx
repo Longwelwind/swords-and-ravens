@@ -103,16 +103,16 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
             <>
               <Trans
                 i18nKey="resolveSinglePlaceOrdersForVassals.houseMustNowPlaceOrdersForb23e23"
+                values={{ house: this.house.name }}
                 components={{
-                  element0: <b />,
-                  value1: <>{this.house.name}</>,
-                  value2: (
+                  bold: <b />,
+                  houses: (
                     <>
                       {houses.length == 1 ? (
                         <>
                           <Trans
                             i18nKey="resolveSinglePlaceOrdersForVassals.house275ad0"
-                            components={{ value0: <>{houses[0]}</> }}
+                            values={{ houses: houses[0] }}
                           />
                         </>
                       ) : (
@@ -168,7 +168,7 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
               <Col xs={12} className="text-center mt-3">
                 <Trans
                   i18nKey="common.waitingFor"
-                  components={{ houses: <>{this.house.name}</> }}
+                  values={{ houses: this.house.name }}
                 />
               </Col>
             </Row>

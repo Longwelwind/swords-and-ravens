@@ -21,20 +21,17 @@ export default class PatchfaceAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="patchfaceAbility.patchfaceHouseMayChooseToDiscardOneHouseCardbe33f3"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemyHouse: this.props.gameState.combat.getEnemy(
+                this.props.gameState.childGameState.house
+              ).name
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.childGameState.house.name}</>,
-              element3: <b />,
-              value4: (
-                <>
-                  {
-                    this.props.gameState.combat.getEnemy(
-                      this.props.gameState.childGameState.house
-                    ).name
-                  }
-                </>
-              )
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
             }}
           />
         </Col>

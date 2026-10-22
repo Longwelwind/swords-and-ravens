@@ -79,9 +79,9 @@ export default class PlayerReconcileArmiesComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="playerReconcileArmies.mustReconcileTheirArmiesAccordingToTheirSupplyLimits664089"
+            values={{ house: this.props.gameState.house.name }}
             components={{
-              element0: <b />,
-              value1: <>{this.props.gameState.house.name}</>
+              bold: <b />
             }}
           />
         </Col>
@@ -98,8 +98,9 @@ export default class PlayerReconcileArmiesComponent extends Component<
                       <li key={`player-reconcile-armies_${region.id}`}>
                         <Trans
                           i18nKey="common.in"
+                          values={{ region: region.name }}
                           components={{
-                            value0: (
+                            units: (
                               <>
                                 {joinReactNodes(
                                   units.map((u, i) => (
@@ -113,8 +114,7 @@ export default class PlayerReconcileArmiesComponent extends Component<
                                 )}
                               </>
                             ),
-                            element1: <b />,
-                            value2: <>{region.name}</>
+                            bold: <b />
                           }}
                         />
                       </li>
@@ -155,16 +155,11 @@ export default class PlayerReconcileArmiesComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: (
-                  <>
-                    {
-                      this.props.gameState.parentGameState.ingame.getControllerOfHouse(
-                        this.house
-                      ).house.name
-                    }
-                  </>
-                )
+              values={{
+                houses:
+                  this.props.gameState.parentGameState.ingame.getControllerOfHouse(
+                    this.house
+                  ).house.name
               }}
             />
           </Col>

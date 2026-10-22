@@ -22,9 +22,9 @@ export default class IngameCancelledComponent extends Component<
               <Trans
                 i18nKey="ingameCancelled.thisGameHasBeenCancelledByAModeratorOnly517bf0"
                 components={{
-                  element0: <FontAwesomeIcon icon={faTimes} size="3x" />,
-                  element1: <br />,
-                  element2: <br />
+                  details: <FontAwesomeIcon icon={faTimes} size="3x" />,
+                  lineBreak: <br />,
+                  lineBreak2: <br />
                 }}
               />
             </Col>
@@ -33,8 +33,8 @@ export default class IngameCancelledComponent extends Component<
               <Trans
                 i18nKey="ingameCancelled.thisGameHasBeenCancelledByVote6045ef"
                 components={{
-                  element0: <FontAwesomeIcon icon={faTimes} size="3x" />,
-                  element1: <br />
+                  details: <FontAwesomeIcon icon={faTimes} size="3x" />,
+                  lineBreak: <br />
                 }}
               />
             </Col>

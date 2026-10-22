@@ -135,7 +135,8 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="resolveSingleMarchOrder.houseMustResolveOneOfItsMarchOrdersb059a2"
-            components={{ element0: <b />, value1: <>{this.house.name}</> }}
+            values={{ house: this.house.name }}
+            components={{ bold: <b /> }}
           />
         </Col>
         {this.gameClient.doesControlHouse(this.house) ? (
@@ -147,7 +148,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                     <>
                       <Trans
                         i18nKey="resolveSingleMarchOrder.clickOnOneOfYourMarchOrdersDoubleClick3422b5"
-                        components={{ element0: <br /> }}
+                        components={{ lineBreak: <br /> }}
                       />
                     </>
                   ) : this.selectedUnits.length == 0 &&
@@ -155,10 +156,13 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                     <>
                       <Trans
                         i18nKey="resolveSingleMarchOrder.clickOnASubsetOfTheTroopsInDouble64b0c6"
+                        values={{
+                          selectedMarchOrderRegion:
+                            this.selectedMarchOrderRegion.name
+                        }}
                         components={{
-                          element0: <b />,
-                          value1: <>{this.selectedMarchOrderRegion.name}</>,
-                          element2: <br />
+                          bold: <b />,
+                          lineBreak: <br />
                         }}
                       />
                     </>
@@ -175,32 +179,31 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                       <Trans
                         i18nKey="resolveSingleMarchOrder.clickOnANeighbouringAread7198d"
                         components={{
-                          value0: (
+                          selectedMarchOrderRegion: (
                             <>
                               {!allUnitsSelected && (
                                 <>
                                   <Trans
                                     i18nKey="resolveSingleMarchOrder.orClickOnOtherUnitsInce9c04"
+                                    values={{
+                                      selectedMarchOrderRegion:
+                                        this.selectedMarchOrderRegion.name
+                                    }}
                                     components={{
-                                      element0: <b />,
-                                      value1: (
-                                        <>
-                                          {this.selectedMarchOrderRegion.name}
-                                        </>
-                                      )
+                                      bold: <b />
                                     }}
                                   />
                                 </>
                               )}
                             </>
                           ),
-                          value1: (
+                          selectionHint: (
                             <>
                               {!allUnitsSelected && (
                                 <>
                                   <Trans
                                     i18nKey="resolveSingleMarchOrder.doubleClickTheMarchOrderToSelectAllUnitsc3464f"
-                                    components={{ element0: <br /> }}
+                                    components={{ lineBreak: <br /> }}
                                   />
                                 </>
                               )}
@@ -237,9 +240,12 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                   <div style={{ marginBottom: "20px" }}>
                     <Trans
                       i18nKey="resolveSingleMarchOrder.plannedMovesFrom8ec31b"
+                      values={{
+                        selectedMarchOrderRegion:
+                          this.selectedMarchOrderRegion.name
+                      }}
                       components={{
-                        element0: <b />,
-                        value1: <>{this.selectedMarchOrderRegion.name}</>
+                        bold: <b />
                       }}
                     />
                   </div>
@@ -327,15 +333,9 @@ export default class ResolveSingleMarchOrderComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: (
-                  <>
-                    {
-                      this.gameState.ingame.getControllerOfHouse(this.house)
-                        .house.name
-                    }
-                  </>
-                )
+              values={{
+                houses: this.gameState.ingame.getControllerOfHouse(this.house)
+                  .house.name
               }}
             />
           </Col>
@@ -352,19 +352,19 @@ export default class ResolveSingleMarchOrderComponent extends Component<
           <div>
             <Trans
               i18nKey="resolveSingleMarchOrder.whiteSelectabled13318"
-              components={{ element0: <b /> }}
+              components={{ bold: <b /> }}
             />
           </div>
           <div>
             <Trans
               i18nKey="resolveSingleMarchOrder.yellowSelected7c96d2"
-              components={{ element0: <b style={{ color: "yellow" }} /> }}
+              components={{ bold: <b style={{ color: "yellow" }} /> }}
             />
           </div>
           <div>
             <Trans
               i18nKey="resolveSingleMarchOrder.redAttacking78ab70"
-              components={{ element0: <b style={{ color: "red" }} /> }}
+              components={{ bold: <b style={{ color: "red" }} /> }}
             />
           </div>
         </Col>
@@ -425,7 +425,8 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         <small>
           <Trans
             i18nKey="resolveSingleMarchOrder.ifYouDoNotLeaveATokenTheShips19c3e9"
-            components={{ element0: <b />, value1: <>{portRegion.name}</> }}
+            values={{ portRegion: portRegion.name }}
+            components={{ bold: <b /> }}
           />
         </small>
       ) : moveWillLoseControlOverRegion &&
@@ -436,13 +437,15 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         <small>
           <Trans
             i18nKey="resolveSingleMarchOrder.ifYouDoNotLeaveATokenWillRegainf919b9"
+            values={{
+              superTokenOwnerName: superTokenOwnerName,
+              startingRegion: startingRegion.name,
+              portRegion: portRegion.name
+            }}
             components={{
-              element0: <b />,
-              value1: <>{superTokenOwnerName}</>,
-              element2: <b />,
-              value3: <>{startingRegion.name}</>,
-              element4: <b />,
-              value5: <>{portRegion.name}</>
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
             }}
           />
         </small>
@@ -454,11 +457,13 @@ export default class ResolveSingleMarchOrderComponent extends Component<
         <small>
           <Trans
             i18nKey="resolveSingleMarchOrder.ifYouDoNotLeaveATokenWillRegain928856"
+            values={{
+              superTokenOwnerName: superTokenOwnerName,
+              startingRegion: startingRegion.name
+            }}
             components={{
-              element0: <b />,
-              value1: <>{superTokenOwnerName}</>,
-              element2: <b />,
-              value3: <>{startingRegion.name}</>
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </small>
@@ -478,9 +483,9 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                       <Form.Label>
                         <Trans
                           i18nKey="resolveSingleMarchOrder.doYouWantToLeaveAPowerTokenIn620e98"
+                          values={{ startingRegion: startingRegion.name }}
                           components={{
-                            element0: <b />,
-                            value1: <>{startingRegion.name}</>
+                            bold: <b />
                           }}
                         />
                       </Form.Label>
@@ -512,9 +517,9 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                     <small>
                       <Trans
                         i18nKey="resolveSingleMarchOrder.vassalsAutomaticallyLeaveAPowerTokenBehindToMaintain0bfef5"
+                        values={{ startingRegion: startingRegion.name }}
                         components={{
-                          element0: <b />,
-                          value1: <>{startingRegion.name}</>
+                          bold: <b />
                         }}
                       />
                     </small>
@@ -524,7 +529,7 @@ export default class ResolveSingleMarchOrderComponent extends Component<
                   <Col xs={12} className="text-center mb-0 pb-0">
                     <Trans
                       i18nKey="resolveSingleMarchOrder.youDonTHaveAnyPowerTokensLeftAnd919e6b"
-                      components={{ value0: <>{startingRegion.name}</> }}
+                      values={{ startingRegion: startingRegion.name }}
                     />
                   </Col>
                 ) : (

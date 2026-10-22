@@ -19,16 +19,18 @@ export default class MaceTyrellASoSAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="maceTyrellASoSAbility.maceTyrellHouseMayChooseToPlaceASupportb85605"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              combatGameStateDefendingRegion:
+                this.props.gameState.combatGameState.defendingRegion.name
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.childGameState.house.name}</>,
-              element3: <b />,
-              element4: <b />,
-              element5: <b />,
-              value6: (
-                <>{this.props.gameState.combatGameState.defendingRegion.name}</>
-              )
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />,
+              bold4: <b />,
+              bold5: <b />
             }}
           />
         </Col>

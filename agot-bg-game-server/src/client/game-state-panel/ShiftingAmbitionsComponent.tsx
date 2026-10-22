@@ -36,7 +36,7 @@ export default class ShiftingAmbitionsComponent extends Component<
               <>
                 <Trans
                   i18nKey="shiftingAmbitions.eachHouseChoose1ObjectiveCardFromTheirHand5cd87a"
-                  components={{ element0: <br />, element1: <small /> }}
+                  components={{ lineBreak: <br />, small: <small /> }}
                 />
               </>
             ) : (

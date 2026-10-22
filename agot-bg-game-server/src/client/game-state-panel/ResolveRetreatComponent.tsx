@@ -34,9 +34,12 @@ export default class ResolveRetreatComponent extends Component<
             <Col xs={12} className="text-center">
               <Trans
                 i18nKey="resolveRetreat.houseMustChooseTheRetreatLocationOfTheDefeated39c8d3"
+                values={{
+                  childGameStateHouse:
+                    this.props.gameState.childGameState.house.name
+                }}
                 components={{
-                  element0: <b />,
-                  value1: <>{this.props.gameState.childGameState.house.name}</>
+                  bold: <b />
                 }}
               />
             </Col>
@@ -46,18 +49,15 @@ export default class ResolveRetreatComponent extends Component<
                 <Col xs={12} className="text-center">
                   <Trans
                     i18nKey="resolveRetreat.mustBeDestroyedIfYouRetreatToc07ed8"
+                    values={{
+                      unitCountToBeDestroyed: unitCountToBeDestroyed,
+                      unit: t("common.unit", { count: unitCountToBeDestroyed }),
+                      selectRegionComponentSelectedRegion:
+                        this.selectRegionComponent.selectedRegion.name
+                    }}
                     components={{
-                      element0: <b />,
-                      value1: <>{unitCountToBeDestroyed}</>,
-                      value2: (
-                        <>
-                          {t("common.unit", { count: unitCountToBeDestroyed })}
-                        </>
-                      ),
-                      element3: <b />,
-                      value4: (
-                        <>{this.selectRegionComponent.selectedRegion.name}</>
-                      )
+                      bold: <b />,
+                      bold2: <b />
                     }}
                   />
                 </Col>
@@ -68,25 +68,21 @@ export default class ResolveRetreatComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="resolveRetreat.houseMustChooseAsCasualtiesForRemainingUnitsTo0a572b"
+              values={{
+                childGameStateHouse:
+                  this.props.gameState.childGameState.house.name,
+                childGameStateCount: this.props.gameState.childGameState.count,
+                unit: t("common.unit", {
+                  count: this.props.gameState.childGameState.count
+                }),
+                retreatRegion:
+                  this.props.gameState.retreatRegion?.name ??
+                  t("common.unknown")
+              }}
               components={{
-                element0: <b />,
-                value1: <>{this.props.gameState.childGameState.house.name}</>,
-                element2: <b />,
-                value3: <>{this.props.gameState.childGameState.count}</>,
-                value4: (
-                  <>
-                    {t("common.unit", {
-                      count: this.props.gameState.childGameState.count
-                    })}
-                  </>
-                ),
-                element5: <b />,
-                value6: (
-                  <>
-                    {this.props.gameState.retreatRegion?.name ??
-                      t("common.unknown")}
-                  </>
-                )
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
               }}
             />
           </Col>

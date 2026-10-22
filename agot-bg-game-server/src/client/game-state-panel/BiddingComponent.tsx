@@ -95,19 +95,15 @@ export default class BiddingComponent<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="common.waitingFor"
-            components={{
-              houses: (
-                <>
-                  {this.gameState
-                    .getHousesLeftToBid()
-                    .map(
-                      (h) =>
-                        this.props.gameState.ingame.getControllerOfHouse(h)
-                          .house.name
-                    )
-                    .join(", ")}
-                </>
-              )
+            values={{
+              houses: this.gameState
+                .getHousesLeftToBid()
+                .map(
+                  (h) =>
+                    this.props.gameState.ingame.getControllerOfHouse(h).house
+                      .name
+                )
+                .join(", ")
             }}
           />
         </Col>

@@ -20,12 +20,13 @@ export default class CallForSupportAgainstNeutralForcesComponent extends Compone
           <p>
             <Trans
               i18nKey="callForSupportAgainstNeutralForces.houseCallsForSupportAgainstNeutralForces17fabf"
+              values={{
+                houseThatResolvesMarchOrder:
+                  this.props.gameState.houseThatResolvesMarchOrder.name
+              }}
               components={{
-                element0: <b />,
-                value1: (
-                  <>{this.props.gameState.houseThatResolvesMarchOrder.name}</>
-                ),
-                element2: <b />
+                bold: <b />,
+                bold2: <b />
               }}
             />
           </p>

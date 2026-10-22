@@ -34,6 +34,14 @@ component placeholders can be reordered in translations without losing event
 handlers or translating player/house names. Do not concatenate translated
 sentence fragments.
 
+Pass text and numbers through descriptive `values` such as `{{house}}` or
+`{{round}}`. Reserve named `components` tags for real React content such as
+`<bold>{{house}}</bold>` or `<userLink/>`; do not wrap scalar values in fragments
+just to insert them. The local `Trans` defers rich-text interpolation until after
+parsing so player-written values cannot become component markup. Keep spaces
+between words and placeholders, while preserving language-specific suffixes and
+intentional spacing in conditional sentence fragments.
+
 Keep `{{interpolation}}` variables and named `<component/>`/`<component>...</component>`
 tags intact. Use i18next plural families (`_one`, `_other`, and locale-specific
 forms such as Russian `_few` and `_many`). A language may spell out "one" when

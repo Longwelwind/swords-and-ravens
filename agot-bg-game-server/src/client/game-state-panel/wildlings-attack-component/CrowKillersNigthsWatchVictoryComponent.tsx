@@ -18,10 +18,13 @@ export default class CrowKillersNigthsWatchVictoryComponent extends Component<
         <Col xs={12}>
           <Trans
             i18nKey="crowKillersNigthsWatchVictory.mayImmediatelyReplaceUpToOfHisFootmenWith97e56a"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              childGameStateCount: this.props.gameState.childGameState.count
+            }}
             components={{
-              element0: <b />,
-              value1: <>{this.props.gameState.childGameState.house.name}</>,
-              value2: <>{this.props.gameState.childGameState.count}</>
+              bold: <b />
             }}
           />
         </Col>

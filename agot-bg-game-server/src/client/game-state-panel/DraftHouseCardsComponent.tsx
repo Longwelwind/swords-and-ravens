@@ -65,9 +65,9 @@ export default class DraftHouseCardsComponent extends Component<
               <div className="text-center">
                 <Trans
                   i18nKey="draftHouseCards.houseMustDecideWhetherToSelectAHouseCard0540ce"
+                  values={{ house: this.house.name }}
                   components={{
-                    element0: <b style={{ color: this.house.color }} />,
-                    value1: <>{this.house.name}</>
+                    bold: <b style={{ color: this.house.color }} />
                   }}
                 />
               </div>
@@ -75,9 +75,9 @@ export default class DraftHouseCardsComponent extends Component<
               <div className="text-center">
                 <Trans
                   i18nKey="draftHouseCards.houseMustSelectAHouseCard58199e"
+                  values={{ house: this.house.name }}
                   components={{
-                    element0: <b style={{ color: this.house.color }} />,
-                    value1: <>{this.house.name}</>
+                    bold: <b style={{ color: this.house.color }} />
                   }}
                 />
               </div>
@@ -85,9 +85,9 @@ export default class DraftHouseCardsComponent extends Component<
               <div className="text-center">
                 <Trans
                   i18nKey="draftHouseCards.houseMustChooseAnInfluenceTrackefe933"
+                  values={{ house: this.house.name }}
                   components={{
-                    element0: <b style={{ color: this.house.color }} />,
-                    value1: <>{this.house.name}</>
+                    bold: <b style={{ color: this.house.color }} />
                   }}
                 />
               </div>
@@ -100,10 +100,10 @@ export default class DraftHouseCardsComponent extends Component<
               <Trans
                 i18nKey="common.noteAllHouseCardsWorkInAGenericWay"
                 components={{
-                  element0: <b />,
-                  element1: <br />,
-                  element2: <br />,
-                  element3: <br />
+                  bold: <b />,
+                  lineBreak: <br />,
+                  lineBreak2: <br />,
+                  lineBreak3: <br />
                 }}
               />
             </small>
@@ -111,7 +111,7 @@ export default class DraftHouseCardsComponent extends Component<
               <Trans
                 i18nKey="draftHouseCards.theseAreTheNextHouses551e40"
                 components={{
-                  value0: (
+                  houses: (
                     <>
                       {joinReactNodes(
                         this.props.gameState.getNextHouses().map((h, i) => (

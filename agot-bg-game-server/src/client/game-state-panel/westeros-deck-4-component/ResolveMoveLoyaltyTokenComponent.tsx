@@ -46,9 +46,9 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="resolveMoveLoyaltyToken.houseMustMoveALoyaltyTokenToAnAdjacent74d6d6"
+            values={{ house: this.gameState.house.name }}
             components={{
-              element0: <b />,
-              value1: <>{this.gameState.house.name}</>
+              bold: <b />
             }}
           />
         </Col>
@@ -59,15 +59,15 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                 <Trans
                   i18nKey="resolveMoveLoyaltyToken.moveALoyaltyTokenFrome21f73"
                   components={{
-                    value0: (
+                    from: (
                       <>
                         {this.from ? (
                           <>
                             <Trans
                               i18nKey="resolveMoveLoyaltyToken.to17bfa6"
+                              values={{ from: this.from.name }}
                               components={{
-                                element0: <b />,
-                                value1: <>{this.from.name}</>
+                                bold: <b />
                               }}
                             />
                           </>
@@ -76,7 +76,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                         )}
                       </>
                     ),
-                    value1: <>{this.to ? <b>{this.to.name}</b> : ""}</>
+                    to: <>{this.to ? <b>{this.to.name}</b> : ""}</>
                   }}
                 />
               </p>
@@ -114,7 +114,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{ houses: <>{this.gameState.house.name}</> }}
+                values={{ houses: this.gameState.house.name }}
               />
             </div>
           )}

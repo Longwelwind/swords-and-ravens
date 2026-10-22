@@ -21,10 +21,13 @@ export default class MaesterLuwinAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="maesterLuwinAbility.maesterLuwinHouseMayReturnOneHouseCardFrom9884ef"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.childGameState.house.name}</>
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </Col>

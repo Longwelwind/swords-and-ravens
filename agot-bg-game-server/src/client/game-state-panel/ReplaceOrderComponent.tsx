@@ -44,11 +44,11 @@ export default class ReplaceOrderComponent extends Component<
               <Col xs={12} className="text-center">
                 <Trans
                   i18nKey="replaceOrder.chooseWhichOrderTokenToPlaceOn8932a6"
+                  values={{ selectedRegion: this.selectedRegion.name }}
                   components={{
-                    element0: <b />,
-                    value1: <>{this.selectedRegion.name}</>,
-                    element2: <br />,
-                    element3: (
+                    bold: <b />,
+                    lineBreak: <br />,
+                    details: (
                       <OrderGridComponent
                         orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(
                           this.props.gameState.ravenHolder
@@ -110,9 +110,7 @@ export default class ReplaceOrderComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: <>{this.props.gameState.ravenHolder.name}</>
-              }}
+              values={{ houses: this.props.gameState.ravenHolder.name }}
             />
           </Col>
         )}

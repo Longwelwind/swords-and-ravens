@@ -65,16 +65,16 @@ export default class ResolveSinglePayDebtComponent extends Component<
           <p>
             <Trans
               i18nKey="resolveSinglePayDebt.mustDestroyOfHouse802a9b"
+              values={{
+                resolver: this.resolver.name,
+                debt: this.props.gameState.debt,
+                unit: t("common.unit", { count: this.props.gameState.debt }),
+                house: this.house.name
+              }}
               components={{
-                element0: <b />,
-                value1: <>{this.resolver.name}</>,
-                element2: <b />,
-                value3: <>{this.props.gameState.debt}</>,
-                value4: (
-                  <>{t("common.unit", { count: this.props.gameState.debt })}</>
-                ),
-                element5: <b />,
-                value6: <>{this.house.name}</>
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
               }}
             />
           </p>
@@ -92,8 +92,9 @@ export default class ResolveSinglePayDebtComponent extends Component<
                       <li key={`pay-single-debt_${region.id}`}>
                         <Trans
                           i18nKey="common.in"
+                          values={{ region: region.name }}
                           components={{
-                            value0: (
+                            units: (
                               <>
                                 {joinReactNodes(
                                   units.map((u, i) => (
@@ -107,8 +108,7 @@ export default class ResolveSinglePayDebtComponent extends Component<
                                 )}
                               </>
                             ),
-                            element1: <b />,
-                            value2: <>{region.name}</>
+                            bold: <b />
                           }}
                         />
                       </li>
@@ -144,7 +144,7 @@ export default class ResolveSinglePayDebtComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{ houses: <>{this.resolver.name}</> }}
+              values={{ houses: this.resolver.name }}
             />
           </Col>
         )}

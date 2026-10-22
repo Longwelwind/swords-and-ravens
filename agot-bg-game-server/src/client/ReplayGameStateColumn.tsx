@@ -103,9 +103,9 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
                     <h5>
                       <Trans
                         i18nKey="common.round"
-                        components={{
-                          value0: <>{gameSnapshot?.round}</>,
-                          value1: <>{ingame.game.maxTurns}</>
+                        values={{
+                          turn: gameSnapshot?.round,
+                          maxTurns: ingame.game.maxTurns
                         }}
                       />
                     </h5>
@@ -422,10 +422,7 @@ export default class ReplayGameStateColumn extends Component<ReplayGameStateColu
             });
           }}
         >
-          <Trans
-            i18nKey="gameTabs.round6f8874"
-            components={{ value0: <>{round}</> }}
-          />
+          <Trans i18nKey="gameTabs.round6f8874" values={{ round: round }} />
         </Dropdown.Item>
       );
     });

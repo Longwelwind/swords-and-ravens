@@ -48,7 +48,8 @@ export default class ResolveSingleRaidOrderComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="resolveSingleRaidOrder.houseMustResolveOneOfItsRaidOrdersafcaf3"
-            components={{ element0: <b />, value1: <>{this.house.name}</> }}
+            values={{ house: this.house.name }}
+            components={{ bold: <b /> }}
           />
         </Col>
         {this.props.gameClient.doesControlHouse(this.house) ? (
@@ -64,9 +65,11 @@ export default class ResolveSingleRaidOrderComponent extends Component<
                 <p>
                   <Trans
                     i18nKey="resolveSingleRaidOrder.chosenRaidOrderd3858c"
+                    values={{
+                      selectedOrderRegion: this.selectedOrderRegion.name
+                    }}
                     components={{
-                      element0: <b />,
-                      value1: <>{this.selectedOrderRegion.name}</>
+                      bold: <b />
                     }}
                   />
                 </p>
@@ -75,20 +78,19 @@ export default class ResolveSingleRaidOrderComponent extends Component<
                     <p>
                       <Trans
                         i18nKey="resolveSingleRaidOrder.clickTheTargetOrderToRaidItOrClickaed65f"
+                        values={{
+                          alternative:
+                            this.orderInOrderRegion instanceof
+                            RaidSupportOrderType
+                              ? t(
+                                  "resolveSingleRaidOrder.useTheOrderAsSupport1Orderb16954"
+                                )
+                              : t(
+                                  "resolveSingleRaidOrder.removeYourRaidOrderc36902"
+                                )
+                        }}
                         components={{
-                          element0: <b />,
-                          value1: (
-                            <>
-                              {this.orderInOrderRegion instanceof
-                              RaidSupportOrderType
-                                ? t(
-                                    "resolveSingleRaidOrder.useTheOrderAsSupport1Orderb16954"
-                                  )
-                                : t(
-                                    "resolveSingleRaidOrder.removeYourRaidOrderc36902"
-                                  )}
-                            </>
-                          )
+                          bold: <b />
                         }}
                       />
                     </p>
@@ -97,8 +99,8 @@ export default class ResolveSingleRaidOrderComponent extends Component<
                   <>
                     <Trans
                       i18nKey="resolveSingleRaidOrder.target2e5c89"
-                      components={{
-                        value0: <>{this.selectedTargetRegion.name}</>
+                      values={{
+                        selectedTargetRegion: this.selectedTargetRegion.name
                       }}
                     />
                   </>
@@ -132,16 +134,11 @@ export default class ResolveSingleRaidOrderComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: (
-                  <>
-                    {
-                      this.props.gameState.ingameGameState.getControllerOfHouse(
-                        this.house
-                      ).house.name
-                    }
-                  </>
-                )
+              values={{
+                houses:
+                  this.props.gameState.ingameGameState.getControllerOfHouse(
+                    this.house
+                  ).house.name
               }}
             />
           </Col>

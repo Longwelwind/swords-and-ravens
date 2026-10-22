@@ -47,17 +47,13 @@ export default class ClashOfKingsComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="clashOfKings.housesBidForTheTracka3f008"
-              components={{
-                element0: <strong />,
-                value1: (
-                  <>
-                    {translateGameText(
-                      this.props.gameState.game.getNameInfluenceTrack(
-                        currentTrackI
-                      )
-                    )}
-                  </>
+              values={{
+                influenceTrack: translateGameText(
+                  this.props.gameState.game.getNameInfluenceTrack(currentTrackI)
                 )
+              }}
+              components={{
+                strong: <strong />
               }}
             />
           </Col>

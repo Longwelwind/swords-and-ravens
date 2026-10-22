@@ -37,7 +37,7 @@ export default class OrderGridComponent extends Component<OrderGridProps> {
                       <>
                         <Trans
                           i18nKey="orderGrid.youAreNotAllowedToPlaceThisOrderButd60452"
-                          components={{ element0: <br /> }}
+                          components={{ lineBreak: <br /> }}
                         />
                       </>
                     )}

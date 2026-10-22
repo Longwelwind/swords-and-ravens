@@ -19,20 +19,17 @@ export default class DoranMartellAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="doranMartellAbility.doranMartellHouseMustMoveHouseToTheBottom074d71"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemyHouse: this.props.gameState.combatGameState.getEnemy(
+                this.props.gameState.childGameState.house
+              ).name
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.childGameState.house.name}</>,
-              element3: <b />,
-              value4: (
-                <>
-                  {
-                    this.props.gameState.combatGameState.getEnemy(
-                      this.props.gameState.childGameState.house
-                    ).name
-                  }
-                </>
-              )
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
             }}
           />
         </Col>

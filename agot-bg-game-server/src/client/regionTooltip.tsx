@@ -69,7 +69,8 @@ export function renderRegionTooltip(
           <small>
             <Trans
               i18nKey="common.of"
-              components={{ element0: <b />, value1: <>{controller.name}</> }}
+              values={{ controller: controller.name }}
+              components={{ bold: <b /> }}
             />
           </small>
         )}
@@ -87,16 +88,16 @@ export function renderRegionTooltip(
             <Trans
               i18nKey="regionTooltip.capital59fab3"
               components={{
-                element0: <br />,
-                value1: (
+                lineBreak: <br />,
+                garrison: (
                   <>
                     {region.garrison > 0 && (
                       <>
                         <Trans
                           i18nKey="regionTooltip.withGarrisonOf5aa47b"
+                          values={{ regionGarrison: region.garrison }}
                           components={{
-                            element0: <b />,
-                            value1: <>{region.garrison}</>
+                            bold: <b />
                           }}
                         />
                       </>
@@ -111,17 +112,15 @@ export function renderRegionTooltip(
             <>
               <Trans
                 i18nKey="regionTooltip.ofab5d26"
+                values={{
+                  garrisonType: !controller
+                    ? t("regionTooltip.neutralForceeeb1ae")
+                    : t("common.garrison"),
+                  regionGarrison: region.garrison
+                }}
                 components={{
-                  element0: <br />,
-                  value1: (
-                    <>
-                      {!controller
-                        ? t("regionTooltip.neutralForceeeb1ae")
-                        : t("common.garrison")}
-                    </>
-                  ),
-                  element2: <b />,
-                  value3: <>{region.garrison}</>
+                  lineBreak: <br />,
+                  bold: <b />
                 }}
               />
             </>

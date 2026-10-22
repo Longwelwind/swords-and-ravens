@@ -91,9 +91,16 @@ export default class VoteComponent extends Component<VoteComponentProps> {
         <Col>
           <Trans
             i18nKey="vote.initiatedAVoteToMustAcceptToPassThe69a13a"
+            values={{
+              verb: this.vote.type.verb(),
+              votePositiveCountToPass: this.vote.positiveCountToPass,
+              player: t("common.player", {
+                count: this.vote.positiveCountToPass
+              })
+            }}
             components={{
-              element0: <b />,
-              value1: (
+              bold: <b />,
+              initiator: (
                 <>
                   {getUserLinkOrLabel(
                     this.vote.initiator,
@@ -102,15 +109,8 @@ export default class VoteComponent extends Component<VoteComponentProps> {
                   )}
                 </>
               ),
-              element2: <b />,
-              value3: <>{this.vote.type.verb()}</>,
-              value4: <>{this.vote.positiveCountToPass}</>,
-              value5: (
-                <>
-                  {t("common.player", { count: this.vote.positiveCountToPass })}
-                </>
-              ),
-              element6: (
+              bold2: <b />,
+              voteControls: (
                 <Row className="mt-1">
                   <Col
                     xs="auto"

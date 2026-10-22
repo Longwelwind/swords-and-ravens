@@ -73,18 +73,21 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
             <>
               <Trans
                 i18nKey="resolveSingleConsolidatePower.vassalHouseMustResolveTheirMusterOrder4ea409"
+                values={{ house: this.house.name }}
                 components={{
-                  element0: <b />,
-                  value1: <>{this.house.name}</>,
-                  value2: (
+                  bold: <b />,
+                  defenseMusterOrderRegion: (
                     <>
                       {this.defenseMusterOrderRegion && (
                         <>
                           <Trans
                             i18nKey="resolveSingleConsolidatePower.in567ab8"
+                            values={{
+                              defenseMusterOrderRegion:
+                                this.defenseMusterOrderRegion.name
+                            }}
                             components={{
-                              element0: <b />,
-                              value1: <>{this.defenseMusterOrderRegion.name}</>
+                              bold: <b />
                             }}
                           />
                         </>
@@ -98,18 +101,16 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
             <>
               <Trans
                 i18nKey="resolveSingleConsolidatePower.houseMustResolveOneOfItsConsolidatePowerOrdersd2abe9"
-                components={{
-                  element0: <b />,
-                  value1: <>{this.house.name}</>,
-                  value2: (
-                    <>
-                      {availableOrders.values.some(
-                        (ot) => ot instanceof IronBankOrderType
-                      )
-                        ? t("resolveSingleConsolidatePower.orIronBankd17b1f")
-                        : ""}
-                    </>
+                values={{
+                  house: this.house.name,
+                  ironBankLabel: availableOrders.values.some(
+                    (ot) => ot instanceof IronBankOrderType
                   )
+                    ? t("resolveSingleConsolidatePower.orIronBankd17b1f")
+                    : ""
+                }}
+                components={{
+                  bold: <b />
                 }}
               />
             </>
@@ -145,15 +146,9 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: (
-                  <>
-                    {
-                      this.gameState.ingame.getControllerOfHouse(this.house)
-                        .house.name
-                    }
-                  </>
-                )
+              values={{
+                houses: this.gameState.ingame.getControllerOfHouse(this.house)
+                  .house.name
               }}
             />
           </Col>
@@ -173,11 +168,10 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
           <p>
             <Trans
               i18nKey="common.in89ff9d"
+              values={{ order: orderType.name, region: orderRegion.name }}
               components={{
-                element0: <b />,
-                value1: <>{orderType.name}</>,
-                element2: <b />,
-                value3: <>{orderRegion.name}</>
+                bold: <b />,
+                bold2: <b />
               }}
             />
           </p>
@@ -197,7 +191,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                   >
                     <Trans
                       i18nKey="resolveSingleConsolidatePower.musterIn709abb"
-                      components={{ value0: <>{orderRegion.name}</> }}
+                      values={{ orderRegion: orderRegion.name }}
                     />
                   </Button>
                 </Col>
@@ -231,7 +225,7 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                     >
                       <Trans
                         i18nKey="resolveSingleConsolidatePower.musterIn709abb"
-                        components={{ value0: <>{orderRegion.name}</> }}
+                        values={{ orderRegion: orderRegion.name }}
                       />
                     </Button>
                   </Col>
@@ -279,16 +273,12 @@ export default class ResolveSingleConsolidatePowerComponent extends Component<
                       >
                         <Trans
                           i18nKey="resolveSingleConsolidatePower.payToPurchase679165"
-                          components={{
-                            value0: <>{purchasable.costs}</>,
-                            value1: (
-                              <>
-                                {t("common.PowertokenLabel", {
-                                  count: purchasable.costs
-                                })}
-                              </>
-                            ),
-                            value2: <>{purchasable.loan.name}</>
+                          values={{
+                            purchasableCosts: purchasable.costs,
+                            powerTokenLabel: t("common.PowertokenLabel", {
+                              count: purchasable.costs
+                            }),
+                            purchasableLoan: purchasable.loan.name
                           }}
                         />
                       </Button>

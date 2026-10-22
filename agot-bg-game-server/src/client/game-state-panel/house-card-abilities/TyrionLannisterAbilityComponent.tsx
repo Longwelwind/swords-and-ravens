@@ -60,12 +60,11 @@ export default class TyrionLannisterAbilityComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="tyrionLannisterAbility.tyrionLannisterHouseMayCancelHouseSHouseCarde92300"
+              values={{ house: this.house.name, enemy: this.enemy.name }}
               components={{
-                element0: <b />,
-                element1: <b />,
-                value2: <>{this.house.name}</>,
-                element3: <b />,
-                value4: <>{this.enemy.name}</>
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
               }}
             />
           </Col>
@@ -74,10 +73,10 @@ export default class TyrionLannisterAbilityComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="tyrionLannisterAbility.tyrionLannisterHouseHasToChooseANewHousebcedd8"
+              values={{ enemy: this.enemy.name }}
               components={{
-                element0: <b />,
-                element1: <b />,
-                value2: <>{this.enemy.name}</>
+                bold: <b />,
+                bold2: <b />
               }}
             />
           </Col>

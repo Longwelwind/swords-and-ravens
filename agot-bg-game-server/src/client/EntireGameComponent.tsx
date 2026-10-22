@@ -225,7 +225,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   <Trans
                     i18nKey="entireGame.tidesOfBattleaa351e"
                     components={{
-                      value0: (
+                      noThrees: (
                         <>
                           {this.settings.removeTob3 && (
                             <>
@@ -235,7 +235,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                           )}
                         </>
                       ),
-                      value1: (
+                      noSkulls: (
                         <>
                           {this.settings.removeTobSkulls && (
                             <>
@@ -245,7 +245,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                           )}
                         </>
                       ),
-                      value2: (
+                      limitedTwos: (
                         <>
                           {this.settings.limitTob2 && (
                             <>
@@ -282,7 +282,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   <small>
                     <Trans
                       i18nKey="entireGame.whenAPlayerPlaysTheirLastHouseCardThey0829f1"
-                      components={{ element0: <br /> }}
+                      components={{ lineBreak: <br /> }}
                     />
                   </small>
                 </div>
@@ -307,9 +307,9 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
               <Tooltip id="evolution-active-tooltip">
                 <Trans
                   i18nKey="entireGame.fromRoundOnwardsEachHouseReceivesItsAlternativeDeck0f2244"
+                  values={{ round: this.settings.houseCardsEvolutionRound }}
                   components={{
-                    element0: <b />,
-                    value1: <>{this.settings.houseCardsEvolutionRound}</>
+                    bold: <b />
                   }}
                 />
               </Tooltip>
@@ -396,10 +396,10 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                   <Trans
                     i18nKey="entireGame.pLayBYEMAil7dae07"
                     components={{
-                      element0: <b />,
-                      element1: <b />,
-                      element2: <b />,
-                      element3: <b />
+                      bold: <b />,
+                      bold2: <b />,
+                      bold3: <b />,
+                      bold4: <b />
                     }}
                   />
                 </Tooltip>
@@ -444,7 +444,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                         <h6>
                           <Trans
                             i18nKey="entireGame.theVictoryConditionsHaveBeenModifiedf88c2a"
-                            components={{ element0: <br /> }}
+                            components={{ lineBreak: <br /> }}
                           />
                         </h6>
                       </div>
@@ -452,11 +452,12 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                     <div className="text-small">
                       <Trans
                         i18nKey="entireGame.requiredVictoryPoints72bc5d"
+                        values={{
+                          victoryPoints:
+                            this.settings.victoryPointsCountNeededToWin
+                        }}
                         components={{
-                          element0: <b className="text-large" />,
-                          value1: (
-                            <>{this.settings.victoryPointsCountNeededToWin}</>
-                          )
+                          bold: <b className="text-large" />
                         }}
                       />
                     </div>
@@ -464,11 +465,12 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                       <div className="text-small">
                         <Trans
                           i18nKey="entireGame.requiredLoyaltyTokens2f3768"
+                          values={{
+                            loyaltyTokens:
+                              this.settings.loyaltyTokenCountNeededToWin
+                          }}
                           components={{
-                            element0: <b className="text-large" />,
-                            value1: (
-                              <>{this.settings.loyaltyTokenCountNeededToWin}</>
-                            )
+                            bold: <b className="text-large" />
                           }}
                         />
                       </div>
@@ -477,11 +479,12 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                       <div className="text-small mt-3">
                         <Trans
                           i18nKey="entireGame.playersMustHoldVictoryPointsUntilTheEndOf20b204"
+                          values={{
+                            victoryPoints:
+                              this.settings.victoryPointsCountNeededToWin
+                          }}
                           components={{
-                            value0: (
-                              <>{this.settings.victoryPointsCountNeededToWin}</>
-                            ),
-                            element1: <br />
+                            lineBreak: <br />
                           }}
                         />
                       </div>

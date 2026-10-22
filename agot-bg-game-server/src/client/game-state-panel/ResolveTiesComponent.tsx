@@ -128,9 +128,7 @@ export default class ResolveTiesComponent extends Component<
             <Col xs={12} className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{
-                  houses: <>{this.props.gameState.decider.name}</>
-                }}
+                values={{ houses: this.props.gameState.decider.name }}
               />
             </Col>
           </>

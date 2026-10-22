@@ -156,14 +156,13 @@ export default class CombatComponent extends Component<
             <h5>
               <Trans
                 i18nKey="combat.battleFordaa1d7"
+                values={{
+                  combatDefendingRegion: this.combat.defendingRegion.name,
+                  resultsLabel:
+                    this.combatStats.length > 0 ? t("combat.results9709ae") : ""
+                }}
                 components={{
-                  value0: (
-                    <>
-                      {this.combatStats.length > 0 && t("combat.results9709ae")}
-                    </>
-                  ),
-                  element1: <b />,
-                  value2: <>{this.combat.defendingRegion.name}</>
+                  bold: <b />
                 }}
               />
             </h5>
@@ -176,9 +175,9 @@ export default class CombatComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.winner"
+              values={{ winner: winner.name }}
               components={{
-                element0: <b style={{ color: winner.color }} />,
-                value1: <>{winner.name}</>
+                bold: <b style={{ color: winner.color }} />
               }}
             />
           </Col>

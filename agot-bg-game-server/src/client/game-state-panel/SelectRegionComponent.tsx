@@ -34,9 +34,9 @@ export default class SelectRegionComponent extends Component<
                 <p className="text-center">
                   <Trans
                     i18nKey="selectRegion.selectedArea8b3a09"
+                    values={{ selectedRegion: this.selectedRegion.name }}
                     components={{
-                      element0: <b />,
-                      value1: <>{this.selectedRegion.name}</>
+                      bold: <b />
                     }}
                   />
                 </p>
@@ -68,16 +68,10 @@ export default class SelectRegionComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{
-                  houses: (
-                    <>
-                      {
-                        this.props.gameState.ingame.getControllerOfHouse(
-                          this.props.gameState.house
-                        ).house.name
-                      }
-                    </>
-                  )
+                values={{
+                  houses: this.props.gameState.ingame.getControllerOfHouse(
+                    this.props.gameState.house
+                  ).house.name
                 }}
               />
             </div>

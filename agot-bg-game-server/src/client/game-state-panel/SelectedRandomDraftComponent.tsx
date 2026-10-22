@@ -38,10 +38,10 @@ export default class SelectedRandomDraftComponent extends Component<
             <Trans
               i18nKey="common.noteAllHouseCardsWorkInAGenericWay"
               components={{
-                element0: <b />,
-                element1: <br />,
-                element2: <br />,
-                element3: <br />
+                bold: <b />,
+                lineBreak: <br />,
+                lineBreak2: <br />,
+                lineBreak3: <br />
               }}
             />
           </small>
@@ -149,14 +149,10 @@ export default class SelectedRandomDraftComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: (
-                  <>
-                    {this.props.gameState.unreadyPlayers
-                      .map((p) => p.house.name)
-                      .join(", ")}
-                  </>
-                )
+              values={{
+                houses: this.props.gameState.unreadyPlayers
+                  .map((p) => p.house.name)
+                  .join(", ")
               }}
             />
           </Col>

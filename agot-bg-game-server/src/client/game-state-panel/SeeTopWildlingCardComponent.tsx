@@ -69,9 +69,7 @@ export default class SeeTopWildlingCardComponent extends Component<
             <Col xs={12} className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{
-                  houses: <>{this.props.gameState.ravenHolder.name}</>
-                }}
+                values={{ houses: this.props.gameState.ravenHolder.name }}
               />
             </Col>
           )}

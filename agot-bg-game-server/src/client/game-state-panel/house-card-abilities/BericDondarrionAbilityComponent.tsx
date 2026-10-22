@@ -19,10 +19,10 @@ export default class BericDondarrionAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="bericDondarrionAbility.bericDondarrionHouseMustDestroy1UnitOfTheir5c0f0c"
+            values={{ house: this.props.gameState.house.name }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.house.name}</>
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </Col>

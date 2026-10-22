@@ -77,7 +77,7 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                   <Tooltip id="braavos-controller-tooltip">
                     <Trans
                       i18nKey="ironBankInfos.theControllerOfBraavosReceivesA1ToThe1dea8a"
-                      components={{ element0: <b />, element1: <b /> }}
+                      components={{ bold: <b />, bold2: <b /> }}
                     />
                   </Tooltip>
                 }
@@ -109,11 +109,11 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                     <Trans
                       i18nKey="ironBankInfos.atTheBeginningOfTheWesterosPhaseAnyPlayer34f1e3"
                       components={{
-                        element0: <br />,
-                        element1: <br />,
-                        element2: <br />,
-                        element3: <br />,
-                        element4: <br />
+                        lineBreak: <br />,
+                        lineBreak2: <br />,
+                        lineBreak3: <br />,
+                        lineBreak4: <br />,
+                        lineBreak5: <br />
                       }}
                     />
                   </Tooltip>
@@ -150,26 +150,28 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
             <Trans
               i18nKey="ironBankInfos.nestledInASeeminglyImpenetrableNorthernBayTheFree7573dd"
               components={{
-                element0: (
+                title: (
                   <h4 className="text-center">
                     {t("ironBankInfos.theIronBankOfBraavos47e011")}
                   </h4>
                 ),
-                element1: <br />,
-                element2: <br />,
-                element3: <br />,
-                element4: <h5>{t("ironBankInfos.purchasingLoans9325fa")}</h5>,
-                element5: <br />,
-                element6: <br />,
-                element7: <i />,
-                element8: <br />,
-                element9: <br />,
-                element10: <i />,
-                element11: <br />,
-                element12: <br />,
-                element13: <br />,
-                element14: <br />,
-                element15: (
+                lineBreak: <br />,
+                lineBreak2: <br />,
+                lineBreak3: <br />,
+                purchasingHeading: (
+                  <h5>{t("ironBankInfos.purchasingLoans9325fa")}</h5>
+                ),
+                lineBreak4: <br />,
+                lineBreak5: <br />,
+                emphasis: <i />,
+                lineBreak6: <br />,
+                lineBreak7: <br />,
+                emphasis2: <i />,
+                lineBreak8: <br />,
+                lineBreak9: <br />,
+                lineBreak10: <br />,
+                lineBreak11: <br />,
+                purchaseSteps: (
                   <ol className="mb-0 mt-1">
                     <li>
                       {t(
@@ -179,57 +181,57 @@ export default class IronBankInfosComponent extends Component<IronBankInfosCompo
                     <li>
                       <Trans
                         i18nKey="ironBankInfos.thePlayerPaysTheLoanSInitialCostBy2bde6e"
+                        values={{
+                          position: this.isEssosMapUsed
+                            ? t("ironBankInfos.above88c7f0")
+                            : t("ironBankInfos.below8ada24")
+                        }}
                         components={{
-                          element0: <b />,
-                          element1: <br />,
-                          value2: (
-                            <>
-                              {this.isEssosMapUsed
-                                ? t("ironBankInfos.above88c7f0")
-                                : t("ironBankInfos.below8ada24")}
-                            </>
-                          )
+                          bold: <b />,
+                          lineBreak: <br />
                         }}
                       />
                     </li>
                     <li>
                       <Trans
                         i18nKey="ironBankInfos.thePlayerResolvesTheEffectOfTheirChosenLoan8ca811"
-                        components={{ element0: <br />, element1: <i /> }}
+                        components={{ lineBreak: <br />, emphasis: <i /> }}
                       />
                     </li>
                   </ol>
                 ),
-                element16: <br />,
-                element17: <h5>{t("ironBankInfos.payingInterestd21db4")}</h5>,
-                element18: <br />,
-                element19: <br />,
-                element20: <br />,
-                element21: <br />,
-                element22: <br />,
-                element23: <br />,
-                element24: <br />,
-                element25: <br />,
-                value26: (
+                lineBreak12: <br />,
+                interestHeading: (
+                  <h5>{t("ironBankInfos.payingInterestd21db4")}</h5>
+                ),
+                lineBreak13: <br />,
+                lineBreak14: <br />,
+                lineBreak15: <br />,
+                lineBreak16: <br />,
+                lineBreak17: <br />,
+                lineBreak18: <br />,
+                lineBreak19: <br />,
+                lineBreak20: <br />,
+                braavosRules: (
                   <>
                     {this.isEssosMapUsed && (
                       <>
                         <Trans
                           i18nKey="ironBankInfos.thoughNoEasyTaskItIsPossibleToGain17b043"
                           components={{
-                            element0: <br />,
-                            element1: (
+                            lineBreak: <br />,
+                            braavosHeading: (
                               <h5>
                                 {t("ironBankInfos.controllingBraavosd7b7ff")}
                               </h5>
                             ),
-                            element2: <br />,
-                            element3: <br />,
-                            element4: <br />,
-                            element5: <b />,
-                            element6: <b />,
-                            element7: <br />,
-                            element8: <br />
+                            lineBreak2: <br />,
+                            lineBreak3: <br />,
+                            lineBreak4: <br />,
+                            bold: <b />,
+                            bold2: <b />,
+                            lineBreak5: <br />,
+                            lineBreak6: <br />
                           }}
                         />
                       </>
