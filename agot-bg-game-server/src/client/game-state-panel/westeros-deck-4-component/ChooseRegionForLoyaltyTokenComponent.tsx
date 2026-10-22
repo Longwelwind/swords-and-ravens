@@ -23,9 +23,12 @@ export default class ChooseRegionForLoyaltyTokenComponent extends Component<
           <Col className="text-center">
             <Trans
               i18nKey="common.houseMustChooseAnAreaToPlaceALoyalty"
+              values={{
+                childGameStateHouse:
+                  this.props.gameState.childGameState.house.name
+              }}
               components={{
-                element0: <b />,
-                value1: <>{this.props.gameState.childGameState.house.name}</>
+                bold: <b />
               }}
             />
           </Col>

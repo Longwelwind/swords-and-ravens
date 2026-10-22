@@ -19,11 +19,14 @@ export default class ChooseCasualtiesComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="chooseCasualties.houseMustChooseOfTheirUnitsAsCasualtiesOf8d30b4"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              childGameStateCount: this.props.gameState.childGameState.count
+            }}
             components={{
-              element0: <b />,
-              value1: <>{this.props.gameState.childGameState.house.name}</>,
-              element2: <b />,
-              value3: <>{this.props.gameState.childGameState.count}</>
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </Col>

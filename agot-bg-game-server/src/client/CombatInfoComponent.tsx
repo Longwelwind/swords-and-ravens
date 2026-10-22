@@ -305,7 +305,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             <b>
               <Trans
                 i18nKey="combatInfo.tidesOfBattle5287f6"
-                components={{ element0: <br /> }}
+                components={{ lineBreak: <br /> }}
               />
             </b>
           </div>
@@ -331,7 +331,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             <b>
               <Trans
                 i18nKey="combatInfo.valyrianSteelBlade6c78a8"
-                components={{ element0: <br /> }}
+                components={{ lineBreak: <br /> }}
               />
             </b>
           </div>

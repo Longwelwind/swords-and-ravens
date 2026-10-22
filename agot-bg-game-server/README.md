@@ -13,11 +13,14 @@ The `src/` contains the code of the game server and is split into 5 folders:
 ## Game-client translations
 
 The React client uses i18next/react-i18next. English is the fallback language;
-German, Spanish, Italian, French, Portuguese, Russian and Simplified Chinese can
-be selected after the badges in the centered game title bar. The selection is
-saved locally in the browser under `snr.game.language`, shared by all games on
-the site; otherwise the browser language is used. Language is a presentation
-preference, not part of the saved game or WebSocket protocol.
+English appears first, followed by Czech, Dutch, French, German, Hungarian,
+Italian, Norwegian (Bokmål), Polish, Portuguese, Spanish, Swedish and Turkish;
+Japanese, Simplified Chinese, Korean, Ukrainian and Russian appear last.
+The selection is saved locally in the browser under `snr.game.language`,
+shared by all games on the site; otherwise the browser
+language is used. Language is a presentation preference, not part of the saved
+game or WebSocket protocol. Translation catalogs cover the full English catalog;
+English remains the fallback for newly added or missing messages.
 
 Translation resources are in `src/client/i18n/locales/`. Start with `en.json`
 when adding a message and update the other language files. Reuse `common` keys
@@ -30,6 +33,14 @@ sentences containing formatting, icons or dynamic React content: its named
 component placeholders can be reordered in translations without losing event
 handlers or translating player/house names. Do not concatenate translated
 sentence fragments.
+
+Pass text and numbers through descriptive `values` such as `{{house}}` or
+`{{round}}`. Reserve named `components` tags for real React content such as
+`<bold>{{house}}</bold>` or `<userLink/>`; do not wrap scalar values in fragments
+just to insert them. The local `Trans` defers rich-text interpolation until after
+parsing so player-written values cannot become component markup. Keep spaces
+between words and placeholders, while preserving language-specific suffixes and
+intentional spacing in conditional sentence fragments.
 
 Keep `{{interpolation}}` variables and named `<component/>`/`<component>...</component>`
 tags intact. Use i18next plural families (`_one`, `_other`, and locale-specific

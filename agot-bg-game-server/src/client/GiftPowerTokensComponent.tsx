@@ -52,10 +52,10 @@ export default class GiftPowerTokensComponent extends Component<GiftPowerTokensC
                   <Tooltip id="gift-power-tokens-tooltip">
                     <Trans
                       i18nKey="giftPowerTokens.giftPowerTokensToHouse15c7a9"
+                      values={{ toHouse: this.toHouse.name }}
                       components={{
-                        element0: <br />,
-                        element1: <b />,
-                        value2: <>{this.toHouse.name}</>
+                        lineBreak: <br />,
+                        bold: <b />
                       }}
                     />
                   </Tooltip>

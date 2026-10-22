@@ -111,7 +111,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                       <Col xs="auto" style={{ width: "100px" }}>
                         <b>
                           {this.randomHouses
-                            ? t("lobby.seat9f2b77", { value0: i + 1 })
+                            ? t("lobby.seat9f2b77", { seatNumber: i + 1 })
                             : h.name}
                         </b>
                       </Col>
@@ -190,7 +190,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         </Col>
         <Col xs={12}>
           <Row className="justify-content-center no-space-around">
-            <Card>
+            <Card className="w-auto">
               <Card.Body className="py-2">
                 {!this.props.gameClient.isRealOwner() &&
                   this.lobby.password != "" &&

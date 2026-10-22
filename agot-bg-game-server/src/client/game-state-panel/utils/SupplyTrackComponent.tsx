@@ -54,7 +54,7 @@ export default class SupplyTrackComponent extends Component<SupplyTrackComponent
               <Tooltip id="supply-track">
                 <Trans
                   i18nKey="supplyTrack.supplyTrackEachSupplyTrackColumnContainsAList352379"
-                  components={{ element0: <b />, element1: <br /> }}
+                  components={{ bold: <b />, lineBreak: <br /> }}
                 />
               </Tooltip>
             }

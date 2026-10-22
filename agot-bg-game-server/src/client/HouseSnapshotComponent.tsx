@@ -111,11 +111,11 @@ export default class HouseSnapshotComponent extends Component<HouseSnapshotCompo
                   <>
                     <Trans
                       i18nKey="houseRow.commandedBy467f37"
+                      values={{ suzerainHouse: this.suzerainHouse.name }}
                       components={{
-                        element0: (
+                        label: (
                           <span style={{ color: this.suzerainHouse.color }} />
-                        ),
-                        value1: <>{this.suzerainHouse.name}</>
+                        )
                       }}
                     />
                   </>

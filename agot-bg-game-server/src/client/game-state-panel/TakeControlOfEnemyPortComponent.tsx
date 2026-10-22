@@ -20,11 +20,13 @@ export default class TakeControlOfEnemyPortComponent extends Component<
           <p>
             <Trans
               i18nKey="takeControlOfEnemyPort.houseHasToChooseTheAmountOfShipsTo96a595"
+              values={{
+                newController: this.props.gameState.newController.name,
+                port: this.props.gameState.port.name
+              }}
               components={{
-                element0: <b />,
-                value1: <>{this.props.gameState.newController.name}</>,
-                element2: <b />,
-                value3: <>{this.props.gameState.port.name}</>
+                bold: <b />,
+                bold2: <b />
               }}
             />
           </p>

@@ -94,7 +94,7 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
                 <h5 className="mb-0 text-center">
                   <Trans
                     i18nKey="objectivesInfo.sCompletedObjectives4e0446"
-                    components={{ value0: <>{h.name}</> }}
+                    values={{ house: h.name }}
                   />
                 </h5>
               </Col>
@@ -151,66 +151,66 @@ export default class ObjectivesInfoComponent extends Component<ObjectivesInfoCom
         <Trans
           i18nKey="objectivesInfo.theAFeastForCrowsScenarioIntroducesANewed21a9"
           components={{
-            element0: <h5 className="text-center">{t("common.objectives")}</h5>,
-            element1: <br />,
-            element2: <br />,
-            element3: <br />,
-            element4: <br />,
-            element5: <br />,
-            element6: (
+            details: <h5 className="text-center">{t("common.objectives")}</h5>,
+            lineBreak: <br />,
+            lineBreak2: <br />,
+            lineBreak3: <br />,
+            lineBreak4: <br />,
+            lineBreak5: <br />,
+            details2: (
               <h5 className="text-center">
                 {t("objectivesInfo.scoringAndSupply9e93ab")}
               </h5>
             ),
-            element7: <br />,
-            element8: (
+            lineBreak6: <br />,
+            details3: (
               <ol className="mb-0 mt-1">
                 <li>
                   <Trans
                     i18nKey="objectivesInfo.updateSupplyInTurnOrderAllPlayersUpdateTheir1bd566"
-                    components={{ element0: <b />, element1: <br /> }}
+                    components={{ bold: <b />, lineBreak: <br /> }}
                   />
                 </li>
                 <li>
                   <Trans
                     i18nKey="objectivesInfo.scoreSpecialObjectivesEachRoundDuringThisStepEachb75030"
-                    components={{ element0: <b />, element1: <br /> }}
+                    components={{ bold: <b />, lineBreak: <br /> }}
                   />
                 </li>
                 <li>
                   <Trans
                     i18nKey="objectivesInfo.scoreOtherObjectivesInTurnOrderEachPlayerMayb216b1"
                     components={{
-                      element0: <b />,
-                      element1: <br />,
-                      element2: <br />,
-                      element3: <br />,
-                      element4: <br />
+                      bold: <b />,
+                      lineBreak: <br />,
+                      lineBreak2: <br />,
+                      lineBreak3: <br />,
+                      lineBreak4: <br />
                     }}
                   />
                 </li>
                 <li>
                   <Trans
                     i18nKey="objectivesInfo.drawObjectiveCardsAnyPlayerWhoDoesNotHave23ffea"
-                    components={{ element0: <b />, element1: <br /> }}
+                    components={{ bold: <b />, lineBreak: <br /> }}
                   />
                 </li>
               </ol>
             ),
-            element9: <br />,
-            element10: (
+            lineBreak7: <br />,
+            details4: (
               <h5 className="text-center">
                 {t("objectivesInfo.winningTheGamee9057e")}
               </h5>
             ),
-            element11: <br />,
-            element12: <br />,
-            element13: <br />,
-            element14: <br />,
-            element15: <h5 className="text-center">{t("common.faq")}</h5>,
-            element16: <i />,
-            element17: <br />,
-            element18: <br />
+            lineBreak8: <br />,
+            lineBreak9: <br />,
+            lineBreak10: <br />,
+            lineBreak11: <br />,
+            details5: <h5 className="text-center">{t("common.faq")}</h5>,
+            emphasis: <i />,
+            lineBreak12: <br />,
+            lineBreak13: <br />
           }}
         />
       </Tooltip>

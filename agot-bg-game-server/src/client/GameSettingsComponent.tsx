@@ -70,15 +70,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <Trans
                         i18nKey="gameSettings.liveGameALiveGameCanBePlayedWhenc2f959"
                         components={{
-                          element0: <b />,
-                          element1: <br />,
-                          element2: <br />,
-                          element3: <br />,
-                          element4: <b />,
-                          element5: <b />,
-                          element6: <b />,
-                          element7: <b />,
-                          element8: <br />
+                          bold: <b />,
+                          lineBreak: <br />,
+                          lineBreak2: <br />,
+                          lineBreak3: <br />,
+                          bold2: <b />,
+                          bold3: <b />,
+                          bold4: <b />,
+                          bold5: <b />,
+                          lineBreak4: <br />
                         }}
                       />
                     </Tooltip>
@@ -149,12 +149,12 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                           <Trans
                             i18nKey="gameSettings.ifThisOptionIsEnabledEachPlayerWillHaveffd163"
                             components={{
-                              element0: <br />,
-                              element1: <br />,
-                              element2: <br />,
-                              element3: <br />,
-                              element4: <br />,
-                              element5: <br />
+                              lineBreak: <br />,
+                              lineBreak2: <br />,
+                              lineBreak3: <br />,
+                              lineBreak4: <br />,
+                              lineBreak5: <br />,
+                              lineBreak6: <br />
                             }}
                           />
                         </Tooltip>
@@ -180,7 +180,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <Trans
                     i18nKey="gameSettings.min9aef64"
                     components={{
-                      element0: (
+                      details: (
                         <select
                           id="initial-live-clock"
                           value={this.gameSettings.initialLiveClock}
@@ -288,16 +288,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisSetupSupports3PlayerAnd6PlayerModesd2e9ce"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theOfficialAGameOfThronesBoardGame2nd358ef9"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />,
-                element2: <br />
+                lineBreak: <br />,
+                lineBreak2: <br />
               }}
             />
           </>
@@ -308,16 +308,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisExpansionAdds2AdditionalHousesArrynAndTargaryen723511"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theOfficialMotherOfDragonsExpansiona2949c"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />,
-                element2: <br />
+                lineBreak: <br />,
+                lineBreak2: <br />
               }}
             />
           </>
@@ -328,18 +328,18 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisExpansionThematicallyReflectsALaterPointInThe9c9325"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theOfficialDanceWithDragonsExpansion7824b7"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />,
-                element2: <i />,
-                element3: <b />,
-                element4: <br />
+                lineBreak: <br />,
+                emphasis: <i />,
+                bold: <b />,
+                lineBreak2: <br />
               }}
             />
           </>
@@ -350,16 +350,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisIsA4PlayerExpansionItAddsHoused62d5f"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theOfficialAFeastForCrowsExpansionc31f91"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />,
-                element2: <br />
+                lineBreak: <br />,
+                lineBreak2: <br />
               }}
             />
           </>
@@ -370,19 +370,19 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisIsACommunityCreatedVariantAndCombinesA7d2a73"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theUnofficialADanceWithMotherOfDragonsVariantfa93ec"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <i />,
-                element2: <br />,
-                element3: <i />,
-                element4: <b />,
-                element5: <br />
+                emphasis: <i />,
+                lineBreak: <br />,
+                emphasis2: <i />,
+                bold: <b />,
+                lineBreak2: <br />
               }}
             />
           </>
@@ -393,16 +393,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisIsACommunityCreatedVariantFor4Andb19cc8"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theUnofficialStruggleInTheNorthVariant93cc40"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />,
-                element2: <br />
+                lineBreak: <br />,
+                lineBreak2: <br />
               }}
             />
           </>
@@ -413,16 +413,16 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisIsACommunityCreatedVariantFor4Playersd25b60"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theUnofficialRumbeInTheSouthVariant044ba3"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />,
-                element2: <br />
+                lineBreak: <br />,
+                lineBreak2: <br />
               }}
             />
           </>
@@ -433,15 +433,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisIsACommunityCreatedVariantFor5Players6e4891"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theUnofficialRaceToKingsLandingVariant246958"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />
+                lineBreak: <br />
               }}
             />
           </>
@@ -452,15 +452,15 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisIsACommunityCreatedVariantFor5Playersa4a230"
               components={{
-                element0: (
+                details: (
                   <h5>
                     <Trans
                       i18nKey="gameSettings.theUnofficialNoKrakenForDinnerVariant87fa1d"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </h5>
                 ),
-                element1: <br />
+                lineBreak: <br />
               }}
             />
           </>
@@ -471,10 +471,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
             <Trans
               i18nKey="gameSettings.thisModeAllowsYouToStartTheGameWithc24a61"
               components={{
-                element0: <h5>{t("gameSettings.teachTheGameMode7a34c3")}</h5>,
-                element1: <br />,
-                element2: <br />,
-                element3: <br />
+                details: <h5>{t("gameSettings.teachTheGameMode7a34c3")}</h5>,
+                lineBreak: <br />,
+                lineBreak2: <br />,
+                lineBreak3: <br />
               }}
             />
           </>
@@ -515,7 +515,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
               <Trans
                 i18nKey="gameSettings.playersf220fc"
                 components={{
-                  element0: (
+                  details: (
                     <select
                       id="player-count"
                       name="playerCount"
@@ -542,7 +542,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                 <Trans
                   i18nKey="gameSettings.vpsebc6d7"
                   components={{
-                    element0: (
+                    details: (
                       <select
                         id="vp-count-setting"
                         value={this.gameSettings.victoryPointsCountNeededToWin}
@@ -599,7 +599,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <Trans
                     i18nKey="gameSettings.ltsef35a8"
                     components={{
-                      element0: (
+                      details: (
                         <select
                           id="lt-count-setting"
                           value={this.gameSettings.loyaltyTokenCountNeededToWin}
@@ -685,7 +685,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="adwd-house-cards-tooltip">
                       <Trans
                         i18nKey="gameSettings.ifThisOptionIsEnabledTheHouseCardsFrom36ba0c"
-                        components={{ element0: <b />, element1: <b /> }}
+                        components={{ bold: <b />, bold2: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -693,7 +693,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <label htmlFor="adwd-house-cards">
                     <Trans
                       i18nKey="gameSettings.useAdwdHouseCards09c29a"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </label>
                 </OverlayTrigger>
@@ -718,7 +718,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="asos-house-cards-setting-tooltip">
                       <Trans
                         i18nKey="gameSettings.ifThisOptionIsEnabledTheHouseCardsFroma220e0"
-                        components={{ element0: <b /> }}
+                        components={{ bold: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -726,7 +726,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <label htmlFor="asos-house-cards-setting">
                     <Trans
                       i18nKey="gameSettings.useAsosHouseCardsfc9124"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </label>
                 </OverlayTrigger>
@@ -751,7 +751,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="first-edition-house-cards-setting-tooltip">
                       <Trans
                         i18nKey="gameSettings.ifThisOptionIsEnabledTheHouseCardsFrom2748f0"
-                        components={{ element0: <b /> }}
+                        components={{ bold: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -759,7 +759,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                   <label htmlFor="first-edition-house-cards-setting">
                     <Trans
                       i18nKey="gameSettings.use1stEditionHouseCards4f98d7"
-                      components={{ element0: <i /> }}
+                      components={{ emphasis: <i /> }}
                     />
                   </label>
                 </OverlayTrigger>
@@ -784,7 +784,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="decks-evolution-setting-tooltip">
                       <Trans
                         i18nKey="gameSettings.thisIsACommunityVariantThatStartsWithThe4017a7"
-                        components={{ element0: <b /> }}
+                        components={{ bold: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -862,8 +862,8 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                             <Trans
                               i18nKey="gameSettings.aCommunityProposalToAvoidAnEarlyGangUp2485ff"
                               components={{
-                                element0: <br />,
-                                element1: (
+                                lineBreak: <br />,
+                                actionLink: (
                                   <a
                                     href="https://www.boardgamedungeon.net/threads/my-balance-proposition-for-a-game-of-thrones-mother-of-dragons-expansion-targaryen.11/"
                                     target="_blank"
@@ -913,7 +913,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="vassals-tooltip">
                       <Trans
                         i18nKey="gameSettings.unassignedHousesWillBeVassalsIntroducedByTheMother979100"
-                        components={{ element0: <b /> }}
+                        components={{ bold: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -942,10 +942,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <Trans
                         i18nKey="gameSettings.enableTheIronBankFromTheMotherOfDragons958c74"
                         components={{
-                          element0: <b />,
-                          element1: <br />,
-                          element2: <br />,
-                          element3: <i />
+                          bold: <b />,
+                          lineBreak: <br />,
+                          lineBreak2: <br />,
+                          emphasis: <i />
                         }}
                       />
                     </Tooltip>
@@ -975,7 +975,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="sea-orders-tooltip">
                       <Trans
                         i18nKey="gameSettings.enableSeaOrderTokensFromTheMotherOfDragons5b4dda"
-                        components={{ element0: <b /> }}
+                        components={{ bold: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -1026,6 +1026,33 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
           </Col>
           <Col xs="12">
             <FormCheck
+              id="empowered-vassals-setting"
+              type="switch"
+              label={
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip id="empowered-vassals-tooltip">
+                      {t("gameSettings.empoweredVassalsDescription")}
+                    </Tooltip>
+                  }
+                >
+                  <label htmlFor="empowered-vassals-setting">
+                    {t("gameSettings.empoweredVassals")}
+                  </label>
+                </OverlayTrigger>
+              }
+              checked={this.gameSettings.empoweredVassals}
+              onChange={() =>
+                this.changeGameSettings(
+                  () =>
+                    (this.gameSettings.empoweredVassals =
+                      !this.gameSettings.empoweredVassals)
+                )
+              }
+            />
+          </Col>
+          <Col xs="12">
+            <FormCheck
               id="random-vassal-assignment-setting"
               type="switch"
               label={
@@ -1063,7 +1090,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="dragon-war-tooltip">
                       <Trans
                         i18nKey="gameSettings.allHousesExceptTargaryenWillReplaceTheirStartingKnight546494"
-                        components={{ element0: <small />, element1: <i /> }}
+                        components={{ small: <small />, emphasis: <i /> }}
                       />
                     </Tooltip>
                   }
@@ -1287,12 +1314,12 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <Trans
                         i18nKey="gameSettings.ifThisOptionIsEnabledOneMusteringCardWill5cabaf"
                         components={{
-                          element0: <b />,
-                          element1: <b />,
-                          element2: <b />,
-                          element3: <b />,
-                          element4: <b />,
-                          element5: <b />
+                          bold: <b />,
+                          bold2: <b />,
+                          bold3: <b />,
+                          bold4: <b />,
+                          bold5: <b />,
+                          bold6: <b />
                         }}
                       />
                     </Tooltip>
@@ -1596,7 +1623,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="tournament-mode-tooltip">
                       <Trans
                         i18nKey="gameSettings.thisOptionIsIntendedForTournamentsItDisablesThec3323a"
-                        components={{ element0: <br /> }}
+                        components={{ lineBreak: <br /> }}
                       />
                     </Tooltip>
                   }
@@ -1629,9 +1656,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <Trans
                         i18nKey="gameSettings.playersWillDraftTheirHouseCardsStepByStep47fa57"
                         components={{
-                          element0: <br />,
-                          element1: <b />,
-                          element2: <br />
+                          lineBreak: <br />,
+                          bold: <b />,
+                          lineBreak2: <br />
                         }}
                       />
                     </Tooltip>
@@ -1691,7 +1718,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="selected-random-draft-tooltip">
                       <Trans
                         i18nKey="gameSettings.playersSimultaneouslyDraftTheHouseCardsToBeUsed5a613b"
-                        components={{ element0: <b />, element1: <b /> }}
+                        components={{ bold: <b />, bold2: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -1721,7 +1748,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                     <Tooltip id="random-draft-tooltip">
                       <Trans
                         i18nKey="gameSettings.playersReceiveRandomHouseCardsAndInfluencePositionsIf40b0ef"
-                        components={{ element0: <b />, element1: <b /> }}
+                        components={{ bold: <b />, bold2: <b /> }}
                       />
                     </Tooltip>
                   }
@@ -1752,14 +1779,14 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <p>
                         <Trans
                           i18nKey="gameSettings.playersCanAdjustStartingPositionsByAddingAndRemoving8b4747"
-                          components={{ element0: <br />, element1: <small /> }}
+                          components={{ lineBreak: <br />, small: <small /> }}
                         />
                       </p>
                       <p>
                         <Trans
                           i18nKey="gameSettings.unclaimedTerritoriesAreDistributedFairlyAmongHousesAllPlayers61978c"
                           components={{
-                            element0: (
+                            details: (
                               <ul>
                                 <li>
                                   {t(
@@ -1807,9 +1834,9 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Trans
                           i18nKey="gameSettings.ifThisOptionIsEnabledPlayersCanChooseTo566c1d"
                           components={{
-                            element0: <br />,
-                            element1: <b />,
-                            element2: <b />
+                            lineBreak: <br />,
+                            bold: <b />,
+                            bold2: <b />
                           }}
                         />
                       </Tooltip>
@@ -1871,7 +1898,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                           <Tooltip id="blind-draft-tooltip">
                             <Trans
                               i18nKey="gameSettings.playersReceiveRandomHouseCardsAndInfluencePositionsIf7019a6"
-                              components={{ element0: <b />, element1: <b /> }}
+                              components={{ bold: <b />, bold2: <b /> }}
                             />
                           </Tooltip>
                         }
@@ -1933,10 +1960,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Trans
                           i18nKey="gameSettings.thisOptionAddsThe2ndEditionBaseGameDecks0d72c2"
                           components={{
-                            element0: <b />,
-                            element1: <b />,
-                            element2: <b />,
-                            element3: <b />
+                            bold: <b />,
+                            bold2: <b />,
+                            bold3: <b />,
+                            bold4: <b />
                           }}
                         />
                       </Tooltip>
@@ -1968,11 +1995,11 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Trans
                           i18nKey="gameSettings.thisOptionAddsTheDecksFromTheDanceWitha2c839"
                           components={{
-                            element0: <b />,
-                            element1: <b />,
-                            element2: <b />,
-                            element3: <b />,
-                            element4: <b />
+                            bold: <b />,
+                            bold2: <b />,
+                            bold3: <b />,
+                            bold4: <b />,
+                            bold5: <b />
                           }}
                         />
                       </Tooltip>
@@ -2004,10 +2031,10 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                         <Trans
                           i18nKey="gameSettings.thisOptionAddsTheDecksFromTheStormOfecdf54"
                           components={{
-                            element0: <b />,
-                            element1: <b />,
-                            element2: <b />,
-                            element3: <b />
+                            bold: <b />,
+                            bold2: <b />,
+                            bold3: <b />,
+                            bold4: <b />
                           }}
                         />
                       </Tooltip>
@@ -2038,7 +2065,7 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
                       <Tooltip id="first-edition-deck-setting-tooltip">
                         <Trans
                           i18nKey="gameSettings.thisOptionAddsTheDecksFromThe1stEditione59ff2"
-                          components={{ element0: <b /> }}
+                          components={{ bold: <b /> }}
                         />
                       </Tooltip>
                     }

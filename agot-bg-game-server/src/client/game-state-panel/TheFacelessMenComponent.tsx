@@ -67,13 +67,15 @@ export default class TheFacelessMenComponent extends Component<
                   <Col xs="auto" className="p-0">
                     <Trans
                       i18nKey="theFacelessMen.ofInbc8f9f"
+                      values={{
+                        unitType: translateGameText(unit.type.name),
+                        unitAllegiance: unit.allegiance.name,
+                        region: region.name
+                      }}
                       components={{
-                        element0: <b />,
-                        value1: <>{translateGameText(unit.type.name)}</>,
-                        element2: <small />,
-                        value3: <>{unit.allegiance.name}</>,
-                        element4: <b />,
-                        value5: <>{region.name}</>
+                        bold: <b />,
+                        small: <small />,
+                        bold2: <b />
                       }}
                     />
                   </Col>
@@ -106,7 +108,7 @@ export default class TheFacelessMenComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{ houses: <>{this.house.name}</> }}
+              values={{ houses: this.house.name }}
             />
           </Col>
         )}

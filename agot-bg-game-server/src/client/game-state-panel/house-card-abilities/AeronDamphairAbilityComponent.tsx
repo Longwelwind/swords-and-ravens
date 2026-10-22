@@ -30,10 +30,10 @@ export default class AeronDamphairAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="aeronDamphairAbility.aeronDamphairHouseMayDiscard2PowerTokensTo6499aa"
+            values={{ childGameStateHouse: childGameState.house.name }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{childGameState.house.name}</>
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </Col>
@@ -48,7 +48,7 @@ export default class AeronDamphairAbilityComponent extends Component<
                   <small>
                     <Trans
                       i18nKey="aeronDamphairAbility.warningThisCardSAbilityWillHaveNoEffectcab05e"
-                      components={{ element0: <b /> }}
+                      components={{ bold: <b /> }}
                     />
                   </small>
                 </Alert>

@@ -84,9 +84,9 @@ export default class PlaceSellswordsComponent extends Component<
                   <>
                     <Trans
                       i18nKey="placeSellswords.clickIntoToPlaceASellswordThere876165"
+                      values={{ regions: this.props.gameState.regions[0].name }}
                       components={{
-                        element0: <b />,
-                        value1: <>{this.props.gameState.regions[0].name}</>
+                        bold: <b />
                       }}
                     />
                   </>
@@ -130,7 +130,7 @@ export default class PlaceSellswordsComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{ houses: <>{this.house.name}</> }}
+              values={{ houses: this.house.name }}
             />
           </Col>
         )}

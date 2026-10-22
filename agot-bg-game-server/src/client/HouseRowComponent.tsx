@@ -165,9 +165,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
       <>
         <Trans
           i18nKey="houseRow.commandedBy467f37"
+          values={{ suzerainHouse: this.suzerainHouse.name }}
           components={{
-            element0: <span style={{ color: this.suzerainHouse.color }} />,
-            value1: <>{this.suzerainHouse.name}</>
+            label: <span style={{ color: this.suzerainHouse.color }} />
           }}
         />
       </>
@@ -271,7 +271,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                     <Tooltip id={"vassal-house-" + this.house.id}>
                       <Trans
                         i18nKey="houseRow.vassalAtTheBeginningOfThePlanningPhaseEach3ff25f"
-                        components={{ element0: <b />, element1: <br /> }}
+                        components={{ bold: <b />, lineBreak: <br /> }}
                       />
                     </Tooltip>
                   }
@@ -492,9 +492,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
                       <Tooltip id={"knows-things-house-" + this.house.id}>
                         <Trans
                           i18nKey="houseRow.knowsThingsd3ec18"
+                          values={{ house: this.house.name }}
                           components={{
-                            element0: <b />,
-                            value1: <>{this.house.name}</>
+                            bold: <b />
                           }}
                         />
                       </Tooltip>
@@ -570,7 +570,9 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <h4 className="d-inline ms-3" style={{ color: "white" }}>
               <Trans
                 i18nKey="houseRow.isRunningOutOfTime7ff506"
-                components={{ value0: <>{getUserLinkOrLabel(player.user)}</> }}
+                components={{
+                  playerUser: <>{getUserLinkOrLabel(player.user)}</>
+                }}
               />
             </h4>
           </Card.Body>
@@ -711,7 +713,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
     if (
       window.confirm(
         t("houseRow.doYouWantToLaunchAVoteToReplaceca3d9c", {
-          value0: this.house.name
+          house: this.house.name
         })
       )
     ) {
@@ -822,81 +824,59 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <h5 className="text-center">
               <Trans
                 i18nKey="houseRow.additionalInformationDoesNotCountInCaseOfAf77645"
-                components={{ element0: <br />, element1: <small /> }}
+                components={{ lineBreak: <br />, small: <small /> }}
               />
             </h5>
             <br />
             <h5 className="text-center">
               <Trans
                 i18nKey="houseRow.castles93e2d1"
+                values={{
+                  castleCount: regions.filter(
+                    (r) => r.castleLevel == 1 && r.getController() == this.house
+                  ).length
+                }}
                 components={{
-                  element0: <b />,
-                  value1: (
-                    <>
-                      {
-                        regions.filter(
-                          (r) =>
-                            r.castleLevel == 1 &&
-                            r.getController() == this.house
-                        ).length
-                      }
-                    </>
-                  )
+                  bold: <b />
                 }}
               />
             </h5>
             <h5 className="text-center">
               <Trans
                 i18nKey="houseRow.strongholdsca5286"
+                values={{
+                  strongholdCount: regions.filter(
+                    (r) => r.castleLevel == 2 && r.getController() == this.house
+                  ).length
+                }}
                 components={{
-                  element0: <b />,
-                  value1: (
-                    <>
-                      {
-                        regions.filter(
-                          (r) =>
-                            r.castleLevel == 2 &&
-                            r.getController() == this.house
-                        ).length
-                      }
-                    </>
-                  )
+                  bold: <b />
                 }}
               />
             </h5>
             <h5 className="text-center">
               <Trans
                 i18nKey="houseRow.seaAreasdea370"
+                values={{
+                  seaAreaCount: regions.filter(
+                    (r) => r.type == sea && r.getController() == this.house
+                  ).length
+                }}
                 components={{
-                  element0: <b />,
-                  value1: (
-                    <>
-                      {
-                        regions.filter(
-                          (r) =>
-                            r.type == sea && r.getController() == this.house
-                        ).length
-                      }
-                    </>
-                  )
+                  bold: <b />
                 }}
               />
             </h5>
             <h5 className="text-center">
               <Trans
                 i18nKey="houseRow.ports071004"
+                values={{
+                  portCount: regions.filter(
+                    (r) => r.type == port && r.getController() == this.house
+                  ).length
+                }}
                 components={{
-                  element0: <b />,
-                  value1: (
-                    <>
-                      {
-                        regions.filter(
-                          (r) =>
-                            r.type == port && r.getController() == this.house
-                        ).length
-                      }
-                    </>
-                  )
+                  bold: <b />
                 }}
               />
             </h5>
@@ -909,20 +889,23 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
             <h6>
               <Trans
                 i18nKey="houseRow.onTheBoard438042"
+                values={{
+                  loyaltyTokensOnBoardCount: loyaltyTokensOnBoardCount
+                }}
                 components={{
-                  element0: <b />,
-                  value1: <>{loyaltyTokensOnBoardCount}</>
+                  bold: <b />
                 }}
               />
             </h6>
             <h6>
               <Trans
                 i18nKey="houseRow.loyaltyPoolfe90cb"
+                values={{
+                  remainingTokens:
+                    MAX_LOYALTY_TOKEN_COUNT - loyaltyTokensOnBoardCount
+                }}
                 components={{
-                  element0: <b />,
-                  value1: (
-                    <>{MAX_LOYALTY_TOKEN_COUNT - loyaltyTokensOnBoardCount}</>
-                  )
+                  bold: <b />
                 }}
               />
             </h6>
@@ -945,7 +928,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
               <h4>
                 <Trans
                   i18nKey="houseRow.sPower26fd93"
-                  components={{ value0: <>{this.house.name}</> }}
+                  values={{ house: this.house.name }}
                 />
               </h4>
             </Col>
@@ -996,7 +979,7 @@ export default class HouseRowComponent extends Component<HouseRowComponentProps>
         <h4>
           <Trans
             i18nKey="houseRow.sPower26fd93"
-            components={{ value0: <>{this.house.name}</> }}
+            values={{ house: this.house.name }}
           />
         </h4>
         <div className="text-center">

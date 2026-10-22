@@ -584,7 +584,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <h3 className="text-center" style={{ color: "red" }}>
             <Trans
               i18nKey="ingame.usefulHintPleaseReadda51ec"
-              components={{ element0: <br />, element1: <small /> }}
+              components={{ lineBreak: <br />, small: <small /> }}
             />
           </h3>
         </Modal.Header>
@@ -594,14 +594,14 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               <Trans
                 i18nKey="ingame.theGameIsOptimizedForHdResolutionsYouAreae11ff"
                 components={{
-                  element0: <br />,
-                  element1: <b />,
-                  element2: <br />,
-                  element3: <br />,
-                  element4: <small />,
-                  element5: <i />,
-                  element6: <br />,
-                  element7: <b />
+                  lineBreak: <br />,
+                  bold: <b />,
+                  lineBreak2: <br />,
+                  lineBreak3: <br />,
+                  small: <small />,
+                  emphasis: <i />,
+                  lineBreak4: <br />,
+                  bold2: <b />
                 }}
               />
             </div>
@@ -966,9 +966,11 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <h5>
             <Trans
               i18nKey="ingame.battleResultsFor11fa2e"
+              values={{
+                houseCombatDatasRegion: houseCombatDatas[1].region.name
+              }}
               components={{
-                element0: <b />,
-                value1: <>{houseCombatDatas[1].region.name}</>
+                bold: <b />
               }}
             />
           </h5>
@@ -980,9 +982,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <p className="text-center mt-2">
             <Trans
               i18nKey="common.winner"
+              values={{ winner: winner.name }}
               components={{
-                element0: <b style={{ color: winner.color }} />,
-                value1: <>{winner.name}</>
+                bold: <b style={{ color: winner.color }} />
               }}
             />
           </p>
@@ -1027,9 +1029,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <p className="text-center mt-2">
             <Trans
               i18nKey="common.highestBidder"
+              values={{ highestBidder: highestBidder.name }}
               components={{
-                element0: <b style={{ color: highestBidder.color }} />,
-                value1: <>{highestBidder.name}</>
+                bold: <b style={{ color: highestBidder.color }} />
               }}
             />
           </p>
@@ -1038,9 +1040,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <p className="text-center mt-2">
             <Trans
               i18nKey="common.lowestBidder"
+              values={{ lowestBidder: lowestBidder.name }}
               components={{
-                element0: <b style={{ color: lowestBidder.color }} />,
-                value1: <>{lowestBidder.name}</>
+                bold: <b style={{ color: lowestBidder.color }} />
               }}
             />
           </p>
@@ -1144,24 +1146,24 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <p className="text-center mt-3">
                   <Trans
                     i18nKey="ingame.houseResolvedAnIronBankOrderInPayingPower3d5a0f"
+                    values={{
+                      house: house.name,
+                      region: region.name,
+                      loanPurchasedPaid: loanPurchased.paid,
+                      logGained: log.gained,
+                      powerTokenLabel: t("common.PowertokenLabel", {
+                        count: log.gained
+                      })
+                    }}
                     components={{
-                      element0: <b />,
-                      value1: <>{house.name}</>,
-                      element2: <b />,
-                      element3: <b />,
-                      value4: <>{region.name}</>,
-                      element5: <br />,
-                      element6: <b />,
-                      value7: <>{loanPurchased.paid}</>,
-                      element8: <b />,
-                      element9: <br />,
-                      element10: <b />,
-                      value11: <>{log.gained}</>,
-                      value12: (
-                        <>
-                          {t("common.PowertokenLabel", { count: log.gained })}
-                        </>
-                      )
+                      bold: <b />,
+                      bold2: <b />,
+                      bold3: <b />,
+                      lineBreak: <br />,
+                      bold4: <b />,
+                      bold5: <b />,
+                      lineBreak2: <br />,
+                      bold6: <b />
                     }}
                   />
                 </p>
@@ -1169,16 +1171,16 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                 <p className="text-center mt-3">
                   <Trans
                     i18nKey="common.houseGained"
+                    values={{
+                      house: house.name,
+                      gain: log.gained,
+                      powerTokenLabel: t("common.PowertokenLabel", {
+                        count: log.gained
+                      })
+                    }}
                     components={{
-                      element0: <b />,
-                      value1: <>{house.name}</>,
-                      element2: <b />,
-                      value3: <>{log.gained}</>,
-                      value4: (
-                        <>
-                          {t("common.PowertokenLabel", { count: log.gained })}
-                        </>
-                      )
+                      bold: <b />,
+                      bold2: <b />
                     }}
                   />
                 </p>

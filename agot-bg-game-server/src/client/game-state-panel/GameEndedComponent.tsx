@@ -77,7 +77,8 @@ export default class GameEndedComponent extends Component<
               <h5>
                 <Trans
                   i18nKey="gameEnded.houseHasWonThisGameOfThronesa1b8be"
-                  components={{ element0: <b />, value1: <>{winner.name}</> }}
+                  values={{ winner: winner.name }}
+                  components={{ bold: <b /> }}
                 />
               </h5>
             </Col>

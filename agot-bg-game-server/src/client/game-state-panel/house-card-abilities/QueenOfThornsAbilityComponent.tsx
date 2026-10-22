@@ -26,17 +26,16 @@ export default class QueenOfThornsAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="queenOfThornsAbility.queenOfThornsHouseMustRemoveAnEnemyOrder17fa9c"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              embattledArea: this.removingOrderInEmbattledAreaAllowed
+                ? t("queenOfThornsAbility.eitherInTheEmbattledAreaOr7b757d")
+                : ""
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.childGameState.house.name}</>,
-              value3: (
-                <>
-                  {this.removingOrderInEmbattledAreaAllowed
-                    ? t("queenOfThornsAbility.eitherInTheEmbattledAreaOr7b757d")
-                    : ""}
-                </>
-              )
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </Col>

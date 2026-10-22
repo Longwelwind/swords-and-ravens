@@ -448,13 +448,14 @@ export default class MapComponent extends Component<MapComponentProps> {
                         <small>
                           <Trans
                             i18nKey="map.ofda0760"
+                            values={{
+                              controller:
+                                r.overwrittenSuperControlPowerToken.name,
+                              region: r.name
+                            }}
                             components={{
-                              element0: <b />,
-                              value1: (
-                                <>{r.overwrittenSuperControlPowerToken.name}</>
-                              ),
-                              element2: <br />,
-                              value3: <>{r.name}</>
+                              bold: <b />,
+                              lineBreak: <br />
                             }}
                           />
                         </small>
@@ -485,11 +486,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                         <small>
                           <Trans
                             i18nKey="map.ofda0760"
+                            values={{
+                              controller: r.controlPowerToken.name,
+                              region: r.name
+                            }}
                             components={{
-                              element0: <b />,
-                              value1: <>{r.controlPowerToken.name}</>,
-                              element2: <br />,
-                              value3: <>{r.name}</>
+                              bold: <b />,
+                              lineBreak: <br />
                             }}
                           />
                         </small>
@@ -902,14 +905,15 @@ export default class MapComponent extends Component<MapComponentProps> {
                         <small>
                           <Trans
                             i18nKey="map.of4fba64"
+                            values={{
+                              controller:
+                                controller?.name ?? t("common.unknown"),
+                              region: r.name
+                            }}
                             components={{
-                              element0: <b />,
-                              value1: (
-                                <>{controller?.name ?? t("common.unknown")}</>
-                              ),
-                              element2: <br />,
-                              element3: <b />,
-                              value4: <>{r.name}</>
+                              bold: <b />,
+                              lineBreak: <br />,
+                              bold2: <b />
                             }}
                           />
                         </small>
@@ -1003,14 +1007,13 @@ export default class MapComponent extends Component<MapComponentProps> {
                         <small>
                           <Trans
                             i18nKey="common.of"
+                            values={{
+                              controller:
+                                this.allRegionsWithControllers.get(r)?.name ??
+                                t("common.unknown")
+                            }}
                             components={{
-                              element0: <b />,
-                              value1: (
-                                <>
-                                  {this.allRegionsWithControllers.get(r)
-                                    ?.name ?? t("common.unknown")}
-                                </>
-                              )
+                              bold: <b />
                             }}
                           />
                         </small>
@@ -1378,11 +1381,13 @@ export default class MapComponent extends Component<MapComponentProps> {
           <small>
             <Trans
               i18nKey="map.ofda0760"
+              values={{
+                controller: controller?.name ?? t("common.unknown"),
+                region: region.name
+              }}
               components={{
-                element0: <b />,
-                value1: <>{controller?.name ?? t("common.unknown")}</>,
-                element2: <br />,
-                value3: <>{region.name}</>
+                bold: <b />,
+                lineBreak: <br />
               }}
             />
           </small>

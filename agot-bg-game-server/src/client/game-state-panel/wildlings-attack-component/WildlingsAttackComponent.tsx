@@ -95,16 +95,19 @@ export default class WildlingsAttackComponent extends Component<
             <Col xs={12} className="text-center mb-3">
               <Trans
                 i18nKey="wildlingsAttack.allPlayerHousesBidPowerTokensToOvercomeTheef377f"
+                values={{
+                  wildlingStrength: this.props.gameState.wildlingStrength
+                }}
                 components={{
-                  element0: <b />,
-                  value1: (
+                  bold: <b />,
+                  excludedHouses: (
                     <>
                       {this.props.gameState.excludedHouses.length > 0 && (
                         <>
                           <Trans
                             i18nKey="wildlingsAttack.excepta66c96"
                             components={{
-                              value0: (
+                              houses: (
                                 <>
                                   {joinReactNodes(
                                     this.props.gameState.excludedHouses.map(
@@ -126,8 +129,7 @@ export default class WildlingsAttackComponent extends Component<
                       )}
                     </>
                   ),
-                  element2: <b style={{ fontSize: "2rem" }} />,
-                  value3: <>{this.props.gameState.wildlingStrength}</>
+                  bold2: <b style={{ fontSize: "2rem" }} />
                 }}
               />
             </Col>
@@ -151,15 +153,17 @@ export default class WildlingsAttackComponent extends Component<
               <div className="text-center mt-1">
                 <Trans
                   i18nKey="common.highestBidder"
+                  values={{
+                    highestBidder: this.props.gameState._highestBidder.name
+                  }}
                   components={{
-                    element0: (
+                    bold: (
                       <b
                         style={{
                           color: this.props.gameState._highestBidder.color
                         }}
                       />
-                    ),
-                    value1: <>{this.props.gameState._highestBidder.name}</>
+                    )
                   }}
                 />
               </div>
@@ -170,15 +174,17 @@ export default class WildlingsAttackComponent extends Component<
               <div className="text-center mt-1">
                 <Trans
                   i18nKey="common.lowestBidder"
+                  values={{
+                    lowestBidder: this.props.gameState._lowestBidder.name
+                  }}
                   components={{
-                    element0: (
+                    bold: (
                       <b
                         style={{
                           color: this.props.gameState._lowestBidder.color
                         }}
                       />
-                    ),
-                    value1: <>{this.props.gameState._lowestBidder.name}</>
+                    )
                   }}
                 />
               </div>

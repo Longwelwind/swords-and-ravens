@@ -19,12 +19,15 @@ export default class SerDavosSeaworthASoSAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="serDavosSeaworthASoSAbility.serDavosSeaworthHouseMayDiscard2OfTheira17eaa"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.childGameState.house.name}</>,
-              element3: <b />,
-              element4: <b />
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />,
+              bold4: <b />
             }}
           />
         </Col>

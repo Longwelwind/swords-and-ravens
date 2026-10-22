@@ -28,8 +28,8 @@ export default class CancelledComponent extends Component<CancelledComponentProp
                 <Trans
                   i18nKey="cancelled.thisGameHasBeenCancelled821d2e"
                   components={{
-                    element0: <FontAwesomeIcon icon={faTimes} size="3x" />,
-                    element1: <br />
+                    details: <FontAwesomeIcon icon={faTimes} size="3x" />,
+                    lineBreak: <br />
                   }}
                 />
               </Card.Body>

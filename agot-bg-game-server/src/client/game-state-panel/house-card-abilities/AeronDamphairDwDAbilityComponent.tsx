@@ -27,10 +27,10 @@ export default class AeronDamphairAbilityComponent extends Component<
             <>
               <Trans
                 i18nKey="aeronDamphairDwDAbility.aeronDamphairHouseMayDiscardAnyNumberOfAvailableff5c60"
+                values={{ house: this.props.gameState.house.name }}
                 components={{
-                  element0: <b />,
-                  element1: <b />,
-                  value2: <>{this.props.gameState.house.name}</>
+                  bold: <b />,
+                  bold2: <b />
                 }}
               />
             </>
@@ -38,10 +38,10 @@ export default class AeronDamphairAbilityComponent extends Component<
             <>
               <Trans
                 i18nKey="aeronDamphairDwDAbility.aeronDamphairHouseMayDiscardOnePowerTokenFor20ec76"
+                values={{ house: this.props.gameState.house.name }}
                 components={{
-                  element0: <b />,
-                  element1: <b />,
-                  value2: <>{this.props.gameState.house.name}</>
+                  bold: <b />,
+                  bold2: <b />
                 }}
               />
             </>
@@ -88,7 +88,7 @@ export default class AeronDamphairAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="common.waitingFor"
-            components={{ houses: <>{this.props.gameState.house.name}</> }}
+            values={{ houses: this.props.gameState.house.name }}
           />
         </Col>
       </>

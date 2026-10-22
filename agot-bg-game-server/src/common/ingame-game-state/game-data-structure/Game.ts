@@ -20,7 +20,7 @@ import { land, port } from "./regionTypes";
 import PlanningRestriction from "./westeros-card/planning-restriction/PlanningRestriction";
 import WesterosCardType from "./westeros-card/WesterosCardType";
 import IngameGameState from "../IngameGameState";
-import {
+import orders, {
   vassalHousesOrders,
   playerHousesOrders,
   seaOrders,
@@ -224,7 +224,9 @@ export default class Game {
 
   getOrdersListForHouse(house: House): Order[] {
     if (this.ingame.isVassalHouse(house)) {
-      return vassalHousesOrders;
+      return this.ingame.entireGame.gameSettings.empoweredVassals
+        ? [orders.get(1), ...vassalHousesOrders]
+        : vassalHousesOrders;
     }
 
     if (this.ingame.entireGame.gameSettings.seaOrderTokens) {

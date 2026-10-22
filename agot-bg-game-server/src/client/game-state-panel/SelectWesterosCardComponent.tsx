@@ -59,7 +59,7 @@ export default class SelectWesterosCardComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{ houses: <>{this.props.gameState.house.name}</> }}
+                values={{ houses: this.props.gameState.house.name }}
               />
             </div>
           )}

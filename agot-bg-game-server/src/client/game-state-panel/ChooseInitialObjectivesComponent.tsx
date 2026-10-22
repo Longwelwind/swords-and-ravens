@@ -20,7 +20,7 @@ export default class ChooseInitialObjectivesComponent extends Component<
           <Trans
             i18nKey="chooseInitialObjectives.eachHouseChooses3OutOf5ObjectiveCards5332ec"
             components={{
-              value0: (
+              portNote: (
                 <>
                   {this.props.gameState.entireGame.gameSettings
                     .addPortToTheEyrie && (
@@ -28,10 +28,10 @@ export default class ChooseInitialObjectivesComponent extends Component<
                       <Trans
                         i18nKey="chooseInitialObjectives.noteDueToTheCustomPortInTheEyrie48f169"
                         components={{
-                          element0: <br />,
-                          element1: <b />,
-                          element2: <i />,
-                          element3: <small />
+                          lineBreak: <br />,
+                          bold: <b />,
+                          emphasis: <i />,
+                          small: <small />
                         }}
                       />
                     </>

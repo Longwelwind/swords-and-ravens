@@ -19,18 +19,14 @@ export default class SerIlynPayneASoSAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="serIlynPayneASoSAbility.serIlynPayneHouseMustLoseOneCasualty98ca8f"
+            values={{
+              enemyHouse: this.props.gameState.combatGameState.getEnemy(
+                this.props.gameState.house
+              ).name
+            }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: (
-                <>
-                  {
-                    this.props.gameState.combatGameState.getEnemy(
-                      this.props.gameState.house
-                    ).name
-                  }
-                </>
-              )
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </Col>

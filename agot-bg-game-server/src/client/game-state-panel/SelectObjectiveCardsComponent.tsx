@@ -86,12 +86,10 @@ export default class SelectObjectiveCardsComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="common.waitingFor"
-            components={{
-              houses: (
-                <>
-                  {this.gameState.notReadyHouses.map((h) => h.name).join(", ")}
-                </>
-              )
+            values={{
+              houses: this.gameState.notReadyHouses
+                .map((h) => h.name)
+                .join(", ")
             }}
           />
         </Col>

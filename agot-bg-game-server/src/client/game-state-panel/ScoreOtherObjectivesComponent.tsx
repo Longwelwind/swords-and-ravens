@@ -93,17 +93,17 @@ export default class ScoreOtherObjectivesComponent extends Component<
           <Trans
             i18nKey="scoreOtherObjectives.eachHouseMayChooseToScoreOneObjectiveCarda2d53d"
             components={{
-              value0: (
+              warning: (
                 <>
                   {this.raiseBackdoorPoliticsWarning && (
                     <>
                       <Trans
                         i18nKey="scoreOtherObjectives.warningYouHoldBackdoorPoliticsInYourObjectivesHand4f7a4e"
                         components={{
-                          element0: <br />,
-                          element1: <br />,
-                          element2: <b style={{ color: "red" }} />,
-                          element3: <b />
+                          lineBreak: <br />,
+                          lineBreak2: <br />,
+                          bold: <b style={{ color: "red" }} />,
+                          bold2: <b />
                         }}
                       />
                     </>
@@ -118,7 +118,7 @@ export default class ScoreOtherObjectivesComponent extends Component<
             <>
               <Trans
                 i18nKey="scoreOtherObjectives.noteYouCanTScoreAnyOfYourSecret7fd1d7"
-                components={{ element0: <b />, element1: <i /> }}
+                components={{ bold: <b />, emphasis: <i /> }}
               />
             </>
           </Col>

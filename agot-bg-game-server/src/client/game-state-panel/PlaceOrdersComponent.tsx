@@ -148,15 +148,11 @@ export default class PlaceOrdersComponent extends Component<
               <Col xs={12} className="text-center" style={{ marginTop: 10 }}>
                 <Trans
                   i18nKey="common.waitingFor"
-                  components={{
-                    houses: (
-                      <>
-                        {this.placeOrders
-                          .getNotReadyPlayers()
-                          .map((p) => p.house.name)
-                          .join(", ")}
-                      </>
-                    )
+                  values={{
+                    houses: this.placeOrders
+                      .getNotReadyPlayers()
+                      .map((p) => p.house.name)
+                      .join(", ")
                   }}
                 />
               </Col>

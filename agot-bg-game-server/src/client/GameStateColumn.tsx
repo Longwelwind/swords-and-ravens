@@ -216,7 +216,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               <>
                                 <Trans
                                   i18nKey="gameStateColumn.phasee16825"
-                                  components={{ value0: <>{phases[0].name}</> }}
+                                  values={{ phase: phases[0].name }}
                                 />
                               </>
                             </ConditionalWrap>
@@ -243,7 +243,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                               <>
                                 <Trans
                                   i18nKey="gameStateColumn.phasee16825"
-                                  components={{ value0: <>{phase.name}</> }}
+                                  values={{ phase: phase.name }}
                                 />
                               </>
                             </ConditionalWrap>
@@ -300,9 +300,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                         <h5>
                           <Trans
                             i18nKey="common.round"
-                            components={{
-                              value0: <>{this.game.turn}</>,
-                              value1: <>{this.game.maxTurns}</>
+                            values={{
+                              turn: this.game.turn,
+                              maxTurns: this.game.maxTurns
                             }}
                           />
                         </h5>
@@ -444,7 +444,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                     <b>
                       <Trans
                         i18nKey="gameStateColumn.deckdede0b"
-                        components={{ value0: <>{i + 1}</> }}
+                        values={{ deckNumber: i + 1 }}
                       />
                     </b>
                   </Col>
@@ -492,7 +492,7 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 <b>
                   <Trans
                     i18nKey="gameStateColumn.deckdede0b"
-                    components={{ value0: <>{i + 1}</> }}
+                    values={{ deckNumber: i + 1 }}
                   />
                 </b>
               </Col>
@@ -646,9 +646,9 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
             <p>
               <Trans
                 i18nKey="gameStateColumn.willIncreaseInRound7dd1c1"
+                values={{ rounds: joinNaturalLanguage(roundsWhenIncreased) }}
                 components={{
-                  element0: <br />,
-                  value1: <>{joinNaturalLanguage(roundsWhenIncreased)}</>
+                  lineBreak: <br />
                 }}
               />
             </p>

@@ -9,7 +9,7 @@ function banUser(user: User, entireGame: EntireGame): void {
   if (
     !window.confirm(
       t("getIngameUserLinkOrLabel.areYouSureYouWantToBanFrom23e4ed", {
-        value0: user.name
+        user: user.name
       })
     )
   ) {

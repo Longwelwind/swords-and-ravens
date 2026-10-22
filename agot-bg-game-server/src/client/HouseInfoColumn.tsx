@@ -104,7 +104,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                     >
                       <Trans
                         i18nKey="houseInfoColumn.theHousesInfoListIsAlwaysReorderedByScoreadbbe7"
-                        components={{ element0: <br />, element1: <br /> }}
+                        components={{ lineBreak: <br />, lineBreak2: <br /> }}
                       />
                     </Tooltip>
                   }
@@ -208,9 +208,9 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                       <Trans
                         i18nKey="houseInfoColumn.ironThroneTrackAllTiesExceptMilitaryOnesAre6b30b5"
                         components={{
-                          element0: <b />,
-                          element1: <br />,
-                          element2: <br />
+                          bold: <b />,
+                          lineBreak: <br />,
+                          lineBreak2: <br />
                         }}
                       />
                     </>
@@ -218,29 +218,21 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                     <>
                       <Trans
                         i18nKey="houseInfoColumn.fiefdomsTrackOncePerRoundTheHolderOfValyrianbce67a"
+                        values={{
+                          bladeStatus: this.game.valyrianSteelBladeUsed
+                            ? t(
+                                "houseInfoColumn.theValyrianSteelBladeHasBeenUsedThisRoundb9af41"
+                              )
+                            : t(
+                                "houseInfoColumn.theValyrianSteelBladeIsAvailablef2bb4f"
+                              )
+                        }}
                         components={{
-                          element0: <b />,
-                          element1: <br />,
-                          element2: <br />,
-                          element3: <br />,
-                          element4: <br />,
-                          value5: (
-                            <>
-                              {this.game.valyrianSteelBladeUsed ? (
-                                <>
-                                  {t(
-                                    "houseInfoColumn.theValyrianSteelBladeHasBeenUsedThisRoundb9af41"
-                                  )}
-                                </>
-                              ) : (
-                                <>
-                                  {t(
-                                    "houseInfoColumn.theValyrianSteelBladeIsAvailablef2bb4f"
-                                  )}
-                                </>
-                              )}
-                            </>
-                          )
+                          bold: <b />,
+                          lineBreak: <br />,
+                          lineBreak2: <br />,
+                          lineBreak3: <br />,
+                          lineBreak4: <br />
                         }}
                       />
                     </>
@@ -248,7 +240,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                     <>
                       <Trans
                         i18nKey="houseInfoColumn.kingsSCourtTrackAtTheEndOfThed57382"
-                        components={{ element0: <b />, element1: <br /> }}
+                        components={{ bold: <b />, lineBreak: <br /> }}
                       />
                     </>
                   )}
@@ -314,7 +306,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
       if (
         !window.confirm(
           t("houseInfoColumn.areYouSureYouWantToUnband3897e", {
-            value0: user.name
+            user: user.name
           })
         )
       ) {

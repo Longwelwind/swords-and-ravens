@@ -43,7 +43,7 @@ export default class PyromancerComponent extends Component<
       <Col xs={12} className="text-center">
         <Trans
           i18nKey="common.waitingFor"
-          components={{ houses: <>{this.house.name}</> }}
+          values={{ houses: this.house.name }}
         />
       </Col>
     );

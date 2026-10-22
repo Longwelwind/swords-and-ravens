@@ -23,12 +23,14 @@ export default class ArianneMartell1stAbilityComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="arianneMartell1stAbility.arianneMartellHouseMayKillAnArmyUnitOf6c291a"
+              values={{
+                house: this.props.gameState.house.name,
+                enemy: this.props.gameState.enemy.name
+              }}
               components={{
-                element0: <b />,
-                element1: <b />,
-                value2: <>{this.props.gameState.house.name}</>,
-                element3: <b />,
-                value4: <>{this.props.gameState.enemy.name}</>
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
               }}
             />
           </Col>
@@ -36,10 +38,10 @@ export default class ArianneMartell1stAbilityComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="arianneMartell1stAbility.arianneMartellHouseMustChooseAUnitToDestroyae97fd"
+              values={{ enemy: this.props.gameState.enemy.name }}
               components={{
-                element0: <b />,
-                element1: <b />,
-                value2: <>{this.props.gameState.enemy.name}</>
+                bold: <b />,
+                bold2: <b />
               }}
             />
           </Col>

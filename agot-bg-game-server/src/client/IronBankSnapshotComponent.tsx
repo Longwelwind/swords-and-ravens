@@ -80,7 +80,7 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
                   <Tooltip id="braavos-controller-tooltip">
                     <Trans
                       i18nKey="ironBankInfos.theControllerOfBraavosReceivesA1ToThe1dea8a"
-                      components={{ element0: <b />, element1: <b /> }}
+                      components={{ bold: <b />, bold2: <b /> }}
                     />
                   </Tooltip>
                 }
@@ -113,11 +113,11 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
                       <Trans
                         i18nKey="ironBankInfos.atTheBeginningOfTheWesterosPhaseAnyPlayer34f1e3"
                         components={{
-                          element0: <br />,
-                          element1: <br />,
-                          element2: <br />,
-                          element3: <br />,
-                          element4: <br />
+                          lineBreak: <br />,
+                          lineBreak2: <br />,
+                          lineBreak3: <br />,
+                          lineBreak4: <br />,
+                          lineBreak5: <br />
                         }}
                       />
                     </Col>

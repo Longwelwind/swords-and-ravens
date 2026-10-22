@@ -23,9 +23,12 @@ export default class ChooseMultipleRegionsForLoyaltyTokenComponent extends Compo
           <Col className="text-center">
             <Trans
               i18nKey="chooseMultipleRegionsForLoyaltyToken.houseMustChooseRegionsToPlaceLoyaltyTokens51dd05"
+              values={{
+                childGameStateHouse:
+                  this.props.gameState.childGameState.house.name
+              }}
               components={{
-                element0: <b />,
-                value1: <>{this.props.gameState.childGameState.house.name}</>
+                bold: <b />
               }}
             />
           </Col>

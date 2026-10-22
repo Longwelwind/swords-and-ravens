@@ -111,7 +111,7 @@ export default class App extends Component<AppProps> {
                   <h4>
                     <Trans
                       i18nKey="app.theConnectionToTheServerIsLostPleaseReload24b81d"
-                      components={{ element0: <br /> }}
+                      components={{ lineBreak: <br /> }}
                     />
                   </h4>
                   <button

@@ -1,6 +1,6 @@
 import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
-import { Component, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import PlayingWithFireGameState from "../../../common/ingame-game-state/westeros-game-state/westeros-deck-4-game-state/playing-with-fire-game-state/PlayingWithFireGameState";
@@ -31,9 +31,12 @@ export default class PlayingWithFireComponent extends Component<
           <Col className="text-center">
             <Trans
               i18nKey="common.houseMustChooseAnAreaToPlaceALoyalty"
+              values={{
+                childGameStateHouse:
+                  this.props.gameState.childGameState.house.name
+              }}
               components={{
-                element0: <b />,
-                value1: <>{this.props.gameState.childGameState.house.name}</>
+                bold: <b />
               }}
             />
           </Col>

@@ -46,12 +46,12 @@ export default class RobertArrynAbilityComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="robertArrynAbility.robertArrynHouseMayRemoveRobertArrynAndFrom7f91f9"
+              values={{ house: this.house.name }}
               components={{
-                element0: <b />,
-                element1: <b />,
-                value2: <>{this.house.name}</>,
-                element3: <b />,
-                value4: (
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                houseCards: (
                   <>
                     {joinReactNodes(
                       possibleHouseCardToRemove.map((hc) => (
@@ -69,10 +69,10 @@ export default class RobertArrynAbilityComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="robertArrynAbility.robertArrynHouseHasToDecideWhichHouseCard2f8b3b"
+              values={{ house: this.house.name }}
               components={{
-                element0: <b />,
-                element1: <b />,
-                value2: <>{this.house.name}</>
+                bold: <b />,
+                bold2: <b />
               }}
             />
           </Col>

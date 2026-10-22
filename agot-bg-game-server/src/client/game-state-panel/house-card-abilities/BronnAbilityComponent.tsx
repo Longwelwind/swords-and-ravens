@@ -19,11 +19,11 @@ export default class BronnAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="bronnAbility.bronnHouseMayDiscard2OfTheirAvailablePowerfd7257"
+            values={{ enemy: this.props.gameState.enemy.name }}
             components={{
-              element0: <b />,
-              element1: <b />,
-              value2: <>{this.props.gameState.enemy.name}</>,
-              element3: <b />
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
             }}
           />
         </Col>

@@ -20,21 +20,18 @@ export default class MaceTyrellAbilityComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="maceTyrellAbility.houseImmediatelyKillsAFootmanOfHouse87e808"
+            values={{
+              houseCardName: houseCardName,
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemyHouse: this.props.gameState.combatGameState.getEnemy(
+                this.props.gameState.childGameState.house
+              ).name
+            }}
             components={{
-              element0: <b />,
-              value1: <>{houseCardName}</>,
-              element2: <b />,
-              value3: <>{this.props.gameState.childGameState.house.name}</>,
-              element4: <b />,
-              value5: (
-                <>
-                  {
-                    this.props.gameState.combatGameState.getEnemy(
-                      this.props.gameState.childGameState.house
-                    ).name
-                  }
-                </>
-              )
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
             }}
           />
         </Col>

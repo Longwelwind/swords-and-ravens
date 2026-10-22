@@ -91,15 +91,11 @@ export default class DraftMapComponent extends Component<
           <Col xs={12} className="text-center">
             <Trans
               i18nKey="common.waitingFor"
-              components={{
-                houses: (
-                  <>
-                    {this.props.gameState
-                      .getNotReadyPlayers()
-                      .map((p) => p.house.name)
-                      .join(", ")}
-                  </>
-                )
+              values={{
+                houses: this.props.gameState
+                  .getNotReadyPlayers()
+                  .map((p) => p.house.name)
+                  .join(", ")
               }}
             />
           </Col>

@@ -47,16 +47,11 @@ export default class SimpleChoiceComponent extends Component<
             <>
               <Trans
                 i18nKey="common.waitingFor"
-                components={{
-                  houses: (
-                    <>
-                      {
-                        this.props.gameState.parentGameState.ingame.getControllerOfHouse(
-                          this.props.gameState.house
-                        ).house.name
-                      }
-                    </>
-                  )
+                values={{
+                  houses:
+                    this.props.gameState.parentGameState.ingame.getControllerOfHouse(
+                      this.props.gameState.house
+                    ).house.name
                 }}
               />
             </>

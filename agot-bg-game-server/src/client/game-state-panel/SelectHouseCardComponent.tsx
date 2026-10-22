@@ -96,7 +96,7 @@ export default class SelectHouseCardComponent extends Component<
             <Row className="justify-content-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{ houses: <>{this.props.gameState.house.name}</> }}
+                values={{ houses: this.props.gameState.house.name }}
               />
             </Row>
           </Col>

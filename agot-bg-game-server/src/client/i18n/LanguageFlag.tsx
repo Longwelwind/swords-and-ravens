@@ -77,6 +77,84 @@ const flags: Record<Language, React.ReactNode> = {
         <path d="m20 17 .5 1.4H22l-1.2.9.5 1.4-1.3-.8-1.2.8.5-1.4-1.2-.9h1.5z" />
       </g>
     </>
+  ),
+  nl: (
+    <>
+      <path fill="#ae1c28" d="M0 0h60v13.33H0z" />
+      <path fill="#fff" d="M0 13.33h60v13.34H0z" />
+      <path fill="#21468b" d="M0 26.67h60V40H0z" />
+    </>
+  ),
+  pl: (
+    <>
+      <path fill="#fff" d="M0 0h60v20H0z" />
+      <path fill="#dc143c" d="M0 20h60v20H0z" />
+    </>
+  ),
+  cs: (
+    <>
+      <path fill="#fff" d="M0 0h60v20H0z" />
+      <path fill="#d7141a" d="M0 20h60v20H0z" />
+      <path fill="#11457e" d="M0 0 30 20 0 40z" />
+    </>
+  ),
+  ja: (
+    <>
+      <path fill="#fff" d="M0 0h60v40H0z" />
+      <circle cx="30" cy="20" r="9" fill="#bc002d" />
+    </>
+  ),
+  tr: (
+    <>
+      <path fill="#e30a17" d="M0 0h60v40H0z" />
+      <circle cx="26" cy="20" r="11" fill="#fff" />
+      <circle cx="29" cy="20" r="9" fill="#e30a17" />
+      <path
+        fill="#fff"
+        d="m40 12 2.2 5.4 5.8.4-4.5 3.6 1.5 5.6-5-3.1-4.9 3.1 1.5-5.6-4.5-3.6 5.8-.4z"
+      />
+    </>
+  ),
+  uk: (
+    <>
+      <path fill="#0057b7" d="M0 0h60v20H0z" />
+      <path fill="#ffd700" d="M0 20h60v20H0z" />
+    </>
+  ),
+  sv: (
+    <>
+      <path fill="#006aa7" d="M0 0h60v40H0z" />
+      <path fill="#fecc00" d="M18 0h6v40h-6zM0 17h60v6H0z" />
+    </>
+  ),
+  no: (
+    <>
+      <path fill="#ba0c2f" d="M0 0h60v40H0z" />
+      <path fill="#fff" d="M15 0h12v40H15zM0 14h60v12H0z" />
+      <path fill="#00205b" d="M18 0h6v40h-6zM0 17h60v6H0z" />
+    </>
+  ),
+  hu: (
+    <>
+      <path fill="#ce2939" d="M0 0h60v13.33H0z" />
+      <path fill="#fff" d="M0 13.33h60v13.34H0z" />
+      <path fill="#477050" d="M0 26.67h60V40H0z" />
+    </>
+  ),
+  ko: (
+    <>
+      <path fill="#fff" d="M0 0h60v40H0z" />
+      <path fill="#cd2e3a" d="M21 20a9 9 0 0 1 18 0v4H21z" />
+      <path fill="#0047a0" d="M21 20a9 9 0 0 0 18 0H21z" />
+      <circle cx="25.5" cy="20" r="4.5" fill="#cd2e3a" />
+      <circle cx="34.5" cy="20" r="4.5" fill="#0047a0" />
+      <g stroke="#000" strokeWidth="2">
+        <path d="m8 11 6-6m-4 8 6-6m-4 8 6-6" />
+        <path d="m42 31 2-2m2-2 2-2m-4 8 2-2m2-2 2-2m-4 8 2-2m2-2 2-2" />
+        <path d="m42 5 6 6m-8-4 2 2m2 2 2 2m-8-4 6 6" />
+        <path d="m8 29 2 2m2 2 2 2m-4-8 6 6m-4-8 2 2m2 2 2 2" />
+      </g>
+    </>
   )
 };
 

@@ -21,14 +21,16 @@ export default class ClaimVassalComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="claimVassal.mayCommandVassalThisTurnea8432"
+            values={{
+              house: this.props.gameState.house.name,
+              vassalCount: this.props.gameState.count,
+              houseLabel: t("common.house", {
+                count: this.props.gameState.count
+              })
+            }}
             components={{
-              element0: <b />,
-              value1: <>{this.props.gameState.house.name}</>,
-              element2: <b />,
-              value3: <>{this.props.gameState.count}</>,
-              value4: (
-                <>{t("common.house", { count: this.props.gameState.count })}</>
-              )
+              bold: <b />,
+              bold2: <b />
             }}
           />
         </Col>
@@ -78,7 +80,7 @@ export default class ClaimVassalComponent extends Component<
             <Col xs={12} className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{ houses: <>{this.props.gameState.house.name}</> }}
+                values={{ houses: this.props.gameState.house.name }}
               />
             </Col>
           )}

@@ -42,33 +42,30 @@ export default class SelectOrdersComponent extends Component<
                   <p className="text-center">
                     <Trans
                       i18nKey="selectOrders.selectedOrder13dece"
+                      values={{
+                        token: t("common.token", {
+                          count: this.selectedRegions.length
+                        })
+                      }}
                       components={{
-                        value0: (
-                          <>
-                            {t("common.token", {
-                              count: this.selectedRegions.length
-                            })}
-                          </>
-                        ),
-                        element1: <br />,
-                        value2: (
+                        lineBreak: <br />,
+                        orders: (
                           <>
                             {joinReactNodes(
                               this.selectedRegions.map((r) => (
                                 <span key={`select-order_${r.id}`}>
                                   <Trans
                                     i18nKey="common.in89ff9d"
+                                    values={{
+                                      order:
+                                        translateGameText(
+                                          this.getOrderInRegion(r)?.type.name
+                                        ) ?? t("common.unknown"),
+                                      region: r.name
+                                    }}
                                     components={{
-                                      element0: <b />,
-                                      value1: (
-                                        <>
-                                          {translateGameText(
-                                            this.getOrderInRegion(r)?.type.name
-                                          ) ?? t("common.unknown")}
-                                        </>
-                                      ),
-                                      element2: <b />,
-                                      value3: <>{r.name}</>
+                                      bold: <b />,
+                                      bold2: <b />
                                     }}
                                   />
                                 </span>
@@ -111,7 +108,7 @@ export default class SelectOrdersComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="common.waitingFor"
-                components={{ houses: <>{this.props.gameState.house.name}</> }}
+                values={{ houses: this.props.gameState.house.name }}
               />
             </div>
           )}

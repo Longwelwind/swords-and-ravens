@@ -22,7 +22,7 @@ export default class DeclareSupportComponent extends Component<
         <Col xs={12} className="text-center">
           <Trans
             i18nKey="declareSupport.maySupportOneBelligerentOfTheFight0f1430"
-            components={{ value0: <>{this.props.gameState.house.name}</> }}
+            values={{ house: this.props.gameState.house.name }}
           />
         </Col>
         <Col xs={12}>
@@ -78,16 +78,11 @@ export default class DeclareSupportComponent extends Component<
             <div className="text-center">
               <Trans
                 i18nKey="declareSupport.waitingForToDeclareItsSupport0029a4"
-                components={{
-                  value0: (
-                    <>
-                      {
-                        this.props.gameState.ingameGameState.getControllerOfHouse(
-                          this.props.gameState.house
-                        ).house.name
-                      }
-                    </>
-                  )
+                values={{
+                  house:
+                    this.props.gameState.ingameGameState.getControllerOfHouse(
+                      this.props.gameState.house
+                    ).house.name
                 }}
               />
             </div>
