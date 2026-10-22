@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Valyrian Steel Blade 持有者为每枚未偿付的利息权力标记消灭一支部队。"
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "您可以为每个附庸放置至多两个命令标记。确定要在未放满的情况下继续吗？",
+    "confirmFewerOrders": "您可以为每个附庸放置至多{{maxOrders}}个命令标记。确定要在未放满的情况下继续吗？",
     "house275ad0": " <value0/> 家族",
     "houseMustNowPlaceOrdersForb23e23": "<element0><value1/></element0> 家族现在必须为<value2/>放置命令。"
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "随机分配家族。",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "如果玩家只剩一支非龙陆地部队，且不再拥有城堡，该部队将变成一条龙。",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "除 Targaryen 外，所有家族将起始骑士替换为一条龙。<element0><element1>（灵感来自 LordWazza）</element1></element0>",
+    "empoweredVassals": "强化附庸",
+    "empoweredVassalsDescription": "附庸可以放置至多3个命令标记，而非2个，并在行军+0之外额外获得一个行军-1命令标记。",
     "randomVassalAssignment766874": "随机分配附庸",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "附庸随机分配给玩家家族。",
     "modGiftingPowerTokens1d8f63": "MoD 赠送权力标记",

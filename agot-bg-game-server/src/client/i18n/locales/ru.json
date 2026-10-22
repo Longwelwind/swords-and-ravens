@@ -474,7 +474,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Владелец Valyrian Steel Blade уничтожает по одному отряду за каждый неуплаченный жетон власти в счёт процентов."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Каждому вассалу можно разместить до двух приказов. Вы уверены, что хотите продолжить с меньшим числом?",
+    "confirmFewerOrders": "Максимальное число приказов для каждого вассала — {{maxOrders}}. Вы уверены, что хотите продолжить с меньшим числом?",
     "house275ad0": " дом <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "Дом <element0><value1/></element0> должен разместить приказы для<value2/>."
   },
@@ -983,6 +983,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Дома распределяются случайным образом.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Если у игрока остался лишь один сухопутный отряд, не являющийся драконом, и нет замков, этот отряд превращается в дракона.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Все дома, кроме Targaryen, заменяют начального рыцаря драконом. <element0><element1>(По идее LordWazza)</element1></element0>",
+    "empoweredVassals": "Усиленные вассалы",
+    "empoweredVassalsDescription": "Вассалы могут размещать до 3 приказов вместо 2 и получают дополнительный жетон Похода -1 в дополнение к своему Походу +0.",
     "randomVassalAssignment766874": "Случайное распределение вассалов",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Вассалы случайно распределяются между домами игроков.",
     "modGiftingPowerTokens1d8f63": "MoD: передача жетонов власти",

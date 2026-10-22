@@ -474,7 +474,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Držitel Valyrijského ocelového meče zničí jednu jednotku za každý nezaplacený mocenský žeton úroku."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Pro každého vazala můžete umístit až dva žetony rozkazů. Opravdu chcete pokračovat s menším počtem?",
+    "confirmFewerOrders": "Pro každého vazala můžete umístit až {{maxOrders}} žetony rozkazů. Opravdu chcete pokračovat s menším počtem?",
     "house275ad0": " rod <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "Rod <element0><value1/></element0> nyní musí umístit rozkazy pro<value2/>."
   },
@@ -983,6 +983,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Přiřazení rodů se vytvoří náhodně.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Pokud hráči zůstane pouze jedna pozemní jednotka, která není drakem, a žádné hrady, promění se tato jednotka v draka.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Všechny rody kromě Targaryenů nahradí svého počátečního rytíře drakem. <element0><element1>(Inspirováno hráčem LordWazza)</element1></element0>",
+    "empoweredVassals": "Posílení vazalové",
+    "empoweredVassalsDescription": "Vazalové mohou umístit až 3 žetony rozkazů místo 2 a kromě svého Pochodu +0 získají další žeton Pochodu -1.",
     "randomVassalAssignment766874": "Náhodné přiřazení vazalů",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Vazalové se náhodně přiřadí k hráčským rodům.",
     "modGiftingPowerTokens1d8f63": "MoD: Darování mocenských žetonů",

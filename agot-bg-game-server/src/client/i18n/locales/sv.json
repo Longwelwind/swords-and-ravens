@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Den innehaver på valyriskt stålssvärd destroys en enhet för varje unpaid ränta makt markör."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "You kan placera up till två orderbrickor per vasall. Er you sure you want till continue med fewer?",
+    "confirmFewerOrders": "Du får placera upp till {{maxOrders}} orderbrickor per vasall. Är du säker på att du vill fortsätta med färre?",
     "house275ad0": " hus <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "hus <element0><value1/></element0> må nu placera order för<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Hustilldelningarna skapas slumpmässigt.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Om en spelare bara har en landbaserad enhet kvar som inte är en drake och inte har några borgar kvar, förvandlas enheten till en drake.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Alla hus utom Targaryen ersätter sin startriddare med en drake. <element0><element1>(Inspirerat av LordWazza)</element1></element0>",
+    "empoweredVassals": "Stärkta vasaller",
+    "empoweredVassalsDescription": "Vasaller får placera upp till 3 orderbrickor i stället för 2 och får en extra Marsch -1-orderbricka utöver sin Marsch +0.",
     "randomVassalAssignment766874": "Slumpmässig vasalltilldelning",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Vasaller tilldelas spelarhusen slumpmässigt.",
     "modGiftingPowerTokens1d8f63": "MoD: ge bort maktmarkörer",

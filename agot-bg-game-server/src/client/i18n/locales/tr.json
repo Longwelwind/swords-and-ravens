@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Valyria Çeliği Kılıcı'nın sahibi, ödenmemiş her faiz güç jetonu için bir birim yok eder."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Vasal başına en fazla iki emir jetonu yerleştirebilirsin. Daha azıyla devam etmek istediğine emin misin?",
+    "confirmFewerOrders": "Vasal başına en fazla {{maxOrders}} emir jetonu yerleştirebilirsin. Daha azıyla devam etmek istediğine emin misin?",
     "house275ad0": " <value0/> Hanesi",
     "houseMustNowPlaceOrdersForb23e23": "<element0><value1/></element0> Hanesi şimdi<value2/> için emir yerleştirmelidir."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Hane atamaları rastgele oluşturulur.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Bir oyuncunun yalnızca bir ejderha olmayan kara birimi kaldıysa ve hiç şatosu yoksa, bu birim ejderhaya dönüşür.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Targaryen dışındaki tüm haneler başlangıç şövalyesini bir ejderhayla değiştirir. <element0><element1>(LordWazza'dan esinlenilmiştir)</element1></element0>",
+    "empoweredVassals": "Güçlendirilmiş Vasallar",
+    "empoweredVassalsDescription": "Vasallar 2 yerine en fazla 3 emir jetonu yerleştirebilir ve Yürüyüş +0 jetonlarına ek olarak bir Yürüyüş -1 emir jetonu alır.",
     "randomVassalAssignment766874": "Rastgele vasal ataması",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Vasallar oyuncu hanelerine rastgele atanır.",
     "modGiftingPowerTokens1d8f63": "MoD güç jetonu hediye etme",

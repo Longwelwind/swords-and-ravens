@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Der Besitzer der Valyrischen Stahlklinge vernichtet für jeden nicht gezahlten Machtmarker an Zinsen eine Einheit."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Du darfst bis zu zwei Befehlsmarker pro Vasall platzieren. Möchtest du wirklich mit weniger fortfahren?",
+    "confirmFewerOrders": "Du darfst bis zu {{maxOrders}} Befehlsmarker pro Vasall platzieren. Möchtest du wirklich mit weniger fortfahren?",
     "house275ad0": " Haus <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "Haus <element0><value1/></element0> muss jetzt Befehle für<value2/> platzieren."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Die Häuser werden zufällig zugewiesen.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Hat ein Spieler nur noch eine Landeinheit, die kein Drache ist, und keine Burgen mehr, verwandelt sich diese Einheit in einen Drachen.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Alle Häuser außer Targaryen ersetzen ihren anfänglichen Ritter durch einen Drachen. <element0><element1>(Inspiriert von LordWazza)</element1></element0>",
+    "empoweredVassals": "Stärkere Vasallen",
+    "empoweredVassalsDescription": "Vasallen dürfen bis zu 3 statt 2 Befehlsmarker platzieren und erhalten zusätzlich zu ihrem Marsch-Befehl einen Marsch-Befehl -1.",
     "randomVassalAssignment766874": "Zufällige Vasallenzuweisung",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Vasallen werden den Spielerhäusern zufällig zugeteilt.",
     "modGiftingPowerTokens1d8f63": "MoD: Machtmarker verschenken",

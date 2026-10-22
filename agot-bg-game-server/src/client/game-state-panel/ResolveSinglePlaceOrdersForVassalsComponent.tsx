@@ -311,9 +311,9 @@ export default class ResolveSinglePlaceOrdersForVassalsComponent extends Compone
     if (readyState.reason == "not-all-regions-filled") {
       if (
         !window.confirm(
-          t(
-            "resolveSinglePlaceOrdersForVassals.youMayPlaceUpToTwoOrderTokensPer0f8f73"
-          )
+          t("resolveSinglePlaceOrdersForVassals.confirmFewerOrders", {
+            maxOrders: this.singlePlaceOrders.placeOrdersGameState.maxOrders
+          })
         )
       ) {
         return;

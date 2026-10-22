@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "De houder van het Valyrisch stalen zwaard vernietigt één eenheid voor elke onbetaalde Machtfiche aan rente."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Je mag maximaal twee orderfiches per vazal plaatsen. Weet je zeker dat je met minder wilt doorgaan?",
+    "confirmFewerOrders": "Je mag maximaal {{maxOrders}} orderfiches per vazal plaatsen. Weet je zeker dat je met minder wilt doorgaan?",
     "house275ad0": " Huis <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "Huis <element0><value1/></element0> moet nu orders plaatsen voor<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "De huistoewijzingen worden willekeurig bepaald.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Als een speler nog maar één landeenheid heeft die geen Draak is en geen kastelen meer bezit, verandert die eenheid in een Draak.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Alle huizen behalve Targaryen vervangen hun startende Ridder door een Draak. <element0><element1>(Geïnspireerd door LordWazza)</element1></element0>",
+    "empoweredVassals": "Versterkte vazallen",
+    "empoweredVassalsDescription": "Vazallen mogen maximaal 3 orderfiches plaatsen in plaats van 2 en krijgen naast hun Mars +0 een extra Mars -1-orderfiche.",
     "randomVassalAssignment766874": "Willekeurige toewijzing van vazallen",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Vazallen worden willekeurig aan de huizen van spelers toegewezen.",
     "modGiftingPowerTokens1d8f63": "Machtfiches schenken (MoD)",

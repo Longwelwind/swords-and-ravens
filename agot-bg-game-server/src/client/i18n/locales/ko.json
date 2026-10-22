@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": " 보유자   발리리아 강철 검 파괴함 하나 유닛 위해 각 미지불 이자 권력 토큰."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "당신 가능 배치 위  둘 명령 토큰 당 봉신.  당신 확실 당신 원하다  계속 함께 더 적은?",
+    "confirmFewerOrders": "봉신마다 명령 토큰을 최대 {{maxOrders}}개 배치할 수 있습니다. 더 적은 수로 계속하시겠습니까?",
     "house275ad0": " 가문 <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "가문 <element0><value1/></element0> 반드시 지금 배치 명령 위해<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "가문 배정  생성됨 무작위로.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "만약  플레이어  만 하나 남은 비-드래곤 육지 유닛 및 없음 더 성, 그것  턴 안으로  드래곤.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "모든 가문 제외 Targaryen  교체 그들의 시작 기사 함께  드래곤. <element0><element1>(영감을 받음 으로 LordWazza)</element1></element0>",
+    "empoweredVassals": "강화된 봉신",
+    "empoweredVassalsDescription": "봉신은 명령 토큰을 2개 대신 최대 3개 배치할 수 있으며, 행군 +0 외에 행군 -1 명령 토큰을 하나 더 받습니다.",
     "randomVassalAssignment766874": "무작위 봉신 배정",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "봉신  무작위로 배정됨   플레이어 가문.",
     "modGiftingPowerTokens1d8f63": "MoD 선물하기 권력 토큰",

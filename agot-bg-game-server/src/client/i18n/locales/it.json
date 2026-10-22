@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Il possessore della Spada di acciaio di Valyria distrugge un'unità per ogni segnalino potere di interessi non pagati."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Puoi collocare fino a due segnalini ordine per vassallo. Vuoi davvero continuare con meno ordini?",
+    "confirmFewerOrders": "Puoi collocare fino a {{maxOrders}} segnalini ordine per vassallo. Vuoi davvero continuare con meno ordini?",
     "house275ad0": " Casa <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "La Casa <element0><value1/></element0> deve collocare ordini per<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Le Case vengono assegnate casualmente.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Se a un giocatore rimane una sola unità terrestre non drago e nessun castello, l'unità si trasforma in un drago.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Tutte le Case tranne Targaryen sostituiscono il cavaliere iniziale con un drago. <element0><element1>(Ispirato da LordWazza)</element1></element0>",
+    "empoweredVassals": "Vassalli potenziati",
+    "empoweredVassalsDescription": "I vassalli possono collocare fino a 3 segnalini ordine invece di 2 e ricevono un segnalino Marcia -1 aggiuntivo oltre alla loro Marcia +0.",
     "randomVassalAssignment766874": "Assegnazione casuale dei vassalli",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "I vassalli vengono assegnati casualmente alle Case dei giocatori.",
     "modGiftingPowerTokens1d8f63": "MoD: doni di segnalini potere",

@@ -15,8 +15,6 @@ import ResolveSinglePlaceOrdersForVassalsGameState, {
   SerializedSinglePlaceOrdersForVassalsGameState
 } from "./resolve-single-place-orders-for-vassals-game-state/ResolveSinglePlaceOrdersForVassalsGameState";
 
-const MAX_VASSAL_ORDERS = 2;
-
 export default class PlaceOrdersForVassalsGameState extends GameState<
   PlanningGameState,
   ResolveSinglePlaceOrdersForVassalsGameState
@@ -38,6 +36,10 @@ export default class PlaceOrdersForVassalsGameState extends GameState<
 
   get placedOrders(): BetterMap<Region, Order | null> {
     return this.planningGameState.placedOrders;
+  }
+
+  get maxOrders(): number {
+    return this.entireGame.gameSettings.empoweredVassals ? 3 : 2;
   }
 
   firstStart(): void {
@@ -120,43 +122,45 @@ export default class PlaceOrdersForVassalsGameState extends GameState<
 
     // Iterate over all the houses the player should put orders for to find
     // an error in one of the houses.
-    const possibleError = this.getHousesToPutOrdersForPlayer(player).reduce(
-      (state, house) => {
-        const orderList = this.getOrdersList(house);
-        if (
-          this.getPlacedOrdersOfHouse(house).some(
-            ([_r, o]) => !orderList.includes(o)
-          )
-        ) {
-          return { status: false, reason: "invalid-orders-placed" };
-        }
+    const possibleError = this.getHousesToPutOrdersForPlayer(player).reduce<{
+      status: boolean;
+      reason: string;
+    } | null>((state, house) => {
+      if (state && !state.status) {
+        return state;
+      }
 
-        const possibleRegions = this.getPossibleRegionsForOrders(house);
+      const orderList = this.getOrdersList(house);
+      if (
+        this.getPlacedOrdersOfHouse(house).some(
+          ([_r, o]) => !orderList.includes(o)
+        )
+      ) {
+        return { status: false, reason: "invalid-orders-placed" };
+      }
 
-        const regionsWithOrders = possibleRegions.filter((r) =>
-          this.placedOrders.has(r)
-        );
+      const possibleRegions = this.getPossibleRegionsForOrders(house);
 
-        if (possibleRegions.length > MAX_VASSAL_ORDERS) {
-          if (regionsWithOrders.length == MAX_VASSAL_ORDERS) {
-            return state;
-          } else if (regionsWithOrders.length > MAX_VASSAL_ORDERS) {
-            return { status: false, reason: "too-much-orders-placed" };
-          }
-        }
+      const regionsWithOrders = possibleRegions.filter((r) =>
+        this.placedOrders.has(r)
+      );
 
-        if (possibleRegions.every((r) => this.placedOrders.has(r))) {
+      if (possibleRegions.length > this.maxOrders) {
+        if (regionsWithOrders.length == this.maxOrders) {
           return state;
-        } else {
-          return { status: true, reason: "not-all-regions-filled" };
+        } else if (regionsWithOrders.length > this.maxOrders) {
+          return { status: false, reason: "too-much-orders-placed" };
         }
-      },
-      null
-    );
+      }
 
-    return possibleError
-      ? (possibleError as { status: boolean; reason: string })
-      : { status: true, reason: "" };
+      if (possibleRegions.every((r) => this.placedOrders.has(r))) {
+        return state;
+      } else {
+        return { status: true, reason: "not-all-regions-filled" };
+      }
+    }, null);
+
+    return possibleError ?? { status: true, reason: "" };
   }
 
   onPlayerMessage(player: Player, message: ClientMessage): void {
@@ -210,7 +214,7 @@ export default class PlaceOrdersForVassalsGameState extends GameState<
       this.placedOrders.has(r)
     );
 
-    if (regionsWithOrders.length == MAX_VASSAL_ORDERS) {
+    if (regionsWithOrders.length >= this.maxOrders) {
       return regionsWithOrders;
     }
 

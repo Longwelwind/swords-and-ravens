@@ -23,6 +23,7 @@ export class GameSettings {
   vassals = true;
   seaOrderTokens = true;
   allowGiftingPowerTokens = true;
+  empoweredVassals = false;
   ironBank = true;
   tidesOfBattle = false;
   draftHouseCards = false;
@@ -77,6 +78,7 @@ export class GameSettings {
     settings.vassals = data.vassals ?? false;
     settings.seaOrderTokens = data.seaOrderTokens ?? false;
     settings.allowGiftingPowerTokens = data.allowGiftingPowerTokens ?? false;
+    settings.empoweredVassals = data.empoweredVassals ?? false;
     settings.ironBank = data.ironBank ?? false;
     settings.tidesOfBattle = data.tidesOfBattle ?? false;
     settings.draftHouseCards = data.draftHouseCards ?? false;
@@ -141,6 +143,7 @@ export class GameSettings {
       vassals: this.vassals || undefined,
       seaOrderTokens: this.seaOrderTokens || undefined,
       allowGiftingPowerTokens: this.allowGiftingPowerTokens || undefined,
+      empoweredVassals: this.empoweredVassals || undefined,
       ironBank: this.ironBank || undefined,
       tidesOfBattle: this.tidesOfBattle || undefined,
       draftHouseCards: this.draftHouseCards || undefined,
@@ -208,6 +211,7 @@ export class SerializedGameSettings {
   vassals?: boolean;
   seaOrderTokens?: boolean;
   allowGiftingPowerTokens?: boolean;
+  empoweredVassals?: boolean;
   ironBank?: boolean;
   tidesOfBattle?: boolean;
   draftHouseCards?: boolean;

@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "The holder of the Valyrian Steel Blade destroys one unit for each unpaid interest Power token."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "You may place up to two order tokens per vassal. Are you sure you want to continue with fewer?",
+    "confirmFewerOrders": "You may place up to {{maxOrders}} order tokens per vassal. Are you sure you want to continue with fewer?",
     "house275ad0": " House <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "House <element0><value1/></element0> must now place orders for<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "House assignments are created randomly.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "If a player has only one remaining non-dragon land unit and no more castles, it will turn into a dragon.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "All houses except Targaryen will replace their starting knight with a dragon. <element0><element1>(Inspired by LordWazza)</element1></element0>",
+    "empoweredVassals": "Empowered Vassals",
+    "empoweredVassalsDescription": "Vassals may place up to 3 order tokens instead of 2 and gain an additional March -1 order token alongside their regular March order token.",
     "randomVassalAssignment766874": "Random vassal assignment",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Vassals are randomly assigned to the player houses.",
     "modGiftingPowerTokens1d8f63": "MoD Gifting Power Tokens",

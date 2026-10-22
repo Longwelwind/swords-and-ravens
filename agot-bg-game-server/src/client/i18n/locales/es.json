@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "El poseedor de la Espada de acero valyrio destruye una unidad por cada ficha de poder de intereses impagados."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Puedes colocar hasta dos fichas de orden por vasallo. ¿Seguro que quieres continuar con menos?",
+    "confirmFewerOrders": "Puedes colocar hasta {{maxOrders}} fichas de orden por vasallo. ¿Seguro que quieres continuar con menos?",
     "house275ad0": " Casa <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "La Casa <element0><value1/></element0> debe colocar órdenes para<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Las Casas se asignan al azar.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Si a un jugador solo le queda una unidad terrestre que no sea un dragón y ningún castillo, esa unidad se transforma en dragón.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Todas las Casas salvo Targaryen sustituyen su caballero inicial por un dragón. <element0><element1>(Inspirado por LordWazza)</element1></element0>",
+    "empoweredVassals": "Vasallos fortalecidos",
+    "empoweredVassalsDescription": "Los vasallos pueden colocar hasta 3 fichas de orden en lugar de 2 y reciben una ficha de Marcha -1 adicional junto a su Marcha +0.",
     "randomVassalAssignment766874": "Asignación aleatoria de vasallos",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Los vasallos se asignan al azar a las Casas de los jugadores.",
     "modGiftingPowerTokens1d8f63": "MoD: regalar fichas de poder",

@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "ヴァリリア鋼の剣の所持者は、未払いの利息の権力トークン1個につきユニット1体を破壊します。"
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "属家ごとに命令トークンを最大2枚配置できます。少ないまま続けますか？",
+    "confirmFewerOrders": "属家ごとに命令トークンを最大{{maxOrders}}枚配置できます。少ないまま続けますか？",
     "house275ad0": "<value0/>家",
     "houseMustNowPlaceOrdersForb23e23": "<element0><value1/></element0>家は<value2/>の命令を配置してください。"
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "家はランダムに割り当てられます。",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "ドラゴン以外の陸上ユニットが1体だけ残り、城もない場合、そのユニットはドラゴンになります。",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Targaryen家以外のすべての家は、開始時の騎士をドラゴンと置き換えます。<element0><element1>(LordWazzaの案に基づく)</element1></element0>",
+    "empoweredVassals": "強化された属家",
+    "empoweredVassalsDescription": "属家は命令トークンを2枚ではなく最大3枚配置でき、行軍+0に加えて行軍-1の命令トークンを1枚得ます。",
     "randomVassalAssignment766874": "封臣をランダムに割り当て",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "封臣はプレイヤーの家にランダムに割り当てられます。",
     "modGiftingPowerTokens1d8f63": "MoD：権力トークンの贈与",

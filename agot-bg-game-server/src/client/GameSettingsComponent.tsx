@@ -1026,6 +1026,33 @@ export default class GameSettingsComponent extends Component<GameSettingsCompone
           </Col>
           <Col xs="12">
             <FormCheck
+              id="empowered-vassals-setting"
+              type="switch"
+              label={
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip id="empowered-vassals-tooltip">
+                      {t("gameSettings.empoweredVassalsDescription")}
+                    </Tooltip>
+                  }
+                >
+                  <label htmlFor="empowered-vassals-setting">
+                    {t("gameSettings.empoweredVassals")}
+                  </label>
+                </OverlayTrigger>
+              }
+              checked={this.gameSettings.empoweredVassals}
+              onChange={() =>
+                this.changeGameSettings(
+                  () =>
+                    (this.gameSettings.empoweredVassals =
+                      !this.gameSettings.empoweredVassals)
+                )
+              }
+            />
+          </Col>
+          <Col xs="12">
+            <FormCheck
               id="random-vassal-assignment-setting"
               type="switch"
               label={

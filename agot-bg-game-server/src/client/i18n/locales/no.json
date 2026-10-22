@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Den innehaver til valyrisk stålblad destroys én enhet for hver unpaid rente makt markør."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "You kan plassere up til til ordrebrikker per vasall. Er you sure you want til continue med fewer?",
+    "confirmFewerOrders": "Du kan plassere opptil {{maxOrders}} ordrebrikker per vasall. Er du sikker på at du vil fortsette med færre?",
     "house275ad0": " hus <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "hus <element0><value1/></element0> må nu plassere ordrer for<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Hustildelingene gjøres tilfeldig.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Hvis en spiller har endast én gjenværende non-drage land enhet og ingen more borger, den vil tur inn i en drage.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Alle hus except Targaryen vil ersätta sina starting riddare med en drage. <element0><element1>(Inspired av LordWazza)</element1></element0>",
+    "empoweredVassals": "Styrkede vasaller",
+    "empoweredVassalsDescription": "Vasaller kan plassere opptil 3 ordrebrikker i stedet for 2 og får en ekstra Marsj -1-ordrebrikke i tillegg til sin Marsj +0.",
     "randomVassalAssignment766874": "Tilfeldig vasall assignment",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Vasaller tildeles spillerhusene tilfeldig.",
     "modGiftingPowerTokens1d8f63": "MoD Gifting makt Markører",

@@ -474,7 +474,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Posiadacz Ostrza z Valyriańskiej Stali niszczy jedną jednostkę za każdy nieopłacony żeton Władzy należny od odsetek."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Możesz umieścić maksymalnie dwa żetony Rozkazu na wasala. Czy na pewno chcesz kontynuować z mniejszą liczbą?",
+    "confirmFewerOrders": "Możesz umieścić maksymalnie {{maxOrders}} żetony Rozkazu na wasala. Czy na pewno chcesz kontynuować z mniejszą liczbą?",
     "house275ad0": " ród <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "Ród <element0><value1/></element0> musi teraz umieścić rozkazy dla<value2/>."
   },
@@ -983,6 +983,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Przydział rodów jest losowy.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Jeśli graczowi pozostała tylko jedna lądowa jednostka niebędąca Smokiem i nie ma już zamków, jednostka ta zmieni się w Smoka.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Wszystkie rody poza Targaryen zastąpią swojego początkowego Rycerza Smokiem. <element0><element1>(Inspiracja: LordWazza)</element1></element0>",
+    "empoweredVassals": "Wzmocnieni wasale",
+    "empoweredVassalsDescription": "Wasale mogą umieścić do 3 żetonów Rozkazu zamiast 2 i otrzymują dodatkowy żeton Marszu -1 oprócz swojego Marszu +0.",
     "randomVassalAssignment766874": "Losowy przydział wasali",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Wasale są losowo przydzielani do rodów graczy.",
     "modGiftingPowerTokens1d8f63": "Żetony Władzy od MoD",

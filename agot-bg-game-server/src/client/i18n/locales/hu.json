@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": " birtokos   Valyr Acél Kard elpusztít egy egység  minden kifizetetlen kamat Hatalom jelző."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Te lehet elhelyezés fel  kettő parancs jelzők egyenként hűbéres.  te biztos te akar  folytat  kevesebb?",
+    "confirmFewerOrders": "Hűbéresenként legfeljebb {{maxOrders}} parancsjelzőt helyezhetsz le. Biztosan kevesebbel szeretnéd folytatni?",
     "house275ad0": " Ház <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "Ház <element0><value1/></element0> kell legtöbb elhelyezés parancsok <value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Ház kiosztások  létrehozott véletlenszerűen.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Ha  játékos  csak egy megmaradt nem-sárkány szárazföld egység és nincs több kastélyok, az  kör   sárkány.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Minden házak kivéve Targaryen  lecserél az ő kezdő lovag   sárkány. <element0><element1>(ihlette  LordWazza)</element1></element0>",
+    "empoweredVassals": "Megerősített hűbéresek",
+    "empoweredVassalsDescription": "A hűbéresek 2 helyett legfeljebb 3 parancsjelzőt helyezhetnek le, és a Menetelés +0 mellett egy további Menetelés -1 parancsjelzőt kapnak.",
     "randomVassalAssignment766874": "Véletlen hűbéres kiosztás",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Hűbéresek  véletlenszerűen kiosztott   játékos házak.",
     "modGiftingPowerTokens1d8f63": "MoD Ajándékozás Hatalom Jelzők",

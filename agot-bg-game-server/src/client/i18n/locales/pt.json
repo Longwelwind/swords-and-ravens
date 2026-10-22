@@ -457,7 +457,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "O detentor da Lâmina de Aço Valiriano destrói uma unidade por cada ficha de poder de juros por pagar."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Podes colocar até duas fichas de ordem por vassalo. Tens a certeza de que queres continuar com menos?",
+    "confirmFewerOrders": "Podes colocar até {{maxOrders}} fichas de ordem por vassalo. Tens a certeza de que queres continuar com menos?",
     "house275ad0": " Casa <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "A Casa <element0><value1/></element0> tem agora de colocar ordens para<value2/>."
   },
@@ -964,6 +964,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "As Casas são atribuídas aleatoriamente.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Se um jogador tiver apenas uma unidade terrestre que não seja um dragão e já não tiver castelos, essa unidade transforma-se num dragão.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Todas as Casas, exceto Targaryen, substituem o seu cavaleiro inicial por um dragão. <element0><element1>(Inspirado em LordWazza)</element1></element0>",
+    "empoweredVassals": "Vassalos fortalecidos",
+    "empoweredVassalsDescription": "Os vassalos podem colocar até 3 fichas de ordem em vez de 2 e recebem uma ficha de Marcha -1 adicional além da sua Marcha +0.",
     "randomVassalAssignment766874": "Atribuição aleatória de vassalos",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Os vassalos são atribuídos aleatoriamente às Casas dos jogadores.",
     "modGiftingPowerTokens1d8f63": "Oferecer fichas de poder de MoD",

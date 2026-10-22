@@ -19,6 +19,7 @@ import rollingDicesImage from "../../public/images/icons/rolling-dices.svg";
 import cardExchangeImage from "../../public/images/icons/card-exchange.svg";
 import trophyCupImage from "../../public/images/icons/trophy-cup.svg";
 import perpetuumRandomImage from "../../public/images/icons/perpetuum-random.svg";
+import empoweredVassalsImage from "../../public/images/icons/empowered-vassals.svg";
 import { Card, FormCheck, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { preventOverflow } from "@popperjs/core";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
@@ -124,6 +125,7 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
                 {this.renderTidesOfBattleImage()}
                 {this.renderPerpetuumRandomImage()}
                 {this.renderHouseCardsEvolutionImage()}
+                {this.renderEmpoweredVassalsImage()}
                 {this.renderMapSwitch()}
                 {this.renderWarnings()}
                 {this.renderPrivateBadge()}
@@ -315,6 +317,33 @@ export default class EntireGameComponent extends Component<EntireGameComponentPr
             popperConfig={{ modifiers: [preventOverflow] }}
           >
             <img src={cardExchangeImage} width="30" />
+          </OverlayTrigger>
+        </Col>
+      )
+    );
+  }
+
+  renderEmpoweredVassalsImage(): ReactNode {
+    return (
+      this.settings.empoweredVassals && (
+        <Col xs="auto">
+          <OverlayTrigger
+            placement="auto"
+            overlay={
+              <Tooltip id="empowered-vassals-active-tooltip">
+                <div className="text-center">
+                  <h6>{t("gameSettings.empoweredVassals")}</h6>
+                  <small>{t("gameSettings.empoweredVassalsDescription")}</small>
+                </div>
+              </Tooltip>
+            }
+            popperConfig={{ modifiers: [preventOverflow] }}
+          >
+            <img
+              src={empoweredVassalsImage}
+              width="30"
+              alt={t("gameSettings.empoweredVassals")}
+            />
           </OverlayTrigger>
         </Col>
       )

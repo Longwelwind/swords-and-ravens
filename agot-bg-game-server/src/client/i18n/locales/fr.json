@@ -440,7 +440,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Le détenteur de la lame d'acier valyrien détruit une unité pour chaque pion Pouvoir d'intérêts impayé."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Vous pouvez placer jusqu'à deux pions Ordre par vassal. Voulez-vous vraiment continuer avec moins d'ordres ?",
+    "confirmFewerOrders": "Vous pouvez placer jusqu'à {{maxOrders}} pions Ordre par vassal. Voulez-vous vraiment continuer avec moins d'ordres ?",
     "house275ad0": " la maison <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "La maison <element0><value1/></element0> doit maintenant placer des ordres pour<value2/>."
   },
@@ -945,6 +945,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Les maisons sont attribuées au hasard.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Si un joueur n'a plus qu'une unité terrestre autre qu'un dragon et ne possède plus de château, cette unité devient un dragon.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Toutes les maisons sauf Targaryen remplacent leur chevalier initial par un dragon. <element0><element1>(Inspiré par LordWazza)</element1></element0>",
+    "empoweredVassals": "Vassaux renforcés",
+    "empoweredVassalsDescription": "Les vassaux peuvent placer jusqu'à 3 pions Ordre au lieu de 2 et reçoivent un pion Marche -1 supplémentaire en plus de leur Marche +0.",
     "randomVassalAssignment766874": "Attribution aléatoire des vassaux",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Les vassaux sont attribués au hasard aux maisons des joueurs.",
     "modGiftingPowerTokens1d8f63": "MoD : dons de pions Pouvoir",

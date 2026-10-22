@@ -474,7 +474,7 @@
     "theHolderOfTheValyrianSteelBladeDestroysOnee4005a": "Власник Валірійського сталевого клинка знищує один загін за кожен несплачений жетон влади відсотків."
   },
   "resolveSinglePlaceOrdersForVassals": {
-    "youMayPlaceUpToTwoOrderTokensPer0f8f73": "Ви можете розмістити до двох жетонів наказів на васала. Ви впевнені, що хочете продовжити з меншою кількістю?",
+    "confirmFewerOrders": "Максимальна кількість жетонів наказів для кожного васала — {{maxOrders}}. Ви впевнені, що хочете продовжити з меншою кількістю?",
     "house275ad0": " дім <value0/>",
     "houseMustNowPlaceOrdersForb23e23": "Дім <element0><value1/></element0> тепер має розмістити накази для<value2/>."
   },
@@ -983,6 +983,8 @@
     "houseAssignmentsAreCreatedRandomlyef2f7e": "Призначення домів створюються випадково.",
     "ifAPlayerHasOnlyOneRemainingNonDragonac8813": "Якщо в гравця залишився лише один сухопутний загін, що не є драконом, і більше немає замків, він перетвориться на дракона.",
     "allHousesExceptTargaryenWillReplaceTheirStartingKnight546494": "Усі доми, крім Targaryen, замінять свого стартового лицаря драконом. <element0><element1>(За мотивами ідеї LordWazza)</element1></element0>",
+    "empoweredVassals": "Посилені васали",
+    "empoweredVassalsDescription": "Васали можуть розміщувати до 3 жетонів наказів замість 2 та отримують додатковий жетон Походу -1 на додачу до свого Походу +0.",
     "randomVassalAssignment766874": "Випадкове призначення васалів",
     "vassalsAreRandomlyAssignedToThePlayerHouses38bfca": "Васали випадково призначаються домам гравців.",
     "modGiftingPowerTokens1d8f63": "MoD: подарунки жетонів влади",
