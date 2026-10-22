@@ -921,8 +921,13 @@ user's profile page using their `PreviousPlayerInGame` rows (same way wins/losse
   instruction that being removed from a game should never count in your favor even if your former
   house went on to win without you. Since `House`/`WasWinner` aren't tracked at all (§4.4), there's
   no way (and no need) to special-case this either way.
-- `CANCELLED`/`IN_LOBBY`/`ONGOING` games contribute to neither wins nor losses, matching today's
-  Django behavior of only scoring `FINISHED` games.
+- `CANCELLED`/`IN_LOBBY`/`ONGOING` games contribute to neither wins nor losses for still-seated
+  players, matching today's Django behavior of only scoring `FINISHED` games.
+- **Removals are scored regardless of game end**: a `PreviousPlayerInGame` row counts as a loss
+  for `FINISHED`, `ONGOING`, **and later-`CANCELLED`** games (e.g. a player rage-quits, gets
+  vassalized, and the game is then cancelled). Sole exception: a `ClockTimeout` removal from a
+  `CANCELLED` game does not count - the cancelled game counts for nobody else, so penalizing a
+  timeout there would be unfair. Tutorial games and games joined as a pure replacer stay excluded.
 
 ## 11. Rollout plan
 
@@ -1275,6 +1280,27 @@ Follow-up work after first getting the app running locally end-to-end:
   Ongoing games only; sorted in memory for users with ≥1 game, SQL-paged for the rest). `/Users`
   and `/Admin/Users` now *redirect* when restoring their saved page/sort cookie, so the restored
   sort is in the querystring and survives the pager's prev/next links.
+- **Left-early losses in cancelled games**: `UserStatsService` now also counts a
+  `PreviousPlayerInGame` row from a later-`Cancelled` game as "Replaced / left early" and a win-rate
+  loss (a rage-quitter who got vassalized can no longer erase the loss by the game being
+  cancelled), except for `ClockTimeout` removals - see §10.2. Cached stats of affected users update
+  on their next recalculation; run admin "Recalculate stats" (bulk) after deploying to apply it to
+  historical games immediately.
+- **Game statistics + per-house player win rates**: new authenticated `/Statistics` page (nav
+  between Users and FAQ) with finished-game house win rates (CSS bar chart, even-split line),
+  summary cards, newest matching games, and filters (scenario = `setupId`+`playerCount`, PBEM/live,
+  human-controlled seat count, final-round range, Any/No/Yes for allow-listed boolean settings). Queries are raw
+  parameterized SQL over `ViewOfGame`/`PlayersInGame.Data` only (`Services/Statistics/
+  GameStatisticsSql.cs`), never `SerializedGame`; ~100 ms per query on ~10k finished games, cached
+  10 min, no new indexes. Faceless is not filtered or masked: the game server resets it when a
+  game ends, so finished games are never faceless. Private games are
+  listed normally (as on profiles) and can be excluded via the Private game filter. Profiles
+  gain a "Houses" card row (win rate per house, scenario selector) via `PlayerHouseStatsService`,
+  using the same rules as `UserStatsService`; removals have no recorded house and are shown as a
+  footnote. Scenario/house data comes from `GameData/scenarios.json`, generated from
+  `baseGameData.json` by `yarn run generate-scenario-catalog` (sync guarded by
+  `ScenarioCatalogTests`). Game duration is intentionally not shown (no reliable data without
+  reading `SerializedGame`'s game log).
 
 ## 15. Roadmap / follow-ups (as of 2026-09-16)
 
@@ -1304,8 +1330,9 @@ re-derive it. Update this section whenever priorities shift or an item is comple
 ### Deferred / nice-to-have (see §13), suggested rough order
 1. **Precomputed `PlayerStatistics` table** — win-rate/PBEM response time are recomputed on every
    profile view today; update incrementally when a game finishes instead.
-2. **Public game statistics page** — house win-rates by game mode/settings, now that data is
-   relational instead of Django's free-form `ViewOfGame.settings` JSON.
+2. ~~**Public game statistics page**~~ — done (authenticated `/Statistics`, see §14). Possible
+   follow-up: record the house on `PreviousPlayerInGame` going forward so removals can be
+   attributed per house.
 3. **Extended Admin: chat moderation** — browse/search/delete chat messages, edit user profile
    fields (`ProfileText`, `MuteGames`, settings flags) directly from the admin UI.
 4. **CoreAdmin → hand-built admin reuse for High Members** — expose a subset of the hand-built

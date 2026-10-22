@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,9 +19,17 @@ export default class MaesterLuwinAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Maester Luwin</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may return one
-          House card from their discard pile.
+          <Trans
+            i18nKey="maesterLuwinAbility.maesterLuwinHouseMayReturnOneHouseCardFrom9884ef"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name
+            }}
+            components={{
+              bold: <b />,
+              bold2: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

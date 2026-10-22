@@ -11,7 +11,7 @@ export default class ColumnSwapButton extends Component<ColumnSwapButtonProps> {
     return (
       <button
         type="button"
-        className="close"
+        className="icon-button"
         onClick={this.props.onClick}
         style={{ position: "absolute", left: "0px", padding: "4px" }}
       >

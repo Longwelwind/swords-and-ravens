@@ -1,9 +1,9 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { t } from "../../i18n";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "../SimpleChoiceComponent";
-import PreemptiveRaidWildlingVictoryGameState
-    from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/preemptive-raid-wildling-victory-game-state/PreemptiveRaidWildlingVictoryGameState";
+import PreemptiveRaidWildlingVictoryGameState from "../../../common/ingame-game-state/westeros-game-state/wildlings-attack-game-state/preemptive-raid-wildling-victory-game-state/PreemptiveRaidWildlingVictoryGameState";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import SelectUnitsGameState from "../../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
@@ -12,20 +12,30 @@ import React from "react";
 import { Col } from "react-bootstrap";
 
 @observer
-export default class PreemptiveRaidWildlingVictoryComponent extends Component<GameStateComponentProps<PreemptiveRaidWildlingVictoryGameState>> {
-    render(): ReactNode {
-        return <>
-            {this.props.gameState.childGameState instanceof SelectUnitsGameState
-            ?   <Col xs={12} className="text-center">
-                    The lowest bidder destroys 2 units anywhere.
-                </Col>
-            :   <Col xs={12} className="text-center">
-                    The lowest bidder destroys 2 units or is reduced 2 positions on their highest influence track.
-                </Col>}
-            {renderChildGameState(this.props, [
-                [SimpleChoiceGameState, SimpleChoiceComponent],
-                [SelectUnitsGameState, SelectUnitsComponent]
-            ])}
-        </>;
-    }
+export default class PreemptiveRaidWildlingVictoryComponent extends Component<
+  GameStateComponentProps<PreemptiveRaidWildlingVictoryGameState>
+> {
+  render(): ReactNode {
+    return (
+      <>
+        {this.props.gameState.childGameState instanceof SelectUnitsGameState ? (
+          <Col xs={12} className="text-center">
+            {t(
+              "preemptiveRaidWildlingVictory.theLowestBidderDestroys2UnitsAnywhereef263f"
+            )}
+          </Col>
+        ) : (
+          <Col xs={12} className="text-center">
+            {t(
+              "preemptiveRaidWildlingVictory.theLowestBidderDestroys2UnitsOrIsReduced60cb1e"
+            )}
+          </Col>
+        )}
+        {renderChildGameState(this.props, [
+          [SimpleChoiceGameState, SimpleChoiceComponent],
+          [SelectUnitsGameState, SelectUnitsComponent]
+        ])}
+      </>
+    );
+  }
 }

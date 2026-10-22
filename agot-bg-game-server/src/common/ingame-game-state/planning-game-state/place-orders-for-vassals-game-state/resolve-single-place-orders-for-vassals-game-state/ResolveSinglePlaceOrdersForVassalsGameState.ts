@@ -18,7 +18,7 @@ import PlaceOrdersGameState from "../../place-orders-game-state/PlaceOrdersGameS
 import PlaceOrdersForVassalsGameState from "../PlaceOrdersForVassalsGameState";
 
 export default class ResolveSinglePlaceOrdersForVassalsGameState extends GameState<PlaceOrdersForVassalsGameState> {
-  @observable house: House;
+  @observable accessor house: House;
 
   get ingame(): IngameGameState {
     return this.parentGameState.parentGameState.parentGameState;

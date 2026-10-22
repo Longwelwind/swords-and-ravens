@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -7,45 +8,74 @@ import ScoreSpecialObjectivesGameState from "../../common/ingame-game-state/acti
 import Player from "../../common/ingame-game-state/Player";
 
 @observer
-export default class ScoreSpecialObjectivesComponent extends Component<GameStateComponentProps<ScoreSpecialObjectivesGameState>> {
-    get authenticatedPlayer(): Player | null {
-        return this.props.gameClient.authenticatedPlayer;
+export default class ScoreSpecialObjectivesComponent extends Component<
+  GameStateComponentProps<ScoreSpecialObjectivesGameState>
+> {
+  get authenticatedPlayer(): Player | null {
+    return this.props.gameClient.authenticatedPlayer;
+  }
+
+  get gameState(): ScoreSpecialObjectivesGameState {
+    return this.props.gameState;
+  }
+
+  get mustChoose(): boolean {
+    return (
+      this.authenticatedPlayer != null &&
+      !this.gameState.readyHouses.includes(this.authenticatedPlayer.house)
+    );
+  }
+
+  render(): ReactNode {
+    return (
+      <>
+        <Col xs={12} className="text-center">
+          {t(
+            "scoreSpecialObjectives.eachHouseMayChooseToScoreTheirSpecialObjective3df447"
+          )}
+        </Col>
+        {this.authenticatedPlayer && this.mustChoose && (
+          <Col xs={12}>
+            <Row className="justify-content-center">
+              <Col xs="auto">
+                <Button type="button" onClick={() => this.choose(true)}>
+                  {t("scoreSpecialObjectives.score38e5a4")}
+                </Button>
+              </Col>
+              <Col xs="auto">
+                <Button type="button" onClick={() => this.choose(false)}>
+                  {t("scoreSpecialObjectives.donTScore2bfeb2")}
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        )}
+        <Col xs={12} className="text-center">
+          <Trans
+            i18nKey="common.waitingFor"
+            values={{
+              houses: this.gameState.notReadyHouses
+                .map((h) => h.name)
+                .join(", ")
+            }}
+          />
+        </Col>
+      </>
+    );
+  }
+
+  choose(score: boolean): void {
+    if (
+      score == false &&
+      !window.confirm(
+        t(
+          "scoreSpecialObjectives.areYouSureNotToScoreYourSpecialObjective542cd8"
+        )
+      )
+    ) {
+      return;
     }
 
-    get gameState(): ScoreSpecialObjectivesGameState {
-        return this.props.gameState;
-    }
-
-    get mustChoose(): boolean {
-        return this.authenticatedPlayer != null && !this.gameState.readyHouses.includes(this.authenticatedPlayer.house);
-    }
-
-    render(): ReactNode {
-        return <>
-            <Col xs={12} className="text-center">
-                Each house may choose to score their Special Objective card if the criterion described is fulfilled.
-            </Col>
-            {this.authenticatedPlayer && this.mustChoose && <Col xs={12}>
-                <Row className="justify-content-center">
-                    <Col xs="auto">
-                        <Button type="button" onClick={() => this.choose(true)}>Score</Button>
-                    </Col>
-                    <Col xs="auto">
-                        <Button type="button" onClick={() => this.choose(false)}>Don&apos;t score</Button>
-                    </Col>
-                </Row>
-            </Col>}
-            <Col xs={12} className="text-center">
-                Waiting for {this.gameState.notReadyHouses.map(h => h.name).join(", ")}
-            </Col>
-        </>;
-    }
-
-    choose(score: boolean): void {
-        if (score == false && !window.confirm("Are you sure not to score your Special Objective card?")) {
-            return;
-        }
-
-        this.gameState.sendDecision(score);
-    }
+    this.gameState.sendDecision(score);
+  }
 }

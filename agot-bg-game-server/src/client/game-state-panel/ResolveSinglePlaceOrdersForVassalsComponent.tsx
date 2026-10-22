@@ -1,4 +1,7 @@
-import { Component, ReactNode, ReactElement } from "react";
+import { t, Trans } from "../i18n";
+import { action } from "mobx";
+import MapContribution, { wrapMapElement } from "../MapContribution";
+import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
 import React from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
@@ -16,9 +19,21 @@ import { OverlayTrigger, Popover } from "react-bootstrap";
 import BetterMap from "../../utils/BetterMap";
 import WesterosCardComponent from "./utils/WesterosCardComponent";
 import PlanningRestriction from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/PlanningRestriction";
-import { noMarchPlusOneOrder, noDefenseOrder, noSupportOrder, noRaidOrder, noConsolidatePowerOrder } from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/planningRestrictions";
+import {
+  noMarchPlusOneOrder,
+  noDefenseOrder,
+  noSupportOrder,
+  noRaidOrder,
+  noConsolidatePowerOrder
+} from "../../common/ingame-game-state/game-data-structure/westeros-card/planning-restriction/planningRestrictions";
 import WesterosCardType from "../../common/ingame-game-state/game-data-structure/westeros-card/WesterosCardType";
-import { rainsOfAutumn, stormOfSwords, webOfLies, seaOfStorms, feastForCrows } from "../../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
+import {
+  rainsOfAutumn,
+  stormOfSwords,
+  webOfLies,
+  seaOfStorms,
+  feastForCrows
+} from "../../common/ingame-game-state/game-data-structure/westeros-card/westerosCardTypes";
 import { renderRegionTooltip } from "../regionTooltip";
 import { preventOverflow } from "@popperjs/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -27,189 +42,284 @@ import ResolveSinglePlaceOrdersForVassalsGameState from "../../common/ingame-gam
 import joinNaturalLanguage from "../utils/joinNaturalLanguage";
 
 @observer
-export default class ResolveSinglePlaceOrdersForVassalsComponent extends Component<GameStateComponentProps<ResolveSinglePlaceOrdersForVassalsGameState>> {
-    restrictionToWesterosCardTypeMap = new BetterMap<PlanningRestriction, { deckId: number; westerosCardType: WesterosCardType }>([
-        [noMarchPlusOneOrder, { deckId: 2, westerosCardType: rainsOfAutumn }],
-        [noDefenseOrder, { deckId: 2, westerosCardType: stormOfSwords }],
-        [noSupportOrder, { deckId: 2, westerosCardType: webOfLies }],
-        [noRaidOrder, { deckId: 2, westerosCardType: seaOfStorms }],
-        [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows }]
-    ]);
+export default class ResolveSinglePlaceOrdersForVassalsComponent extends Component<
+  GameStateComponentProps<ResolveSinglePlaceOrdersForVassalsGameState>
+> {
+  restrictionToWesterosCardTypeMap = new BetterMap<
+    PlanningRestriction,
+    { deckId: number; westerosCardType: WesterosCardType }
+  >([
+    [noMarchPlusOneOrder, { deckId: 2, westerosCardType: rainsOfAutumn }],
+    [noDefenseOrder, { deckId: 2, westerosCardType: stormOfSwords }],
+    [noSupportOrder, { deckId: 2, westerosCardType: webOfLies }],
+    [noRaidOrder, { deckId: 2, westerosCardType: seaOfStorms }],
+    [noConsolidatePowerOrder, { deckId: 2, westerosCardType: feastForCrows }]
+  ]);
 
-    modifyRegionsOnMapCallback: any;
-    modifyOrdersOnMapCallback: any;
-
-    get player(): Player {
-        if (!this.props.gameClient.authenticatedPlayer) {
-            throw new Error();
-        }
-
-        return this.props.gameClient.authenticatedPlayer;
+  get player(): Player {
+    if (!this.props.gameClient.authenticatedPlayer) {
+      throw new Error();
     }
 
-    get housesToPlaceOrdersFor(): House[] {
-        return this.singlePlaceOrders.placeOrdersGameState.getHousesToPutOrdersForPlayer(this.player);
-    }
+    return this.props.gameClient.authenticatedPlayer;
+  }
 
-    get singlePlaceOrders(): ResolveSinglePlaceOrdersForVassalsGameState {
-        return this.props.gameState;
-    }
+  get housesToPlaceOrdersFor(): House[] {
+    return this.singlePlaceOrders.placeOrdersGameState.getHousesToPutOrdersForPlayer(
+      this.player
+    );
+  }
 
-    get doesControlCurrentHouse(): boolean {
-        return this.props.gameClient.doesControlHouse(this.house);
-    }
+  get singlePlaceOrders(): ResolveSinglePlaceOrdersForVassalsGameState {
+    return this.props.gameState;
+  }
 
-    get house(): House {
-        return this.singlePlaceOrders.house;
-    }
+  get doesControlCurrentHouse(): boolean {
+    return this.props.gameClient.doesControlHouse(this.house);
+  }
 
-    get playerOfCurrentHouse(): Player {
-        return this.singlePlaceOrders.ingame.getControllerOfHouse(this.house);
-    }
+  get house(): House {
+    return this.singlePlaceOrders.house;
+  }
 
-    render(): ReactNode {
-        const houses = this.singlePlaceOrders.placeOrdersGameState.getHousesToPutOrdersForPlayer(this.playerOfCurrentHouse).map(h => h.name);
-        return (
-            <Col>
-                <Row className="justify-content-center">
-                    <Col xs={12} className="text-center">
+  get playerOfCurrentHouse(): Player {
+    return this.singlePlaceOrders.ingame.getControllerOfHouse(this.house);
+  }
+
+  render(): ReactNode {
+    const houses = this.singlePlaceOrders.placeOrdersGameState
+      .getHousesToPutOrdersForPlayer(this.playerOfCurrentHouse)
+      .map((h) => h.name);
+    return (
+      <Col>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          orders={this.modifyOrdersOnMap()}
+        />
+        <Row className="justify-content-center">
+          <Col xs={12} className="text-center">
+            <>
+              <Trans
+                i18nKey="resolveSinglePlaceOrdersForVassals.houseMustNowPlaceOrdersForb23e23"
+                values={{ house: this.house.name }}
+                components={{
+                  bold: <b />,
+                  houses: (
+                    <>
+                      {houses.length == 1 ? (
                         <>
-                            House <b>{this.house.name}</b> must now place orders for
-                            {houses.length == 1 ? <> House {houses[0]}</> : <> {joinNaturalLanguage(houses)}</>}.
+                          <Trans
+                            i18nKey="resolveSinglePlaceOrdersForVassals.house275ad0"
+                            values={{ houses: houses[0] }}
+                          />
                         </>
-                    </Col>
-                    {this.singlePlaceOrders.planningGameState.planningRestrictions.map(pr => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
-                        .map(prWc => prWc != null ?
-                            <Col xs={12} key={`prwc_${prWc.westerosCardType.id}`} className="d-flex flex-column align-items-center">
-                                <WesterosCardComponent cardType={prWc.westerosCardType} size="medium" tooltip={true} westerosDeckI={prWc.deckId} />
-                            </Col> : <></>)
-                    }
-                    <Col xs={12}>
-                        {this.props.gameClient.authenticatedPlayer && this.doesControlCurrentHouse && (
-                            <Row className="justify-content-center">
-                                <Col xs="auto">
-                                    <Button type="button"
-                                        disabled={!this.singlePlaceOrders.placeOrdersGameState.canSubmit(this.props.gameClient.authenticatedPlayer).status}
-                                        onClick={() => this.onSubmitClick()}
-                                        variant="success"
-                                    >
-                                        Submit
-                                    </Button>
-                                </Col>
-                            </Row>
-                        )}
-                        <Row>
-                            <Col xs={12} className="text-center mt-3">
-                                Waiting for {this.house.name}...
-                            </Col>
-                        </Row>
-                    </Col>
+                      ) : (
+                        <> {joinNaturalLanguage(houses)}</>
+                      )}
+                    </>
+                  )
+                }}
+              />
+            </>
+          </Col>
+          {this.singlePlaceOrders.planningGameState.planningRestrictions
+            .map((pr) => this.restrictionToWesterosCardTypeMap.tryGet(pr, null))
+            .map((prWc) =>
+              prWc != null ? (
+                <Col
+                  xs={12}
+                  key={`prwc_${prWc.westerosCardType.id}`}
+                  className="d-flex flex-column align-items-center"
+                >
+                  <WesterosCardComponent
+                    cardType={prWc.westerosCardType}
+                    size="medium"
+                    tooltip={true}
+                    westerosDeckI={prWc.deckId}
+                  />
+                </Col>
+              ) : (
+                <></>
+              )
+            )}
+          <Col xs={12}>
+            {this.props.gameClient.authenticatedPlayer &&
+              this.doesControlCurrentHouse && (
+                <Row className="justify-content-center">
+                  <Col xs="auto">
+                    <Button
+                      type="button"
+                      disabled={
+                        !this.singlePlaceOrders.placeOrdersGameState.canSubmit(
+                          this.props.gameClient.authenticatedPlayer
+                        ).status
+                      }
+                      onClick={() => this.onSubmitClick()}
+                      variant="success"
+                    >
+                      {t("common.submit")}
+                    </Button>
+                  </Col>
                 </Row>
-            </Col>
-        );
-    }
+              )}
+            <Row>
+              <Col xs={12} className="text-center mt-3">
+                <Trans
+                  i18nKey="common.waitingFor"
+                  values={{ houses: this.house.name }}
+                />
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </Col>
+    );
+  }
 
-    componentDidMount(): void {
-        this.props.mapControls.modifyRegionsOnMap.push(this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap());
-        this.props.mapControls.modifyOrdersOnMap.push(this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap());
-    }
+  modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
+    if (this.doesControlCurrentHouse) {
+      const possibleRegions = _.flatMap(
+        this.housesToPlaceOrdersFor.map((h) =>
+          this.singlePlaceOrders.placeOrdersGameState.getPossibleRegionsForOrders(
+            h
+          )
+        )
+      );
 
-    componentWillUnmount(): void {
-        _.pull(this.props.mapControls.modifyRegionsOnMap, this.modifyRegionsOnMapCallback);
-        _.pull(this.props.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
-    }
-
-    modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-        if (this.doesControlCurrentHouse) {
-            const possibleRegions = _.flatMap(this.housesToPlaceOrdersFor.map(h => this.singlePlaceOrders.placeOrdersGameState.getPossibleRegionsForOrders(h)));
-
-            return possibleRegions.map(r => [
-                r,
-                {
-                    // Highlight areas with no order
-                    highlight: { active: !this.singlePlaceOrders.placedOrders.has(r) },
-                    wrap: (child: ReactElement) => (
-                        <OverlayTrigger
-                            placement="auto-start"
-                            trigger="click"
-                            rootClose
-                            overlay={
-                                <Popover id={"place-order-popover_region_" + r.id} className="p-3">
-                                    <Row className="justify-content-center align-items-center mb-2">
-                                        <Col xs="auto"><h5 className="my-0"><b>{r.name}</b></h5></Col>
-                                        <Col xs="auto">
-                                            <OverlayTrigger overlay={renderRegionTooltip(r)}
-                                                popperConfig={{ modifiers: [preventOverflow] }}
-                                                placement="auto"
-                                            >
-                                                <div style={{width: 28, height: 28}} className="circle-border d-flex justify-content-center align-items-center">
-                                                    <FontAwesomeIcon icon={faInfo} fontSize="16px" />
-                                                </div>
-                                            </OverlayTrigger>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <OrderGridComponent orders={this.singlePlaceOrders.placeOrdersGameState.getOrdersList(r.getController() as House)}
-                                            selectedOrder={null}
-                                            availableOrders={
-                                                this.singlePlaceOrders.placeOrdersGameState.getAvailableOrders(r.getController() as House)
-                                            }
-                                            restrictedOrders={this.singlePlaceOrders.ingame.game.getRestrictedOrders(r, this.singlePlaceOrders.planningGameState.planningRestrictions, true)}
-                                            onOrderClick={o => {
-                                                this.singlePlaceOrders.assignOrder(r, o);
-                                                document.body.click();
-                                            }} />
-                                    </Row>
-                                </Popover>
-                            }
-                        >
-                            {child}
-                        </OverlayTrigger>
-                    )
-                }
-            ] as [Region, PartialRecursive<RegionOnMapProperties>]);
-        }
-
-        return [];
-    }
-
-    modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
-        if (this.doesControlCurrentHouse) {
-            return _.flatMap(
-                this.housesToPlaceOrdersFor.map(h => this.singlePlaceOrders.placeOrdersGameState.getPossibleRegionsForOrders(h).map(r => [
-                    r,
-                    {
-                        highlight: { active: true },
-                        onClick: () => this.onOrderClick(r)
-                    }
-                ] as [Region, PartialRecursive<OrderOnMapProperties>]))
-            );
-        }
-
-        return [];
-    }
-
-    onOrderClick(region: Region): void {
-        if (!this.doesControlCurrentHouse) {
-            return;
-        }
-
-        this.singlePlaceOrders.assignOrder(region, null);
-    }
-
-    onSubmitClick(): void {
-        if (!this.doesControlCurrentHouse || !this.props.gameClient.authenticatedPlayer) {
-            return;
-        }
-
-        const readyState = this.singlePlaceOrders.placeOrdersGameState.canSubmit(this.props.gameClient.authenticatedPlayer);
-
-        if (readyState.reason == "not-all-regions-filled") {
-            if (!window.confirm("You may place up to two order tokens per vassal. Are you sure you want to continue with fewer?")) {
-                return;
+      return possibleRegions.map(
+        (r) =>
+          [
+            r,
+            {
+              // Highlight areas with no order
+              highlight: {
+                active: !this.singlePlaceOrders.placedOrders.has(r)
+              },
+              wrap: wrapMapElement(
+                <OverlayTrigger
+                  placement="auto-start"
+                  trigger="click"
+                  rootClose
+                  overlay={
+                    <Popover
+                      id={"place-order-popover_region_" + r.id}
+                      className="p-3"
+                    >
+                      <Row className="justify-content-center align-items-center mb-2">
+                        <Col xs="auto">
+                          <h5 className="my-0">
+                            <b>{r.name}</b>
+                          </h5>
+                        </Col>
+                        <Col xs="auto">
+                          <OverlayTrigger
+                            overlay={renderRegionTooltip(r)}
+                            popperConfig={{ modifiers: [preventOverflow] }}
+                            placement="auto"
+                          >
+                            <div
+                              style={{ width: 28, height: 28 }}
+                              className="circle-border d-flex justify-content-center align-items-center"
+                            >
+                              <FontAwesomeIcon icon={faInfo} fontSize="16px" />
+                            </div>
+                          </OverlayTrigger>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <OrderGridComponent
+                          orders={this.singlePlaceOrders.placeOrdersGameState.getOrdersList(
+                            r.getController() as House
+                          )}
+                          selectedOrder={null}
+                          availableOrders={this.singlePlaceOrders.placeOrdersGameState.getAvailableOrders(
+                            r.getController() as House
+                          )}
+                          restrictedOrders={this.singlePlaceOrders.ingame.game.getRestrictedOrders(
+                            r,
+                            this.singlePlaceOrders.planningGameState
+                              .planningRestrictions,
+                            true
+                          )}
+                          onOrderClick={(o) => {
+                            this.singlePlaceOrders.assignOrder(r, o);
+                            document.body.click();
+                          }}
+                        />
+                      </Row>
+                    </Popover>
+                  }
+                >
+                  <span />
+                </OverlayTrigger>
+              )
             }
-        }
-
-        this.singlePlaceOrders.submit();
+          ] as [Region, PartialRecursive<RegionOnMapProperties>]
+      );
     }
+
+    return [];
+  }
+
+  modifyOrdersOnMap(): [Region, PartialRecursive<OrderOnMapProperties>][] {
+    if (this.doesControlCurrentHouse) {
+      return _.flatMap(
+        this.housesToPlaceOrdersFor.map((h) =>
+          this.singlePlaceOrders.placeOrdersGameState
+            .getPossibleRegionsForOrders(h)
+            .map(
+              (r) =>
+                [
+                  r,
+                  {
+                    highlight: { active: true },
+                    onClick: () => this.onOrderClick(r)
+                  }
+                ] as [Region, PartialRecursive<OrderOnMapProperties>]
+            )
+        )
+      );
+    }
+
+    return [];
+  }
+
+  @action
+  onOrderClick(region: Region): void {
+    if (!this.doesControlCurrentHouse) {
+      return;
+    }
+
+    this.singlePlaceOrders.assignOrder(region, null);
+  }
+
+  @action
+  onSubmitClick(): void {
+    if (
+      !this.doesControlCurrentHouse ||
+      !this.props.gameClient.authenticatedPlayer
+    ) {
+      return;
+    }
+
+    const readyState = this.singlePlaceOrders.placeOrdersGameState.canSubmit(
+      this.props.gameClient.authenticatedPlayer
+    );
+
+    if (readyState.reason == "not-all-regions-filled") {
+      if (
+        !window.confirm(
+          t("resolveSinglePlaceOrdersForVassals.confirmFewerOrders", {
+            maxOrders: this.singlePlaceOrders.placeOrdersGameState.maxOrders
+          })
+        )
+      ) {
+        return;
+      }
+    }
+
+    this.singlePlaceOrders.submit();
+  }
 }

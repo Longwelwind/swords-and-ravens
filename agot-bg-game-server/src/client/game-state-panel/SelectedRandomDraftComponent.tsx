@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
@@ -15,8 +16,8 @@ import _ from "lodash";
 export default class SelectedRandomDraftComponent extends Component<
   GameStateComponentProps<SelectedRandomDraftGameState>
 > {
-  @observable nameFilter = "";
-  @observable selectedHouseCard: HouseCard | null = null;
+  @observable accessor nameFilter = "";
+  @observable accessor selectedHouseCard: HouseCard | null = null;
 
   get player(): Player | null {
     return this.props.gameClient.authenticatedPlayer;
@@ -27,21 +28,22 @@ export default class SelectedRandomDraftComponent extends Component<
       <>
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            All houses choose House cards which then are randomly assigned.
+            {t(
+              "selectedRandomDraft.allHousesChooseHouseCardsWhichThenAreRandomly235f23"
+            )}
           </Col>
         </Row>
         <Row>
           <small>
-            <b>Note</b>: All House cards work in a generic way!
-            <br />
-            That means House card abilities (e.g. Salladhor) referring to
-            specific houses are always available for any house you use.
-            <br />
-            Character references are equivalent to the same-strength character
-            in your hand (e.g. Reek and any 3-strength card).
-            <br />
-            References to capitals always refer to your house&apos;s home
-            territory (e.g. Littlefinger).
+            <Trans
+              i18nKey="common.noteAllHouseCardsWorkInAGenericWay"
+              components={{
+                bold: <b />,
+                lineBreak: <br />,
+                lineBreak2: <br />,
+                lineBreak3: <br />
+              }}
+            />
           </small>
         </Row>
         {this.player &&
@@ -49,13 +51,13 @@ export default class SelectedRandomDraftComponent extends Component<
           <>
             <Row className="mt-3 justify-content-center">
               <Col xs="12" className="text-center">
-                Please select a House card:
+                {t("common.pleaseSelectAHouseCard")}
               </Col>
             </Row>
             <Row className="justify-content-center mb-2">
               <input
                 className="form-control"
-                placeholder="Filter by house card name or strength"
+                placeholder={t("common.filterByHouseCardNameOrStrength")}
                 type="text"
                 value={this.nameFilter}
                 onChange={(e) => (this.nameFilter = e.target.value)}
@@ -97,7 +99,7 @@ export default class SelectedRandomDraftComponent extends Component<
                   onClick={() => this.confirm()}
                   disabled={this.selectedHouseCard == null}
                 >
-                  Confirm
+                  {t("common.confirm")}
                 </Button>
               </Col>
             </Row>
@@ -106,14 +108,14 @@ export default class SelectedRandomDraftComponent extends Component<
           <>
             <Row className="mt-3 justify-content-center">
               <Col xs="12" className="text-center">
-                These are all remaining House cards:
+                {t("common.theseAreAllRemainingHouseCards")}
               </Col>
             </Row>
             <Col xs="12">
               <Row className="justify-content-center mb-2">
                 <input
                   className="form-control"
-                  placeholder="Filter by house card name or strength"
+                  placeholder={t("common.filterByHouseCardNameOrStrength")}
                   type="text"
                   value={this.nameFilter}
                   onChange={(e) => (this.nameFilter = e.target.value)}
@@ -145,11 +147,14 @@ export default class SelectedRandomDraftComponent extends Component<
         )}
         <Row className="mt-3 justify-content-center">
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {this.props.gameState.unreadyPlayers
-              .map((p) => p.house.name)
-              .join(", ")}
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              values={{
+                houses: this.props.gameState.unreadyPlayers
+                  .map((p) => p.house.name)
+                  .join(", ")
+              }}
+            />
           </Col>
         </Row>
       </>

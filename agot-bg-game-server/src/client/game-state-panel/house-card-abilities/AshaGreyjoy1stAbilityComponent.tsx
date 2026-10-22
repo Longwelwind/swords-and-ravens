@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,17 +19,24 @@ export default class AshaGreyjoy1stAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Asha Greyjoy:</b> House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> can choose to
-          remove one Support or Consolidate Power order of House{" "}
-          <b>
-            {
-              this.props.gameState.combat.getEnemy(
+          <Trans
+            i18nKey="ashaGreyjoy1stAbility.ashaGreyjoyHouseCanChooseToRemoveOneSupport68ca0b"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemyHouse: this.props.gameState.combat.getEnemy(
                 this.props.gameState.childGameState.house
-              ).name
-            }
-          </b>{" "}
-          adjacent to <b>{this.props.gameState.combat.defendingRegion.name}</b>.
+              ).name,
+              combatDefendingRegion:
+                this.props.gameState.combat.defendingRegion.name
+            }}
+            components={{
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />,
+              bold4: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

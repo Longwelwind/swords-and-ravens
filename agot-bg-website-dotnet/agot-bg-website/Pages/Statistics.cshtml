@@ -1,0 +1,330 @@
+@page
+@model agot_bg_website.Pages.StatisticsModel
+@using System.Globalization
+@using agot_bg_website.Services.Statistics
+@{
+    ViewData["Title"] = "Statistics";
+    ViewData["WideContainer"] = "md";
+
+    var filter = Model.Filter;
+    var overview = Model.Overview;
+    var catalog = Model.Catalog;
+
+    string Percent(double? rate) =>
+        rate is null ? "n/a" : $"{(rate.Value * 100).ToString("F1", CultureInfo.InvariantCulture)} %";
+
+    var scenarioLabel = filter.AllScenarios
+        ? "All scenarios"
+        : catalog.GetScenarioLabel(filter.SetupId!, filter.PlayerCount!.Value);
+    var evenSplitBottom = overview.EvenSplitRate is { } even
+        ? (even / overview.ChartMaxRate * 100).ToString("F2", CultureInfo.InvariantCulture)
+        : null;
+    const string chartHeight = "16rem";
+    const string gutterWidth = "6.5rem";
+    const string visuallyHidden = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;";
+}
+
+<h1 class="text-2xl font-bold">Statistics</h1>
+<p class="opacity-70 mb-4">Finished games of all players. The tutorial is not included.</p>
+
+<form method="get" class="card bg-base-200 shadow-md border border-base-300 p-4 mb-6">
+    <div class="flex flex-col gap-4">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1rem;">
+            <label class="flex flex-col gap-1">
+                <span class="text-sm font-semibold">Scenario</span>
+                <select name="scenario" class="select w-full" onchange="this.form.submit()">
+                    <option value="@GameStatisticsFilter.AllScenariosValue" selected="@filter.AllScenarios">All scenarios</option>
+                    @foreach (var setup in catalog.Setups.Where(s => s.Id != ScenarioCatalog.TutorialSetupId))
+                    {
+                        <optgroup label="@setup.Name">
+                            @foreach (var playerSetup in setup.PlayerSetups)
+                            {
+                                var value = GameStatisticsFilter.ScenarioValueFor(setup.Id, playerSetup.PlayerCount);
+                                <option value="@value" selected="@(filter.ScenarioValue == value)">@catalog.GetScenarioLabel(setup.Id, playerSetup.PlayerCount)</option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+            </label>
+            <label class="flex flex-col gap-1">
+                <span class="text-sm font-semibold">Game type</span>
+                <select name="type" class="select w-full">
+                    <option value="any" selected="@(filter.GameType == GameTypeFilter.Any)">Any</option>
+                    <option value="pbem" selected="@(filter.GameType == GameTypeFilter.Pbem)">Play By E-Mail</option>
+                    <option value="live" selected="@(filter.GameType == GameTypeFilter.Live)">Live</option>
+                </select>
+            </label>
+            <div class="flex flex-col gap-1">
+                <span class="text-sm font-semibold">Final round</span>
+                <div class="flex items-center gap-2">
+                    <input type="number" name="minRound" min="1" max="@GameStatisticsFilter.MaxRoundLimit" value="@filter.MinRound" placeholder="from" aria-label="Final round, from" class="input w-full" />
+                    <span>–</span>
+                    <input type="number" name="maxRound" min="1" max="@GameStatisticsFilter.MaxRoundLimit" value="@filter.MaxRound" placeholder="to" aria-label="Final round, to" class="input w-full" />
+                </div>
+            </div>
+            <label class="flex flex-col gap-1">
+                <span class="text-sm font-semibold">Human-controlled seats</span>
+                <select name="humanSeats" class="select w-full">
+                    <option value="" selected="@(filter.HumanSeats is null)">Any</option>
+                    @for (var seats = 1; seats <= (filter.PlayerCount ?? catalog.Houses.Count); seats++)
+                    {
+                        var label = filter.PlayerCount == seats ? $"{seats} (no vassals)" : seats.ToString(CultureInfo.InvariantCulture);
+                        <option value="@seats" selected="@(filter.HumanSeats == seats)">@label</option>
+                    }
+                </select>
+                <span class="text-xs opacity-70">Count of players still seated when the game ended.</span>
+            </label>
+        </div>
+
+        @{
+            var activeSettingsCount = filter.Settings.Count;
+        }
+        <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+            <summary class="collapse-title font-semibold">
+                Game settings
+                @if (activeSettingsCount > 0)
+                {
+                    <span class="badge badge-sm badge-primary ml-2">@activeSettingsCount active</span>
+                }
+            </summary>
+            <div class="collapse-content">
+                <div class="flex flex-col gap-2">
+                    @foreach (var group in StatisticsSettingGroups.Groups)
+                    {
+                        var groupHasActive = group.Options.Any(o => filter.GetSetting(o.Key) != SettingFilterValue.Any);
+                        <details class="collapse collapse-arrow bg-base-200 border border-base-300" open="@(!group.Collapsed || groupHasActive)">
+                            <summary class="collapse-title font-semibold">@group.Title</summary>
+                            <div class="collapse-content">
+                                <div class="flex flex-wrap items-center gap-2 mb-3" aria-label="Set all @group.Title filters">
+                                    <span class="text-sm opacity-70">Set all to:</span>
+                                    <button type="button" class="btn btn-xs btn-outline" data-set-all-settings="any">Any</button>
+                                    <button type="button" class="btn btn-xs btn-outline" data-set-all-settings="no">No</button>
+                                    <button type="button" class="btn btn-xs btn-outline" data-set-all-settings="yes">Yes</button>
+                                </div>
+                                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(19rem,1fr));gap:0.5rem 1.5rem;">
+                                    @foreach (var option in group.Options)
+                                    {
+                                        var current = filter.GetSetting(option.Key);
+                                        <label class="flex items-center justify-between gap-2">
+                                            <span class="text-sm">@option.Label</span>
+                                            <select name="@(GameStatisticsFilter.SettingParameterPrefix + option.Key)" class="select" style="width:6rem;" aria-label="@option.Label">
+                                                <option value="any" selected="@(current == SettingFilterValue.Any)">Any</option>
+                                                <option value="no" selected="@(current == SettingFilterValue.No)">No</option>
+                                                <option value="yes" selected="@(current == SettingFilterValue.Yes)">Yes</option>
+                                            </select>
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+                        </details>
+                    }
+                </div>
+            </div>
+        </details>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <button type="submit" class="btn btn-primary">Apply filters</button>
+            <a asp-page="/Statistics" class="btn btn-ghost">Reset</a>
+        </div>
+    </div>
+</form>
+
+@if (overview.FinishedGames == 0)
+{
+    <div class="card bg-base-200 shadow-md border border-base-300 p-6">
+        <p class="opacity-70">No finished games match these filters.</p>
+    </div>
+}
+else
+{
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:1rem;" class="mb-6">
+        <div class="card bg-base-200 shadow-md border border-base-300 p-4">
+            <div class="text-sm opacity-70">Finished games</div>
+            <div class="text-3xl font-bold">@overview.FinishedGames.ToString("N0", CultureInfo.InvariantCulture)</div>
+            <div class="text-xs opacity-70">@scenarioLabel</div>
+        </div>
+        <div class="card bg-base-200 shadow-md border border-base-300 p-4">
+            <div class="text-sm opacity-70">Average final round</div>
+            <div class="text-3xl font-bold">@(overview.AverageRound is { } avg ? avg.ToString("F1", CultureInfo.InvariantCulture) : "n/a")</div>
+        </div>
+        @if (overview.UnknownWinnerGames > 0)
+        {
+            <div class="card bg-base-200 shadow-md border border-base-300 p-4" title="No winner is recorded for these games. They are not part of the win rates.">
+                <div class="text-sm opacity-70">Games with unknown winner</div>
+                <div class="text-3xl font-bold">@overview.UnknownWinnerGames.ToString("N0", CultureInfo.InvariantCulture)</div>
+                <div class="text-xs opacity-70">not counted in win rates</div>
+            </div>
+        }
+        <div class="card bg-base-200 shadow-md border border-base-300 p-4">
+            <div class="text-sm opacity-70">House with most wins</div>
+            @if (overview.MostWins is { } mostWins)
+            {
+                <div class="flex items-center gap-2 text-3xl font-bold">
+                    <img src="~/house_icons/@(mostWins.HouseId).png" alt="" class="h-8 w-8 shrink-0" />
+                    <span>@mostWins.Name</span>
+                </div>
+                <div class="text-xs opacity-70">@mostWins.Wins.ToString("N0", CultureInfo.InvariantCulture) wins</div>
+            }
+            else
+            {
+                <div class="text-3xl font-bold">n/a</div>
+            }
+        </div>
+    </div>
+
+    <section class="card bg-base-200 shadow-md border border-base-300 p-4 mb-6" aria-labelledby="house-domination-heading">
+        <h2 id="house-domination-heading" class="text-lg font-semibold">House domination</h2>
+        <p class="text-sm opacity-70 mb-2">
+            Win rate of each house: games won divided by games the house was played by a player,
+            among the @overview.DecidedGames.ToString("N0", CultureInfo.InvariantCulture) games with a known winner.
+        </p>
+
+        @if (overview.Houses.Count == 0 || overview.TotalSeats == 0)
+        {
+            <p class="opacity-70">No games with a known winner match these filters.</p>
+        }
+        else
+        {
+            <div style="overflow-x:auto;">
+                <div style="min-width:@((overview.Houses.Count * 4.5 + 6.5).ToString("F1", CultureInfo.InvariantCulture))rem;">
+                    <div style="position:relative;height:@chartHeight;margin-top:2rem;border-bottom:1px solid currentColor;">
+                        <div style="display:flex;height:100%;margin-right:@gutterWidth;">
+                            @foreach (var house in overview.Houses)
+                            {
+                                var barHeight = ((house.WinRate ?? 0) / overview.ChartMaxRate * 100).ToString("F2", CultureInfo.InvariantCulture);
+                                <div style="flex:1 1 0;position:relative;@(house.Seats == 0 ? "opacity:0.4;" : "")"
+                                     role="img"
+                                     aria-label="@(house.Seats == 0 ? $"{house.Name}: not played" : $"{house.Name}: {Percent(house.WinRate)}, {house.Wins} won of {house.Seats}")">
+                                    @if (house.Seats > 0)
+                                    {
+                                        <div style="position:absolute;left:12%;right:12%;bottom:0;height:@(barHeight)%;min-height:2px;background:@house.Color;border-radius:0.25rem 0.25rem 0 0;"></div>
+                                        <div class="font-bold text-sm" style="position:absolute;left:0;right:0;bottom:@(barHeight)%;text-align:center;padding-bottom:0.125rem;white-space:nowrap;">
+                                            @if (house.IsTop)
+                                            {
+                                                <i class="fas fa-crown text-warning" title="Highest win rate"></i>
+                                            }
+                                            @Percent(house.WinRate)
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-xs" style="position:absolute;left:0;right:0;bottom:0;text-align:center;padding-bottom:0.25rem;">not played</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        @if (evenSplitBottom is not null)
+                        {
+                            <div style="position:absolute;left:0;right:0;bottom:@(evenSplitBottom)%;border-top:2px dashed currentColor;opacity:0.7;pointer-events:none;">
+                                <span class="text-xs" style="position:absolute;right:0;bottom:0.125rem;width:@gutterWidth;padding-left:0.5rem;line-height:1.1;">
+                                    Even split<br />@Percent(overview.EvenSplitRate)
+                                </span>
+                            </div>
+                        }
+                    </div>
+                    <div style="display:flex;margin-right:@gutterWidth;" aria-hidden="true">
+                        @foreach (var house in overview.Houses)
+                        {
+                            <div class="text-center text-xs p-1" style="flex:1 1 0;min-width:0;@(house.Seats == 0 ? "opacity:0.4;" : "")">
+                                <img src="~/house_icons/@(house.HouseId).png" alt="" class="h-8 w-8 mx-auto" />
+                                <div class="font-semibold">@house.Name</div>
+                                @if (house.Seats > 0)
+                                {
+                                    <div class="opacity-70">@house.Wins won of @house.Seats</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <p class="text-xs opacity-70 mt-2">
+                The dashed line marks an even split: the win rate every house would have if all houses won equally often
+                (@overview.DecidedGames.ToString("N0", CultureInfo.InvariantCulture) decided games on @overview.TotalSeats.ToString("N0", CultureInfo.InvariantCulture) seats).
+            </p>
+
+            <table style="@visuallyHidden">
+                <caption>Win rate per house</caption>
+                <thead><tr><th>House</th><th>Win rate</th><th>Wins</th><th>Games played</th></tr></thead>
+                <tbody>
+                    @foreach (var house in overview.Houses)
+                    {
+                        <tr><td>@house.Name</td><td>@Percent(house.WinRate)</td><td>@house.Wins</td><td>@house.Seats</td></tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+
+    <section class="card bg-base-200 shadow-md border border-base-300 p-4" aria-labelledby="latest-games-heading">
+        <h2 id="latest-games-heading" class="text-lg font-semibold mb-2">Latest games</h2>
+        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-300">
+            <table class="table table-zebra">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Scenario</th>
+                        <th>Winner</th>
+                        <th class="text-center">Final round</th>
+                        <th>Finished</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var game in Model.LatestGames)
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge @(game.IsPbem ? "badge-info" : "badge-success") align-middle" title="@(game.IsPbem ? "Play By E-Mail" : "Live game")">@(game.IsPbem ? "PBEM" : "Live")</span>
+                                <a class="link font-semibold text-base-content" href="/play/@game.Id" target="_blank" rel="noopener noreferrer">@game.Name</a>
+                            </td>
+                            <td>@game.ScenarioLabel</td>
+                            <td>
+                                @if (game.WinnerHouseId is null)
+                                {
+                                    <span class="opacity-70">unknown</span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center gap-1">
+                                        <img src="~/house_icons/@(game.WinnerHouseId).png" alt="" class="h-6 w-6 shrink-0" />
+                                        <span>@game.WinnerHouseName</span>
+                                        @if (game.WinnerUserName is not null)
+                                        {
+                                            <span class="opacity-70">–</span>
+                                            @if (game.WinnerUserId is { } winnerId)
+                                            {
+                                                <a class="link link-hover" href="/user/@winnerId">@game.WinnerUserName</a>
+                                            }
+                                            else
+                                            {
+                                                <span>@game.WinnerUserName</span>
+                                            }
+                                        }
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-center">@(game.Round?.ToString(CultureInfo.InvariantCulture) ?? "?")</td>
+                            <td class="whitespace-nowrap"><time datetime="@game.FinishedAt.ToString("O")" data-local-datetime-minute>@game.FinishedAt.ToLocalTime().ToString("g")</time></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <partial name="_Pager" model="Model.Pager" />
+    </section>
+}
+
+<script nonce="@HttpContext.GetCspNonce()">
+    document.addEventListener("click", (event) => {
+        if (!(event.target instanceof Element)) return;
+        const button = event.target.closest("[data-set-all-settings]");
+        if (!button) return;
+
+        const group = button.closest("details");
+        if (!group) return;
+
+        const value = button.dataset.setAllSettings;
+        for (const select of group.querySelectorAll('select[name^="s."]')) {
+            select.value = value;
+        }
+    });
+</script>

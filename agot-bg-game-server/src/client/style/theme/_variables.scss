@@ -1,7 +1,6 @@
 @use "sass:color";
 
-// Darkly 4.3.1
-// Bootswatch
+// Darkly-derived application palette, retaining the Bootstrap 4 layout metrics.
 
 //
 // Color system
@@ -39,16 +38,29 @@ $danger: $red !default;
 $light: $gray-600 !default;
 $dark: $gray-800 !default;
 
-$yiq-contrasted-threshold: 175 !default;
+$min-contrast-ratio: 2 !default;
+$enable-rfs: false !default;
+$enable-dark-mode: false !default;
+$enable-smooth-scroll: false !default;
+$border-radius: 0.25rem !default;
+$border-radius-sm: 0.2rem !default;
+$border-radius-lg: 0.3rem !default;
 
 // Body
 
 $body-bg: $gray-900 !default;
 $body-color: $white !default;
+$body-secondary-color: $gray-600 !default;
+$body-secondary-bg: $gray-800 !default;
+$body-tertiary-bg: $gray-700 !default;
+$body-emphasis-color: $white !default;
 
 // Links
 
 $link-color: $success !default;
+$link-decoration: none !default;
+$link-hover-color: color.adjust($success, $lightness: -15%) !default;
+$link-hover-decoration: underline !default;
 
 // Fonts
 
@@ -70,22 +82,43 @@ $font-size-base: 0.9375rem !default;
 $h1-font-size: 3rem !default;
 $h2-font-size: 2.5rem !default;
 $h3-font-size: 2rem !default;
+$hr-opacity: 1 !default;
 
 // Tables
 
-$table-accent-bg: $gray-800 !default;
-
+$table-color: $white !default;
+$table-bg: transparent !default;
+$table-cell-padding-y: 0.75rem !default;
+$table-cell-padding-x: 0.75rem !default;
+$table-cell-padding-y-sm: 0.3rem !default;
+$table-cell-padding-x-sm: 0.3rem !default;
+$table-striped-bg: $gray-800 !default;
+$table-hover-bg: rgba($white, 0.075) !default;
 $table-border-color: $gray-700 !default;
 
 // Forms
 
+$input-bg: $white !default;
+$input-color: $gray-700 !default;
+$input-disabled-bg: $gray-200 !default;
+$input-placeholder-color: $gray-600 !default;
 $input-border-color: transparent !default;
+$input-focus-border-color: color.adjust($primary, $lightness: 25%) !default;
 
 $input-group-addon-color: $gray-500 !default;
 $input-group-addon-bg: $gray-700 !default;
-
-$custom-file-color: $gray-500 !default;
-$custom-file-border-color: $gray-700 !default;
+$form-check-input-bg: $white !default;
+$form-check-input-border: 1px solid $gray-500 !default;
+$form-check-input-width: 1rem !default;
+$form-check-padding-start: 1.5rem !default;
+$form-check-margin-bottom: 0 !default;
+$form-switch-width: 1.75rem !default;
+$form-switch-padding-start: 2.25rem !default;
+$form-switch-color: $gray-500 !default;
+$form-select-indicator-color: $gray-800 !default;
+$form-select-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'><path fill='#{$gray-800}' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>") !default;
+$form-select-bg-size: 8px 10px !default;
+$form-select-indicator-padding: 1.75rem !default;
 
 // Dropdowns
 
@@ -96,6 +129,7 @@ $dropdown-divider-bg: $gray-700 !default;
 $dropdown-link-color: $white !default;
 $dropdown-link-hover-color: $white !default;
 $dropdown-link-hover-bg: $primary !default;
+$dropdown-item-padding-x: 1.5rem !default;
 
 // Navs
 
@@ -140,20 +174,31 @@ $pagination-disabled-color: $white !default;
 $pagination-disabled-bg: color.adjust($success, $lightness: -15%) !default;
 $pagination-disabled-border-color: transparent !default;
 
-// Jumbotron
-
-$jumbotron-bg: $gray-800 !default;
-
 // Cards
 
 $card-cap-bg: $gray-700 !default;
 $card-bg: $gray-800 !default;
+$card-color: $white !default;
+$card-border-color: rgba($black, 0.125) !default;
+$card-spacer-y: 1.25rem !default;
+$card-spacer-x: 1.25rem !default;
+$card-cap-padding-y: 0.75rem !default;
+$card-cap-padding-x: 1.25rem !default;
 
 // Popovers
 
 $popover-bg: $gray-800 !default;
-
 $popover-header-bg: $gray-700 !default;
+$popover-body-color: $white !default;
+$popover-body-padding-y: 0.5rem !default;
+$popover-body-padding-x: 0.75rem !default;
+$popover-header-padding-y: 0.5rem !default;
+$popover-header-padding-x: 0.75rem !default;
+$popover-border-color: rgba($black, 0.2) !default;
+$tooltip-bg: $black !default;
+$tooltip-color: $white !default;
+$badge-padding-y: 0.25em !default;
+$badge-padding-x: 0.4em !default;
 
 // Modals
 
@@ -171,33 +216,12 @@ $progress-bg: $gray-700 !default;
 // List group
 
 $list-group-bg: $gray-800 !default;
+$list-group-color: $white !default;
 $list-group-border-color: $gray-700 !default;
-
 $list-group-hover-bg: $gray-700 !default;
-
-// Breadcrumbs
-
-$breadcrumb-bg: $gray-700 !default;
+$list-group-item-padding-y: 0.75rem !default;
+$list-group-item-padding-x: 1.25rem !default;
 
 // Close
 
-$close-color: $white !default;
-$close-text-shadow: none !default;
-
-// Code
-
-$pre-color: inherit !default;
-
-$sizes: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
-$sizes: map-merge(
-  (
-    25: 25%,
-    50: 50%,
-    75: 75%,
-    90: 90%,
-    100: 100%,
-    auto: auto
-  ),
-  $sizes
-);
+$btn-close-color: $white !default;

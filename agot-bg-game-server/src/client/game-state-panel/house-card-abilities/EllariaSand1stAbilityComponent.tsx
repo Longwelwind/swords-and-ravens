@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,9 +17,17 @@ export default class EllariaSand1stAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Ellaria Sand</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> can choose one
-          defending footmen to upgrade to a knight.
+          <Trans
+            i18nKey="ellariaSand1stAbility.ellariaSandHouseCanChooseOneDefendingFootmenTo963347"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name
+            }}
+            components={{
+              bold: <b />,
+              bold2: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectUnitsGameState, SelectUnitsComponent]

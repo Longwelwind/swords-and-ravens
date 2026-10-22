@@ -1,6 +1,7 @@
+import { t, Trans } from "./i18n";
 import { Component, ReactNode } from "react";
 import React from "react";
-import presentImage from "../../public/images/icons/present.svg"
+import presentImage from "../../public/images/icons/present.svg";
 import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import House from "../common/ingame-game-state/game-data-structure/House";
 import { Button, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
@@ -11,86 +12,116 @@ import { observable } from "mobx";
 import { preventOverflow } from "@popperjs/core";
 
 interface GiftPowerTokensComponentProps {
-    toHouse: House;
-    ingame: IngameGameState;
-    authenticatedPlayer: Player;
+  toHouse: House;
+  ingame: IngameGameState;
+  authenticatedPlayer: Player;
 }
 
 @observer
 export default class GiftPowerTokensComponent extends Component<GiftPowerTokensComponentProps> {
-    @observable powerTokens = 0;
+  @observable accessor powerTokens = 0;
 
-    get house(): House {
-        return this.props.authenticatedPlayer.house;
-    }
+  get house(): House {
+    return this.props.authenticatedPlayer.house;
+  }
 
-    get toHouse(): House {
-        return this.props.toHouse;
-    }
+  get toHouse(): House {
+    return this.props.toHouse;
+  }
 
-    get game(): Game {
-        return this.props.ingame.game;
-    }
+  get game(): Game {
+    return this.props.ingame.game;
+  }
 
-    get receivablePowerTokens(): number {
-        return this.toHouse.maxPowerTokens - this.toHouse.powerTokens - this.props.ingame.game.countPowerTokensOnBoard(this.toHouse);
-    }
+  get receivablePowerTokens(): number {
+    return (
+      this.toHouse.maxPowerTokens -
+      this.toHouse.powerTokens -
+      this.props.ingame.game.countPowerTokensOnBoard(this.toHouse)
+    );
+  }
 
-    render(): ReactNode {
-        return <>
-            <Col xs={12}>
-                <Row className="justify-content-center">
-                    <Col xs="auto">
-                        <OverlayTrigger overlay={
-                            <Tooltip id="gift-power-tokens-tooltip">
-                                Gift Power tokens to<br/>House <b>{this.toHouse.name}</b>
-                            </Tooltip>}
-                            popperConfig={{modifiers: [preventOverflow]}}
-                            placement="auto">
-                            <div style={{backgroundImage: `url(${presentImage})`, width: 24, height: 24}}/>
-                        </OverlayTrigger>
-                    </Col>
-                    <Col xs="auto">
-                        <input
-                            type="range"
-                            className="custom-range"
-                            min={0}
-                            max={Math.min(this.house.powerTokens, this.receivablePowerTokens)}
-                            value={this.powerTokens}
-                            onChange={e => {
-                                this.powerTokens = parseInt(e.target.value);
-                            }}
-                            disabled={!this.canGiftPowerTokens()}
-                        />
-                    </Col>
-                    <Col style={{ width: "50px" }}>
-                        <b>{this.powerTokens}</b>
-                    </Col>
-                </Row>
-                <Row className="justify-content-center">
-                    <Col xs="auto">
-                        <Button type="button"
-                            onClick={() => {
-                                this.props.ingame.entireGame.sendMessageToServer({
-                                    type: "gift-power-tokens",
-                                    toHouse: this.toHouse.id,
-                                    powerTokens: this.powerTokens
-                                });
-                                this.powerTokens = 0;
-                                document.body.click();
-                            }}
-                            disabled={!this.canGiftPowerTokens()}
-                            variant="success"
-                        >
-                            Confirm
-                        </Button>
-                    </Col>
-                </Row>
+  render(): ReactNode {
+    return (
+      <>
+        <Col xs={12}>
+          <Row className="justify-content-center">
+            <Col xs="auto">
+              <OverlayTrigger
+                overlay={
+                  <Tooltip id="gift-power-tokens-tooltip">
+                    <Trans
+                      i18nKey="giftPowerTokens.giftPowerTokensToHouse15c7a9"
+                      values={{ toHouse: this.toHouse.name }}
+                      components={{
+                        lineBreak: <br />,
+                        bold: <b />
+                      }}
+                    />
+                  </Tooltip>
+                }
+                popperConfig={{ modifiers: [preventOverflow] }}
+                placement="auto"
+              >
+                <div
+                  style={{
+                    backgroundImage: `url(${presentImage})`,
+                    width: 24,
+                    height: 24
+                  }}
+                />
+              </OverlayTrigger>
             </Col>
-        </>;
-    }
+            <Col xs="auto">
+              <input
+                type="range"
+                className="w-100"
+                min={0}
+                max={Math.min(
+                  this.house.powerTokens,
+                  this.receivablePowerTokens
+                )}
+                value={this.powerTokens}
+                onChange={(e) => {
+                  this.powerTokens = parseInt(e.target.value);
+                }}
+                disabled={!this.canGiftPowerTokens()}
+              />
+            </Col>
+            <Col style={{ width: "50px" }}>
+              <b>{this.powerTokens}</b>
+            </Col>
+          </Row>
+          <Row className="justify-content-center">
+            <Col xs="auto">
+              <Button
+                type="button"
+                onClick={() => {
+                  this.props.ingame.entireGame.sendMessageToServer({
+                    type: "gift-power-tokens",
+                    toHouse: this.toHouse.id,
+                    powerTokens: this.powerTokens
+                  });
+                  this.powerTokens = 0;
+                  document.body.click();
+                }}
+                disabled={!this.canGiftPowerTokens()}
+                variant="success"
+              >
+                {t("common.confirm")}
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+      </>
+    );
+  }
 
-    canGiftPowerTokens(): boolean {
-        return this.house.powerTokens > 0 && this.receivablePowerTokens > 0 && this.props.ingame.canGiftPowerTokens(this.house);
-    }
+  canGiftPowerTokens(): boolean {
+    return (
+      this.house.powerTokens > 0 &&
+      this.receivablePowerTokens > 0 &&
+      this.props.ingame.canGiftPowerTokens(this.house)
+    );
+  }
 }

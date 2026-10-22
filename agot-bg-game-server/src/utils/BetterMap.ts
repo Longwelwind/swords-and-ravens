@@ -14,7 +14,7 @@ function safeKeyString<K>(key: K): string {
       const json = JSON.stringify(key);
       // Truncate very long strings to keep error messages readable
       return json.length > 200 ? json.substring(0, 200) + "..." : json;
-    } catch (e) {
+    } catch {
       // Fallback for circular references
       return String(key);
     }
@@ -24,10 +24,10 @@ function safeKeyString<K>(key: K): string {
 }
 
 export default class BetterMap<K, V> {
-  @observable _map: Map<K, V>;
+  @observable accessor _map: Map<K, V>;
 
-  constructor(entries: [K, V][] = []) {
-    this._map = new Map(entries);
+  constructor(entries: [K, V][] = [], deep = true) {
+    this._map = observable.map(entries, { deep });
   }
 
   get keys(): K[] {
@@ -68,11 +68,11 @@ export default class BetterMap<K, V> {
 
   mapOver<KP, VP>(
     mapKey: (k: K) => KP,
-    mapValue: (v: V, k: K) => VP,
+    mapValue: (v: V, k: K) => VP
   ): [KP, VP][] {
     return this.entries.map(([key, value]) => [
       mapKey(key),
-      mapValue(value, key),
+      mapValue(value, key)
     ]);
   }
 

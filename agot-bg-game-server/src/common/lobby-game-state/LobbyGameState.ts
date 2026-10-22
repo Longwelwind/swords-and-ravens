@@ -15,10 +15,10 @@ import { v4 } from "uuid";
 
 export default class LobbyGameState extends GameState<EntireGame> {
   lobbyHouses: BetterMap<string, LobbyHouse>;
-  @observable players = new BetterMap<LobbyHouse, User>();
-  @observable password = "";
-  @observable readyUsers: User[] | null = null;
-  @observable readyCheckWillTimeoutAt: Date | null = null;
+  @observable accessor players = new BetterMap<LobbyHouse, User>();
+  @observable accessor password = "";
+  @observable accessor readyUsers: User[] | null = null;
+  @observable accessor readyCheckWillTimeoutAt: Date | null = null;
   readyCheckTimeout: NodeJS.Timeout | null;
 
   get entireGame(): EntireGame {

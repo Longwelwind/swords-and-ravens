@@ -91,31 +91,30 @@ export default class CombatGameState extends GameState<
   defender: House;
   houseCombatDatas: BetterMap<House, HouseCombatData>;
   dontSkipVsbQuestion: boolean;
-  @observable valyrianSteelBladeUser: House | null;
+  @observable accessor valyrianSteelBladeUser: House | null;
   revealTidesOfBattleCards: boolean;
   tidesOfBattleDeck: TidesOfBattleCard[] = this.isTidesOfBattleCardsActive
     ? getShuffledTidesOfBattleDeck(this.entireGame.gameSettings)
     : [];
 
-  @observable
-  stats: CombatStats[] = [];
+  @observable accessor stats: CombatStats[] = [];
 
-  @observable
-  houseCardModifiers: BetterMap<string, HouseCardModifier> = new BetterMap();
+  @observable accessor houseCardModifiers: BetterMap<
+    string,
+    HouseCardModifier
+  > = new BetterMap();
 
-  @observable
-  stateVersion = 0;
+  @observable accessor stateVersion = 0;
 
   // True for a short window right after both house cards have been revealed simultaneously, so
   // CombatInfoComponent can render the real 3D flip (hidden back -> revealed house card) instead
   // of jumping straight to the plain, revealed HouseCardComponent.
-  @observable
-  animatingHouseCardReveal = false;
+  @observable accessor animatingHouseCardReveal = false;
 
   // The key is the supporting house and the value is the supported house.
   // The value is always either attacker or defender or null if the supporter
   // decided to support no-one.
-  @observable supporters = new BetterMap<House, House | null>();
+  @observable accessor supporters = new BetterMap<House, House | null>();
 
   get attackingRegion(): Region {
     return this.attackingHouseCombatData.region;
@@ -402,9 +401,7 @@ export default class CombatGameState extends GameState<
             // Take into account the possible support order bonus
             const supportOrder = this.actionGameState.ordersOnBoard.get(region);
             const supportOrderType:
-              | SupportOrderType
-              | RaidSupportOrderType
-              | null =
+              SupportOrderType | RaidSupportOrderType | null =
               supportOrder.type instanceof SupportOrderType
                 ? (supportOrder.type as SupportOrderType)
                 : supportOrder.type instanceof RaidSupportOrderType

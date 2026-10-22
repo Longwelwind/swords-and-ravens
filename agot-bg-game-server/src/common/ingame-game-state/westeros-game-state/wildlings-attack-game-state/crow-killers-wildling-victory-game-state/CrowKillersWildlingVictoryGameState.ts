@@ -28,8 +28,8 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
   | SelectUnitsGameState<CrowKillersWildlingVictoryGameState>
   | TakeControlOfEnemyPortGameState
 > {
-  @observable
-  step: CrowKillersStep = CrowKillersStep.DEGRADING_KNIGHTS;
+  @observable accessor step: CrowKillersStep =
+    CrowKillersStep.DEGRADING_KNIGHTS;
 
   static readonly EVERYONE_ELSE_REPLACE_COUNT = 2;
 
@@ -318,7 +318,6 @@ export default class CrowKillersWildlingVictoryGameState extends WildlingCardEff
 export interface SerializedCrowKillersWildlingVictoryGameState {
   type: "crow-killers-wildling-victory";
   childGameState:
-    | SerializedSelectUnitsGameState
-    | SerializedTakeControlOfEnemyPortGameState;
+    SerializedSelectUnitsGameState | SerializedTakeControlOfEnemyPortGameState;
   step: CrowKillersStep;
 }

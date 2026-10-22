@@ -9,8 +9,10 @@ import _ from "lodash";
 export default class SnapshotHighlighter {
   replayManager: GameReplayManager;
 
-  @observable regionsToHighlight: BetterMap<string, string> = new BetterMap();
-  @observable marchMarkers: [string, { to: string; color: string }][] = [];
+  @observable accessor regionsToHighlight: BetterMap<string, string> =
+    new BetterMap();
+  @observable accessor marchMarkers: [string, { to: string; color: string }][] =
+    [];
 
   get hlHouseAreas(): boolean {
     return this.replayManager.highlightHouseAreas;

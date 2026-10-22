@@ -1,3 +1,5 @@
+import { Trans, t } from "../i18n";
+import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import CombatGameState, {
@@ -28,7 +30,6 @@ import {
   UnitOnMapProperties
 } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
-import _ from "lodash";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import BeforeCombatHouseCardAbilitiesGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/before-combat-house-card-abilities-game-state/BeforeCombatHouseCardAbilitiesGameState";
 import BeforeCombatHouseCardAbilitiesComponent from "./house-card-abilities/BeforeCombatHouseCardsAbilitiesComponent";
@@ -42,10 +43,6 @@ import AfterCombatHouseCardAbilitiesGameState from "../../common/ingame-game-sta
 export default class CombatComponent extends Component<
   GameStateComponentProps<CombatGameState>
 > {
-  modifyRegionsOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
-  modifyOrdersOnMapCallback: any;
-
   get combat(): CombatGameState {
     return this.props.gameState;
   }
@@ -147,11 +144,27 @@ export default class CombatComponent extends Component<
           ];
     return (
       <div key={`combat-component-${this.props.gameState.stateVersion}`}>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          units={this.modifyUnitsOnMap()}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Col xs={12}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <h5>
-              Battle {this.combatStats.length > 0 && "results "} for{" "}
-              <b>{this.combat.defendingRegion.name}</b>
+              <Trans
+                i18nKey="combat.battleFordaa1d7"
+                values={{
+                  combatDefendingRegion: this.combat.defendingRegion.name,
+                  resultsLabel:
+                    this.combatStats.length > 0 ? t("combat.results9709ae") : ""
+                }}
+                components={{
+                  bold: <b />
+                }}
+              />
             </h5>
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -160,7 +173,13 @@ export default class CombatComponent extends Component<
         </Col>
         {winner && (
           <Col xs={12} className="text-center">
-            Winner: <b style={{ color: winner.color }}>{winner.name}</b>
+            <Trans
+              i18nKey="common.winner"
+              values={{ winner: winner.name }}
+              components={{
+                bold: <b style={{ color: winner.color }} />
+              }}
+            />
           </Col>
         )}
         {renderChildGameState(this.props, [
@@ -208,27 +227,54 @@ export default class CombatComponent extends Component<
   }
 
   modifyRegionsOnMap(): [Region, PartialRecursive<RegionOnMapProperties>][] {
-    // Highlight the embattled area in yellow
+    const postCombat =
+      this.combat.childGameState instanceof PostCombatGameState
+        ? this.combat.childGameState
+        : null;
+    const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState)
+      ? (this.combat.getChildGameState(
+          SelectUnitsGameState
+        ) as SelectUnitsGameState<any>)
+      : null;
+    const drawMarchMarker =
+      (!postCombat ||
+        (!postCombat.hasChildGameState(
+          AfterCombatHouseCardAbilitiesGameState
+        ) &&
+          postCombat.winner == this.combat.attacker)) &&
+      (!selectUnits ||
+        !this.props.gameClient.doesControlHouse(selectUnits.house)) &&
+      this.combat.attackingArmy.some(
+        (unit) => unit.region == this.combat.attackingRegion
+      );
+
     return [
       [
+        this.combat.attackingRegion,
+        {
+          marchMarker: drawMarchMarker
+            ? {
+                targetRegion: this.combat.defendingRegion,
+                color: this.combat.attacker.getHighlightColor()
+              }
+            : undefined
+        }
+      ],
+      [
         this.combat.defendingRegion,
-        { highlight: { active: true, color: "yellow" } }
+        {
+          highlight: {
+            active: true,
+            color: this.combat.attacker.getHighlightColor()
+          }
+        }
       ]
     ];
   }
 
   modifyUnitsOnMap(): [Unit, PartialRecursive<UnitOnMapProperties>][] {
     // Highlight the attacking army in red when game state tree does not contain SelectUnitsGameState
-    // or the user does not control the house to select units but never show march markers when attacker lost the combat
-    // (but post combat may be still active for abilties)
-    const postCombat =
-      this.combat.childGameState instanceof PostCombatGameState
-        ? this.combat.childGameState
-        : null;
-    const drawMarchMarkers =
-      !postCombat ||
-      (!postCombat.hasChildGameState(AfterCombatHouseCardAbilitiesGameState) &&
-        postCombat.winner == this.combat.attacker);
+    // or the user does not control the house to select units.
     const selectUnits = this.combat.hasChildGameState(SelectUnitsGameState)
       ? (this.combat.getChildGameState(
           SelectUnitsGameState
@@ -242,23 +288,11 @@ export default class CombatComponent extends Component<
       return this.combat.attackingArmy.map((u) => [
         u,
         {
-          highlight: { active: true, color: "red" },
-          targetRegion: drawMarchMarkers
-            ? this.combat.defendingRegion
-            : undefined
+          highlight: { active: true, color: "red" }
         }
       ]);
-    } else if (this.props.gameClient.doesControlHouse(selectUnits.house)) {
-      return [];
     } else {
-      return this.combat.attackingArmy.map((u) => [
-        u,
-        {
-          targetRegion: drawMarchMarkers
-            ? this.combat.defendingRegion
-            : undefined
-        }
-      ]);
+      return [];
     }
   }
 
@@ -270,16 +304,6 @@ export default class CombatComponent extends Component<
   }
 
   componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-
     window.setTimeout(() => {
       document.body.click();
       window.setTimeout(() => {
@@ -291,19 +315,6 @@ export default class CombatComponent extends Component<
   }
 
   componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-
     this.props.gameClient.sfxManager.fadeOutCurrentMusic();
   }
 }

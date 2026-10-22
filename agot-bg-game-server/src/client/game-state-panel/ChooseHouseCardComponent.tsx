@@ -1,3 +1,5 @@
+import { t, Trans } from "../i18n";
+import joinNaturalLanguage from "../utils/joinNaturalLanguage";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { Component } from "react";
@@ -18,7 +20,7 @@ import House from "../../common/ingame-game-state/game-data-structure/House";
 export default class ChooseHouseCardComponent extends Component<
   GameStateComponentProps<ChooseHouseCardGameState>
 > {
-  @observable dontSkipVsbQuestion: boolean;
+  @observable accessor dontSkipVsbQuestion: boolean;
 
   get chosenHouseCard(): HouseCard | null {
     const commandedHouse = this.tryGetCommandedHouseInCombat();
@@ -75,11 +77,11 @@ export default class ChooseHouseCardComponent extends Component<
 
   tryGetCommandedHouseInCombat(): House | null {
     return this.combat.tryGetCommandedHouseInCombat(
-      this.props.gameClient.authenticatedPlayer,
+      this.props.gameClient.authenticatedPlayer
     );
   }
 
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     const waitingFor = this.props.gameState.getWaitingForHouses();
     const commandedHouse = this.tryGetCommandedHouseInCombat();
     const supportingHouses =
@@ -89,7 +91,7 @@ export default class ChooseHouseCardComponent extends Component<
     ) : (
       <>
         <Col xs={12} className="text-center">
-          The attacker and the defender must choose a House&nbsp;card
+          {t("chooseHouseCard.theAttackerAndTheDefenderMustChooseAHouse2c46fa")}
         </Col>
         {this.shouldChooseHouseCard() && (
           <>
@@ -103,7 +105,7 @@ export default class ChooseHouseCardComponent extends Component<
                       paddingRight: 6,
                       paddingLeft: 6,
                       paddingBottom: 4,
-                      paddingTop: 4,
+                      paddingTop: 4
                     }}
                   >
                     <HouseCardComponent
@@ -133,19 +135,20 @@ export default class ChooseHouseCardComponent extends Component<
                           <OverlayTrigger
                             overlay={
                               <Tooltip id="donst-skip-vsb-tooltip">
-                                In case the +1 bonus won&apos;t affect the
-                                outcome of the battle, the game usually will
-                                skip the question of whether to use the blade or
-                                not.
-                                <br />
-                                In case you might want to be asked anyway, you
-                                can pre-mark it here.
-                                <br />
+                                <Trans
+                                  i18nKey="chooseHouseCard.inCaseThe1BonusWonTAffectTheb02ea3"
+                                  components={{
+                                    lineBreak: <br />,
+                                    lineBreak2: <br />
+                                  }}
+                                />
                               </Tooltip>
                             }
                           >
                             <label htmlFor="dont-skip-vsb-question">
-                              Don&apos;t skip VSB bonus question
+                              {t(
+                                "chooseHouseCard.donTSkipVsbBonusQuestion56dd52"
+                              )}
                             </label>
                           </OverlayTrigger>
                         }
@@ -166,7 +169,7 @@ export default class ChooseHouseCardComponent extends Component<
                     onClick={() => this.chooseHouseCard()}
                     disabled={!this.dirty || this.selectedHouseCard == null}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
               </Row>
@@ -181,14 +184,16 @@ export default class ChooseHouseCardComponent extends Component<
                           onClick={() => {
                             if (
                               window.confirm(
-                                "Are you sure you want to refuse all the support you have received?",
+                                t(
+                                  "chooseHouseCard.areYouSureYouWantToRefuseAllThe14713d"
+                                )
                               )
                             ) {
                               this.props.gameState.refuseSupport();
                             }
                           }}
                         >
-                          Refuse ALL received support
+                          {t("chooseHouseCard.refuseAllReceivedSupportd59ddf")}
                         </Button>
                       </Col>
                     )}
@@ -204,19 +209,25 @@ export default class ChooseHouseCardComponent extends Component<
                             if (
                               window.confirm(
                                 commandedHouse == supportingHouse
-                                  ? "Are you sure you want to refuse your own support?"
-                                  : `Are you sure you want to refuse the support you have received from House ${supportingHouse.name}?`,
+                                  ? t(
+                                      "chooseHouseCard.areYouSureYouWantToRefuseYourOwn97bdc7"
+                                    )
+                                  : t("chooseHouseCard.confirmRefuseSupport", {
+                                      house: supportingHouse.name
+                                    })
                               )
                             ) {
                               this.props.gameState.refuseSupport(
-                                supportingHouse,
+                                supportingHouse
                               );
                             }
                           }}
                         >
                           {commandedHouse == supportingHouse
-                            ? "Refuse own support"
-                            : `Refuse support from ${supportingHouse.name}`}
+                            ? t("chooseHouseCard.refuseOwnSupport6e9b1f")
+                            : t("chooseHouseCard.refuseSupportFrom3f7482", {
+                                supportingHouse: supportingHouse.name
+                              })}
                         </Button>
                       </Col>
                     ))}
@@ -227,16 +238,21 @@ export default class ChooseHouseCardComponent extends Component<
         )}
         <Col xs={12} className="text-center">
           <div>
-            Waiting for{" "}
-            {waitingFor
-              .map(
-                (h) =>
-                  this.combat.ingameGameState.getControllerOfHouse(h).house
-                    .name,
-              )
-              .join(" and ")}{" "}
-            to choose their House&nbsp;card{waitingFor.length != 1 ? "s" : ""}
-            ...
+            <Trans
+              i18nKey="chooseHouseCard.waitingForToChooseTheir05a4e8"
+              values={{
+                houses: joinNaturalLanguage(
+                  waitingFor.map(
+                    (h) =>
+                      this.combat.ingameGameState.getControllerOfHouse(h).house
+                        .name
+                  )
+                ),
+                houseCardLabel: t("common.HousecardLabel", {
+                  count: waitingFor.length
+                })
+              }}
+            />
           </div>
         </Col>
       </>
@@ -245,7 +261,7 @@ export default class ChooseHouseCardComponent extends Component<
 
   shouldChooseHouseCard(): boolean {
     return this.props.gameState.combatGameState.houseCombatDatas.keys.some(
-      (h) => this.props.gameClient.doesControlHouse(h),
+      (h) => this.props.gameClient.doesControlHouse(h)
     );
   }
 
@@ -256,7 +272,7 @@ export default class ChooseHouseCardComponent extends Component<
 
     this.props.gameState.chooseHouseCard(
       this.selectedHouseCard,
-      this.dontSkipVsbQuestion,
+      this.dontSkipVsbQuestion
     );
   }
 

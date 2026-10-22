@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { Component, default as React, ReactNode } from "react";
 import { observer } from "mobx-react";
 import Tooltip from "react-bootstrap/Tooltip";
@@ -55,7 +56,7 @@ export default class InfluenceIconComponent extends Component<InfluenceIconCompo
         key={`influence-icon-${this.house?.id ?? "unknown"}-${this.props.ingame.stateVersion}`}
         overlay={
           <Tooltip id="influence-icon">
-            <b>{this.house?.name ?? "Unknown"}</b>
+            <b>{this.house?.name ?? t("common.unknown")}</b>
           </Tooltip>
         }
         placement="bottom"

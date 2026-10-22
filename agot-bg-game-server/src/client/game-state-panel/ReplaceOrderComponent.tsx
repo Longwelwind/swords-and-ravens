@@ -1,11 +1,12 @@
+import { t, Trans } from "../i18n";
+import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import ReplaceOrderGameState from "../../common/ingame-game-state/action-game-state/use-raven-game-state/replace-order-game-state/ReplaceOrderGameState";
 import React from "react";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Order from "../../common/ingame-game-state/game-data-structure/Order";
-import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -17,17 +18,19 @@ import PartialRecursive from "../../utils/PartialRecursive";
 export default class ReplaceOrderComponent extends Component<
   GameStateComponentProps<ReplaceOrderGameState>
 > {
-  @observable selectedRegion: Region | null;
-  @observable selectedOrder: Order | null;
-
-  modifyOrdersOnMapCallback: any;
+  @observable accessor selectedRegion: Region | null;
+  @observable accessor selectedOrder: Order | null;
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          orders={this.modifyOrdersOnMap()}
+        />
         <Col xs={12} className="text-center">
-          The holder of the Raven token may now choose to replace one of its
-          Order tokens or to look at the top card of the Wildling deck.
+          {t("replaceOrder.theHolderOfTheRavenTokenMayNowChoose2ef071")}
         </Col>
         {this.props.gameClient.doesControlHouse(
           this.props.gameState.ravenHolder
@@ -35,27 +38,35 @@ export default class ReplaceOrderComponent extends Component<
           <>
             {this.selectedRegion == null ? (
               <Col xs={12} className="text-center">
-                Click the Order token on the map you want to replace.
+                {t("replaceOrder.clickTheOrderTokenOnTheMapYouWant15cff4")}
               </Col>
             ) : (
               <Col xs={12} className="text-center">
-                Choose which Order token to place on{" "}
-                <b>{this.selectedRegion.name}</b>:<br />
-                <OrderGridComponent
-                  orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(
-                    this.props.gameState.ravenHolder
-                  )}
-                  selectedOrder={this.selectedOrder}
-                  availableOrders={this.props.gameState.getAvailableOrders(
-                    this.selectedRegion
-                  )}
-                  restrictedOrders={this.props.gameState.ingameGameState.game.getRestrictedOrders(
-                    this.selectedRegion,
-                    this.props.gameState.parentGameState.parentGameState
-                      .planningRestrictions,
-                    true
-                  )}
-                  onOrderClick={(o) => this.selectOrder(o)}
+                <Trans
+                  i18nKey="replaceOrder.chooseWhichOrderTokenToPlaceOn8932a6"
+                  values={{ selectedRegion: this.selectedRegion.name }}
+                  components={{
+                    bold: <b />,
+                    lineBreak: <br />,
+                    details: (
+                      <OrderGridComponent
+                        orders={this.props.gameState.ingameGameState.game.getOrdersListForHouse(
+                          this.props.gameState.ravenHolder
+                        )}
+                        selectedOrder={this.selectedOrder}
+                        availableOrders={this.props.gameState.getAvailableOrders(
+                          this.selectedRegion
+                        )}
+                        restrictedOrders={this.props.gameState.ingameGameState.game.getRestrictedOrders(
+                          this.selectedRegion,
+                          this.props.gameState.parentGameState.parentGameState
+                            .planningRestrictions,
+                          true
+                        )}
+                        onOrderClick={(o) => this.selectOrder(o)}
+                      />
+                    )
+                  }}
                 />
               </Col>
             )}
@@ -69,7 +80,7 @@ export default class ReplaceOrderComponent extends Component<
                     this.selectedOrder == null || this.selectedRegion == null
                   }
                 >
-                  Confirm Order token replacement
+                  {t("replaceOrder.confirmOrderTokenReplacement411d63")}
                 </Button>
               </Col>
               <Col xs={12} className="d-flex justify-content-center">
@@ -78,7 +89,7 @@ export default class ReplaceOrderComponent extends Component<
                   onClick={() => this.seeTopWildlingCardInstead()}
                   disabled={this.selectedOrder != null}
                 >
-                  Look at the Top Wildling Card instead
+                  {t("replaceOrder.lookAtTheTopWildlingCardInsteade2a4e9")}
                 </Button>
               </Col>
               <Col xs={12} className="d-flex justify-content-center">
@@ -90,20 +101,24 @@ export default class ReplaceOrderComponent extends Component<
                   }
                   onClick={() => this.reset()}
                 >
-                  Reset
+                  {t("common.reset")}
                 </Button>
               </Col>
             </Col>
           </>
         ) : (
           <Col xs={12} className="text-center">
-            Waiting for {this.props.gameState.ravenHolder.name}...
+            <Trans
+              i18nKey="common.waitingFor"
+              values={{ houses: this.props.gameState.ravenHolder.name }}
+            />
           </Col>
         )}
       </>
     );
   }
 
+  @action
   onOrderClick(region: Region): void {
     if (region.getController() == this.props.gameState.ravenHolder) {
       if (this.selectedRegion == region) {
@@ -135,7 +150,9 @@ export default class ReplaceOrderComponent extends Component<
       ) {
         if (
           !window.confirm(
-            "Your replaced order is restricted and will be removed afterwards. Do you want to continue?"
+            t(
+              "replaceOrder.yourReplacedOrderIsRestrictedAndWillBeRemoved747ba6"
+            )
           )
         ) {
           return;
@@ -176,19 +193,7 @@ export default class ReplaceOrderComponent extends Component<
     return [];
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyOrdersOnMap,
-      this.modifyOrdersOnMapCallback
-    );
-  }
-
+  @action
   private reset(): void {
     this.selectedRegion = null;
     this.selectedOrder = null;

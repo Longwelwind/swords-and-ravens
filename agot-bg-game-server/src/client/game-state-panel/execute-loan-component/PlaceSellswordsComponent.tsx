@@ -1,8 +1,10 @@
+import { t, Trans, translateGameText } from "../../i18n";
+import MapContribution, { wrapMapElement } from "../../MapContribution";
 import { observer } from "mobx-react";
-import React, { Component, ReactElement, ReactNode } from "react";
+import React, { Component, ReactNode } from "react";
 import Region from "../../../common/ingame-game-state/game-data-structure/Region";
 import BetterMap from "../../../utils/BetterMap";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import House from "../../../common/ingame-game-state/game-data-structure/House";
 import * as _ from "lodash";
 import { Button, OverlayTrigger, Popover } from "react-bootstrap";
@@ -20,10 +22,7 @@ import UnitIconComponent from "../../../client/UnitIconComponent";
 export default class PlaceSellswordsComponent extends Component<
   GameStateComponentProps<PlaceSellswordsGameState>
 > {
-  @observable placedSellswords = new BetterMap<Region, Unit[]>();
-
-  modifyRegionsOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
+  @observable accessor placedSellswords = new BetterMap<Region, Unit[]>();
 
   get house(): House {
     return this.props.gameState.house;
@@ -45,12 +44,20 @@ export default class PlaceSellswordsComponent extends Component<
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          units={this.modifyUnitsOnMap()}
+        />
         {this.doesControlCurrentHouse && (
           <>
             {this.placedSellswords.size > 0 && (
               <Col xs={12}>
                 <>
-                  {this.placedSellswords.size > 0 && <p>Your placements:</p>}
+                  {this.placedSellswords.size > 0 && (
+                    <p>{t("placeSellswords.yourPlacements5abb57")}</p>
+                  )}
                   {this.placedSellswords.entries.map(([r, placements]) => (
                     <div key={`sellsword-placements_${r.id}`}>
                       <b>{r.name}</b>
@@ -60,7 +67,7 @@ export default class PlaceSellswordsComponent extends Component<
                             onClick={() => this.removePlacement(placements, i)}
                             key={`sellsword-placements_${r.id}_${i}`}
                           >
-                            {unit.type.name}
+                            {translateGameText(unit.type.name)}
                           </li>
                         ))}
                       </ul>
@@ -75,11 +82,20 @@ export default class PlaceSellswordsComponent extends Component<
               <Col xs={12} className="text-center">
                 {this.props.gameState.regions.length == 1 ? (
                   <>
-                    Click into <b>{this.props.gameState.regions[0].name}</b> to
-                    place a sellsword there.
+                    <Trans
+                      i18nKey="placeSellswords.clickIntoToPlaceASellswordThere876165"
+                      values={{ regions: this.props.gameState.regions[0].name }}
+                      components={{
+                        bold: <b />
+                      }}
+                    />
                   </>
                 ) : (
-                  <>Click on a area to place a sellsword there.</>
+                  <>
+                    {t(
+                      "placeSellswords.clickOnAAreaToPlaceASellswordTherecb1e61"
+                    )}
+                  </>
                 )}
               </Col>
             )}
@@ -92,7 +108,7 @@ export default class PlaceSellswordsComponent extends Component<
                     disabled={!this.canSubmit()}
                     onClick={() => this.submit()}
                   >
-                    Submit
+                    {t("common.submit")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -102,7 +118,7 @@ export default class PlaceSellswordsComponent extends Component<
                     disabled={this.placedSellswords.size == 0}
                     onClick={() => this.reset()}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
@@ -112,7 +128,10 @@ export default class PlaceSellswordsComponent extends Component<
         {(!this.doesControlCurrentHouse ||
           this.props.gameState.ingame.isVassalHouse(this.house)) && (
           <Col xs={12} className="text-center">
-            Waiting for {this.house.name}...
+            <Trans
+              i18nKey="common.waitingFor"
+              values={{ houses: this.house.name }}
+            />
           </Col>
         )}
       </>
@@ -129,6 +148,7 @@ export default class PlaceSellswordsComponent extends Component<
     this.removeEmptyPlacements();
   }
 
+  @action
   private removeEmptyPlacements(): void {
     this.placedSellswords.keys.forEach((r) => {
       const placements = this.placedSellswords.get(r);
@@ -142,10 +162,13 @@ export default class PlaceSellswordsComponent extends Component<
     return this.props.gameState.isPlacementValid(this.placedSellswordTypes);
   }
 
+  @action
   submit(): void {
     if (this.props.gameState.anyPlacementPossible(this.placedSellswordTypes)) {
       if (
-        !confirm("You have not placed all of your sellswords. Continue anyway?")
+        !confirm(
+          t("placeSellswords.youHaveNotPlacedAllOfYourSellswordsContinue2bc53c")
+        )
       ) {
         return;
       }
@@ -172,7 +195,7 @@ export default class PlaceSellswordsComponent extends Component<
         modifiedRegion,
         {
           highlight: { active: true },
-          wrap: (child: ReactElement) => (
+          wrap: wrapMapElement(
             <OverlayTrigger
               placement="auto"
               trigger="click"
@@ -213,7 +236,7 @@ export default class PlaceSellswordsComponent extends Component<
                 </Popover>
               }
             >
-              {child}
+              <span />
             </OverlayTrigger>
           )
         }
@@ -223,6 +246,7 @@ export default class PlaceSellswordsComponent extends Component<
     return [];
   }
 
+  @action
   private addPlacement(region: Region, unitType: UnitType): void {
     const placements: Unit[] = this.placedSellswords.tryGet(region, []);
     const newUnit = this.props.gameState.game.createUnit(
@@ -270,29 +294,12 @@ export default class PlaceSellswordsComponent extends Component<
     return [];
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-  }
-
   componentWillUnmount(): void {
     // Discard any pending, unsent sellsword placements so they don't corrupt the shared game model
     this.reset();
-
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 
+  @action
   private onUnitClick(unit: Unit): void {
     for (const region of this.placedSellswords.keys) {
       const placements = this.placedSellswords.get(region);
@@ -307,6 +314,7 @@ export default class PlaceSellswordsComponent extends Component<
     }
   }
 
+  @action
   private reset(): void {
     _.flatMap(this.placedSellswords.values).forEach((r) => {
       r.region.newUnits = [];

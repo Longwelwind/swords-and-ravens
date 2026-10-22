@@ -19,18 +19,18 @@ export default class Region {
   game: Game;
 
   id: string;
-  @observable units: BetterMap<number, Unit>;
-  @observable garrison: number;
-  @observable controlPowerToken: House | null;
-  @observable loyaltyTokens: number;
-  @observable castleModifier: number;
-  @observable barrelModifier: number;
-  @observable crownModifier: number;
+  @observable accessor units: BetterMap<number, Unit>;
+  @observable accessor garrison: number;
+  @observable accessor controlPowerToken: House | null;
+  @observable accessor loyaltyTokens: number;
+  @observable accessor castleModifier: number;
+  @observable accessor barrelModifier: number;
+  @observable accessor crownModifier: number;
   overwrittenSuperControlPowerToken: House | null;
 
   // Client-side only to support live update of planned musterings
-  @observable newUnits: Unit[];
-  @observable removedUnits: Unit[];
+  @observable accessor newUnits: Unit[];
+  @observable accessor removedUnits: Unit[];
 
   get staticRegion(): StaticRegion {
     return getStaticWorld(

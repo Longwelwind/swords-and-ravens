@@ -19,7 +19,7 @@ import DraftGameState from "../DraftGameState";
 import AgreeOnGameStartGameState from "../agree-on-game-start-game-state/AgreeOnGameStartGameState";
 
 export default class DraftMapGameState extends GameState<DraftGameState> {
-  @observable readyHouses: House[];
+  @observable accessor readyHouses: House[];
   initialSupplies: BetterMap<House, number> = new BetterMap();
 
   get ingame(): IngameGameState {

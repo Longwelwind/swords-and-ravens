@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { ServerMessage } from "../messages/ServerMessage";
 import { ClientMessage } from "../messages/ClientMessage";
 import EntireGame from "../common/EntireGame";
@@ -39,14 +40,15 @@ export default class GameClient {
   private pendingMessages: ServerMessage[] = [];
   private pendingMessagesFlushTimeout: number | null = null;
 
-  @observable connectionState: ConnectionState = ConnectionState.INITIALIZING;
-  @observable entireGame: EntireGame | null = null;
+  @observable accessor connectionState: ConnectionState =
+    ConnectionState.INITIALIZING;
+  @observable accessor entireGame: EntireGame | null = null;
 
-  @observable authenticated = false;
-  @observable authenticatedUser: User | null = null;
+  @observable accessor authenticated = false;
+  @observable accessor authenticatedUser: User | null = null;
 
-  @observable showMapWhileDrafting = false;
-  @observable logChatFullScreen = false;
+  @observable accessor showMapWhileDrafting = false;
+  @observable accessor logChatFullScreen = false;
 
   chatClient: ChatClient = new ChatClient(this);
   sfxManager: SfxManager = new SfxManager(this);
@@ -283,7 +285,9 @@ export default class GameClient {
     console.log(`Connecting to ${websocketHost}`);
 
     this.socket = new WebSocket(websocketHost);
-    this.connectionState = ConnectionState.CONNECTING;
+    runInAction(() => {
+      this.connectionState = ConnectionState.CONNECTING;
+    });
 
     this.socket.onopen = () => {
       // Heroku timeouts a WebSocket connection after 55 seconds of inactivity.
@@ -370,7 +374,9 @@ export default class GameClient {
       authData: this.authData
     });
 
-    this.connectionState = ConnectionState.AUTHENTICATING;
+    runInAction(() => {
+      this.connectionState = ConnectionState.AUTHENTICATING;
+    });
   }
 
   onMessage(data: string): void {
@@ -393,7 +399,9 @@ export default class GameClient {
     if (message.type == "user-banned") {
       if (this.authenticatedUser?.id == message.userId) {
         this.clearPendingMessages();
-        this.connectionState = ConnectionState.BANNED;
+        runInAction(() => {
+          this.connectionState = ConnectionState.BANNED;
+        });
         this.socket?.close();
         return;
       }
@@ -513,8 +521,7 @@ export default class GameClient {
         if (!this.hasShownServerMessageErrorDialog) {
           this.hasShownServerMessageErrorDialog = true;
           window.alert(
-            "Something strange happened and your game view may be out of sync. " +
-              "Please open the browser console (F12) and send the error details there to the site admin."
+            t("gameClient.somethingStrangeHappenedAndYourGameViewMay9d8eff")
           );
         }
       }
@@ -530,7 +537,7 @@ export default class GameClient {
     }
 
     // Turn ownership is derived from the state tree, whose transition token is observable.
-    this.entireGame.leafStateId;
+    void this.entireGame.leafStateId;
     return this.entireGame.getWaitedUsers().includes(this.authenticatedUser);
   }
 
@@ -555,13 +562,15 @@ export default class GameClient {
   }
 
   setDisconnectedState(): void {
-    this.clearPendingMessages();
-    if (this.connectionState != ConnectionState.BANNED) {
-      this.connectionState = ConnectionState.CLOSED;
-    }
-    this.entireGame = null;
-    this.authenticated = false;
-    this.authenticatedUser = null;
+    runInAction(() => {
+      this.clearPendingMessages();
+      if (this.connectionState != ConnectionState.BANNED) {
+        this.connectionState = ConnectionState.CLOSED;
+      }
+      this.entireGame = null;
+      this.authenticated = false;
+      this.authenticatedUser = null;
+    });
   }
 
   private loadVolumeSettingsFromLocalStorage(): void {

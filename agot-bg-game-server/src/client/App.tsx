@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import * as React from "react";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
@@ -72,7 +73,7 @@ export default class App extends Component<AppProps> {
           paddingLeft: "3rem",
           maxWidth: !this.isFullScreen ? "2800px" : "auto",
           minWidth: minWidth,
-          overflowX: "hidden",
+          overflowX: "hidden"
         }}
       >
         <Row className="justify-content-center">
@@ -80,21 +81,21 @@ export default class App extends Component<AppProps> {
           ConnectionState.INITIALIZING ? (
             <Col xs="auto" className="m-4 p-3 text-center">
               <h4>
-                <span className="loader">Initializing</span>
+                <span className="loader">{t("app.initializing2abae3")}</span>
               </h4>
             </Col>
           ) : this.props.gameClient.connectionState ==
             ConnectionState.CONNECTING ? (
             <Col xs="auto" className="m-4 p-3 text-center">
               <h4>
-                <span className="loader">Connecting</span>
+                <span className="loader">{t("app.connectingd403c6")}</span>
               </h4>
             </Col>
           ) : this.props.gameClient.connectionState ==
             ConnectionState.AUTHENTICATING ? (
             <Col xs="auto" className="m-4 p-3 text-center">
               <h4>
-                <span className="loader">Authenticating</span>
+                <span className="loader">{t("app.authenticatinga6d57a")}</span>
               </h4>
             </Col>
           ) : this.isConnected ? (
@@ -108,9 +109,10 @@ export default class App extends Component<AppProps> {
               <Col xs="auto" className="m-4 p-3 text-center">
                 <Alert variant="danger">
                   <h4>
-                    The connection to the server is lost.
-                    <br />
-                    Please reload this page.
+                    <Trans
+                      i18nKey="app.theConnectionToTheServerIsLostPleaseReload24b81d"
+                      components={{ lineBreak: <br /> }}
+                    />
                   </h4>
                   <button
                     type="submit"
@@ -120,7 +122,7 @@ export default class App extends Component<AppProps> {
                     }}
                   >
                     <FontAwesomeIcon icon={faRotateRight} size="lg" />
-                    <h5 className="ml-2 d-inline">Reload</h5>
+                    <h5 className="ms-2 d-inline">{t("app.reloadbdc090")}</h5>
                   </button>
                 </Alert>
               </Col>
@@ -129,12 +131,12 @@ export default class App extends Component<AppProps> {
             ConnectionState.BANNED ? (
             <Col xs="auto" className="m-4 p-3 text-center">
               <Alert variant="danger">
-                <h4>The game host has banned you from this game.</h4>
+                <h4>{t("app.theGameHostHasBannedYouFromThisGame4a8aea")}</h4>
               </Alert>
             </Col>
           ) : (
             <Col xs="auto" className="m-4 p-3 text-center">
-              <span className="loader">Error</span>
+              <span className="loader">{t("app.error54a0e8")}</span>
             </Col>
           )}
         </Row>

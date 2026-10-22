@@ -18,7 +18,7 @@ export default class HouseCard {
   extraAbility: HouseCardAbility | null;
   disabled: boolean;
   houseId?: string;
-  @observable state: HouseCardState = HouseCardState.AVAILABLE;
+  @observable accessor state: HouseCardState = HouseCardState.AVAILABLE;
 
   constructor(
     id: string,

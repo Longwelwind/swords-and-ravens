@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { observer } from "mobx-react";
 import UseValyrianSteelBladeGameState from "../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/use-valyrian-steel-blade-game-state/UseValyrianSteelBladeGameState";
 import { Component, ReactNode } from "react";
@@ -34,11 +35,15 @@ export default class UseValyrianSteelBladeComponent extends Component<
     ) : (
       <>
         <Col xs={12} className="text-center">
-          {this.house.name} may choose to use the Valyrian Steel Blade to{" "}
-          {this.gameState.forNewTidesOfBattleCard
-            ? "draw a new Tides of Battle card"
-            : "increase their combat strength by 1"}
-          .
+          <Trans
+            i18nKey="useValyrianSteelBlade.mayChooseToUseTheValyrianSteelBladeTo13a6db"
+            values={{
+              house: this.house.name,
+              effect: this.gameState.forNewTidesOfBattleCard
+                ? t("common.drawANewTidesOfBattleCard")
+                : t("common.increaseTheirCombatStrengthBy1")
+            }}
+          />
         </Col>
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(this.house) ? (
@@ -54,11 +59,13 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     <Col xs="auto">
                       <Alert
                         variant="warning"
-                        className="text-center pl-2 pt-1 pr-2 pb-2"
+                        className="text-center ps-2 pt-1 pe-2 pb-2"
                       >
                         <small>
-                          <b>Warning:</b> Using the Valyrian Steel Blade
-                          won&apos;t change the outcome of the battle.
+                          <Trans
+                            i18nKey="useValyrianSteelBlade.warningUsingTheValyrianSteelBladeWonTChange46dca7"
+                            components={{ bold: <b /> }}
+                          />
                         </small>
                       </Alert>
                     </Col>
@@ -70,14 +77,13 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     <Col xs="auto">
                       <Alert
                         variant="warning"
-                        className="text-center pl-2 pt-1 pr-2 pb-2"
+                        className="text-center ps-2 pt-1 pe-2 pb-2"
                       >
                         <small>
-                          <b>Warning:</b> The Valyrian Steel Blade decision is
-                          forced by a house card effect.
-                          <br />
-                          The +1 bonus may not be enough to win the battle this
-                          time.
+                          <Trans
+                            i18nKey="useValyrianSteelBlade.warningTheValyrianSteelBladeDecisionIsForcedBy987e15"
+                            components={{ bold: <b />, lineBreak: <br /> }}
+                          />
                         </small>
                       </Alert>
                     </Col>
@@ -92,7 +98,7 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     onClick={() => this.choose(true)}
                     disabled={!houseCardsAreRevealed}
                   >
-                    Use it
+                    {t("useValyrianSteelBlade.useIt57a645")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -102,19 +108,20 @@ export default class UseValyrianSteelBladeComponent extends Component<
                     onClick={() => this.choose(false)}
                     disabled={!houseCardsAreRevealed}
                   >
-                    Don&apos;t use it
+                    {t("useValyrianSteelBlade.donTUseItabf983")}
                   </Button>
                 </Col>
               </Row>
             </>
           ) : (
             <div className="text-center">
-              Waiting for{" "}
-              {
-                this.gameState.ingame.getControllerOfHouse(this.house).house
-                  .name
-              }
-              ...
+              <Trans
+                i18nKey="common.waitingFor"
+                values={{
+                  houses: this.gameState.ingame.getControllerOfHouse(this.house)
+                    .house.name
+                }}
+              />
             </div>
           )}
         </Col>

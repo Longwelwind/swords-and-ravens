@@ -23,7 +23,7 @@ export default class ClashOfKingsGameState extends GameState<
   | ResolveTiesGameState
   | DistributePowerTokensGameState
 > {
-  @observable currentTrackI = -1;
+  @observable accessor currentTrackI = -1;
 
   get game(): Game {
     return this.parentGameState.game;

@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import * as React from "react";
@@ -50,7 +51,7 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
             style={{
               opacity: backgroundOpacity,
               height: "100%",
-              width: "auto",
+              width: "auto"
             }}
           />
           <Card.ImgOverlay style={{ padding: 16, paddingBottom: 8 }}>
@@ -64,7 +65,7 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
   renderIronBankInfos(
     braavosController: House | null,
     interestCosts: [House, number][]
-  ): JSX.Element {
+  ): React.JSX.Element {
     return (
       <Row style={{ height: "100%" }} className="align-items-center">
         <Col xs={12}>
@@ -77,8 +78,10 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
                 placement="auto"
                 overlay={
                   <Tooltip id="braavos-controller-tooltip">
-                    The controller of Braavos receives a <b>-1</b> to the{" "}
-                    <b>initial cost</b> of the loan.
+                    <Trans
+                      i18nKey="ironBankInfos.theControllerOfBraavosReceivesA1ToThe1dea8a"
+                      components={{ bold: <b />, bold2: <b /> }}
+                    />
                   </Tooltip>
                 }
                 popperConfig={{ modifiers: [preventOverflow] }}
@@ -107,22 +110,16 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
                     className="tooltip-w-100"
                   >
                     <Col>
-                      At the beginning of the Westeros Phase, any player having
-                      received loans
-                      <br />
-                      must pay one Power token per loan as interest, resolving
-                      in turn order.
-                      <br />
-                      For every token the player cannot pay, the Valyrian Steel
-                      Blade holder
-                      <br />
-                      destroys one of that player&apos;s units anywhere on the
-                      map.
-                      <br />
-                      If the player holds the Valyrian Steel Blade, the next
-                      highest player
-                      <br />
-                      on the Fiefdoms track will make this choice instead.
+                      <Trans
+                        i18nKey="ironBankInfos.atTheBeginningOfTheWesterosPhaseAnyPlayer34f1e3"
+                        components={{
+                          lineBreak: <br />,
+                          lineBreak2: <br />,
+                          lineBreak3: <br />,
+                          lineBreak4: <br />,
+                          lineBreak5: <br />
+                        }}
+                      />
                     </Col>
                   </Tooltip>
                 }
@@ -130,7 +127,9 @@ export default class IronBankSnapshotComponent extends Component<IronBankSnapsho
                 popperConfig={{ modifiers: [preventOverflow] }}
               >
                 <Col xs={12} className="py-1">
-                  <h5 className="text-center">Interest per round</h5>
+                  <h5 className="text-center">
+                    {t("ironBankInfos.interestPerRound0ec415")}
+                  </h5>
                 </Col>
               </OverlayTrigger>
               <Col xs="auto" className="py-0">

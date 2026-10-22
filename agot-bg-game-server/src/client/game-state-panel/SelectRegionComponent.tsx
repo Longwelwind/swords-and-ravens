@@ -1,9 +1,10 @@
+import { t, Trans } from "../i18n";
+import MapContribution from "../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import React from "react";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
-import * as _ from "lodash";
 import GameStateComponentProps from "./GameStateComponentProps";
 import { Row, Col, Button } from "react-bootstrap";
 import SelectRegionGameState from "../../common/ingame-game-state/select-region-game-state/SelectRegionGameState";
@@ -14,13 +15,16 @@ import PartialRecursive from "../../utils/PartialRecursive";
 export default class SelectRegionComponent extends Component<
   GameStateComponentProps<SelectRegionGameState<any>>
 > {
-  @observable selectedRegion: Region | null;
-
-  modifyRegionsOnMapCallback: any;
+  @observable accessor selectedRegion: Region | null;
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+        />
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(
             this.props.gameState.house
@@ -28,7 +32,13 @@ export default class SelectRegionComponent extends Component<
             <>
               {this.selectedRegion && (
                 <p className="text-center">
-                  Selected area: <b>{this.selectedRegion.name}</b>
+                  <Trans
+                    i18nKey="selectRegion.selectedArea8b3a09"
+                    values={{ selectedRegion: this.selectedRegion.name }}
+                    components={{
+                      bold: <b />
+                    }}
+                  />
                 </p>
               )}
               <Row className="justify-content-center">
@@ -39,7 +49,7 @@ export default class SelectRegionComponent extends Component<
                     onClick={() => this.confirm()}
                     disabled={this.selectedRegion == null}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -49,20 +59,21 @@ export default class SelectRegionComponent extends Component<
                     onClick={() => this.reset()}
                     disabled={this.selectedRegion == null}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
             </>
           ) : (
             <div className="text-center">
-              Waiting for{" "}
-              {
-                this.props.gameState.ingame.getControllerOfHouse(
-                  this.props.gameState.house
-                ).house.name
-              }
-              ...
+              <Trans
+                i18nKey="common.waitingFor"
+                values={{
+                  houses: this.props.gameState.ingame.getControllerOfHouse(
+                    this.props.gameState.house
+                  ).house.name
+                }}
+              />
             </div>
           )}
         </Col>
@@ -93,23 +104,12 @@ export default class SelectRegionComponent extends Component<
     return [];
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
-  }
-
+  @action
   private reset(): void {
     this.selectedRegion = null;
   }
 
+  @action
   private onRegionClick(r: Region): void {
     if (this.selectedRegion == r) {
       this.reset();
@@ -118,6 +118,7 @@ export default class SelectRegionComponent extends Component<
     }
   }
 
+  @action
   private confirm(): void {
     if (!this.selectedRegion) {
       return;

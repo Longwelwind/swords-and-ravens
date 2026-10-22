@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import * as React from "react";
 import User from "../../server/User";
 import ConditionalWrap from "./ConditionalWrap";
@@ -7,7 +8,9 @@ import EntireGame from "../../common/EntireGame";
 function banUser(user: User, entireGame: EntireGame): void {
   if (
     !window.confirm(
-      "Are you sure you want to ban '" + user.name + "' from your game?",
+      t("getIngameUserLinkOrLabel.areYouSureYouWantToBanFrom23e4ed", {
+        user: user.name
+      })
     )
   ) {
     return;
@@ -15,15 +18,15 @@ function banUser(user: User, entireGame: EntireGame): void {
 
   entireGame.sendMessageToServer({
     type: "ban-user",
-    userId: user.id,
+    userId: user.id
   });
 }
 
 export default function getUserLinkOrLabel(
   user: User,
   houseNames?: boolean,
-  showBanButton?: boolean,
-): JSX.Element {
+  showBanButton?: boolean
+): React.JSX.Element {
   const entireGame = user.entireGame;
   const player = entireGame.ingameGameState?.players.tryGet(user, null) ?? null;
   const displayName = !houseNames || !player ? user.name : player.house.name;
@@ -36,7 +39,7 @@ export default function getUserLinkOrLabel(
           <OverlayTrigger
             overlay={
               <Tooltip id="user-is-spectator-tooltip">
-                This user does not participate in the game
+                {t("common.thisUserDoesNotParticipateInTheGame")}
               </Tooltip>
             }
             placement="auto"
@@ -68,7 +71,7 @@ export default function getUserLinkOrLabel(
         <OverlayTrigger
           overlay={
             <Tooltip id={`ban-user-${user.id}-tooltip`}>
-              Ban this user from your game.
+              {t("getIngameUserLinkOrLabel.banThisUserFromYourGameac90fc")}
             </Tooltip>
           }
           placement="auto"
@@ -76,7 +79,7 @@ export default function getUserLinkOrLabel(
         >
           <button
             type="button"
-            className="close ml-1"
+            className="icon-button ms-1"
             style={{ float: "none" }}
             onClick={() => banUser(user, entireGame)}
           >

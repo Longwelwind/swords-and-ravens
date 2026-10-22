@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { Component, default as React, ReactNode } from "react";
 import { observer } from "mobx-react";
 import Badge from "react-bootstrap/Badge";
@@ -14,24 +15,25 @@ interface ReplaySupplyTrackComponentProps {
 
 @observer
 export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTrackComponentProps> {
+  private readonly propsSnapshot = this.props;
   modifyRegionsOnMapCallback: any;
 
   render(): ReactNode {
     return (
       <Row>
         <Col xs="auto">
-          <img width="32px" src={barrelImage} alt="Supply" />
+          <img width="32px" src={barrelImage} alt={t("common.supply")} />
         </Col>
         <Col>
           <Row className="justify-content-center">
-            {this.props.supplyRestrictions.map((allowedArmies, i) => (
+            {this.propsSnapshot.supplyRestrictions.map((allowedArmies, i) => (
               <Col
                 xs="auto"
                 key={`supply-track_${i}`}
                 className="d-flex flex-column align-items-center"
               >
                 <div>
-                  <Badge variant="secondary" style={{ fontSize: "1rem" }}>
+                  <Badge bg="secondary" style={{ fontSize: "1rem" }}>
                     {i}
                   </Badge>
                 </div>
@@ -40,7 +42,7 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
                     style={{
                       width: "18px",
                       marginRight: "6px",
-                      marginTop: "10px",
+                      marginTop: "10px"
                     }}
                   >
                     {this.getHousesAtSupplyLevel(i).map((h) => (
@@ -49,7 +51,7 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
                         className="supply-icon hover-weak-outline"
                         style={{
                           backgroundImage: `url(${houseInfluenceImages.get(h.id)})`,
-                          marginTop: "-5px",
+                          marginTop: "-5px"
                         }}
                       ></div>
                     ))}
@@ -74,6 +76,6 @@ export default class ReplaySupplyTrackComponent extends Component<ReplaySupplyTr
   }
 
   getHousesAtSupplyLevel(supplyLevel: number): HouseSnapshot[] {
-    return this.props.houses.filter((h) => h.supply == supplyLevel);
+    return this.propsSnapshot.houses.filter((h) => h.supply == supplyLevel);
   }
 }

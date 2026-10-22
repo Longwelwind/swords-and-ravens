@@ -38,7 +38,7 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
             .slice()
             .reverse()
             .map((lc, i) => (
-              <Col xs="auto" key={`loan-slot-${i}`} className="pr-0">
+              <Col xs="auto" key={`loan-slot-${i}`} className="pe-0">
                 <OverlayTrigger
                   overlay={
                     <ImagePopover
@@ -46,7 +46,7 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
                       style={{
                         backgroundImage: lc
                           ? `url(${loanCardImages.get(lc)})`
-                          : "none",
+                          : "none"
                       }}
                     />
                   }
@@ -61,25 +61,25 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
                         style={{
                           backgroundImage: lc
                             ? `url(${loanCardImages.get(lc)})`
-                            : "none",
+                            : "none"
                         }}
                       />
                     ) : (
                       <div className="vertical-game-card game-card-slot smedium" />
                     )}
                     <FontAwesomeIcon
-                      className="ml-2"
+                      className="ms-2"
                       icon={faCaretLeft}
                       size="2x"
                     />
                   </div>
                 </OverlayTrigger>
                 <Badge
-                  variant="secondary"
+                  bg="secondary"
                   style={{
                     fontSize: "1.125rem",
                     marginTop: "10px",
-                    marginLeft: "35px",
+                    marginLeft: "35px"
                   }}
                 >
                   {this.ingame.game.theIronBank.loanCosts.slice().reverse()[i]}
@@ -90,7 +90,7 @@ export default class IronBankSnapshotTabComponent extends Component<IronBankSnap
             <div
               className="vertical-game-card smedium"
               style={{
-                backgroundImage: `url(${loanCardImages.get("back")})`,
+                backgroundImage: `url(${loanCardImages.get("back")})`
               }}
             />
           </Col>
