@@ -6,6 +6,7 @@ using agot_bg_website.Infrastructure.Auth;
 using agot_bg_website.Infrastructure.Stats;
 using agot_bg_website.Services;
 using agot_bg_website.Services.GameListing;
+using agot_bg_website.Services.Statistics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,8 @@ public class UserModel(
     ApplicationDbContext db,
     UserManager<ApplicationUser> userManager,
     IAuthorizationService authorizationService,
-    UserStatsRecalculationQueue userStatsQueue
+    UserStatsRecalculationQueue userStatsQueue,
+    PlayerHouseStatsService houseStatsService
 ) : PageModel
 {
     /// <summary>Badge color per role - see <see cref="RoleBadges"/>.</summary>
@@ -119,6 +121,9 @@ public class UserModel(
     /// <see cref="ApplicationUser.CachedReplacerLossesExcludedCount"/>.</summary>
     public int ReplacerLossesExcludedCount { get; set; }
 
+    /// <summary>Selector options (first is "All scenarios") with their house cards; empty when the user has nothing to show.</summary>
+    public IReadOnlyList<HouseStatsSelection> HouseSelections { get; set; } = [];
+
     public string WinRateDisplay { get; set; } = "n/a";
 
     public string AveragePbemResponseTimeDisplay { get; set; } = "n/a";
@@ -155,6 +160,7 @@ public class UserModel(
         await LoadGamesAsync(id);
         await LoadPreviouslyParticipatedGamesAsync(id);
         await LoadStatsAsync(id);
+        await LoadHouseStatsAsync(id);
 
         return Page();
     }
@@ -314,6 +320,18 @@ public class UserModel(
                 );
             })
             .ToList();
+    }
+
+    private async Task LoadHouseStatsAsync(Guid userId)
+    {
+        var selections = PlayerHouseStatsView.BuildSelections(
+            await houseStatsService.GetAsync(userId),
+            ScenarioCatalog.Instance
+        );
+        if (selections[0].Games > 0 || selections[0].RemovedGames > 0)
+        {
+            HouseSelections = selections;
+        }
     }
 
     private async Task LoadStatsAsync(Guid userId)

@@ -80,6 +80,7 @@
     "build-local-client": "webpack --config webpack.client.local.js --mode=production",
     "run-server": "ts-node -T src/server/server.ts",
     "generate-json-schemas": "typescript-json-schema --strict-null-checks src/messages/ClientMessage.ts ClientMessage -o src/server/ClientMessage.json --include src/messages/*.ts",
+    "generate-scenario-catalog": "node scripts/generate-scenario-catalog.js",
     "test-map-controls": "node --require ts-node/register/transpile-only --test tests/map-controls.test.cjs",
     "test-client": "node --require ts-node/register/transpile-only --test tests/*.test.cjs",
     "lint": "eslint . --ext .ts,.tsx"

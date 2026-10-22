@@ -1286,6 +1286,19 @@ Follow-up work after first getting the app running locally end-to-end:
   cancelled), except for `ClockTimeout` removals - see §10.2. Cached stats of affected users update
   on their next recalculation; run admin "Recalculate stats" (bulk) after deploying to apply it to
   historical games immediately.
+- **Game statistics + per-house player win rates**: new authenticated `/Statistics` page (nav
+  between Users and FAQ) with finished-game house win rates (CSS bar chart, even-split line),
+  summary cards, newest matching games, and filters (scenario = `setupId`+`playerCount`, PBEM/live,
+  human-controlled seat count, final-round range, Any/No/Yes for allow-listed boolean settings). Queries are raw
+  parameterized SQL over `ViewOfGame`/`PlayersInGame.Data` only (`Services/Statistics/
+  GameStatisticsSql.cs`), never `SerializedGame`; ~100 ms per query on ~10k finished games, cached
+  10 min, no new indexes. Private games' names and faceless winners are stripped in SQL. Profiles
+  gain a "Houses" card row (win rate per house, scenario selector) via `PlayerHouseStatsService`,
+  using the same rules as `UserStatsService`; removals have no recorded house and are shown as a
+  footnote. Scenario/house data comes from `GameData/scenarios.json`, generated from
+  `baseGameData.json` by `yarn run generate-scenario-catalog` (sync guarded by
+  `ScenarioCatalogTests`). Game duration is intentionally not shown (no reliable data without
+  reading `SerializedGame`'s game log).
 
 ## 15. Roadmap / follow-ups (as of 2026-09-16)
 
@@ -1315,8 +1328,9 @@ re-derive it. Update this section whenever priorities shift or an item is comple
 ### Deferred / nice-to-have (see §13), suggested rough order
 1. **Precomputed `PlayerStatistics` table** — win-rate/PBEM response time are recomputed on every
    profile view today; update incrementally when a game finishes instead.
-2. **Public game statistics page** — house win-rates by game mode/settings, now that data is
-   relational instead of Django's free-form `ViewOfGame.settings` JSON.
+2. ~~**Public game statistics page**~~ — done (authenticated `/Statistics`, see §14). Possible
+   follow-up: record the house on `PreviousPlayerInGame` going forward so removals can be
+   attributed per house.
 3. **Extended Admin: chat moderation** — browse/search/delete chat messages, edit user profile
    fields (`ProfileText`, `MuteGames`, settings flags) directly from the admin UI.
 4. **CoreAdmin → hand-built admin reuse for High Members** — expose a subset of the hand-built
