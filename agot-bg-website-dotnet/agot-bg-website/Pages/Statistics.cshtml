@@ -274,14 +274,7 @@ else
                         <tr>
                             <td>
                                 <span class="badge @(game.IsPbem ? "badge-info" : "badge-success") align-middle" title="@(game.IsPbem ? "Play By E-Mail" : "Live game")">@(game.IsPbem ? "PBEM" : "Live")</span>
-                                @if (game.Id is { } gameId)
-                                {
-                                    <a class="link font-semibold text-base-content" href="/play/@gameId" target="_blank" rel="noopener noreferrer">@game.Name</a>
-                                }
-                                else
-                                {
-                                    <span class="opacity-70">Private game</span>
-                                }
+                                <a class="link font-semibold text-base-content" href="/play/@game.Id" target="_blank" rel="noopener noreferrer">@game.Name</a>
                             </td>
                             <td>@game.ScenarioLabel</td>
                             <td>

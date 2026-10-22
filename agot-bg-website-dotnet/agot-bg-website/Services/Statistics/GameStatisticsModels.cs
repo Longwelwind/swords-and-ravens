@@ -18,7 +18,7 @@ public sealed class StatisticsHouseRow
 
 public sealed class StatisticsLatestRow
 {
-    public Guid? Id { get; set; }
+    public Guid Id { get; set; }
     public string? Name { get; set; }
     public string? SetupId { get; set; }
     public string? PlayerCount { get; set; }
@@ -61,7 +61,7 @@ public sealed record GameStatisticsOverview(
 );
 
 public sealed record LatestGame(
-    Guid? Id,
+    Guid Id,
     string? Name,
     string ScenarioLabel,
     bool IsPbem,

@@ -132,11 +132,10 @@ public class GameStatisticsSqlTests
     }
 
     [Fact]
-    public void Latest_HidesPrivateNamesAndFacelessWinnersInSql()
+    public void Latest_HidesFacelessWinnersInSql()
     {
         var sql = GameStatisticsSql.Latest(Default, 0, 25).Sql;
 
-        Assert.Contains("CASE WHEN f.is_private THEN NULL ELSE f.\"Name\" END", sql);
         Assert.Contains("CASE WHEN f.faceless THEN NULL ELSE u.\"UserName\" END", sql);
     }
 }

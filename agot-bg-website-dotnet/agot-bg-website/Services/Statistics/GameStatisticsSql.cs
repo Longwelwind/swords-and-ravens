@@ -59,8 +59,8 @@ public static class GameStatisticsSql
     }
 
     /// <summary>
-    /// One page of the newest matching games. Private games lose their id/name and faceless games
-    /// their winner's user, inside SQL, so those never reach the page model.
+    /// One page of the newest matching games. Faceless games lose their winner's user inside SQL,
+    /// so it never reaches the page model.
     /// </summary>
     public static StatisticsSqlQuery Latest(GameStatisticsFilter filter, int offset, int limit)
     {
@@ -71,8 +71,8 @@ public static class GameStatisticsSql
         var sql =
             cte
             + $"""
-                SELECT CASE WHEN f.is_private THEN NULL ELSE f."Id" END AS "Id",
-                       CASE WHEN f.is_private THEN NULL ELSE f."Name" END AS "Name",
+                SELECT f."Id" AS "Id",
+                       f."Name" AS "Name",
                        f.setup_id AS "SetupId",
                        f.player_count AS "PlayerCount",
                        f.is_pbem AS "IsPbem",
@@ -169,7 +169,6 @@ public static class GameStatisticsSql
             $"{RoundExpression} AS round",
             $"COALESCE({Settings}->>'pbem', 'false') = 'true' AS is_pbem",
             $"COALESCE({Settings}->>'faceless', 'false') = 'true' AS faceless",
-            $"COALESCE({Settings}->>'private', 'false') = 'true' AS is_private",
         };
         if (includeWinnerFlag)
         {
