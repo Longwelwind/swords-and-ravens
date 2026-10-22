@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace agot_bg_website.Pages;
 
 /// <summary>
-/// Public user profile, mirroring Django's agotboardgame_main.views.user_profile (route
+/// Authenticated-only user profile, mirroring Django's agotboardgame_main.views.user_profile (route
 /// "/user/&lt;uuid:user_id&gt;", template user_profile.html) — see MIGRATION_PLAN.md §10.2/§13/§14.
 /// </summary>
 public class UserModel(

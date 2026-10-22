@@ -336,6 +336,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizePage("/Games");
     options.Conventions.AuthorizePage("/MyGames");
     options.Conventions.AuthorizePage("/Users");
+    options.Conventions.AuthorizePage("/User");
 });
 
 // External logins: Google/Discord/Facebook — see MIGRATION_PLAN.md §5. Plus a MasterApi Basic
