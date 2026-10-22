@@ -13,6 +13,7 @@
     "thisGameHasBeenCancelled821d2e": "<element0/><element1/>此游戏已取消"
   },
   "chat": {
+    "aFewSecondsAgo": "几秒前",
     "sendf6f468": "发送",
     "thisChatIsNotConnectedPleaseWaitUntilThe28f8e6": "聊天尚未连接。请等待连接建立，或重新加载页面。",
     "loadMoreMessagesbc1c7d": "加载更多消息",

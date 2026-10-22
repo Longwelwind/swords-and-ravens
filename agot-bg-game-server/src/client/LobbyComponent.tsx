@@ -190,7 +190,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         </Col>
         <Col xs={12}>
           <Row className="justify-content-center no-space-around">
-            <Card>
+            <Card className="w-auto">
               <Card.Body className="py-2">
                 {!this.props.gameClient.isRealOwner() &&
                   this.lobby.password != "" &&

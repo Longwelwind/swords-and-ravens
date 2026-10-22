@@ -13,6 +13,7 @@
     "thisGameHasBeenCancelled821d2e": "<element0/><element1/>Esta partida ha sido cancelada"
   },
   "chat": {
+    "aFewSecondsAgo": "hace unos segundos",
     "sendf6f468": "Enviar",
     "thisChatIsNotConnectedPleaseWaitUntilThe28f8e6": "El chat no está conectado. Espera a que se establezca la conexión o recarga la página.",
     "loadMoreMessagesbc1c7d": "Cargar más mensajes",

@@ -492,7 +492,29 @@ test("toast notifications still render and dismiss under React 19", async () => 
   await waitFor(() => assert.ok(view.queryByText("Your turn") === null));
 });
 
-test("autoscroll follows content, lets readers scroll up, and resumes via the latest button", async (context) => {
+test("relative timestamps use a few seconds ago throughout the first minute", () => {
+  const { formatRelativeTime } = require("../src/client/i18n/formatting");
+  const createdAt = new Date("2026-10-22T12:00:00Z");
+  for (const seconds of [0, 1, 30, 59, 59.999]) {
+    assert.equal(
+      formatRelativeTime(
+        createdAt,
+        new Date(createdAt.getTime() + seconds * 1000)
+      ),
+      "a few seconds ago"
+    );
+  }
+  assert.equal(
+    formatRelativeTime(createdAt, new Date(createdAt.getTime() + 60000)),
+    "1 minute ago"
+  );
+  assert.equal(
+    formatRelativeTime(createdAt, new Date(createdAt.getTime() + 120000)),
+    "2 minutes ago"
+  );
+});
+
+test("autoscroll follows content and viewport resizing, preserves scroll-up, and resumes via the latest button", async (context) => {
   const observers = [];
   const original = globalThis.ResizeObserver;
   context.after(() => {
@@ -532,8 +554,19 @@ test("autoscroll follows content, lets readers scroll up, and resumes via the la
     scrollHeight: { configurable: true, value: 1000 }
   });
   const observer = observers.find((observer) => observer.element);
+  const viewportObserver = observers.find(
+    (observer) => observer.element === viewport
+  );
   await act(async () => observer.notify(1000));
   await waitFor(() => assert.equal(viewport.scrollTop, 899));
+  assert.ok(viewportObserver, "Viewport-only resizes must also be observed");
+  await act(async () => viewportObserver.notify(100));
+  Object.defineProperty(viewport, "clientHeight", {
+    configurable: true,
+    value: 80
+  });
+  await act(async () => viewportObserver.notify(80));
+  await waitFor(() => assert.equal(viewport.scrollTop, 919));
   fireEvent.wheel(viewport, { deltaY: -100 });
   assert.ok(view.getByRole("button", { name: "Scroll to latest" }));
   viewport.scrollTop = 200;
@@ -542,15 +575,17 @@ test("autoscroll follows content, lets readers scroll up, and resumes via the la
     value: 1200
   });
   await act(async () => {
+    viewportObserver.notify(80);
     observer.notify(1200);
     await new Promise((resolve) => setTimeout(resolve, 50));
   });
   assert.equal(viewport.scrollTop, 200);
   fireEvent.click(view.getByRole("button", { name: "Scroll to latest" }));
-  await waitFor(() => assert.ok(Math.abs(viewport.scrollTop - 1099) < 1), {
+  await waitFor(() => assert.ok(Math.abs(viewport.scrollTop - 1119) < 1), {
     timeout: 3000
   });
   assert.equal(view.queryByRole("button", { name: "Scroll to latest" }), null);
   view.unmount();
   assert.ok(observer.disconnected);
+  assert.ok(viewportObserver.disconnected);
 });

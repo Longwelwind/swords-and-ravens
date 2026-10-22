@@ -13,6 +13,7 @@
     "thisGameHasBeenCancelled821d2e": "<element0/><element1/>This game has been cancelled"
   },
   "chat": {
+    "aFewSecondsAgo": "a few seconds ago",
     "sendf6f468": "Send",
     "thisChatIsNotConnectedPleaseWaitUntilThe28f8e6": "This chat is not connected. Please wait until the connection is established or reload the page.",
     "loadMoreMessagesbc1c7d": "Load more messages",

@@ -13,6 +13,7 @@
     "thisGameHasBeenCancelled821d2e": "<element0/><element1/>Cette partie a été annulée"
   },
   "chat": {
+    "aFewSecondsAgo": "il y a quelques secondes",
     "sendf6f468": "Envoyer",
     "thisChatIsNotConnectedPleaseWaitUntilThe28f8e6": "Ce salon n'est pas connecté. Veuillez attendre que la connexion soit établie ou recharger la page.",
     "loadMoreMessagesbc1c7d": "Charger plus de messages",

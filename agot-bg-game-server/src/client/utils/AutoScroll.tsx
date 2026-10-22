@@ -1,5 +1,5 @@
 import { useTranslation } from "../i18n";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import classNames from "classnames";
 import { useStickToBottom } from "use-stick-to-bottom";
 
@@ -22,6 +22,26 @@ export default function AutoScroll({
       initial: initialScrollBehavior === "auto" ? "instant" : "smooth",
       resize: "smooth"
     });
+
+  useEffect(() => {
+    const viewport = scrollRef.current;
+    if (!viewport) return;
+
+    let previousHeight: number | undefined;
+    const observer = new ResizeObserver(([entry]) => {
+      const height = entry.contentRect.height;
+      const resized = previousHeight !== undefined && height !== previousHeight;
+      previousHeight = height;
+      if (!resized) return;
+
+      void scrollToBottom({
+        animation: "instant",
+        preserveScrollPosition: true
+      });
+    });
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [scrollRef, scrollToBottom]);
 
   return (
     <div className={classNames("auto-scroll position-relative", className)}>
