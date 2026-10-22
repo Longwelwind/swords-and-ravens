@@ -10,16 +10,36 @@ import fr from "./locales/fr.json";
 import pt from "./locales/pt.json";
 import ru from "./locales/ru.json";
 import zh from "./locales/zh.json";
+import nl from "./locales/nl.json";
+import pl from "./locales/pl.json";
+import cs from "./locales/cs.json";
+import ja from "./locales/ja.json";
+import tr from "./locales/tr.json";
+import uk from "./locales/uk.json";
+import sv from "./locales/sv.json";
+import no from "./locales/no.json";
+import hu from "./locales/hu.json";
+import ko from "./locales/ko.json";
 
 export const languages = [
   { code: "en", name: "English" },
-  { code: "de", name: "Deutsch" },
-  { code: "es", name: "Español" },
-  { code: "it", name: "Italiano" },
+  { code: "cs", name: "Čeština" },
+  { code: "nl", name: "Nederlands" },
   { code: "fr", name: "Français" },
+  { code: "de", name: "Deutsch" },
+  { code: "hu", name: "Magyar" },
+  { code: "it", name: "Italiano" },
+  { code: "no", name: "Norsk" },
+  { code: "pl", name: "Polski" },
   { code: "pt", name: "Português" },
-  { code: "ru", name: "Русский" },
-  { code: "zh", name: "简体中文" }
+  { code: "es", name: "Español" },
+  { code: "sv", name: "Svenska" },
+  { code: "tr", name: "Türkçe" },
+  { code: "ja", name: "日本語" },
+  { code: "zh", name: "简体中文" },
+  { code: "ko", name: "한국어" },
+  { code: "uk", name: "Українська" },
+  { code: "ru", name: "Русский" }
 ] as const;
 
 export type Language = (typeof languages)[number]["code"];
@@ -45,10 +65,20 @@ void i18n
       fr: { translation: fr },
       pt: { translation: pt },
       ru: { translation: ru },
-      zh: { translation: zh }
+      zh: { translation: zh },
+      nl: { translation: nl },
+      pl: { translation: pl },
+      cs: { translation: cs },
+      ja: { translation: ja },
+      tr: { translation: tr },
+      uk: { translation: uk },
+      sv: { translation: sv },
+      no: { translation: no },
+      hu: { translation: hu },
+      ko: { translation: ko }
     },
-    fallbackLng: "en",
-    supportedLngs: languages.map(({ code }) => code),
+    fallbackLng: { nb: ["no", "en"], default: ["en"] },
+    supportedLngs: [...languages.map(({ code }) => code), "nb"],
     load: "languageOnly",
     initAsync: false,
     returnNull: false,

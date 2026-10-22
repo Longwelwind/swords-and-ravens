@@ -104,6 +104,7 @@ test("all languages cover the catalog and preserve interpolation and rich-text c
         tokens(original),
         `${code}: plural placeholders in ${key}`
       );
+      assertValidTags(target[key], `${code}.${key}`);
     }
     for (const [key, text] of Object.entries(target)) {
       assert.doesNotMatch(
@@ -111,6 +112,61 @@ test("all languages cover the catalog and preserve interpolation and rich-text c
         /animate__|(?:monster|baby)-dragon|^2-digit$|^translate\(|^rotate\(/,
         `${code}: non-UI ${key}`
       );
+    }
+  }
+});
+
+test("new locales supply every plural category for all translated plural families", () => {
+  const source = flatten(en);
+  for (const code of [
+    "nl",
+    "pl",
+    "cs",
+    "ja",
+    "tr",
+    "uk",
+    "sv",
+    "no",
+    "hu",
+    "ko"
+  ]) {
+    const target = flatten(require(`../src/client/i18n/locales/${code}.json`));
+    const categories = new Intl.PluralRules(code).resolvedOptions()
+      .pluralCategories;
+    for (const key of Object.keys(source).filter((key) =>
+      key.endsWith("_other")
+    )) {
+      for (const category of categories) {
+        const pluralKey = key.replace(/_other$/, `_${category}`);
+        assert.equal(
+          typeof target[pluralKey],
+          "string",
+          `${code}: missing ${pluralKey}`
+        );
+      }
+    }
+  }
+});
+
+test("new locales do not ship English fallback paragraphs as translations", () => {
+  const source = flatten(en);
+  for (const code of [
+    "nl",
+    "pl",
+    "cs",
+    "ja",
+    "tr",
+    "uk",
+    "sv",
+    "no",
+    "hu",
+    "ko"
+  ]) {
+    const target = flatten(require(`../src/client/i18n/locales/${code}.json`));
+    for (const [key, text] of Object.entries(source)) {
+      const prose = text.replace(/<[^>]+>|\{\{[^}]+}}/g, " ");
+      if ((prose.match(/[A-Za-z]+/g) ?? []).length < 12) continue;
+      assert.notEqual(target[key], text, `${code}: untranslated ${key}`);
     }
   }
 });
@@ -184,9 +240,9 @@ test("the flagged language menu supports arrow keys, Escape and focus restoratio
   const english = await view.findByRole("menuitemradio", { name: "English" });
   await waitFor(() => assert.equal(document.activeElement, english));
   fireEvent.keyDown(english, { key: "ArrowDown", code: "ArrowDown" });
-  const german = view.getByRole("menuitemradio", { name: "Deutsch" });
-  await waitFor(() => assert.equal(document.activeElement, german));
-  fireEvent.keyDown(german, { key: "Escape", code: "Escape" });
+  const czech = view.getByRole("menuitemradio", { name: "Čeština" });
+  await waitFor(() => assert.equal(document.activeElement, czech));
+  fireEvent.keyDown(czech, { key: "Escape", code: "Escape" });
   await waitFor(() => {
     assert.equal(toggle.getAttribute("aria-expanded"), "false");
     assert.equal(document.activeElement, toggle);
@@ -316,6 +372,24 @@ test("regional language codes, persisted preference and unsupported languages re
   assert.equal(i18n.resolvedLanguage, "zh");
   assert.equal(document.documentElement.lang, "zh-Hans");
   await i18n.changeLanguage("ja-JP");
+  assert.equal(i18n.resolvedLanguage, "ja");
+  assert.equal(document.documentElement.lang, "ja");
+  assert.notEqual(t("common.confirm"), "Confirm");
+  for (const [regionalCode, languageCode] of [
+    ["tr-TR", "tr"],
+    ["uk-UA", "uk"],
+    ["sv-SE", "sv"],
+    ["no-NO", "no"],
+    ["nb-NO", "no"],
+    ["hu-HU", "hu"],
+    ["ko-KR", "ko"]
+  ]) {
+    await i18n.changeLanguage(regionalCode);
+    assert.equal(i18n.resolvedLanguage, languageCode);
+    assert.equal(document.documentElement.lang, languageCode);
+    assert.notEqual(t("common.confirm"), "Confirm");
+  }
+  await i18n.changeLanguage("ar-SA");
   assert.equal(i18n.resolvedLanguage, "en");
   assert.equal(t("common.confirm"), "Confirm");
 });
@@ -385,7 +459,7 @@ test("server-owned prompts and unit descriptions translate only for display, nev
   }
 });
 
-test("durations and token counts follow Russian and Portuguese plural rules", async () => {
+test("durations and token counts follow Russian, Portuguese, Polish, Czech and Ukrainian plural rules", async () => {
   await i18n.changeLanguage("ru");
   const ru = require("../src/client/i18n/locales/ru.json");
   for (const [days, suffix] of [
@@ -404,6 +478,41 @@ test("durations and token counts follow Russian and Portuguese plural rules", as
   await i18n.changeLanguage("pt");
   assert.match(t("common.gainPowerTokens", { count: 0 }), /0/);
   assert.match(t("common.gainPowerTokens", { count: 21 }), /21/);
+  await i18n.changeLanguage("pl");
+  assert.equal(
+    t("common.gainPowerTokens", { count: 2 }),
+    "Zdobądź 2 żetony władzy"
+  );
+  assert.equal(
+    t("common.gainPowerTokens", { count: 5 }),
+    "Zdobądź 5 żetonów władzy"
+  );
+  await i18n.changeLanguage("cs");
+  assert.equal(
+    t("common.gainPowerTokens", { count: 3 }),
+    "Získat 3 mocenské žetony"
+  );
+  assert.equal(
+    t("common.gainPowerTokens", { count: 5 }),
+    "Získat 5 mocenských žetonů"
+  );
+  await i18n.changeLanguage("uk");
+  assert.equal(
+    t("common.gainPowerTokens", { count: 1 }),
+    "Отримати 1 жетон влади"
+  );
+  assert.equal(
+    t("common.gainPowerTokens", { count: 2 }),
+    "Отримати 2 жетони влади"
+  );
+  assert.equal(
+    t("common.gainPowerTokens", { count: 5 }),
+    "Отримати 5 жетонів влади"
+  );
+  assert.equal(
+    t("common.gainPowerTokens", { count: 21 }),
+    "Отримати 21 жетон влади"
+  );
 });
 
 test("localization never replaces CSS classes, protocol values, date formatting parameters or emoji categories", () => {

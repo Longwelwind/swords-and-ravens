@@ -13,11 +13,14 @@ The `src/` contains the code of the game server and is split into 5 folders:
 ## Game-client translations
 
 The React client uses i18next/react-i18next. English is the fallback language;
-German, Spanish, Italian, French, Portuguese, Russian and Simplified Chinese can
-be selected after the badges in the centered game title bar. The selection is
-saved locally in the browser under `snr.game.language`, shared by all games on
-the site; otherwise the browser language is used. Language is a presentation
-preference, not part of the saved game or WebSocket protocol.
+English appears first, followed by Czech, Dutch, French, German, Hungarian,
+Italian, Norwegian (Bokmål), Polish, Portuguese, Spanish, Swedish and Turkish;
+Japanese, Simplified Chinese, Korean, Ukrainian and Russian appear last.
+The selection is saved locally in the browser under `snr.game.language`,
+shared by all games on the site; otherwise the browser
+language is used. Language is a presentation preference, not part of the saved
+game or WebSocket protocol. Translation catalogs cover the full English catalog;
+English remains the fallback for newly added or missing messages.
 
 Translation resources are in `src/client/i18n/locales/`. Start with `en.json`
 when adding a message and update the other language files. Reuse `common` keys
