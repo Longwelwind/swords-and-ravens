@@ -35,8 +35,6 @@ public sealed record PlayerHouseStats(IReadOnlyList<ScenarioHouseStats> Scenario
 /// Uses exactly the rules of <see cref="UserStatsService"/>/<see cref="WinRateCalculator"/> for
 /// the profile's overall win rate:
 /// <list type="bullet">
-/// <item>Faceless games are excluded entirely (the removal count below is the one exception,
-/// because <see cref="UserStatsService"/> doesn't look at faceless there either).</item>
 /// <item>A current <c>PlayerInGame</c> row counts only if its game is Finished, isn't the
 /// tutorial variant and has a recorded <c>is_winner</c>.</item>
 /// <item>A loss as a pure replacer (<see cref="ViewOfGameInfo.IsPureReplacer"/>) is excluded, a win
@@ -105,8 +103,7 @@ public sealed class PlayerHouseStatsService(ApplicationDbContext db, IMemoryCach
             var view = ViewOfGameInfo.Parse(row.ViewOfGame);
             var player = PlayerInGameInfo.Parse(row.Data);
             if (
-                view.IsFaceless
-                || view.IsLearnTheGame
+                view.IsLearnTheGame
                 || player.IsWinner is null
                 || string.IsNullOrEmpty(player.House)
             )

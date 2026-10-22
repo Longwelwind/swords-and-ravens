@@ -58,10 +58,7 @@ public static class GameStatisticsSql
         return new(sql, [.. parameters]);
     }
 
-    /// <summary>
-    /// One page of the newest matching games. Private games lose their id/name and faceless games
-    /// their winner's user, inside SQL, so those never reach the page model.
-    /// </summary>
+    /// <summary>One page of the newest matching games.</summary>
     public static StatisticsSqlQuery Latest(GameStatisticsFilter filter, int offset, int limit)
     {
         var parameters = new List<object>();
@@ -71,17 +68,17 @@ public static class GameStatisticsSql
         var sql =
             cte
             + $"""
-                SELECT CASE WHEN f.is_private THEN NULL ELSE f."Id" END AS "Id",
-                       CASE WHEN f.is_private THEN NULL ELSE f."Name" END AS "Name",
+                SELECT f."Id" AS "Id",
+                       f."Name" AS "Name",
                        f.setup_id AS "SetupId",
                        f.player_count AS "PlayerCount",
                        f.is_pbem AS "IsPbem",
                        f.round::int AS "Round",
                        f."LastActiveAt" AS "FinishedAt",
                        w.house AS "WinnerHouse",
-                       CASE WHEN f.faceless THEN NULL ELSE w."UserId" END AS "WinnerUserId",
-                       CASE WHEN f.faceless THEN NULL ELSE u."UserName" END AS "WinnerUserName",
-                       CASE WHEN f.faceless THEN false ELSE COALESCE(u."IsDeleted", false) END AS "WinnerUserDeleted"
+                       w."UserId" AS "WinnerUserId",
+                       u."UserName" AS "WinnerUserName",
+                       COALESCE(u."IsDeleted", false) AS "WinnerUserDeleted"
                 FROM filtered f
                 LEFT JOIN LATERAL (
                     SELECT p."UserId", p."Data"->>'house' AS house
@@ -168,8 +165,6 @@ public static class GameStatisticsSql
             $"{Settings}->>'playerCount' AS player_count",
             $"{RoundExpression} AS round",
             $"COALESCE({Settings}->>'pbem', 'false') = 'true' AS is_pbem",
-            $"COALESCE({Settings}->>'faceless', 'false') = 'true' AS faceless",
-            $"COALESCE({Settings}->>'private', 'false') = 'true' AS is_private",
         };
         if (includeWinnerFlag)
         {
