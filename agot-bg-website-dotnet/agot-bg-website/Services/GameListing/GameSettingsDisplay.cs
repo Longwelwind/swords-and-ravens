@@ -1,5 +1,6 @@
 using System.Text.Json;
 using agot_bg_website.Domain;
+using agot_bg_website.Services.Statistics;
 
 namespace agot_bg_website.Services.GameListing;
 
@@ -12,23 +13,10 @@ namespace agot_bg_website.Services.GameListing;
 /// </summary>
 public static class GameSettingsDisplay
 {
-    /// <summary>setupId -> the exact display name from data/baseGameData.json's `setups.*.name`.</summary>
-    public static readonly IReadOnlyDictionary<string, string> SetupNames = new Dictionary<
-        string,
-        string
-    >
-    {
-        ["base-game"] = "2nd Edition Base Game (3-6p)",
-        ["mother-of-dragons"] = "Mother of Dragons (7p/8p)",
-        ["a-dance-with-dragons"] = "A Dance with Dragons (6p)",
-        ["a-feast-for-crows"] = "A Feast for Crows (4p)",
-        ["a-dance-with-mother-of-dragons"] = "A Dance with Mother of Dragons (8p)",
-        ["struggle-in-the-north"] = "Struggle in the North (4p/5p)",
-        ["rumble-in-the-south"] = "Rumble in the South (4p)",
-        ["race-to-kings-landing"] = "Race to King's Landing (5p)",
-        ["no-kraken-for-dinner"] = "No Kraken for Dinner (5p)",
-        ["learn-the-game"] = "Teach the Game (2p)",
-    };
+    /// <summary>setupId -> the exact display name from data/baseGameData.json's `setups.*.name`
+    /// (via the generated <see cref="ScenarioCatalog"/>).</summary>
+    public static readonly IReadOnlyDictionary<string, string> SetupNames =
+        ScenarioCatalog.Instance.Setups.ToDictionary(s => s.Id, s => s.Name);
 
     /// <summary>
     /// Boolean GameSettings.ts field -> the exact label text from GameSettingsComponent.tsx's
@@ -38,7 +26,7 @@ public static class GameSettingsDisplay
     /// since, unlike every other entry here, it must always show up first - as either "Play By
     /// E-Mail" or "Live" - rather than only appearing when true.
     /// </summary>
-    private static readonly IReadOnlyDictionary<string, string> SettingLabels = new Dictionary<
+    internal static readonly IReadOnlyDictionary<string, string> SettingLabels = new Dictionary<
         string,
         string
     >

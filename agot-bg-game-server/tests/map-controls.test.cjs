@@ -10,8 +10,14 @@ const MapContribution = require("../src/client/MapContribution").default;
 const BetterMap = require("../src/utils/BetterMap").default;
 const SelectRegion =
   require("../src/client/game-state-panel/SelectRegionComponent").default;
-
 require("../src/common/EntireGame");
+const Combat =
+  require("../src/client/game-state-panel/CombatComponent").default;
+const MapComponent = require("../src/client/MapComponent").default;
+const WorldSnapshot = require("../src/client/WorldSnapshotComponent").default;
+const PostCombat =
+  require("../src/common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/PostCombatGameState").default;
+
 const GameState = require("../src/common/GameState").default;
 const March =
   require("../src/client/game-state-panel/ResolveSingleMarchOrderComponent").default;
@@ -59,6 +65,137 @@ function fixture() {
   );
   return { root, parent, child, regions, controls: new MapControls() };
 }
+
+test("combat contributes one region-to-region march marker for a multi-unit army", () => {
+  const { root, regions, controls } = fixture();
+  const [from, to] = regions;
+  const units = [1, 2, 3].map((id) => ({ id, region: from }));
+  from.allUnits.push(...units);
+  const combat = {
+    attackingRegion: from,
+    defendingRegion: to,
+    attackingArmy: units,
+    attacker: { getHighlightColor: () => "red" },
+    hasChildGameState: () => false
+  };
+  const component = new Combat({ gameState: combat, gameClient: {} });
+  controls.setLayer(Symbol(), {
+    gameState: root,
+    regions: component.modifyRegionsOnMap(),
+    units: component.modifyUnitsOnMap()
+  });
+  controls.setLayer(Symbol(), {
+    kind: "hover",
+    regions: [[to, { highlight: { active: true, color: "blue" } }]]
+  });
+  const resolved = controls.resolve(root, regions);
+  const arrows = MapComponent.prototype.renderMarchMarkers(
+    resolved.regions,
+    false,
+    () => true
+  );
+  assert.equal(arrows.length, 1);
+  assert.equal(
+    arrows[0].props.start,
+    `centered-units-container-div-for-march-markers-${from.id}`
+  );
+  assert.equal(
+    arrows[0].props.end,
+    `centered-units-container-div-for-march-markers-${to.id}`
+  );
+  assert.equal(arrows[0].props.color, "red");
+  assert.equal(resolved.units.get(units[0]).highlight.color, "red");
+  for (const visible of [new Set([from]), new Set([to]), new Set()]) {
+    assert.equal(
+      MapComponent.prototype.renderMarchMarkers(
+        resolved.regions,
+        true,
+        (region) => visible.has(region)
+      ).length,
+      0
+    );
+  }
+  assert.equal(
+    MapComponent.prototype.renderMarchMarkers(
+      resolved.regions,
+      true,
+      () => true
+    ).length,
+    1
+  );
+});
+
+test("combat hides the region marker during selection, after defeat, after combat abilities, and after arrival", () => {
+  const { regions } = fixture();
+  const [from, to] = regions;
+  const attacker = { getHighlightColor: () => "red" };
+  const combat = {
+    attackingRegion: from,
+    defendingRegion: to,
+    attackingArmy: [{ region: from }],
+    attacker,
+    hasChildGameState: () => false
+  };
+  const component = new Combat({
+    gameState: combat,
+    gameClient: { doesControlHouse: () => true }
+  });
+  const marker = () => component.modifyRegionsOnMap()[0][1].marchMarker;
+  assert.ok(marker());
+  combat.hasChildGameState = () => true;
+  combat.getChildGameState = () => ({ house: attacker });
+  assert.equal(marker(), undefined);
+  combat.hasChildGameState = () => false;
+
+  const postCombat = Object.create(PostCombat.prototype);
+  postCombat.hasChildGameState = () => false;
+  postCombat.winner = {};
+  combat.childGameState = postCombat;
+  assert.equal(marker(), undefined);
+  postCombat.winner = attacker;
+  assert.ok(marker());
+  postCombat.hasChildGameState = () => true;
+  assert.equal(marker(), undefined);
+  postCombat.hasChildGameState = () => false;
+  combat.attackingArmy[0].region = to;
+  assert.equal(marker(), undefined);
+  combat.attackingArmy = [];
+  assert.equal(marker(), undefined);
+});
+
+test("replay march markers are anchored inside the region unit slots, including empty regions", () => {
+  const { regions } = fixture();
+  for (const region of regions) {
+    region.unitSlot = { point: { x: 100, y: 200 }, width: 80 };
+  }
+  const snapshot = {
+    worldSnapshot: regions.map((region) => ({ id: region.id, units: [] }))
+  };
+  const component = new WorldSnapshot({
+    ingameGameState: {
+      entireGame: { gameSettings: { playerCount: 6 } },
+      world: { regions: new BetterMap(regions.map((r) => [r.id, r])) },
+      replayManager: {
+        selectedSnapshot: snapshot,
+        highlighter: {
+          marchMarkers: [[regions[0].id, { to: regions[1].id, color: "red" }]]
+        }
+      }
+    }
+  });
+  const renderer = render(
+    React.createElement("div", null, component.renderUnits(new BetterMap()))
+  );
+  const [arrow] = component.renderMarchMarkers();
+  for (const endpoint of [arrow.props.start, arrow.props.end]) {
+    const anchor = renderer.container.querySelector(`#${endpoint}`);
+    assert.ok(anchor.classList.contains("center-relative-to-parent"));
+    assert.ok(anchor.parentElement.classList.contains("units-container"));
+    assert.equal(anchor.parentElement.style.left, "100px");
+    assert.equal(anchor.parentElement.style.top, "200px");
+    assert.equal(anchor.parentElement.style.width, "80px");
+  }
+});
 
 test("child layers win regardless of registration order and can explicitly clear properties", () => {
   const { root, parent, child, regions, controls } = fixture();

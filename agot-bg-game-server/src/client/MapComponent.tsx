@@ -552,7 +552,7 @@ export default class MapComponent extends Component<MapComponentProps> {
           {this.renderLoanCardDeck(ironBankView)}
           {this.renderLoanCardSlots(ironBankView)}
           {this.renderMarchMarkers(
-            propertiesForUnits,
+            propertiesForRegions,
             fogOfWarActive,
             isVisible
           )}
@@ -565,37 +565,40 @@ export default class MapComponent extends Component<MapComponentProps> {
   }
 
   renderMarchMarkers(
-    propertiesForUnits: BetterMap<Unit, UnitOnMapProperties>,
+    propertiesForRegions: BetterMap<Region, RegionOnMapProperties>,
     fogOfWarActive: boolean,
     isVisible: (region: Region) => boolean
   ): ReactNode[] {
-    let markers = propertiesForUnits.entries
-      .filter(([_u, uprop]) => uprop.targetRegion != undefined)
-      .map(([u, uprop]) => [u, uprop.targetRegion] as [Unit, Region])
-      .filter(([u, r]) => u.region != r);
+    return propertiesForRegions.entries.flatMap(([from, { marchMarker }]) => {
+      if (
+        !marchMarker ||
+        from == marchMarker.targetRegion ||
+        (fogOfWarActive &&
+          (!isVisible(from) || !isVisible(marchMarker.targetRegion)))
+      ) {
+        return [];
+      }
 
-    markers = fogOfWarActive
-      ? markers.filter(([u, r]) => isVisible(u.region) && isVisible(r))
-      : markers;
-
-    return markers.map(([unit, to]) => (
-      <Xarrow
-        key={`arrow-${unit.id}-${to.id}`}
-        start={`centered-unit-div-for-march-markers-${unit.id}`}
-        end={`centered-units-container-div-for-march-markers-${to.id}`}
-        color={unit.allegiance.getHighlightColor()}
-        strokeWidth={5}
-        curveness={0.7}
-        dashness={{ animation: 3 }}
-        path="smooth"
-        showHead={true}
-        showTail={true}
-        headShape="arrow1"
-        tailShape="circle"
-        headSize={4}
-        tailSize={2}
-      />
-    ));
+      const to = marchMarker.targetRegion;
+      return [
+        <Xarrow
+          key={`arrow-${from.id}-${to.id}`}
+          start={`centered-units-container-div-for-march-markers-${from.id}`}
+          end={`centered-units-container-div-for-march-markers-${to.id}`}
+          color={marchMarker.color}
+          strokeWidth={5}
+          curveness={0.7}
+          dashness={{ animation: 3 }}
+          path="smooth"
+          showHead={true}
+          showTail={true}
+          headShape="arrow1"
+          tailShape="circle"
+          headSize={4}
+          tailSize={2}
+        />
+      ];
+    });
   }
 
   private renderLoanCardSlots(
@@ -969,12 +972,7 @@ export default class MapComponent extends Component<MapComponentProps> {
                       opacity: opacity,
                       transform: transform
                     }}
-                  >
-                    <div
-                      id={`centered-unit-div-for-march-markers-${u.id}`}
-                      className="center-relative-to-parent disable-pointer-events v-hidden"
-                    />
-                  </div>
+                  />
                 </OverlayTrigger>
               );
             })}
