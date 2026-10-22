@@ -320,7 +320,7 @@ else
     </section>
 }
 
-<script>
+<script nonce="@HttpContext.GetCspNonce()">
     document.addEventListener("click", (event) => {
         if (!(event.target instanceof Element)) return;
         const button = event.target.closest("[data-set-all-settings]");
