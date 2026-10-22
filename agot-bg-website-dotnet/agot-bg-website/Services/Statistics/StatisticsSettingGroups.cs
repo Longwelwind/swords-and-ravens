@@ -23,42 +23,31 @@ public static class StatisticsSettingGroups
         Group(
             "Game",
             collapsed: false,
-            "onlyLive",
+            "tidesOfBattle",
             "randomHouses",
             "randomChosenHouses",
             "tournamentMode",
             "faceless",
-            "private",
-            "noPrivateChats"
+            "private"
         ),
         Group(
             "Mother of Dragons",
-            collapsed: false,
+            collapsed: true,
             "vassals",
             "ironBank",
             "seaOrderTokens",
-            "allowGiftingPowerTokens"
+            "allowGiftingPowerTokens",
+            "empoweredVassals",
+            "randomVassalAssignment"
         ),
         Group(
             "House cards",
-            collapsed: false,
+            collapsed: true,
             "adwdHouseCards",
             "asosHouseCards",
             "firstEditionHouseCards",
             "houseCardsEvolution",
             "draftHouseCards"
-        ),
-        Group(
-            "Rules",
-            collapsed: false,
-            "tidesOfBattle",
-            "cokWesterosPhase",
-            "fogOfWar",
-            "randomStartPositions",
-            "customBalancing",
-            "holdVictoryPointsUntilEndOfRound",
-            "dragonWar",
-            "endless"
         ),
         Group(
             "Draft variants",
@@ -73,22 +62,23 @@ public static class StatisticsSettingGroups
             "draftMap"
         ),
         Group(
-            "Custom vassal rules",
-            collapsed: true,
-            "empoweredVassals",
-            "randomVassalAssignment",
-            "useVassalPositions"
-        ),
-        Group(
             "More custom rules",
             collapsed: true,
-            "dragonRevenge",
-            "addPortToTheEyrie",
-            "mixedWesterosDeck1",
+            "cokWesterosPhase",
+            "customBalancing",
             "precedingMustering",
+            "randomStartPositions",
+            "useVassalPositions",
+            "endless",
+            "fogOfWar",
+            "holdVictoryPointsUntilEndOfRound",
+            "dragonWar",
+            "dragonRevenge",
+            "mixedWesterosDeck1",
             "removeTob3",
             "removeTobSkulls",
-            "limitTob2"
+            "limitTob2",
+            "addPortToTheEyrie"
         ),
     ];
 
