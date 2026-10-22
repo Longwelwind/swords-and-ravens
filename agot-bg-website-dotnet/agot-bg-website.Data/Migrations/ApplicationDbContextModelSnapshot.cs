@@ -208,6 +208,22 @@ namespace agot_bg_website.Data.Migrations
                     b.Property<bool>("EmailNotificationActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("EmailGameNotificationsActive")
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("EmailCombatNotificationsActive")
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("EmailVoteGameEndNotificationsActive")
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("EmailPrivateMessageNotificationsActive")
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("GameStateColumnRight")
                         .HasColumnType("boolean");
 

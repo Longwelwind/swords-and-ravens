@@ -76,8 +76,20 @@ namespace agot_bg_website.Areas.Identity.Pages.Account.Manage
 
         public class PreferencesInputModel
         {
-            [Display(Name = "PBEM Notifications")]
+            [Display(Name = "Email notifications")]
             public bool EmailNotificationActive { get; set; }
+
+            [Display(Name = "Game alerts (ready to start, your turn)")]
+            public bool EmailGameNotificationsActive { get; set; }
+
+            [Display(Name = "Combat alerts (support requests, battle results)")]
+            public bool EmailCombatNotificationsActive { get; set; }
+
+            [Display(Name = "Vote and game-ended alerts")]
+            public bool EmailVoteGameEndNotificationsActive { get; set; }
+
+            [Display(Name = "Private message alerts")]
+            public bool EmailPrivateMessageNotificationsActive { get; set; }
 
             [Display(Name = "Join games in the muted state")]
             public bool MuteGames { get; set; }
@@ -105,6 +117,11 @@ namespace agot_bg_website.Areas.Identity.Pages.Account.Manage
             PreferencesInput = new PreferencesInputModel
             {
                 EmailNotificationActive = user.EmailNotificationActive,
+                EmailGameNotificationsActive = user.EmailGameNotificationsActive,
+                EmailCombatNotificationsActive = user.EmailCombatNotificationsActive,
+                EmailVoteGameEndNotificationsActive = user.EmailVoteGameEndNotificationsActive,
+                EmailPrivateMessageNotificationsActive =
+                    user.EmailPrivateMessageNotificationsActive,
                 MuteGames = user.MuteGames,
                 UseHouseNamesForChat = user.UseHouseNamesForChat,
                 UseMapScrollbar = user.UseMapScrollbar,
@@ -228,11 +245,26 @@ namespace agot_bg_website.Areas.Identity.Pages.Account.Manage
             }
 
             user.EmailNotificationActive = PreferencesInput.EmailNotificationActive;
+            user.EmailGameNotificationsActive = PreferencesInput.EmailGameNotificationsActive;
+            user.EmailCombatNotificationsActive = PreferencesInput.EmailCombatNotificationsActive;
+            user.EmailVoteGameEndNotificationsActive =
+                PreferencesInput.EmailVoteGameEndNotificationsActive;
+            user.EmailPrivateMessageNotificationsActive =
+                PreferencesInput.EmailPrivateMessageNotificationsActive;
             user.MuteGames = PreferencesInput.MuteGames;
             user.UseHouseNamesForChat = PreferencesInput.UseHouseNamesForChat;
             user.UseMapScrollbar = PreferencesInput.UseMapScrollbar;
             user.GameStateColumnRight = PreferencesInput.GameStateColumnRight;
-            await _userManager.UpdateAsync(user);
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                foreach (var error in updateResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                await LoadAsync(user);
+                return Page();
+            }
 
             StatusMessage = "Your preferences have been updated";
             return RedirectToPage();

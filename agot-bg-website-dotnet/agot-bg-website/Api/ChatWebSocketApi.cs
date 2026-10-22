@@ -465,13 +465,15 @@ public static class ChatWebSocketApi
         }
 
         var otherUserInRoom = await db
-            .UsersInRoom.Include(u => u.User)
+            .UsersInRoom.AsNoTracking()
+            .Include(u => u.User)
             .Where(u => u.RoomId == roomId && u.UserId != sender.Id)
             .FirstOrDefaultAsync();
         var recipient = otherUserInRoom?.User;
         if (
             recipient is null
             || !recipient.EmailNotificationActive
+            || !recipient.EmailPrivateMessageNotificationsActive
             || string.IsNullOrEmpty(recipient.Email)
         )
         {

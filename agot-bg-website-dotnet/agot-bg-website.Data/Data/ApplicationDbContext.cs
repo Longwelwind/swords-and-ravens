@@ -50,6 +50,10 @@ namespace agot_bg_website.Data
                 user.Ignore(u => u.DisplayName);
                 user.Property(u => u.GameToken).HasMaxLength(64).IsRequired();
                 user.HasIndex(u => u.GameToken).IsUnique();
+                user.Property(u => u.EmailGameNotificationsActive).HasDefaultValue(true);
+                user.Property(u => u.EmailCombatNotificationsActive).HasDefaultValue(true);
+                user.Property(u => u.EmailVoteGameEndNotificationsActive).HasDefaultValue(true);
+                user.Property(u => u.EmailPrivateMessageNotificationsActive).HasDefaultValue(true);
             });
 
             builder.Entity<Game>(game =>

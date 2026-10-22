@@ -114,6 +114,7 @@ public class ChatWebSocketApiNotifyChatPartnerTests : IDisposable
     }
 
     private readonly ApplicationDbContext _db;
+    private readonly DbContextOptions<ApplicationDbContext> _dbOptions;
     private readonly IMemoryCache _memoryCache;
     private readonly FakeEmailSender _emailSender = new();
     private readonly HttpContext _httpContext;
@@ -121,10 +122,10 @@ public class ChatWebSocketApiNotifyChatPartnerTests : IDisposable
 
     public ChatWebSocketApiNotifyChatPartnerTests()
     {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        _dbOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        _db = new ApplicationDbContext(options);
+        _db = new ApplicationDbContext(_dbOptions);
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
         _httpContext = new DefaultHttpContext();
         _httpContext.Request.Scheme = "https";
@@ -233,6 +234,44 @@ public class ChatWebSocketApiNotifyChatPartnerTests : IDisposable
             pbem: true,
             recipientWantsEmail: false
         );
+
+        await InvokeAsync(roomId, sender, game);
+
+        Assert.Empty(_emailSender.Sent);
+    }
+
+    [Fact]
+    public async Task DoesNotSendEmail_WhenRecipientOptedOutOfPrivateMessageNotifications()
+    {
+        var (game, sender, recipient, roomId) = await SeedGameWithTwoPlayersAsync(pbem: true);
+        recipient.EmailPrivateMessageNotificationsActive = false;
+        await _db.SaveChangesAsync();
+
+        await InvokeAsync(roomId, sender, game);
+
+        Assert.Empty(_emailSender.Sent);
+    }
+
+    [Fact]
+    public async Task ReadsUpdatedPrivateMessagePreference_FromAnotherContextOnTheSameConnection()
+    {
+        var (game, sender, recipient, roomId) = await SeedGameWithTwoPlayersAsync(pbem: true);
+
+        // The first notification materializes and tracks the recipient in the sender's long-lived
+        // WebSocket DbContext.
+        await InvokeAsync(roomId, sender, game);
+        Assert.Single(_emailSender.Sent);
+
+        await using (var preferencesDb = new ApplicationDbContext(_dbOptions))
+        {
+            var preferencesUser = await preferencesDb.Users.SingleAsync(u => u.Id == recipient.Id);
+            preferencesUser.EmailPrivateMessageNotificationsActive = false;
+            await preferencesDb.SaveChangesAsync();
+        }
+
+        // Simulate the seven-minute dedupe window expiring while the sender's socket stays open.
+        _memoryCache.Remove($"chat:private-notify:{roomId}:{recipient.Id}");
+        _emailSender.Sent.Clear();
 
         await InvokeAsync(roomId, sender, game);
 
