@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Er is iets misgegaan en je spelweergave is mogelijk niet gesynchroniseerd. Open de browserconsole (F12) en stuur de foutgegevens naar de sitebeheerder."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Er zijn nog geen Wildlingkaarten onthuld.",
     "house7d99a9": "Huis <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Huis <bold>{{affectedHouse}}</bold> koos ervoor een <bold2>{{unitType}}</bold2> te vernietigen",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: Huis <bold2>{{house}}</bold2> dwong huis <bold3>{{affectedHouse}}</bold3> een eenheid te vernietigen.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "Gezichtloos",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Spelersnamen blijven verborgen en worden pas na afloop van het spel onthuld.",
     "endlessadf7ab": "Eindeloos",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Het aantal spelrondes wordt verhoogd tot 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Het aantal spelrondes wordt verhoogd tot 1000. Westerosstapel III, de Wildlingstapel en, als de IJzeren Bank in het spel is, de leningstapel worden elke 10 rondes opnieuw geschud.",
     "cokWesterosPhase671f64": "CoK-Westerosfase",
     "playersMayLookAtTheNext3WesterosCards320840": "Spelers mogen op elk moment de volgende 3 Westeros-kaarten van elk deck bekijken.",
     "mixedWesterosDeck1084041": "Gemengde Westerosstapel 1",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "Plannen"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Alleen onthulde Wildlingkaarten tonen",
+    "fullScreen": "Volledig scherm",
     "round6f8874": "Ronde {{round}}",
     "privateChat11bbff": "Privéchat",
     "personalNote27c48d": "Persoonlijke notitie",

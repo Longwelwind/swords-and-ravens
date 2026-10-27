@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "È accaduto qualcosa di inatteso e la tua vista della partita potrebbe non essere sincronizzata. Apri la console del browser (F12) e invia i dettagli dell'errore all'amministratore del sito."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Non è stata ancora rivelata alcuna carta dei Bruti.",
     "house7d99a9": "Casa <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "La Casa <bold>{{affectedHouse}}</bold> ha scelto di distruggere un <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: la Casa <bold2>{{house}}</bold2> ha obbligato la Casa <bold3>{{affectedHouse}}</bold3> a distruggere un'unità.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "Senza volto",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "I nomi dei giocatori restano nascosti fino alla fine della partita.",
     "endlessadf7ab": "Senza fine",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Il numero di round viene aumentato a 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Il numero di round viene aumentato a 1000. Il mazzo Continente Occidentale III, il mazzo dei Bruti e, se la Banca di Ferro è in gioco, il mazzo dei prestiti vengono rimescolati ogni 10 round.",
     "cokWesterosPhase671f64": "Fase Westeros di CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "I giocatori possono consultare in qualsiasi momento le prossime 3 carte di ogni mazzo Westeros.",
     "mixedWesterosDeck1084041": "Mazzo Westeros 1 misto",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "Pianificazione"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Mostra solo le carte dei Bruti rivelate",
+    "fullScreen": "Schermo intero",
     "round6f8874": "Round {{round}}",
     "privateChat11bbff": "Chat privata",
     "personalNote27c48d": "Nota personale",

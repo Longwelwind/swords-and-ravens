@@ -619,6 +619,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Wystąpił błąd i widok gry może być niezsynchronizowany. Otwórz konsolę przeglądarki (F12) i prześlij szczegóły błędu administratorowi strony."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Nie odkryto jeszcze żadnych kart Dzikich.",
     "house7d99a9": "Ród <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Ród <bold>{{affectedHouse}}</bold> zdecydował się zniszczyć: <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: Ród <bold2>{{house}}</bold2> zmusił ród <bold3>{{affectedHouse}}</bold3> do zniszczenia jednostki.<lineBreak/><casualty/>",
@@ -964,7 +965,7 @@
     "faceless10470f": "Bez twarzy",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Nazwy graczy pozostaną ukryte do zakończenia gry.",
     "endlessadf7ab": "Bez końca",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Liczba rund gry zostaje zwiększona do 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Liczba rund gry zostaje zwiększona do 1000. Talia Westeros III, talia Dzikich oraz, jeśli w grze jest Żelazny Bank, talia pożyczek są ponownie tasowane po każdej 10. rundzie.",
     "cokWesterosPhase671f64": "Faza Westeros z CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Gracze mogą w dowolnym momencie podejrzeć 3 wierzchnie karty z każdej talii Westeros.",
     "mixedWesterosDeck1084041": "Mieszana talia Westeros 1",
@@ -1061,6 +1062,8 @@
     "planning21cc30": "Planowanie"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Pokaż tylko odkryte karty Dzikich",
+    "fullScreen": "Pełny ekran",
     "round6f8874": "Runda {{round}}",
     "privateChat11bbff": "Czat prywatny",
     "personalNote27c48d": "Notatka osobista",

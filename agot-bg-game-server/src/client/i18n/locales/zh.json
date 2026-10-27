@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "发生了异常，您的游戏画面可能已与服务器不同步。请打开浏览器控制台（F12），将其中的错误详情发送给网站管理员。"
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "尚未揭示任何野人卡牌。",
     "house7d99a9": "<bold>{{attacked}}</bold> 家族",
     "houseChoseToDestroyAa590ac": "<bold>{{affectedHouse}}</bold> 家族选择消灭一支<bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>：<bold2>{{house}}</bold2> 家族迫使 <bold3>{{affectedHouse}}</bold3> 家族消灭一支部队。<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "匿名模式",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "玩家名称将隐藏，直到游戏结束后才会揭示。",
     "endlessadf7ab": "无限模式",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "游戏轮数增加至 1000 轮。",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "游戏轮数增加至 1000 轮。每 10 轮结束后，重新洗混维斯特洛牌堆 III、野人牌堆，以及启用铁金库时的贷款牌堆。",
     "cokWesterosPhase671f64": "CoK Westeros 阶段",
     "playersMayLookAtTheNext3WesterosCards320840": "玩家可以随时查看每叠 Westeros 牌接下来的 3 张卡。",
     "mixedWesterosDeck1084041": "混合 Westeros 第 1 牌堆",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "计划"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "仅显示已揭示的野人卡牌",
+    "fullScreen": "全屏",
     "round6f8874": "第 {{round}} 轮",
     "privateChat11bbff": "私聊",
     "personalNote27c48d": "个人笔记",

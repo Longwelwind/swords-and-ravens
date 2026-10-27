@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "무언가 이상한 발생함 및 당신의 게임 보기 가능 밖 동기화. 부디 열기 브라우저 콘솔 (F12) 및 전송 오류 세부 정보 그곳 장소 관리자."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "아직 공개된 와일들링 카드가 없습니다.",
     "house7d99a9": "가문 <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "가문 <bold>{{affectedHouse}}</bold> 선택함 파괴 <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: 가문 <bold2>{{house}}</bold2> 강제함 가문 <bold3>{{affectedHouse}}</bold3> 파괴 유닛.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "얼굴 없는 자",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "플레이어 이름 숨겨진 및 공개됨 후 게임 종료.",
     "endlessadf7ab": "끝없는",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": " 수 게임 라운드 증가 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "게임 라운드 수가 1000으로 늘어납니다. 매 10라운드가 끝난 후 웨스테로스 덱 III, 와일들링 덱, 그리고 강철 은행을 사용하는 경우 대출 덱을 다시 섞습니다.",
     "cokWesterosPhase671f64": "CoK Westeros 단계",
     "playersMayLookAtTheNext3WesterosCards320840": "플레이어 가능 보기 에서 다음 3 Westeros 카드 부터 각 덱 에서 어떤 시간.",
     "mixedWesterosDeck1084041": "혼합됨 Westeros 덱 1",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "계획"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "공개된 와일들링 카드만 표시",
+    "fullScreen": "전체 화면",
     "round6f8874": "라운드 {{round}}",
     "privateChat11bbff": "비공개 채팅",
     "personalNote27c48d": "개인 참고",

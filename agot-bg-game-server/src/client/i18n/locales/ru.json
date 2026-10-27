@@ -619,6 +619,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Произошла ошибка, и ваша версия игры могла рассинхронизироваться. Откройте консоль браузера (F12) и отправьте сведения об ошибке администратору сайта."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Карты одичалых ещё не раскрывались.",
     "house7d99a9": "Дом <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Дом <bold>{{affectedHouse}}</bold> решил уничтожить: <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: дом <bold2>{{house}}</bold2> вынудил дом <bold3>{{affectedHouse}}</bold3> уничтожить отряд.<lineBreak/><casualty/>",
@@ -964,7 +965,7 @@
     "faceless10470f": "Анонимная игра",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Имена игроков скрыты до завершения игры.",
     "endlessadf7ab": "Бесконечная игра",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Число раундов увеличено до 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Число раундов увеличено до 1000. Колода Вестероса III, колода одичалых и, если в игре участвует Железный банк, колода займов перемешиваются заново после каждого 10-го раунда.",
     "cokWesterosPhase671f64": "Фаза Westeros по CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Игроки могут в любой момент посмотреть следующие 3 карты каждой колоды Westeros.",
     "mixedWesterosDeck1084041": "Смешанная колода Westeros 1",
@@ -1061,6 +1062,8 @@
     "planning21cc30": "Замыслы"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Показать только раскрытые карты одичалых",
+    "fullScreen": "Полный экран",
     "round6f8874": "Раунд {{round}}",
     "privateChat11bbff": "Личный чат",
     "personalNote27c48d": "Личная заметка",

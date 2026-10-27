@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "予期しない問題が発生し、ゲーム画面が同期していない可能性があります。ブラウザーのコンソール（F12）を開き、表示されたエラーの詳細をサイト管理者に送ってください。"
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "まだ野人カードは公開されていません。",
     "house7d99a9": "<bold>{{attacked}}</bold>家",
     "houseChoseToDestroyAa590ac": "<bold>{{affectedHouse}}</bold>家は<bold2>{{unitType}}</bold2>を破壊しました",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>：<bold2>{{house}}</bold2>家は<bold3>{{affectedHouse}}</bold3>家にユニットを破壊させました。<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "匿名",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "プレイヤー名はゲーム終了まで隠され、終了後に公開されます。",
     "endlessadf7ab": "エンドレス",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "ゲームラウンド数を1000に増やします。",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "ゲームラウンド数を1000に増やします。10ラウンドごとにウェスタロスデッキIII、野人デッキ、および鉄の銀行を使用している場合は融資デッキをシャッフルし直します。",
     "cokWesterosPhase671f64": "王たちの衝突：ウェスタロスフェイズ",
     "playersMayLookAtTheNext3WesterosCards320840": "プレイヤーはいつでも各デッキの次のウェスタロスカード3枚を確認できます。",
     "mixedWesterosDeck1084041": "混合Westerosデッキ1",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "計画"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "公開済みの野人カードのみ表示",
+    "fullScreen": "全画面表示",
     "round6f8874": "ラウンド {{round}}",
     "privateChat11bbff": "プライベートチャット",
     "personalNote27c48d": "個人メモ",

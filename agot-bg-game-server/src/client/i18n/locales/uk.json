@@ -619,6 +619,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Сталося щось дивне, і ваше відображення гри могло розсинхронізуватися. Будь ласка, відкрийте консоль браузера (F12) і надішліть подробиці помилки адміністратору сайту."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Карти дикунів ще не розкривалися.",
     "house7d99a9": "Дім <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Дім <bold>{{affectedHouse}}</bold> вирішив знищити <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: дім <bold2>{{house}}</bold2> змусив дім <bold3>{{affectedHouse}}</bold3> знищити загін.<lineBreak/><casualty/>",
@@ -964,7 +965,7 @@
     "faceless10470f": "Безликі",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Імена гравців будуть приховані й розкриті після завершення гри.",
     "endlessadf7ab": "Нескінченна",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Кількість раундів гри збільшується до 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Кількість раундів гри збільшується до 1000. Колода Вестеросу III, колода дикунів та, якщо в грі є Залізний банк, колода позик перемішуються знову після кожного 10-го раунду.",
     "cokWesterosPhase671f64": "Фаза Вестероса CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Гравці можуть будь-коли дивитися наступні 3 карти Вестероса з кожної колоди.",
     "mixedWesterosDeck1084041": "Змішана колода Вестероса 1",
@@ -1061,6 +1062,8 @@
     "planning21cc30": "Планування"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Показати лише розкриті карти дикунів",
+    "fullScreen": "Повний екран",
     "round6f8874": "Раунд {{round}}",
     "privateChat11bbff": "Приватний чат",
     "personalNote27c48d": "Особиста нотатка",

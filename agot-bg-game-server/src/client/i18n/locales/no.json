@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Something strange happened og din spill view kan be out av sync. Please open den browser console (F12) og send den error details there til site admin."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Ingen villkort har blitt avslørt ennå.",
     "house7d99a9": "hus <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "hus <bold>{{affectedHouse}}</bold> valgte å ødelegge en <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: hus <bold2>{{house}}</bold2> tvang hus <bold3>{{affectedHouse}}</bold3> å ødelegge en enhet.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "Ansiktsløs",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Spillernes navn skjules og avsløres når spillet er over.",
     "endlessadf7ab": "Uendelig",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Antallet spillrunder økes til 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Antallet spillrunder økes til 1000. Westeros-kortstokk III, villkortstokken og, hvis Jernbanken er med i spillet, lånekortstokken stokkes på nytt etter hver 10. runde.",
     "cokWesterosPhase671f64": "CoK-Westeros-fase",
     "playersMayLookAtTheNext3WesterosCards320840": "Spillere kan look ved den neste 3 Westeros kort fra hver kortstokk ved valgfri time.",
     "mixedWesterosDeck1084041": "Mixed Westeros Kortstokk 1",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "Planlegging"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Vis bare avslørte villkort",
+    "fullScreen": "Fullskjerm",
     "round6f8874": "Runde {{round}}",
     "privateChat11bbff": "Privat chat",
     "personalNote27c48d": "Personlig notat",

@@ -50,7 +50,6 @@ import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
-import contractImage from "../../public/images/icons/contract.svg";
 
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
@@ -233,20 +232,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             mapControls={this.mapControls}
             border={border}
           />
-          <button
-            className="btn btn-secondary"
-            style={{
-              position: "absolute",
-              top: "20px",
-              right: "20px",
-              zIndex: 1000
-            }}
-            onClick={() => {
-              this.gameClient.logChatFullScreen = false;
-            }}
-          >
-            <img src={contractImage} width={24} />
-          </button>
         </Col>
       );
     }

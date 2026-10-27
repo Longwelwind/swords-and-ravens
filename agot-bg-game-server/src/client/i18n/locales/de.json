@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Ein unerwarteter Fehler ist aufgetreten und deine Spielansicht ist möglicherweise nicht mehr synchron. Bitte öffne die Browserkonsole (F12) und sende die dort angezeigten Fehlerdetails an den Seitenadministrator."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Es wurden noch keine Wildlingskarten aufgedeckt.",
     "house7d99a9": "Haus <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Haus <bold>{{affectedHouse}}</bold> entschied sich, eine Einheit vom Typ <bold2>{{unitType}}</bold2> zu vernichten",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: Haus <bold2>{{house}}</bold2> zwang Haus <bold3>{{affectedHouse}}</bold3>, eine Einheit zu vernichten.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "Anonym",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Die Spielernamen bleiben verborgen und werden nach Spielende aufgedeckt.",
     "endlessadf7ab": "Endlos",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Die Anzahl der Spielrunden wird auf 1000 erhöht.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Die Anzahl der Spielrunden wird auf 1000 erhöht. Der Westeros-Stapel III, der Wildlingsstapel und, falls die Eiserne Bank im Spiel ist, der Darlehensstapel werden nach jeder 10. Runde neu gemischt.",
     "cokWesterosPhase671f64": "CoK-Westeros-Phase",
     "playersMayLookAtTheNext3WesterosCards320840": "Die Spieler dürfen jederzeit die nächsten 3 Westeros-Karten jedes Stapels ansehen.",
     "mixedWesterosDeck1084041": "Gemischter Westeros-Stapel 1",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "Planungs"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Nur aufgedeckte Wildlingskarten anzeigen",
+    "fullScreen": "Vollbild",
     "round6f8874": "Runde {{round}}",
     "privateChat11bbff": "Privater Chat",
     "personalNote27c48d": "Persönliche Notiz",

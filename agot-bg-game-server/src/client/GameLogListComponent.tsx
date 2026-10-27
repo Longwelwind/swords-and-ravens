@@ -61,6 +61,7 @@ interface GameLogListComponentProps {
   gameClient: GameClient;
   currentlyViewed: boolean;
   scrollToLog?: number;
+  wildlingCardsOnly?: boolean;
 }
 
 @observer
@@ -71,8 +72,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       .filter((hc) => hc.ability != null)
       .map((hc) => [hc.ability?.id ?? "ability-never-null-here", hc])
   );
-
-  currentRound = 0;
 
   get ingame(): IngameGameState {
     return this.props.ingameGameState;
@@ -110,7 +109,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       ? ticksToTime(lastSeenLogTicks)
       : null;
 
-    this.currentRound = 0;
+    let currentRound = 0;
+    const visibleLogs = this.logManager.logs
+      .map((log, index) => {
+        if (log.data.type == "turn-begin") {
+          currentRound = log.data.turn;
+        }
+        return { log, index, round: currentRound };
+      })
+      .filter(
+        ({ log }) =>
+          !this.props.wildlingCardsOnly ||
+          log.data.type == "wildling-card-revealed"
+      );
+
+    if (this.props.wildlingCardsOnly && visibleLogs.length == 0) {
+      return (
+        <p className="text-center">
+          {t("gameLogList.noWildlingCardsRevealed")}
+        </p>
+      );
+    }
 
     const highlightLog = (i: number): boolean => {
       return this.replayManager.isReplayMode
@@ -118,9 +137,12 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         : this.replayManager.isModifyingGameLogUI(this.logManager.logs[i].data);
     };
 
-    return this.logManager.logs.map((l, i) => (
+    return visibleLogs.map(({ log: l, index: i, round }, visibleIndex) => (
       <div key={`log_${i}`}>
-        {lastSeenLogTime == null && i == 0 && (
+        {this.props.wildlingCardsOnly &&
+          (visibleIndex == 0 || visibleLogs[visibleIndex - 1].round != round) &&
+          this.renderGameLogData({ type: "turn-begin", turn: round }, round)}
+        {lastSeenLogTime == null && visibleIndex == 0 && (
           <Row className="justify-content-center align-items-center">
             <Col xs={true}>
               <hr className="red" />
@@ -190,14 +212,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 }
               }}
             >
-              {this.renderGameLogData(l.data, this.currentRound)}
+              {this.renderGameLogData(l.data, round)}
             </div>
           </Col>
         </Row>
         {lastSeenLogTime &&
-          i + 1 < this.logManager.logs.length &&
-          this.logManager.logs[i].time <= lastSeenLogTime &&
-          this.logManager.logs[i + 1].time > lastSeenLogTime && (
+          visibleIndex + 1 < visibleLogs.length &&
+          l.time <= lastSeenLogTime &&
+          visibleLogs[visibleIndex + 1].log.time > lastSeenLogTime && (
             <Row className="justify-content-center align-items-center">
               <Col xs={true}>
                 <hr className="red" />
@@ -326,7 +348,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           </>
         );
       case "turn-begin":
-        this.currentRound = data.turn;
         return (
           <Row className="justify-content-center">
             <Col xs={true}>

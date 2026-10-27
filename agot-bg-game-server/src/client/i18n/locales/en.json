@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Something strange happened and your game view may be out of sync. Please open the browser console (F12) and send the error details there to the site admin."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "No Wildling cards have been revealed yet.",
     "house7d99a9": "House <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "House <bold>{{affectedHouse}}</bold> chose to destroy a <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: House <bold2>{{house}}</bold2> forced House <bold3>{{affectedHouse}}</bold3> to destroy a unit.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "Faceless",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Player names will be hidden and revealed after the game ends.",
     "endlessadf7ab": "Endless",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "The number of game rounds is increased to 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "The number of game rounds is increased to 1000. Westeros deck III, the Wildling deck and, if the Iron Bank is in play, the loan deck are reshuffled after every 10th round.",
     "cokWesterosPhase671f64": "CoK Westeros Phase",
     "playersMayLookAtTheNext3WesterosCards320840": "Players may look at the next 3 Westeros cards from each deck at any time.",
     "mixedWesterosDeck1084041": "Mixed Westeros Deck 1",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "Planning"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Show only revealed Wildling cards",
+    "fullScreen": "Full screen",
     "round6f8874": "Round {{round}}",
     "privateChat11bbff": "Private Chat",
     "personalNote27c48d": "Personal note",

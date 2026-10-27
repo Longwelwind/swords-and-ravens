@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Valami furcsa történt és a te játék nézet lehet ki szinkronizálás. Kérjük nyitott böngésző konzol (F12) és küldés hiba részletek ott hely adminisztrátor."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Még nem fedtek fel Vadak-kártyát.",
     "house7d99a9": "Ház <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Ház <bold>{{affectedHouse}}</bold> választott elpusztít <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: Ház <bold2>{{house}}</bold2> kényszerített Ház <bold3>{{affectedHouse}}</bold3> elpusztít egység.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "Névtelen",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Játékos nevek rejtett és felfedve után játék véget ér.",
     "endlessadf7ab": "Végtelen",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": " szám játék fordulók növekedett 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "A játék fordulóinak száma 1000-re nő. A III. Westeros-paklit, a Vadak-paklit és, ha a Vasbank játékban van, a kölcsönpaklit minden 10. forduló után újrakeverjük.",
     "cokWesterosPhase671f64": "CoK Westeros Fázis",
     "playersMayLookAtTheNext3WesterosCards320840": "Játékosok lehet néz következő 3 Westeros kártyák minden pakli bármely idő.",
     "mixedWesterosDeck1084041": "kevert Westeros Pakli 1",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "Tervezés"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Csak a felfedett Vadak-kártyák megjelenítése",
+    "fullScreen": "Teljes képernyő",
     "round6f8874": "Forduló {{round}}",
     "privateChat11bbff": "Privát Csevegés",
     "personalNote27c48d": "személyes megjegyzés",

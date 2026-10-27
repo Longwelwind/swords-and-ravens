@@ -602,6 +602,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Ocorreu um erro inesperado e a tua vista do jogo pode estar dessincronizada. Abre a consola do navegador (F12) e envia os detalhes do erro aí apresentados ao administrador do site."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Ainda não foram reveladas cartas de Selvagens.",
     "house7d99a9": "Casa <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "A Casa <bold>{{affectedHouse}}</bold> escolheu destruir um <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: A Casa <bold2>{{house}}</bold2> obrigou a Casa <bold3>{{affectedHouse}}</bold3> a destruir uma unidade.<lineBreak/><casualty/>",
@@ -945,7 +946,7 @@
     "faceless10470f": "Anonimato",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Os nomes dos jogadores ficam ocultos e só são revelados após o fim do jogo.",
     "endlessadf7ab": "Sem fim",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "O número de rondas de jogo é aumentado para 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "O número de rondas de jogo é aumentado para 1000. O baralho Westeros III, o baralho de Selvagens e, se o Banco de Ferro estiver em jogo, o baralho de empréstimos são baralhados novamente a cada 10 rondas.",
     "cokWesterosPhase671f64": "Fase de Westeros de CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Os jogadores podem ver a qualquer momento as próximas 3 cartas de Westeros de cada baralho.",
     "mixedWesterosDeck1084041": "Baralho de Westeros 1 misto",
@@ -1042,6 +1043,8 @@
     "planning21cc30": "Planeamento"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Mostrar apenas cartas de Selvagens reveladas",
+    "fullScreen": "Ecrã inteiro",
     "round6f8874": "Ronda {{round}}",
     "privateChat11bbff": "Chat privado",
     "personalNote27c48d": "Nota pessoal",

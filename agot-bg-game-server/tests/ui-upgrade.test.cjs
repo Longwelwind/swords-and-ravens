@@ -9,7 +9,7 @@ const {
   act,
   waitFor
 } = require("@testing-library/react");
-const { runInAction } = require("mobx");
+const { observable, runInAction } = require("mobx");
 const { OverlayTrigger, Modal, Button } = require("react-bootstrap");
 const ImagePopover = require("../src/client/utils/ImagePopover").default;
 const VolumeSlider =
@@ -42,6 +42,240 @@ beforeEach((context) => {
 });
 
 afterEach(cleanup);
+
+function gameLogFixture(context, data) {
+  const GameLogPanel = require("../src/client/GameLogPanel").default;
+  const BetterMap = require("../src/utils/BetterMap").default;
+  const WildlingCard =
+    require("../src/common/ingame-game-state/game-data-structure/wildling-card/WildlingCard").default;
+  const {
+    silenceAtTheWall,
+    mammothRiders
+  } = require("../src/common/ingame-game-state/game-data-structure/wildling-card/wildlingCardTypes");
+  const original = globalThis.ResizeObserver;
+  context.after(() => {
+    globalThis.ResizeObserver = original;
+  });
+  globalThis.ResizeObserver = class {
+    observe() {}
+    disconnect() {}
+  };
+  const logs = observable.array(
+    data.map((data, i) => ({
+      data,
+      time: new Date(2026, 9, 27, 12, i)
+    })),
+    { deep: false }
+  );
+  const selected = [];
+  const props = {
+    currentlyViewed: false,
+    gameClient: { authenticatedUser: null },
+    ingameGameState: {
+      entireGame: { now: new Date() },
+      game: {
+        world: {},
+        wildlingDeck: [
+          new WildlingCard(1, silenceAtTheWall),
+          new WildlingCard(2, mammothRiders)
+        ]
+      },
+      gameLogManager: { logs, lastSeenLogTimes: new BetterMap() },
+      replayManager: {
+        isReplayMode: true,
+        selectedLogIndex: -1,
+        selectLog: (i) => selected.push(i)
+      }
+    }
+  };
+  return { GameLogPanel, logs, selected, props };
+}
+
+test("game-log toolbar filters revealed cards while preserving rounds, live updates and replay indices", async (context) => {
+  const { GameLogPanel, logs, selected, props } = gameLogFixture(context, [
+    { type: "turn-begin", turn: 1 },
+    { type: "westeros-phase-began" },
+    { type: "wildling-card-revealed", wildlingCard: 1 },
+    { type: "wildling-card-revealed", wildlingCard: 2 },
+    { type: "turn-begin", turn: 2 },
+    { type: "planning-phase-began" },
+    { type: "turn-begin", turn: 3 },
+    { type: "wildling-card-revealed", wildlingCard: 1 }
+  ]);
+  const view = render(React.createElement(GameLogPanel, props));
+  const toggle = view.getByRole("button", { name: "Game Logs" });
+  assert.equal(toggle.getAttribute("aria-expanded"), "false");
+  assert.equal(view.queryByRole("button", { name: "Jump to" }), null);
+  fireEvent.click(toggle);
+  const toolbar = view.getByRole("group", { name: "Game Logs" });
+  assert.equal(toggle.getAttribute("aria-expanded"), "true");
+  assert.ok(toolbar.contains(view.getByText("Jump to")));
+  assert.equal(view.queryByRole("button", { name: "Full screen" }), null);
+  const filter = view.getByRole("button", {
+    name: "Show only revealed Wildling cards"
+  });
+  fireEvent.click(filter);
+  assert.equal(filter.getAttribute("aria-pressed"), "true");
+  assert.equal(view.queryByText("Westeros Phase"), null);
+  assert.equal(view.queryByText("Planning Phase"), null);
+  assert.deepEqual(
+    Array.from(
+      view.container.querySelectorAll(".game-log-content"),
+      (e) => e.id
+    ),
+    ["game-log-content-2", "game-log-content-3", "game-log-content-7"]
+  );
+  assert.deepEqual(
+    Array.from(
+      view.container.querySelectorAll('[id^="gamelog-round-"]'),
+      (e) => e.id
+    ),
+    ["gamelog-round-1", "gamelog-round-3"]
+  );
+  fireEvent.click(view.container.querySelector("#game-log-content-7"));
+  assert.deepEqual(selected, [7]);
+
+  const round3 = view.container.querySelector("#gamelog-round-3");
+  const scrolls = [];
+  round3.scrollIntoView = (options) => scrolls.push(options);
+  fireEvent.click(view.getByRole("button", { name: "Jump to" }));
+  assert.equal(view.queryByText("Round 2"), null);
+  fireEvent.click(
+    await view.findByText("Round 3", { selector: ".dropdown-item" })
+  );
+  assert.deepEqual(scrolls, [{ behavior: "smooth", block: "center" }]);
+
+  act(() => {
+    runInAction(() => {
+      logs.push(
+        { data: { type: "turn-begin", turn: 4 }, time: new Date() },
+        {
+          data: { type: "wildling-card-revealed", wildlingCard: 2 },
+          time: new Date()
+        }
+      );
+    });
+  });
+  assert.ok(view.container.querySelector("#game-log-content-9"));
+  fireEvent.click(view.getByRole("button", { name: "Jump to" }));
+  assert.ok(await view.findByText("Round 4", { selector: ".dropdown-item" }));
+  fireEvent.click(view.getByRole("button", { name: "Jump to" }));
+  fireEvent.click(filter);
+  assert.equal(filter.getAttribute("aria-pressed"), "false");
+  assert.ok(view.getByText("Planning Phase"));
+  assert.equal(view.container.querySelectorAll(".game-log-content").length, 10);
+  fireEvent.click(toggle);
+  assert.equal(toggle.getAttribute("aria-expanded"), "false");
+  assert.equal(view.queryByRole("group", { name: "Game Logs" }), null);
+  assert.ok(view.container.querySelector("#game-log-content-9"));
+});
+
+test("game-log toolbar shows an empty filter state and invokes mobile fullscreen", (context) => {
+  addBootstrapStyles(context);
+  const { GameLogPanel, props } = gameLogFixture(context, [
+    { type: "turn-begin", turn: 1 },
+    { type: "planning-phase-began" }
+  ]);
+  let expanded = false;
+  const view = render(
+    React.createElement(GameLogPanel, {
+      ...props,
+      onFullScreenClick: () => {
+        expanded = true;
+      }
+    })
+  );
+  const toggle = view.getByRole("button", { name: "Game Logs" });
+  assert.equal(getComputedStyle(toggle).position, "absolute");
+  assert.equal(getComputedStyle(toggle).width, "32px");
+  assert.equal(getComputedStyle(toggle.parentElement).position, "relative");
+  fireEvent.click(toggle);
+  const toolbar = view.getByRole("group", { name: "Game Logs" });
+  assert.equal(toolbar.id, toggle.getAttribute("aria-controls"));
+  assert.equal(getComputedStyle(toolbar).display, "flex");
+  assert.equal(getComputedStyle(toolbar).flexWrap, "nowrap");
+  const fullscreen = view.getByRole("button", { name: "Full screen" });
+  assert.ok(toolbar.contains(fullscreen));
+  fireEvent.click(fullscreen);
+  assert.equal(expanded, true);
+  fireEvent.click(
+    view.getByRole("button", {
+      name: "Show only revealed Wildling cards"
+    })
+  );
+  assert.ok(view.getByText("No Wildling cards have been revealed yet."));
+  assert.equal(
+    view.container.querySelectorAll('[id^="gamelog-round-"]').length,
+    0
+  );
+  fireEvent.click(toggle);
+  assert.ok(view.getByText("No Wildling cards have been revealed yet."));
+  fireEvent.click(toggle);
+  assert.equal(
+    view
+      .getByRole("button", {
+        name: "Show only revealed Wildling cards"
+      })
+      .getAttribute("aria-pressed"),
+    "true"
+  );
+});
+
+test("game-log toolbar stays expanded after fullscreen remount and contains the exit control", (context) => {
+  const { GameLogPanel, props } = gameLogFixture(context, [
+    { type: "turn-begin", turn: 1 }
+  ]);
+  const GameTabs = require("../src/client/GameTabsComponent").default;
+  const client = {
+    authenticatedUser: { settings: { lastOpenedTab: "chat" } },
+    logChatFullScreen: false,
+    lastOpenedGameTab: null
+  };
+  const tabProps = {
+    gameClient: client,
+    ingame: { entireGame: { gameSettings: {} } }
+  };
+  const tabs = new GameTabs(tabProps);
+  runInAction(() => {
+    tabs.currentOpenedTab = "game-logs";
+  });
+  const view = render(
+    React.createElement(GameLogPanel, {
+      ...props,
+      key: "normal",
+      onFullScreenClick: () => {
+        tabs.logChatFullScreen = true;
+      }
+    })
+  );
+  fireEvent.click(view.getByRole("button", { name: "Game Logs" }));
+  fireEvent.click(view.getByRole("button", { name: "Full screen" }));
+  assert.equal(client.logChatFullScreen, true);
+  const fullscreenTabs = new GameTabs(tabProps);
+  assert.equal(fullscreenTabs.currentOpenedTab, "game-logs");
+  view.rerender(
+    React.createElement(GameLogPanel, {
+      ...props,
+      key: "fullscreen",
+      fullScreen: true,
+      onFullScreenClick: () => {
+        fullscreenTabs.logChatFullScreen = false;
+      }
+    })
+  );
+  assert.equal(
+    view
+      .getByRole("button", { name: "Game Logs" })
+      .getAttribute("aria-expanded"),
+    "true"
+  );
+  const exit = view.getByRole("button", { name: "Full screen", pressed: true });
+  assert.ok(view.getByRole("group", { name: "Game Logs" }).contains(exit));
+  assert.match(exit.querySelector("img").src, /contract\.svg$/);
+  fireEvent.click(exit);
+  assert.equal(client.logChatFullScreen, false);
+  assert.equal(new GameTabs(tabProps).currentOpenedTab, "game-logs");
+});
 
 function addBootstrapStyles(context) {
   const style = document.createElement("style");

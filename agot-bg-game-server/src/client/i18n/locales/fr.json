@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Une erreur inattendue s'est produite et votre vue de la partie est peut-être désynchronisée. Veuillez ouvrir la console du navigateur (F12) et envoyer les détails de l'erreur à l'administrateur du site."
   },
   "gameLogList": {
+    "noWildlingCardsRevealed": "Aucune carte Sauvage n'a encore été révélée.",
     "house7d99a9": "Maison <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "La maison <bold>{{affectedHouse}}</bold> a choisi de détruire une unité de type <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold> : La maison <bold2>{{house}}</bold2> a contraint la maison <bold3>{{affectedHouse}}</bold3> à détruire une unité.<lineBreak/><casualty/>",
@@ -926,7 +927,7 @@
     "faceless10470f": "Anonymat",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Les noms des joueurs sont masqués jusqu'à la fin de la partie.",
     "endlessadf7ab": "Sans fin",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Le nombre de tours est porté à 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Le nombre de tours est porté à 1000. Le paquet Westeros III, le paquet Sauvage et, si la Banque de Fer est en jeu, le paquet de prêts sont remélangés tous les 10 tours.",
     "cokWesterosPhase671f64": "Phase Westeros CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Les joueurs peuvent consulter à tout moment les 3 prochaines cartes Westeros de chaque paquet.",
     "mixedWesterosDeck1084041": "Paquet Westeros 1 mixte",
@@ -1023,6 +1024,8 @@
     "planning21cc30": "programmation"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Afficher uniquement les cartes Sauvage révélées",
+    "fullScreen": "Plein écran",
     "round6f8874": "Tour {{round}}",
     "privateChat11bbff": "Chat privé",
     "personalNote27c48d": "Note personnelle",
