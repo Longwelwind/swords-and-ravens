@@ -864,6 +864,33 @@ test("autoscroll follows content and viewport resizing, preserves scroll-up, and
   });
   await act(async () => viewportObserver.notify(80));
   await waitFor(() => assert.equal(viewport.scrollTop, 919));
+  fireEvent.scroll(viewport);
+  // Growing the viewport (e.g. the mobile keyboard closing) clamps scrollTop;
+  // that scroll must not be treated as the reader scrolling up.
+  Object.defineProperty(viewport, "clientHeight", {
+    configurable: true,
+    value: 100
+  });
+  await act(async () => {
+    viewportObserver.notify(100);
+    viewport.scrollTop = 899;
+    fireEvent.scroll(viewport);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  });
+  Object.defineProperty(viewport, "scrollHeight", {
+    configurable: true,
+    value: 1100
+  });
+  await act(async () => observer.notify(1100));
+  await waitFor(() => assert.ok(Math.abs(viewport.scrollTop - 999) < 1), {
+    timeout: 3000
+  });
+  Object.defineProperty(viewport, "clientHeight", {
+    configurable: true,
+    value: 80
+  });
+  await act(async () => viewportObserver.notify(80));
+  await waitFor(() => assert.equal(viewport.scrollTop, 1019));
   fireEvent.wheel(viewport, { deltaY: -100 });
   assert.ok(view.getByRole("button", { name: "Scroll to latest" }));
   viewport.scrollTop = 200;
@@ -882,6 +909,23 @@ test("autoscroll follows content and viewport resizing, preserves scroll-up, and
     timeout: 3000
   });
   assert.equal(view.queryByRole("button", { name: "Scroll to latest" }), null);
+  // A native drag swallows mouseup; following must not stay paused afterwards.
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(viewport);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  fireEvent.mouseDown(document);
+  fireEvent(document.body, new window.Event("dragend", { bubbles: true }));
+  Object.defineProperty(viewport, "scrollHeight", {
+    configurable: true,
+    value: 1300
+  });
+  await act(async () => observer.notify(1300));
+  await waitFor(() => assert.ok(Math.abs(viewport.scrollTop - 1219) < 1), {
+    timeout: 3000
+  });
+  selection.removeAllRanges();
   view.unmount();
   assert.ok(observer.disconnected);
   assert.ok(viewportObserver.disconnected);
