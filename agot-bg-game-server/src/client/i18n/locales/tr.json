@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Garip bir şey oldu ve oyun görünümün senkronizasyondan çıkmış olabilir. Lütfen tarayıcı konsolunu (F12) açıp oradaki hata ayrıntılarını site yöneticisine gönder."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Güçlendirilmiş vasallar oylamayla etkinleştirildi.",
     "noWildlingCardsRevealed": "Henüz hiçbir Yabanıl kartı açılmadı.",
     "house7d99a9": "<bold>{{attacked}}</bold> Hanesi",
     "houseChoseToDestroyAa590ac": "<bold>{{affectedHouse}}</bold> Hanesi <bold2>{{unitType}}</bold2> birimini yok etmeyi seçti",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Bu vasal hanenin süresi doldu, bu nedenle artık bir oyuncu tarafından değiştirilemez"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "“Güçlendirilmiş vasallar” ayarını etkinleştirmek için oylama başlat",
+    "confirmEnableEmpoweredVassalsVote": "Güçlendirilmiş vasalları etkinleştirmek için oylama başlatmak istiyor musunuz?",
     "gameHasResumed367404": "Oyun devam ediyor!",
     "gameHasBeenPaused8bed51": "Oyun duraklatıldı!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "<bold>{{house}}</bold> Hanesi <bold3>{{region}}</bold3> bölgesinde bir <bold2>Demir Banka</bold2> emrini çözdü,<lineBreak/><bold5>Customs Officer</bold5> için <bold4>{{loanPurchasedPaid}}</bold4> güç jetonu ödedi.<lineBreak2/><bold6>{{logGained}}</bold6> {{powerTokenLabel}} kazandı.",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "'{{user}}' kullanıcısını oyunundan yasaklamak istediğine emin misin?"
   },
   "vote": {
+    "enableEmpoweredVassals": "güçlendirilmiş vasalları etkinleştirmek",
     "refuse263134": "Reddet",
     "accept89713b": "Kabul et",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold>, <bold2>{{verb}}</bold2> için oylama başlattı. Oylamanın geçmesi için {{votePositiveCountToPass}} {{player}} kabul etmelidir.<voteControls/>",

@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "무언가 이상한 발생함 및 당신의 게임 보기 가능 밖 동기화. 부디 열기 브라우저 콘솔 (F12) 및 전송 오류 세부 정보 그곳 장소 관리자."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "투표로 강화된 봉신이 활성화되었습니다.",
     "noWildlingCardsRevealed": "아직 공개된 와일들링 카드가 없습니다.",
     "house7d99a9": "가문 <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "가문 <bold>{{affectedHouse}}</bold> 선택함 파괴 <bold2>{{unitType}}</bold2>",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": " 타이머 이 봉신 가문 실행 밖 및 따라서 그것 가능 없음 더 이상 교체됨 으로 플레이어"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "“강화된 봉신” 설정을 활성화하는 투표 시작",
+    "confirmEnableEmpoweredVassalsVote": "강화된 봉신을 활성화하는 투표를 시작하시겠습니까?",
     "gameHasResumed367404": "게임 재개됨!",
     "gameHasBeenPaused8bed51": "게임 일시 중지!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "가문 <bold>{{house}}</bold> 해결됨 <bold2>철 은행</bold2> 명령 에서 <bold3>{{region}}</bold3>,<lineBreak/>지불 <bold4>{{loanPurchasedPaid}}</bold4> 권력 토큰 위해 <bold5>세관 관리</bold5>.<lineBreak2/>그들 획득함 <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": " 당신 확실 당신 원하다 차단 '{{user}}' 부터 당신의 게임?"
   },
   "vote": {
+    "enableEmpoweredVassals": "강화된 봉신 활성화",
     "refuse263134": "거부",
     "accept89713b": "수락",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> 시작됨 투표 <bold2>{{verb}}</bold2>. {{votePositiveCountToPass}} {{player}} 반드시 수락 통과 투표.<voteControls/>",

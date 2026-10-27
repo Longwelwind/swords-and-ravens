@@ -619,6 +619,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Произошла ошибка, и ваша версия игры могла рассинхронизироваться. Откройте консоль браузера (F12) и отправьте сведения об ошибке администратору сайта."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Усиленные вассалы включены голосованием.",
     "noWildlingCardsRevealed": "Карты одичалых ещё не раскрывались.",
     "house7d99a9": "Дом <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Дом <bold>{{affectedHouse}}</bold> решил уничтожить: <bold2>{{unitType}}</bold2>",
@@ -1111,6 +1112,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Время этого вассального дома истекло, поэтому его нельзя заменить игроком"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Начать голосование за включение настройки «Усиленные вассалы»",
+    "confirmEnableEmpoweredVassalsVote": "Вы хотите начать голосование за включение усиленных вассалов?",
     "gameHasResumed367404": "Игра возобновлена!",
     "gameHasBeenPaused8bed51": "Игра приостановлена!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Дом <bold>{{house}}</bold> выполнил приказ <bold2>Iron Bank</bold2> в <bold3>{{region}}</bold3>,<lineBreak/>заплатив <bold4>{{loanPurchasedPaid}}</bold4> жетонов власти за <bold5>Customs Officer</bold5>.<lineBreak2/>Он получил <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1267,6 +1270,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Вы уверены, что хотите заблокировать «{{user}}» в вашей игре?"
   },
   "vote": {
+    "enableEmpoweredVassals": "включить усиленных вассалов",
     "refuse263134": "Отклонить",
     "accept89713b": "Принять",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> начал голосование: <bold2>{{verb}}</bold2>. Для принятия нужно согласие {{votePositiveCountToPass}} {{player}}.<voteControls/>",

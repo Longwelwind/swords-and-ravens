@@ -602,6 +602,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Ocorreu um erro inesperado e a tua vista do jogo pode estar dessincronizada. Abre a consola do navegador (F12) e envia os detalhes do erro aí apresentados ao administrador do site."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Os vassalos reforçados foram ativados por votação.",
     "noWildlingCardsRevealed": "Ainda não foram reveladas cartas de Selvagens.",
     "house7d99a9": "Casa <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "A Casa <bold>{{affectedHouse}}</bold> escolheu destruir um <bold2>{{unitType}}</bold2>",
@@ -1092,6 +1093,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "O tempo desta Casa vassala esgotou-se e, por isso, já não pode ser substituída por um jogador"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Iniciar uma votação para ativar a opção «Vassalos reforçados»",
+    "confirmEnableEmpoweredVassalsVote": "Queres iniciar uma votação para ativar os vassalos reforçados?",
     "gameHasResumed367404": "O jogo foi retomado!",
     "gameHasBeenPaused8bed51": "O jogo foi colocado em pausa!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "A Casa <bold>{{house}}</bold> resolveu uma ordem do <bold2>Banco de Ferro</bold2> em <bold3>{{region}}</bold3>,<lineBreak/>pagando <bold4>{{loanPurchasedPaid}}</bold4> fichas de poder por <bold5>Customs Officer</bold5>.<lineBreak2/>Ganhou <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1248,6 +1251,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Tens a certeza de que queres banir «{{user}}» do teu jogo?"
   },
   "vote": {
+    "enableEmpoweredVassals": "ativar os vassalos reforçados",
     "refuse263134": "Recusar",
     "accept89713b": "Aceitar",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> iniciou uma votação para <bold2>{{verb}}</bold2>. É necessário que {{votePositiveCountToPass}} {{player}} aceitem para a proposta ser aprovada.<voteControls/>",

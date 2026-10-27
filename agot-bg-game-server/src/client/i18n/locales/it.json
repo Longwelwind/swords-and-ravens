@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "È accaduto qualcosa di inatteso e la tua vista della partita potrebbe non essere sincronizzata. Apri la console del browser (F12) e invia i dettagli dell'errore all'amministratore del sito."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "I vassalli potenziati sono stati attivati tramite votazione.",
     "noWildlingCardsRevealed": "Non è stata ancora rivelata alcuna carta dei Bruti.",
     "house7d99a9": "Casa <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "La Casa <bold>{{affectedHouse}}</bold> ha scelto di distruggere un <bold2>{{unitType}}</bold2>",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Il tempo di questa Casa vassalla è scaduto e non può più essere sostituita da un giocatore"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Avvia una votazione per attivare l'impostazione «Vassalli potenziati»",
+    "confirmEnableEmpoweredVassalsVote": "Vuoi avviare una votazione per attivare i vassalli potenziati?",
     "gameHasResumed367404": "La partita è ripresa!",
     "gameHasBeenPaused8bed51": "La partita è in pausa!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "La Casa <bold>{{house}}</bold> ha risolto un ordine della <bold2>Banca di Ferro</bold2> a <bold3>{{region}}</bold3>,<lineBreak/>pagando <bold4>{{loanPurchasedPaid}}</bold4> segnalini potere per <bold5>Customs Officer</bold5>.<lineBreak2/>Ha ottenuto <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Vuoi davvero bandire «{{user}}» dalla tua partita?"
   },
   "vote": {
+    "enableEmpoweredVassals": "attivare i vassalli potenziati",
     "refuse263134": "Rifiuta",
     "accept89713b": "Accetta",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> ha avviato una votazione per <bold2>{{verb}}</bold2>. Devono accettare {{votePositiveCountToPass}} {{player}} per approvarla.<voteControls/>",

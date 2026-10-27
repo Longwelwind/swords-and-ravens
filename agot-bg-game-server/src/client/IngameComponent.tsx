@@ -50,6 +50,7 @@ import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
+import empoweredVassalsImage from "../../public/images/icons/empowered-vassals.svg";
 
 import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
@@ -659,6 +660,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       result: canLaunchExtendPlayerClocksVote,
       reason: canLaunchExtendPlayerClocksVoteReason
     } = this.ingame.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
+    const {
+      result: canLaunchEnableEmpoweredVassalsVote,
+      reason: canLaunchEnableEmpoweredVassalsVoteReason
+    } = this.ingame.canLaunchEnableEmpoweredVassalsVote(
+      this.authenticatedPlayer
+    );
 
     return (
       <Popover
@@ -910,6 +917,50 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                   </button>
                 </Col>
               )}
+              {!this.gameSettings.empoweredVassals &&
+                this.ingame.getVassalHouses().length > 0 && (
+                  <Col xs="auto">
+                    <OverlayTrigger
+                      placement="auto"
+                      overlay={
+                        <Tooltip id="enable-empowered-vassals-vote-tooltip">
+                          {canLaunchEnableEmpoweredVassalsVote
+                            ? t("ingame.launchEnableEmpoweredVassalsVote")
+                            : canLaunchEnableEmpoweredVassalsVoteReason ==
+                                "game-paused"
+                              ? t("common.resumeFirst")
+                              : canLaunchEnableEmpoweredVassalsVoteReason ==
+                                  "already-ended"
+                                ? t("common.alreadyEnded")
+                                : canLaunchEnableEmpoweredVassalsVoteReason ==
+                                    "already-cancelled"
+                                  ? t("common.alreadyCancelled")
+                                  : t("common.voteNotPossible")}
+                        </Tooltip>
+                      }
+                    >
+                      <span>
+                        <button
+                          type="button"
+                          className="btn btn-outline-light btn-sm"
+                          aria-label={t("gameSettings.empoweredVassals")}
+                          disabled={!canLaunchEnableEmpoweredVassalsVote}
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                t("ingame.confirmEnableEmpoweredVassalsVote")
+                              )
+                            ) {
+                              this.ingame.launchEnableEmpoweredVassalsVote();
+                            }
+                          }}
+                        >
+                          <img src={empoweredVassalsImage} width={32} alt="" />
+                        </button>
+                      </span>
+                    </OverlayTrigger>
+                  </Col>
+                )}
             </Row>
           )}
         </Col>

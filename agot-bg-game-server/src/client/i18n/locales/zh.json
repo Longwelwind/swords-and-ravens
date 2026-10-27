@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "发生了异常，您的游戏画面可能已与服务器不同步。请打开浏览器控制台（F12），将其中的错误详情发送给网站管理员。"
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "已通过投票启用强化附庸。",
     "noWildlingCardsRevealed": "尚未揭示任何野人卡牌。",
     "house7d99a9": "<bold>{{attacked}}</bold> 家族",
     "houseChoseToDestroyAa590ac": "<bold>{{affectedHouse}}</bold> 家族选择消灭一支<bold2>{{unitType}}</bold2>",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "此附庸家族的计时已耗尽，无法再由玩家接替"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "发起投票以启用“强化附庸”设置",
+    "confirmEnableEmpoweredVassalsVote": "是否发起投票以启用强化附庸？",
     "gameHasResumed367404": "游戏已恢复！",
     "gameHasBeenPaused8bed51": "游戏已暂停！",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "<bold>{{house}}</bold> 家族结算了 <bold3>{{region}}</bold3> 中的 <bold2>Iron Bank</bold2> 命令，<lineBreak/>支付 <bold4>{{loanPurchasedPaid}}</bold4> 枚权力标记购买了 <bold5>Customs Officer</bold5>。<lineBreak2/>该家族获得了 <bold6>{{logGained}}</bold6> {{powerTokenLabel}}。",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "确定要禁止“{{user}}”加入您的游戏吗？"
   },
   "vote": {
+    "enableEmpoweredVassals": "启用强化附庸",
     "refuse263134": "拒绝",
     "accept89713b": "接受",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> 发起投票：<bold2>{{verb}}</bold2>。需要 {{votePositiveCountToPass}} {{player}}同意才能通过。<voteControls/>",

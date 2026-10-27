@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Er is iets misgegaan en je spelweergave is mogelijk niet gesynchroniseerd. Open de browserconsole (F12) en stuur de foutgegevens naar de sitebeheerder."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Versterkte vazallen is via stemming ingeschakeld.",
     "noWildlingCardsRevealed": "Er zijn nog geen Wildlingkaarten onthuld.",
     "house7d99a9": "Huis <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Huis <bold>{{affectedHouse}}</bold> koos ervoor een <bold2>{{unitType}}</bold2> te vernietigen",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "De timer van dit vazalhuis is afgelopen; het kan daarom niet langer door een speler worden vervangen."
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Start een stemming om de instelling ‘Versterkte vazallen’ in te schakelen",
+    "confirmEnableEmpoweredVassalsVote": "Wil je een stemming starten om versterkte vazallen in te schakelen?",
     "gameHasResumed367404": "Het spel is hervat!",
     "gameHasBeenPaused8bed51": "Het spel is gepauzeerd!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Huis <bold>{{house}}</bold> voerde in <bold3>{{region}}</bold3> een order van de <bold2>IJzeren Bank</bold2> uit,<lineBreak/>betaalde <bold4>{{loanPurchasedPaid}}</bold4> Machtfiches voor de <bold5>Douanier</bold5> en<lineBreak2/>ontving <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Weet je zeker dat je '{{user}}' uit je spel wilt verbannen?"
   },
   "vote": {
+    "enableEmpoweredVassals": "versterkte vazallen inschakelen",
     "refuse263134": "Weigeren",
     "accept89713b": "Accepteren",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> startte een stemming om <bold2>{{verb}}</bold2>. {{votePositiveCountToPass}} {{player}} moeten instemmen om het voorstel aan te nemen.<voteControls/>",

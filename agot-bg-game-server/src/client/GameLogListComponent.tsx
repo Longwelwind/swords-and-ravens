@@ -5374,6 +5374,8 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       case "game-paused": {
         return <p>{t("gameLogList.theGameWasPausedByVote5b0f00")}</p>;
       }
+      case "empowered-vassals-enabled":
+        return <p>{t("gameLogList.empoweredVassalsEnabled")}</p>;
       case "game-resumed": {
         return (
           <p>

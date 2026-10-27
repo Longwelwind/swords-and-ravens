@@ -1,6 +1,7 @@
 import User from "../../../server/User";
 import BetterMap from "../../../utils/BetterMap";
 import VoteType, {
+  EnableEmpoweredVassals,
   ReplacePlayer,
   ReplacePlayerByVassal,
   ReplaceVassalByPlayer,
@@ -62,6 +63,18 @@ export default class Vote {
   }
 
   get canVote(): { result: boolean; reason: string } {
+    if (this.type instanceof EnableEmpoweredVassals) {
+      if (this.ingame.isEndedOrCancelled) {
+        return { result: false, reason: "already-ended" };
+      }
+      if (this.ingame.entireGame.gameSettings.empoweredVassals) {
+        return { result: false, reason: "already-enabled" };
+      }
+      if (this.ingame.getVassalHouses().length == 0) {
+        return { result: false, reason: "no-vassals" };
+      }
+    }
+
     if (this.type instanceof ReplaceVassalByPlayer) {
       if (this.ingame.hasChildGameState(CombatGameState)) {
         return { result: false, reason: "ongoing-combat" };

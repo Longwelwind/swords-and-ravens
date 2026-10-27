@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "予期しない問題が発生し、ゲーム画面が同期していない可能性があります。ブラウザーのコンソール（F12）を開き、表示されたエラーの詳細をサイト管理者に送ってください。"
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "投票により臣下強化が有効になりました。",
     "noWildlingCardsRevealed": "まだ野人カードは公開されていません。",
     "house7d99a9": "<bold>{{attacked}}</bold>家",
     "houseChoseToDestroyAa590ac": "<bold>{{affectedHouse}}</bold>家は<bold2>{{unitType}}</bold2>を破壊しました",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "この属家は制限時間が切れているため、プレイヤーと交代できません"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "「臣下強化」設定を有効にする投票を開始",
+    "confirmEnableEmpoweredVassalsVote": "臣下強化を有効にする投票を開始しますか？",
     "gameHasResumed367404": "ゲームを再開しました！",
     "gameHasBeenPaused8bed51": "ゲームを一時停止しました！",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "<bold>{{house}}</bold>家は<bold3>{{region}}</bold3>で<bold2>鉄の銀行</bold2>命令を解決し、<lineBreak/><bold5>税関吏</bold5>に権力トークン<bold4>{{loanPurchasedPaid}}</bold4>個を支払いました。<lineBreak2/><bold6>{{logGained}}</bold6> {{powerTokenLabel}}を獲得しました。",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "「{{user}}」をこのゲームへの参加禁止にしますか？"
   },
   "vote": {
+    "enableEmpoweredVassals": "臣下強化を有効にする",
     "refuse263134": "拒否",
     "accept89713b": "賛成",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold>が<bold2>{{verb}}</bold2>の投票を開始しました。可決には{{votePositiveCountToPass}} {{player}}の賛成が必要です。<voteControls/>",

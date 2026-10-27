@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Ein unerwarteter Fehler ist aufgetreten und deine Spielansicht ist möglicherweise nicht mehr synchron. Bitte öffne die Browserkonsole (F12) und sende die dort angezeigten Fehlerdetails an den Seitenadministrator."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Verbesserte Vasallen wurde per Abstimmung aktiviert.",
     "noWildlingCardsRevealed": "Es wurden noch keine Wildlingskarten aufgedeckt.",
     "house7d99a9": "Haus <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Haus <bold>{{affectedHouse}}</bold> entschied sich, eine Einheit vom Typ <bold2>{{unitType}}</bold2> zu vernichten",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Die Zeit dieses Vasallenhauses ist abgelaufen; es kann deshalb nicht mehr durch einen Spieler ersetzt werden"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Eine Abstimmung zur Aktivierung der Einstellung „Verbesserte Vasallen“ starten",
+    "confirmEnableEmpoweredVassalsVote": "Möchtest du eine Abstimmung zur Aktivierung von „Verbesserte Vasallen“ starten?",
     "gameHasResumed367404": "Das Spiel wurde fortgesetzt!",
     "gameHasBeenPaused8bed51": "Das Spiel wurde pausiert!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Haus <bold>{{house}}</bold> führte einen Befehl der <bold2>Eisernen Bank</bold2> in <bold3>{{region}}</bold3> aus<lineBreak/>und zahlte <bold4>{{loanPurchasedPaid}}</bold4> Machtmarker für <bold5>Customs Officer</bold5>.<lineBreak2/>Es erhielt <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Möchtest du „{{user}}“ wirklich aus deinem Spiel verbannen?"
   },
   "vote": {
+    "enableEmpoweredVassals": "verbesserte Vasallen aktivieren",
     "refuse263134": "Ablehnen",
     "accept89713b": "Zustimmen",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> hat eine Abstimmung gestartet: <bold2>{{verb}}</bold2>. {{votePositiveCountToPass}} {{player}} müssen zustimmen, damit die Abstimmung erfolgreich ist.<voteControls/>",

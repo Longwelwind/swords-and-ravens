@@ -585,6 +585,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Valami furcsa történt és a te játék nézet lehet ki szinkronizálás. Kérjük nyitott böngésző konzol (F12) és küldés hiba részletek ott hely adminisztrátor."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "A megerősített vazallusokat szavazással engedélyezték.",
     "noWildlingCardsRevealed": "Még nem fedtek fel Vadak-kártyát.",
     "house7d99a9": "Ház <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Ház <bold>{{affectedHouse}}</bold> választott elpusztít <bold2>{{unitType}}</bold2>",
@@ -1073,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": " időzítő ez hűbéres ház fut ki és ezért az tud nincs tovább lecserélt játékos"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Szavazás indítása a „Megerősített vazallusok” beállítás engedélyezéséről",
+    "confirmEnableEmpoweredVassalsVote": "Szeretnél szavazást indítani a megerősített vazallusok engedélyezéséről?",
     "gameHasResumed367404": "Játék folytatódott!",
     "gameHasBeenPaused8bed51": "Játék szüneteltetve!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Ház <bold>{{house}}</bold> megoldott <bold2>Vas Bank</bold2> parancs <bold3>{{region}}</bold3>,<lineBreak/>fizet <bold4>{{loanPurchasedPaid}}</bold4> Hatalom jelzők <bold5>Vám Tiszt</bold5>.<lineBreak2/>Ők szerzett <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1229,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": " te biztos te akar kitiltás '{{user}}' a te játék?"
   },
   "vote": {
+    "enableEmpoweredVassals": "engedélyezni a megerősített vazallusokat",
     "refuse263134": "Elutasít",
     "accept89713b": "Elfogadás",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> kezdeményezett szavazás <bold2>{{verb}}</bold2>. {{votePositiveCountToPass}} {{player}} kell elfogadás passz szavazás.<voteControls/>",

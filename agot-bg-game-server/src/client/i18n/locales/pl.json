@@ -619,6 +619,7 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Wystąpił błąd i widok gry może być niezsynchronizowany. Otwórz konsolę przeglądarki (F12) i prześlij szczegóły błędu administratorowi strony."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Wzmocnieni wasale zostali włączeni w głosowaniu.",
     "noWildlingCardsRevealed": "Nie odkryto jeszcze żadnych kart Dzikich.",
     "house7d99a9": "Ród <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Ród <bold>{{affectedHouse}}</bold> zdecydował się zniszczyć: <bold2>{{unitType}}</bold2>",
@@ -1111,6 +1112,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Czas tego rodu wasalnego upłynął, więc gracz nie może go już zastąpić."
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Rozpocznij głosowanie nad włączeniem ustawienia „Wzmocnieni wasale”",
+    "confirmEnableEmpoweredVassalsVote": "Czy chcesz rozpocząć głosowanie nad włączeniem wzmocnionych wasali?",
     "gameHasResumed367404": "Gra została wznowiona!",
     "gameHasBeenPaused8bed51": "Gra została wstrzymana!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Ród <bold>{{house}}</bold> rozpatrzył w <bold3>{{region}}</bold3> rozkaz <bold2>Żelaznego Banku</bold2>,<lineBreak/>płacąc <bold4>{{loanPurchasedPaid}}</bold4> żetonów Władzy za <bold5>Urzędnika Celnego</bold5>.<lineBreak2/>Zyskał <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1267,6 +1270,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Czy na pewno chcesz zablokować użytkownikowi „{{user}}” dostęp do twojej gry?"
   },
   "vote": {
+    "enableEmpoweredVassals": "włączyć wzmocnionych wasali",
     "refuse263134": "Odrzuć",
     "accept89713b": "Akceptuj",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> rozpoczął głosowanie, aby <bold2>{{verb}}</bold2>. Do przyjęcia wniosku wymagana jest zgoda {{votePositiveCountToPass}} {{player}}.<voteControls/>",

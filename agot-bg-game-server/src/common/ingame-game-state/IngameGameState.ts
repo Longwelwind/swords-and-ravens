@@ -38,6 +38,7 @@ import VoteType, {
   CancelGame,
   EndGame,
   ExtendPlayerClocks,
+  EnableEmpoweredVassals,
   PauseGame,
   ReplacePlayer,
   ReplacePlayerByVassal,
@@ -849,6 +850,10 @@ export default class IngameGameState extends GameState<
     } else if (message.type == "launch-extend-player-clocks-vote") {
       if (this.canLaunchExtendPlayerClocksVote(player).result) {
         this.createVote(player.user, new ExtendPlayerClocks());
+      }
+    } else if (message.type == "launch-enable-empowered-vassals-vote") {
+      if (this.canLaunchEnableEmpoweredVassalsVote(player).result) {
+        this.createVote(player.user, new EnableEmpoweredVassals());
       }
     } else if (message.type == "launch-replace-player-by-vassal-vote") {
       const playerToReplace = this.players.get(
@@ -2259,6 +2264,46 @@ export default class IngameGameState extends GameState<
         type: "launch-extend-player-clocks-vote"
       });
     }
+  }
+
+  launchEnableEmpoweredVassalsVote(): void {
+    this.entireGame.sendMessageToServer({
+      type: "launch-enable-empowered-vassals-vote"
+    });
+  }
+
+  canLaunchEnableEmpoweredVassalsVote(player: Player | null): {
+    result: boolean;
+    reason: string;
+  } {
+    if (player == null || !this.players.values.includes(player)) {
+      return { result: false, reason: "only-players-can-vote" };
+    }
+    if (this.isCancelled) {
+      return { result: false, reason: "already-cancelled" };
+    }
+    if (this.isEnded) {
+      return { result: false, reason: "already-ended" };
+    }
+    if (this.paused) {
+      return { result: false, reason: "game-paused" };
+    }
+    if (this.entireGame.gameSettings.empoweredVassals) {
+      return { result: false, reason: "already-enabled" };
+    }
+    if (this.getVassalHouses().length == 0) {
+      return { result: false, reason: "no-vassals" };
+    }
+    if (
+      this.votes.values.some(
+        (v) =>
+          v.state == VoteState.ONGOING &&
+          v.type instanceof EnableEmpoweredVassals
+      )
+    ) {
+      return { result: false, reason: "already-existing" };
+    }
+    return { result: true, reason: "" };
   }
 
   canLaunchCancelGameVote(player: Player | null): {
