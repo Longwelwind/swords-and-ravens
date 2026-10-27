@@ -619,6 +619,8 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Došlo k neočekávané události a vaše zobrazení hry nemusí být synchronizované. Otevřete konzoli prohlížeče (F12) a pošlete správci webu podrobnosti uvedené chyby."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Posílení vazalové byli aktivováni hlasováním.",
+    "noWildlingCardsRevealed": "Zatím nebyly odhaleny žádné karty Divokých.",
     "house7d99a9": "Rod <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Rod <bold>{{affectedHouse}}</bold> se rozhodl zničit <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: Rod <bold2>{{house}}</bold2> donutil rod <bold3>{{affectedHouse}}</bold3> zničit jednotku.<lineBreak/><casualty/>",
@@ -964,7 +966,7 @@
     "faceless10470f": "Bez tváře",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Jména hráčů budou skryta a odhalí se až po skončení hry.",
     "endlessadf7ab": "Nekonečná hra",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Počet kol hry se zvýší na 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Počet kol hry se zvýší na 1000. Balíček Západozemí III, balíček Divokých a, pokud je ve hře Železná banka, balíček půjček se znovu zamíchají po každém 10. kole.",
     "cokWesterosPhase671f64": "Fáze Západozemí v Souboji králů",
     "playersMayLookAtTheNext3WesterosCards320840": "Hráči se mohou kdykoli podívat na tři následující karty Západozemí z každého balíčku.",
     "mixedWesterosDeck1084041": "Smíšený balíček Západozemí 1",
@@ -1061,6 +1063,8 @@
     "planning21cc30": "Plánování"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Zobrazit pouze odhalené karty Divokých",
+    "fullScreen": "Celá obrazovka",
     "round6f8874": "Kolo {{round}}",
     "privateChat11bbff": "Soukromý chat",
     "personalNote27c48d": "Osobní poznámka",
@@ -1108,6 +1112,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Tomuto vazalskému rodu vypršel čas, a proto již nemůže být nahrazen hráčem"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Zahájit hlasování o aktivaci nastavení „Posílení vazalové“",
+    "confirmEnableEmpoweredVassalsVote": "Chcete zahájit hlasování o aktivaci posílených vazalů?",
     "gameHasResumed367404": "Hra pokračuje!",
     "gameHasBeenPaused8bed51": "Hra byla pozastavena!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Rod <bold>{{house}}</bold> vyhodnotil rozkaz <bold2>Železná banka</bold2> v oblasti <bold3>{{region}}</bold3>,<lineBreak/>zaplatil <bold4>{{loanPurchasedPaid}}</bold4> mocenských žetonů za <bold5>Celníka</bold5>.<lineBreak2/>Získal <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1264,6 +1270,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Opravdu chcete zablokovat uživatele „{{user}}“ ve vaší hře?"
   },
   "vote": {
+    "enableEmpoweredVassals": "aktivovat posílené vazaly",
     "refuse263134": "Odmítnout",
     "accept89713b": "Přijmout",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> zahájil hlasování o <bold2>{{verb}}</bold2>. Pro schválení musí souhlasit {{votePositiveCountToPass}} {{player}}.<voteControls/>",

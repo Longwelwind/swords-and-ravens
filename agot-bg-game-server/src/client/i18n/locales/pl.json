@@ -619,6 +619,8 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Wystąpił błąd i widok gry może być niezsynchronizowany. Otwórz konsolę przeglądarki (F12) i prześlij szczegóły błędu administratorowi strony."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Wzmocnieni wasale zostali włączeni w głosowaniu.",
+    "noWildlingCardsRevealed": "Nie odkryto jeszcze żadnych kart Dzikich.",
     "house7d99a9": "Ród <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "Ród <bold>{{affectedHouse}}</bold> zdecydował się zniszczyć: <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: Ród <bold2>{{house}}</bold2> zmusił ród <bold3>{{affectedHouse}}</bold3> do zniszczenia jednostki.<lineBreak/><casualty/>",
@@ -964,7 +966,7 @@
     "faceless10470f": "Bez twarzy",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Nazwy graczy pozostaną ukryte do zakończenia gry.",
     "endlessadf7ab": "Bez końca",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Liczba rund gry zostaje zwiększona do 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Liczba rund gry zostaje zwiększona do 1000. Talia Westeros III, talia Dzikich oraz, jeśli w grze jest Żelazny Bank, talia pożyczek są ponownie tasowane po każdej 10. rundzie.",
     "cokWesterosPhase671f64": "Faza Westeros z CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Gracze mogą w dowolnym momencie podejrzeć 3 wierzchnie karty z każdej talii Westeros.",
     "mixedWesterosDeck1084041": "Mieszana talia Westeros 1",
@@ -1061,6 +1063,8 @@
     "planning21cc30": "Planowanie"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Pokaż tylko odkryte karty Dzikich",
+    "fullScreen": "Pełny ekran",
     "round6f8874": "Runda {{round}}",
     "privateChat11bbff": "Czat prywatny",
     "personalNote27c48d": "Notatka osobista",
@@ -1108,6 +1112,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Czas tego rodu wasalnego upłynął, więc gracz nie może go już zastąpić."
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Rozpocznij głosowanie nad włączeniem ustawienia „Wzmocnieni wasale”",
+    "confirmEnableEmpoweredVassalsVote": "Czy chcesz rozpocząć głosowanie nad włączeniem wzmocnionych wasali?",
     "gameHasResumed367404": "Gra została wznowiona!",
     "gameHasBeenPaused8bed51": "Gra została wstrzymana!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "Ród <bold>{{house}}</bold> rozpatrzył w <bold3>{{region}}</bold3> rozkaz <bold2>Żelaznego Banku</bold2>,<lineBreak/>płacąc <bold4>{{loanPurchasedPaid}}</bold4> żetonów Władzy za <bold5>Urzędnika Celnego</bold5>.<lineBreak2/>Zyskał <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1264,6 +1270,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Czy na pewno chcesz zablokować użytkownikowi „{{user}}” dostęp do twojej gry?"
   },
   "vote": {
+    "enableEmpoweredVassals": "włączyć wzmocnionych wasali",
     "refuse263134": "Odrzuć",
     "accept89713b": "Akceptuj",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> rozpoczął głosowanie, aby <bold2>{{verb}}</bold2>. Do przyjęcia wniosku wymagana jest zgoda {{votePositiveCountToPass}} {{player}}.<voteControls/>",

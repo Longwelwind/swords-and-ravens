@@ -585,6 +585,8 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Garip bir şey oldu ve oyun görünümün senkronizasyondan çıkmış olabilir. Lütfen tarayıcı konsolunu (F12) açıp oradaki hata ayrıntılarını site yöneticisine gönder."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Güçlendirilmiş vasallar oylamayla etkinleştirildi.",
+    "noWildlingCardsRevealed": "Henüz hiçbir Yabanıl kartı açılmadı.",
     "house7d99a9": "<bold>{{attacked}}</bold> Hanesi",
     "houseChoseToDestroyAa590ac": "<bold>{{affectedHouse}}</bold> Hanesi <bold2>{{unitType}}</bold2> birimini yok etmeyi seçti",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: <bold2>{{house}}</bold2> Hanesi, <bold3>{{affectedHouse}}</bold3> Hanesini bir birimini yok etmeye zorladı.<lineBreak/><casualty/>",
@@ -926,7 +928,7 @@
     "faceless10470f": "Yüzsüz",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Oyuncu adları gizlenir ve oyun bittikten sonra açıklanır.",
     "endlessadf7ab": "Sonsuz",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Oyun turu sayısı 1000'e çıkarılır.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Oyun turu sayısı 1000'e çıkarılır. Westeros III destesi, Yabanıl destesi ve Demir Banka oyundaysa kredi destesi her 10. turdan sonra yeniden karıştırılır.",
     "cokWesterosPhase671f64": "CoK Westeros aşaması",
     "playersMayLookAtTheNext3WesterosCards320840": "Oyuncular her destedeki sonraki 3 Westeros kartına istedikleri zaman bakabilir.",
     "mixedWesterosDeck1084041": "Karma Westeros destesi 1",
@@ -1023,6 +1025,8 @@
     "planning21cc30": "Planlama"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Yalnızca açılmış Yabanıl kartlarını göster",
+    "fullScreen": "Tam ekran",
     "round6f8874": "Tur {{round}}",
     "privateChat11bbff": "Özel sohbet",
     "personalNote27c48d": "Kişisel not",
@@ -1070,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Bu vasal hanenin süresi doldu, bu nedenle artık bir oyuncu tarafından değiştirilemez"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "“Güçlendirilmiş vasallar” ayarını etkinleştirmek için oylama başlat",
+    "confirmEnableEmpoweredVassalsVote": "Güçlendirilmiş vasalları etkinleştirmek için oylama başlatmak istiyor musunuz?",
     "gameHasResumed367404": "Oyun devam ediyor!",
     "gameHasBeenPaused8bed51": "Oyun duraklatıldı!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "<bold>{{house}}</bold> Hanesi <bold3>{{region}}</bold3> bölgesinde bir <bold2>Demir Banka</bold2> emrini çözdü,<lineBreak/><bold5>Customs Officer</bold5> için <bold4>{{loanPurchasedPaid}}</bold4> güç jetonu ödedi.<lineBreak2/><bold6>{{logGained}}</bold6> {{powerTokenLabel}} kazandı.",
@@ -1226,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "'{{user}}' kullanıcısını oyunundan yasaklamak istediğine emin misin?"
   },
   "vote": {
+    "enableEmpoweredVassals": "güçlendirilmiş vasalları etkinleştirmek",
     "refuse263134": "Reddet",
     "accept89713b": "Kabul et",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold>, <bold2>{{verb}}</bold2> için oylama başlattı. Oylamanın geçmesi için {{votePositiveCountToPass}} {{player}} kabul etmelidir.<voteControls/>",

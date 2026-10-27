@@ -188,6 +188,7 @@ export type GameLogData =
   | AeronDamphairHouseCardChanged
   | ControlPowerTokenRemoved
   | GamePaused
+  | EmpoweredVassalsEnabled
   | GameResumed
   | SupportAttackAgainstNeutralForce
   | HousesSwapped
@@ -1425,6 +1426,10 @@ interface ControlPowerTokenRemoved {
 
 interface GamePaused {
   type: "game-paused";
+}
+
+interface EmpoweredVassalsEnabled {
+  type: "empowered-vassals-enabled";
 }
 
 export interface GameResumed {

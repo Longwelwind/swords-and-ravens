@@ -676,6 +676,17 @@ test("server-owned prompts and unit descriptions translate only for display, nev
   }
 });
 
+test("the Faceless Men loan-card description resolves its translation", async () => {
+  require("../src/common/EntireGame");
+  const {
+    theFacelessMen
+  } = require("../src/common/ingame-game-state/game-data-structure/loan-card/loanCardTypes");
+  await i18n.changeLanguage("de");
+  const translated = translateGameText(theFacelessMen.description);
+  assert.equal(translated, t("gameText.destroyOneKnightInAnyOneAreaAnd79d207"));
+  assert.notEqual(translated, theFacelessMen.description);
+});
+
 test("durations and token counts follow Russian, Portuguese, Polish, Czech and Ukrainian plural rules", async () => {
   await i18n.changeLanguage("ru");
   const ru = require("../src/client/i18n/locales/ru.json");

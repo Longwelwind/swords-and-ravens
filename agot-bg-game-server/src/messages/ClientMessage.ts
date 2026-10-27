@@ -59,6 +59,7 @@ export type ClientMessage =
   | LaunchPauseGameVote
   | LaunchResumeGameVote
   | LaunchExtendPlayerClocksVote
+  | LaunchEnableEmpoweredVassalsVote
   | LaunchSwapHousesVote
   | LaunchDeclareWinnerVote
   | ChangeAcceptAllLoyaltyTokenMovements
@@ -356,6 +357,10 @@ interface GameLogSeen {
 }
 interface LaunchExtendPlayerClocksVote {
   type: "launch-extend-player-clocks-vote";
+}
+
+interface LaunchEnableEmpoweredVassalsVote {
+  type: "launch-enable-empowered-vassals-vote";
 }
 
 interface LaunchPauseGameVote {

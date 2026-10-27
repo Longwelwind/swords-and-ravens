@@ -24,6 +24,7 @@ public static class StatisticsSettingGroups
             "Game",
             collapsed: false,
             "tidesOfBattle",
+            "cokWesterosPhase",
             "randomHouses",
             "randomChosenHouses",
             "tournamentMode",
@@ -35,9 +36,7 @@ public static class StatisticsSettingGroups
             "vassals",
             "ironBank",
             "seaOrderTokens",
-            "allowGiftingPowerTokens",
-            "empoweredVassals",
-            "randomVassalAssignment"
+            "allowGiftingPowerTokens"
         ),
         Group(
             "House cards",
@@ -63,8 +62,12 @@ public static class StatisticsSettingGroups
         Group(
             "More custom rules",
             collapsed: true,
-            "cokWesterosPhase",
+            "removeTob3",
+            "removeTobSkulls",
+            "limitTob2",
             "customBalancing",
+            "empoweredVassals",
+            "randomVassalAssignment",
             "precedingMustering",
             "randomStartPositions",
             "useVassalPositions",
@@ -74,9 +77,6 @@ public static class StatisticsSettingGroups
             "dragonWar",
             "dragonRevenge",
             "mixedWesterosDeck1",
-            "removeTob3",
-            "removeTobSkulls",
-            "limitTob2",
             "addPortToTheEyrie"
         ),
     ];

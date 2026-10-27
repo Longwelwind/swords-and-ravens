@@ -1,4 +1,4 @@
-import { t, Trans } from "./i18n";
+import { t } from "./i18n";
 import React, { Component, ReactNode } from "react";
 import {
   Card,
@@ -24,7 +24,7 @@ import GameClient from "./GameClient";
 import MapControls from "./MapControls";
 import ChatComponent from "./chat-client/ChatComponent";
 import VotesListComponent from "./VotesListComponent";
-import GameLogListComponent from "./GameLogListComponent";
+import GameLogPanel from "./GameLogPanel";
 import GameSettingsComponent from "./GameSettingsComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
@@ -45,6 +45,7 @@ import {
 
 import cardRandomImage from "../../public/images/icons/card-random.svg";
 import expandImage from "../../public/images/icons/expand.svg";
+import contractImage from "../../public/images/icons/contract.svg";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import BetterMap from "../utils/BetterMap";
@@ -68,11 +69,10 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   private gameSettings = this.ingame.entireGame.gameSettings;
 
   @observable accessor currentOpenedTab =
-    this.user?.settings.lastOpenedTab ?? "chat";
+    this.gameClient.lastOpenedGameTab ??
+      this.user?.settings.lastOpenedTab ??
+      "chat";
   @observable accessor unseenNotes = false;
-
-  @observable accessor gameRoundElems: ReactNode | null = null;
-  private previousOpenedTab = this.currentOpenedTab;
 
   get logChatFullScreen(): boolean {
     return this.gameClient.logChatFullScreen;
@@ -80,6 +80,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
 
   set logChatFullScreen(value: boolean) {
     runInAction(() => {
+      this.gameClient.lastOpenedGameTab = this.currentOpenedTab;
       this.gameClient.logChatFullScreen = value;
     });
   }
@@ -343,24 +344,20 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                     </div>
                   </Nav.Item>
                 ))}
-              {this.currentOpenedTab == "game-logs" && (
-                <Dropdown className="ms-auto mt-1">
-                  <Dropdown.Toggle variant="secondary" size="sm">
-                    {t("common.jumpTo")}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>{this.gameRoundElems}</Dropdown.Menu>
-                </Dropdown>
-              )}
-              {isMobile && !this.logChatFullScreen && (
-                <button
-                  className="btn btn-secondary ms-auto"
-                  onClick={() => {
-                    this.logChatFullScreen = true;
-                  }}
-                >
-                  <img src={expandImage} width={24} />
-                </button>
-              )}
+              {(isMobile || this.logChatFullScreen) &&
+                this.currentOpenedTab != "game-logs" && (
+                  <button
+                    className="btn btn-secondary ms-auto"
+                    onClick={() => {
+                      this.logChatFullScreen = !this.logChatFullScreen;
+                    }}
+                  >
+                    <img
+                      src={this.logChatFullScreen ? contractImage : expandImage}
+                      width={24}
+                    />
+                  </button>
+                )}
             </Nav>
           </Card.Header>
           <Card.Body id="game-log-panel" className="px-1">
@@ -399,19 +396,19 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               )}
               <Tab.Pane eventKey="game-logs" className="h-100">
                 {this.currentOpenedTab == "game-logs" || !isMobile ? (
-                  <div className="d-flex flex-column h-100">
-                    <AutoScroll
-                      className="flex-fill-remaining"
-                      scrollViewClassName="overflow-x-hidden"
-                      initialScrollBehavior="auto"
-                    >
-                      <GameLogListComponent
-                        ingameGameState={this.ingame}
-                        gameClient={this.gameClient}
-                        currentlyViewed={this.currentOpenedTab == "game-logs"}
-                      />
-                    </AutoScroll>
-                  </div>
+                  <GameLogPanel
+                    ingameGameState={this.ingame}
+                    gameClient={this.gameClient}
+                    currentlyViewed={this.currentOpenedTab == "game-logs"}
+                    fullScreen={this.logChatFullScreen}
+                    onFullScreenClick={
+                      isMobile || this.logChatFullScreen
+                        ? () => {
+                            this.logChatFullScreen = !this.logChatFullScreen;
+                          }
+                        : undefined
+                    }
+                  />
                 ) : null}
               </Tab.Pane>
               <Tab.Pane eventKey="settings" className="h-100">
@@ -604,36 +601,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     return null;
   }
 
-  renderGameLogRoundsDropDownItems(): ReactNode {
-    const gameRoundElements = document.querySelectorAll(
-      '*[id^="gamelog-round-"]'
-    );
-
-    const result: React.JSX.Element[] = [];
-
-    gameRoundElements.forEach((gameRoundElem) => {
-      const round = gameRoundElem.id.replace("gamelog-round-", "");
-
-      result.push(
-        <Dropdown.Item
-          className="text-center"
-          key={`dropdownitem-for-${gameRoundElem.id}`}
-          onClick={() => {
-            const elemToScroll = document.getElementById(gameRoundElem.id);
-            elemToScroll?.scrollIntoView({
-              behavior: "smooth",
-              block: "center"
-            });
-          }}
-        >
-          <Trans i18nKey="gameTabs.round6f8874" values={{ round: round }} />
-        </Dropdown.Item>
-      );
-    });
-
-    return result;
-  }
-
   onVisibilityChanged(): void {
     if (document.visibilityState == "visible" || !this.user) {
       return;
@@ -664,8 +631,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
       if ((this.user as User)?.note.length ?? 0 > 0) {
         this.unseenNotes = true;
       }
-
-      this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
     });
   }
 
@@ -678,21 +643,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
       runInAction(() => {
         this.unseenNotes = false;
       });
-    }
-
-    // Only update game round elements when switching TO the game-logs tab
-    if (
-      this.currentOpenedTab == "game-logs" &&
-      this.previousOpenedTab != "game-logs"
-    ) {
-      runInAction(() => {
-        this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
-      });
-    }
-
-    // Track tab changes
-    if (this.currentOpenedTab != this.previousOpenedTab) {
-      this.previousOpenedTab = this.currentOpenedTab;
     }
   }
 

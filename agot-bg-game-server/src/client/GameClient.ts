@@ -49,6 +49,7 @@ export default class GameClient {
 
   @observable accessor showMapWhileDrafting = false;
   @observable accessor logChatFullScreen = false;
+  lastOpenedGameTab: string | null = null;
 
   chatClient: ChatClient = new ChatClient(this);
   sfxManager: SfxManager = new SfxManager(this);

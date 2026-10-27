@@ -585,6 +585,8 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Something strange happened och din spel view kan be out av sync. Please open den browser console (F12) och send den error details there till site admin."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Förstärkta vasaller aktiverades genom omröstning.",
+    "noWildlingCardsRevealed": "Inga vildingskort har avslöjats ännu.",
     "house7d99a9": "hus <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "hus <bold>{{affectedHouse}}</bold> valde att förstöra en <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: hus <bold2>{{house}}</bold2> tvingade hus <bold3>{{affectedHouse}}</bold3> att förstöra en enhet.<lineBreak/><casualty/>",
@@ -926,7 +928,7 @@
     "faceless10470f": "Ansiktslös",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Spelarnas namn döljs och avslöjas när spelet är slut.",
     "endlessadf7ab": "Oändligt spel",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Antalet spelrundor ökas till 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Antalet spelrundor ökas till 1000. Westeroslek III, vildingsleken och, om Järnbanken är med i spelet, låneleken blandas om efter var 10:e runda.",
     "cokWesterosPhase671f64": "CoK-Westerosfas",
     "playersMayLookAtTheNext3WesterosCards320840": "Spelarna får när som helst titta på de tre följande Westeros-korten i varje kortlek.",
     "mixedWesterosDeck1084041": "Blandad Westeros-kortlek 1",
@@ -1023,6 +1025,8 @@
     "planning21cc30": "Planering"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Visa endast avslöjade vildingskort",
+    "fullScreen": "Helskärm",
     "round6f8874": "Omgång {{round}}",
     "privateChat11bbff": "Privat chatt",
     "personalNote27c48d": "Personlig anteckning",
@@ -1070,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Den timer av denna vasall hus har run out och therefore den kan ingen longer be ersatte av en spelare"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Starta en omröstning för att aktivera inställningen ”Förstärkta vasaller”",
+    "confirmEnableEmpoweredVassalsVote": "Vill du starta en omröstning för att aktivera förstärkta vasaller?",
     "gameHasResumed367404": "Spel har resumed!",
     "gameHasBeenPaused8bed51": "Spel har been satt på pause!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "hus <bold>{{house}}</bold> löstes en <bold2>Järnbanken</bold2> ellerder i <bold3>{{region}}</bold3>,<lineBreak/>paying <bold4>{{loanPurchasedPaid}}</bold4> maktmarkörer för <bold5>Customs Officer</bold5>.<lineBreak2/>De fick <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1226,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Er you sure you want till ban '{{user}}' från din spel?"
   },
   "vote": {
+    "enableEmpoweredVassals": "aktivera förstärkta vasaller",
     "refuse263134": "Avböj",
     "accept89713b": "Godkänn",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> initiated en vote till <bold2>{{verb}}</bold2>. {{votePositiveCountToPass}} {{player}} må accept till pass den vote.<voteControls/>",

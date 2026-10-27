@@ -585,6 +585,8 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Something strange happened og din spill view kan be out av sync. Please open den browser console (F12) og send den error details there til site admin."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Forsterkede vasaller ble aktivert ved avstemning.",
+    "noWildlingCardsRevealed": "Ingen villkort har blitt avslørt ennå.",
     "house7d99a9": "hus <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "hus <bold>{{affectedHouse}}</bold> valgte å ødelegge en <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: hus <bold2>{{house}}</bold2> tvang hus <bold3>{{affectedHouse}}</bold3> å ødelegge en enhet.<lineBreak/><casualty/>",
@@ -926,7 +928,7 @@
     "faceless10470f": "Ansiktsløs",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Spillernes navn skjules og avsløres når spillet er over.",
     "endlessadf7ab": "Uendelig",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Antallet spillrunder økes til 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Antallet spillrunder økes til 1000. Westeros-kortstokk III, villkortstokken og, hvis Jernbanken er med i spillet, lånekortstokken stokkes på nytt etter hver 10. runde.",
     "cokWesterosPhase671f64": "CoK-Westeros-fase",
     "playersMayLookAtTheNext3WesterosCards320840": "Spillere kan look ved den neste 3 Westeros kort fra hver kortstokk ved valgfri time.",
     "mixedWesterosDeck1084041": "Mixed Westeros Kortstokk 1",
@@ -1023,6 +1025,8 @@
     "planning21cc30": "Planlegging"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Vis bare avslørte villkort",
+    "fullScreen": "Fullskjerm",
     "round6f8874": "Runde {{round}}",
     "privateChat11bbff": "Privat chat",
     "personalNote27c48d": "Personlig notat",
@@ -1070,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Den timer av denna vasall hus har run out og therefore den kan ingen longer be erstattet av en spiller"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Start en avstemning for å aktivere innstillingen «Forsterkede vasaller»",
+    "confirmEnableEmpoweredVassalsVote": "Vil du starte en avstemning for å aktivere forsterkede vasaller?",
     "gameHasResumed367404": "Spill har resumed!",
     "gameHasBeenPaused8bed51": "Spill har been satt på pause!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "hus <bold>{{house}}</bold> løst en <bold2>Jernbanken</bold2> ellerdre i <bold3>{{region}}</bold3>,<lineBreak/>paying <bold4>{{loanPurchasedPaid}}</bold4> maktmarkører feller <bold5>Customs Officer</bold5>.<lineBreak2/>De fikk <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1226,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Er you sure you want til ban '{{user}}' fra din spill?"
   },
   "vote": {
+    "enableEmpoweredVassals": "aktivere forsterkede vasaller",
     "refuse263134": "Avslå",
     "accept89713b": "Godta",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> initiated en vote til <bold2>{{verb}}</bold2>. {{votePositiveCountToPass}} {{player}} må accept til pass den vote.<voteControls/>",

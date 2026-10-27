@@ -20,7 +20,10 @@ import { preventOverflow } from "@popperjs/core";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import { observer } from "mobx-react";
-import { ReplacePlayer } from "../common/ingame-game-state/vote-system/VoteType";
+import {
+  EnableEmpoweredVassals,
+  ReplacePlayer
+} from "../common/ingame-game-state/vote-system/VoteType";
 
 interface VoteComponentProps {
   vote: Vote;
@@ -92,7 +95,10 @@ export default class VoteComponent extends Component<VoteComponentProps> {
           <Trans
             i18nKey="vote.initiatedAVoteToMustAcceptToPassThe69a13a"
             values={{
-              verb: this.vote.type.verb(),
+              verb:
+                this.vote.type instanceof EnableEmpoweredVassals
+                  ? t("vote.enableEmpoweredVassals")
+                  : this.vote.type.verb(),
               votePositiveCountToPass: this.vote.positiveCountToPass,
               player: t("common.player", {
                 count: this.vote.positiveCountToPass

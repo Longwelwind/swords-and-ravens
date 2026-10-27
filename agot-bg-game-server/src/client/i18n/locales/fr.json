@@ -585,6 +585,8 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Une erreur inattendue s'est produite et votre vue de la partie est peut-être désynchronisée. Veuillez ouvrir la console du navigateur (F12) et envoyer les détails de l'erreur à l'administrateur du site."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Les vassaux renforcés ont été activés par vote.",
+    "noWildlingCardsRevealed": "Aucune carte Sauvage n'a encore été révélée.",
     "house7d99a9": "Maison <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "La maison <bold>{{affectedHouse}}</bold> a choisi de détruire une unité de type <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold> : La maison <bold2>{{house}}</bold2> a contraint la maison <bold3>{{affectedHouse}}</bold3> à détruire une unité.<lineBreak/><casualty/>",
@@ -926,7 +928,7 @@
     "faceless10470f": "Anonymat",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Les noms des joueurs sont masqués jusqu'à la fin de la partie.",
     "endlessadf7ab": "Sans fin",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Le nombre de tours est porté à 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "Le nombre de tours est porté à 1000. Le paquet Westeros III, le paquet Sauvage et, si la Banque de Fer est en jeu, le paquet de prêts sont remélangés tous les 10 tours.",
     "cokWesterosPhase671f64": "Phase Westeros CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Les joueurs peuvent consulter à tout moment les 3 prochaines cartes Westeros de chaque paquet.",
     "mixedWesterosDeck1084041": "Paquet Westeros 1 mixte",
@@ -1023,6 +1025,8 @@
     "planning21cc30": "programmation"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Afficher uniquement les cartes Sauvage révélées",
+    "fullScreen": "Plein écran",
     "round6f8874": "Tour {{round}}",
     "privateChat11bbff": "Chat privé",
     "personalNote27c48d": "Note personnelle",
@@ -1070,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "Le temps de cette maison vassale est écoulé ; elle ne peut donc plus être remplacée par un joueur"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Lancer un vote pour activer le paramètre « Vassaux renforcés »",
+    "confirmEnableEmpoweredVassalsVote": "Voulez-vous lancer un vote pour activer les vassaux renforcés ?",
     "gameHasResumed367404": "La partie a repris !",
     "gameHasBeenPaused8bed51": "La partie a été mise en pause !",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "La maison <bold>{{house}}</bold> a résolu un ordre de la <bold2>Banque de Fer</bold2> à <bold3>{{region}}</bold3>,<lineBreak/>payant <bold4>{{loanPurchasedPaid}}</bold4> pions Pouvoir pour <bold5>Customs Officer</bold5>.<lineBreak2/>Elle a gagné <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1226,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "Voulez-vous vraiment bannir « {{user}} » de votre partie ?"
   },
   "vote": {
+    "enableEmpoweredVassals": "activer les vassaux renforcés",
     "refuse263134": "Refuser",
     "accept89713b": "Accepter",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> a lancé un vote pour <bold2>{{verb}}</bold2>. {{votePositiveCountToPass}} {{player}} doivent accepter pour que le vote soit adopté.<voteControls/>",

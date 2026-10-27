@@ -585,6 +585,8 @@
     "somethingStrangeHappenedAndYourGameViewMay9d8eff": "Ha ocurrido algo inesperado y tu vista de la partida podría estar desincronizada. Abre la consola del navegador (F12) y envía los detalles del error al administrador del sitio."
   },
   "gameLogList": {
+    "empoweredVassalsEnabled": "Los vasallos potenciados se han activado por votación.",
+    "noWildlingCardsRevealed": "Todavía no se ha revelado ninguna carta de Salvajes.",
     "house7d99a9": "Casa <bold>{{attacked}}</bold>",
     "houseChoseToDestroyAa590ac": "La Casa <bold>{{affectedHouse}}</bold> eligió destruir un <bold2>{{unitType}}</bold2>",
     "arianneMartellHouseForcedHouseToDestroyAUnitc949f3": "<bold>Arianne Martell</bold>: la Casa <bold2>{{house}}</bold2> obligó a la Casa <bold3>{{affectedHouse}}</bold3> a destruir una unidad.<lineBreak/><casualty/>",
@@ -926,7 +928,7 @@
     "faceless10470f": "Sin rostros",
     "playerNamesWillBeHiddenAndRevealedAfterThe50e6ac": "Los nombres de los jugadores permanecen ocultos hasta el final de la partida.",
     "endlessadf7ab": "Sin fin",
-    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "El número de rondas aumenta a 1000.",
+    "theNumberOfGameRoundsIsIncreasedTo1000cd40d6": "El número de rondas aumenta a 1000. El mazo de Poniente III, el mazo de Salvajes y, si el Banco de Hierro está en juego, el mazo de préstamos se vuelven a barajar cada 10 rondas.",
     "cokWesterosPhase671f64": "Fase de Westeros de CoK",
     "playersMayLookAtTheNext3WesterosCards320840": "Los jugadores pueden consultar en cualquier momento las próximas 3 cartas de cada mazo de Westeros.",
     "mixedWesterosDeck1084041": "Mazo de Westeros 1 mixto",
@@ -1023,6 +1025,8 @@
     "planning21cc30": "Planificación"
   },
   "gameTabs": {
+    "wildlingCardsOnly": "Mostrar solo las cartas de Salvajes reveladas",
+    "fullScreen": "Pantalla completa",
     "round6f8874": "Ronda {{round}}",
     "privateChat11bbff": "Chat privado",
     "personalNote27c48d": "Nota personal",
@@ -1070,6 +1074,8 @@
     "theTimerOfThisVassalHouseHasRunOutb05075": "El reloj de esta Casa vasalla se ha agotado y ya no puede sustituirla un jugador"
   },
   "ingame": {
+    "launchEnableEmpoweredVassalsVote": "Iniciar una votación para activar la opción «Vasallos potenciados»",
+    "confirmEnableEmpoweredVassalsVote": "¿Quieres iniciar una votación para activar los vasallos potenciados?",
     "gameHasResumed367404": "¡La partida se ha reanudado!",
     "gameHasBeenPaused8bed51": "¡La partida se ha pausado!",
     "houseResolvedAnIronBankOrderInPayingPower3d5a0f": "La Casa <bold>{{house}}</bold> resolvió una orden del <bold2>Banco de Hierro</bold2> en <bold3>{{region}}</bold3>,<lineBreak/>pagando <bold4>{{loanPurchasedPaid}}</bold4> fichas de poder por <bold5>Customs Officer</bold5>.<lineBreak2/>Obtuvo <bold6>{{logGained}}</bold6> {{powerTokenLabel}}.",
@@ -1226,6 +1232,7 @@
     "areYouSureYouWantToBanFrom23e4ed": "¿Seguro que quieres expulsar a «{{user}}» de tu partida?"
   },
   "vote": {
+    "enableEmpoweredVassals": "activar los vasallos potenciados",
     "refuse263134": "Rechazar",
     "accept89713b": "Aceptar",
     "initiatedAVoteToMustAcceptToPassThe69a13a": "<bold><initiator/></bold> inició una votación para <bold2>{{verb}}</bold2>. Deben aceptar {{votePositiveCountToPass}} {{player}} para que se apruebe.<voteControls/>",

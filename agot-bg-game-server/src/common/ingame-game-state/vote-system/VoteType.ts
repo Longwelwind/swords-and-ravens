@@ -23,6 +23,7 @@ export type SerializedVoteType =
   | SerializedPauseGame
   | SerializedResumeGame
   | SerializedExtendPlayerClocks
+  | SerializedEnableEmpoweredVassals
   | SerializedSwapHouses
   | SerializedDeclareWinner;
 
@@ -83,8 +84,34 @@ export default abstract class VoteType {
         // Same than above
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return DeclareWinner.deserializeFromServer(ingame, data);
+      case "enable-empowered-vassals":
+        return new EnableEmpoweredVassals();
     }
   }
+}
+
+export class EnableEmpoweredVassals extends VoteType {
+  verb(): string {
+    return "enable empowered vassals";
+  }
+
+  executeAccepted(vote: Vote): void {
+    const ingame = vote.ingame;
+    ingame.entireGame.gameSettings.empoweredVassals = true;
+    ingame.entireGame.broadcastToClients({
+      type: "game-settings-changed",
+      settings: ingame.entireGame.gameSettings.serializeToClient()
+    });
+    ingame.log({ type: "empowered-vassals-enabled" });
+  }
+
+  serializeToClient(): SerializedEnableEmpoweredVassals {
+    return { type: "enable-empowered-vassals" };
+  }
+}
+
+export interface SerializedEnableEmpoweredVassals {
+  type: "enable-empowered-vassals";
 }
 
 export class PauseGame extends VoteType {
