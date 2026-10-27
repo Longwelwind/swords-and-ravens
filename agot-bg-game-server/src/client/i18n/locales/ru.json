@@ -1051,6 +1051,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Анонимный режим включается навсегда, отменить это нельзя.\n\nВы уверены, что хотите включить анонимный режим?"
   },
   "gameStateColumn": {
+    "swapColumns": "Поменять столбцы местами",
+    "collapsePanel": "Свернуть панель состояния игры",
+    "expandPanel": "Развернуть панель состояния игры",
     "willIncreaseInRound7dd1c1": "Увеличится в раунде<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Текущая сила драконов",
     "theWildlingDeck090e33": "Колода одичалых",
@@ -1064,7 +1067,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Показать только раскрытые карты одичалых",
-    "fullScreen": "Полный экран",
     "round6f8874": "Раунд {{round}}",
     "privateChat11bbff": "Личный чат",
     "personalNote27c48d": "Личная заметка",

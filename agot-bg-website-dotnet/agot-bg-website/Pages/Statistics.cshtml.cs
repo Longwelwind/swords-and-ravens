@@ -11,7 +11,7 @@ namespace agot_bg_website.Pages;
 /// </summary>
 public class StatisticsModel(GameStatisticsService statistics) : PageModel
 {
-    private const int DefaultPageSize = 25;
+    private const int DefaultPageSize = 10;
 
     public GameStatisticsFilter Filter { get; private set; } = GameStatisticsFilter.Default;
 

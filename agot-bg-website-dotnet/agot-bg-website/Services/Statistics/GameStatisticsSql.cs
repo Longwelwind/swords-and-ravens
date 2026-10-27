@@ -78,8 +78,14 @@ public static class GameStatisticsSql
                        w.house AS "WinnerHouse",
                        w."UserId" AS "WinnerUserId",
                        u."UserName" AS "WinnerUserName",
-                       COALESCE(u."IsDeleted", false) AS "WinnerUserDeleted"
+                       COALESCE(u."IsDeleted", false) AS "WinnerUserDeleted",
+                       g."CreatedAt" AS "CreatedAt",
+                       g."ViewOfGame"::text AS "ViewOfGame",
+                       o."UserName" AS "OwnerUserName",
+                       COALESCE(o."IsDeleted", false) AS "OwnerUserDeleted"
                 FROM filtered f
+                JOIN "Games" g ON g."Id" = f."Id"
+                LEFT JOIN "AspNetUsers" o ON o."Id" = g."OwnerUserId"
                 LEFT JOIN LATERAL (
                     SELECT p."UserId", p."Data"->>'house' AS house
                     FROM "PlayersInGame" p

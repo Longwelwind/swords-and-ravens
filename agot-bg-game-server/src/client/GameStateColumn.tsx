@@ -21,6 +21,8 @@ import { MAX_WILDLING_STRENGTH } from "../common/ingame-game-state/game-data-str
 
 import classNames from "classnames";
 import * as _ from "lodash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 import BetterMap from "../utils/BetterMap";
 import PartialRecursive from "../utils/PartialRecursive";
@@ -73,6 +75,8 @@ interface GameStateColumnProps {
 
 @observer
 export default class GameStateColumn extends Component<GameStateColumnProps> {
+  @observable accessor collapsed = false;
+
   @observable accessor highlightedRegions = new BetterMap<
     Region,
     RegionOnMapProperties
@@ -176,14 +180,15 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
           className="flex-sized-to-content mb-2"
           border={border}
           style={{
-            maxHeight: "65%",
+            height: this.collapsed ? 80 : undefined,
+            maxHeight: this.collapsed ? 80 : "65%",
             paddingRight: "2px",
             borderWidth: "3px",
             overflowY: "scroll",
             overflowX: "hidden"
           }}
         >
-          <Row className="no-space-around">
+          <Row id="game-state-panel-content" className="no-space-around">
             <Col>
               <ListGroup variant="flush">
                 {phases.some((phase) => isPhaseActive(phase)) && (
@@ -284,10 +289,10 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
                 </ListGroupItem>
               </ListGroup>
             </Col>
-            <Col xs="auto" className="mx-1 px-0">
+            <Col xs="auto" className="mx-1 px-0 py-1">
               <Col
                 style={{ width: "28px", fontSize: "1.375rem" }}
-                className="px-0 text-center"
+                className="p-0 text-center"
               >
                 <Row
                   className="mb-3 g-0"
@@ -390,11 +395,32 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
               </Col>
             </Col>
           </Row>
-          <ColumnSwapButton
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-              this.props.onColumnSwapClick(e)
-            }
-          />
+          <button
+            type="button"
+            className="icon-button"
+            style={{ position: "absolute", top: -4, left: 0, padding: "4px" }}
+            aria-label={t(
+              this.collapsed
+                ? "gameStateColumn.expandPanel"
+                : "gameStateColumn.collapsePanel"
+            )}
+            title={t(
+              this.collapsed
+                ? "gameStateColumn.expandPanel"
+                : "gameStateColumn.collapsePanel"
+            )}
+            aria-expanded={!this.collapsed}
+            aria-controls="game-state-panel-content"
+            onClick={() => this.toggleCollapsed()}
+          >
+            <FontAwesomeIcon
+              icon={this.collapsed ? faChevronDown : faChevronUp}
+              size="2xs"
+            />
+          </button>
+          <div style={{ position: "absolute", top: -4, left: 24 }}>
+            <ColumnSwapButton onClick={this.props.onColumnSwapClick} />
+          </div>
           {isOwnTurn && (
             <Spinner
               animation="grow"
@@ -411,6 +437,11 @@ export default class GameStateColumn extends Component<GameStateColumnProps> {
         />
       </div>
     );
+  }
+
+  @action
+  toggleCollapsed(): void {
+    this.collapsed = !this.collapsed;
   }
 
   private renderRemainingWesterosCards(): OverlayChildren {

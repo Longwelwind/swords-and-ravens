@@ -170,21 +170,13 @@ test("game-log toolbar filters revealed cards while preserving rounds, live upda
   assert.ok(view.container.querySelector("#game-log-content-9"));
 });
 
-test("game-log toolbar shows an empty filter state and invokes mobile fullscreen", (context) => {
+test("game-log toolbar stays compact and preserves its empty filter state", (context) => {
   addBootstrapStyles(context);
   const { GameLogPanel, props } = gameLogFixture(context, [
     { type: "turn-begin", turn: 1 },
     { type: "planning-phase-began" }
   ]);
-  let expanded = false;
-  const view = render(
-    React.createElement(GameLogPanel, {
-      ...props,
-      onFullScreenClick: () => {
-        expanded = true;
-      }
-    })
-  );
+  const view = render(React.createElement(GameLogPanel, props));
   const toggle = view.getByRole("button", { name: "Game Logs" });
   assert.equal(getComputedStyle(toggle).position, "absolute");
   assert.equal(getComputedStyle(toggle).width, "32px");
@@ -194,10 +186,7 @@ test("game-log toolbar shows an empty filter state and invokes mobile fullscreen
   assert.equal(toolbar.id, toggle.getAttribute("aria-controls"));
   assert.equal(getComputedStyle(toolbar).display, "flex");
   assert.equal(getComputedStyle(toolbar).flexWrap, "nowrap");
-  const fullscreen = view.getByRole("button", { name: "Full screen" });
-  assert.ok(toolbar.contains(fullscreen));
-  fireEvent.click(fullscreen);
-  assert.equal(expanded, true);
+  assert.equal(view.queryByRole("button", { name: "Full screen" }), null);
   fireEvent.click(
     view.getByRole("button", {
       name: "Show only revealed Wildling cards"
@@ -221,61 +210,135 @@ test("game-log toolbar shows an empty filter state and invokes mobile fullscreen
   );
 });
 
-test("game-log toolbar stays expanded after fullscreen remount and contains the exit control", (context) => {
-  const { GameLogPanel, props } = gameLogFixture(context, [
-    { type: "turn-begin", turn: 1 }
-  ]);
-  const GameTabs = require("../src/client/GameTabsComponent").default;
-  const client = {
-    authenticatedUser: { settings: { lastOpenedTab: "chat" } },
-    logChatFullScreen: false,
-    lastOpenedGameTab: null
-  };
-  const tabProps = {
-    gameClient: client,
-    ingame: { entireGame: { gameSettings: {} } }
-  };
-  const tabs = new GameTabs(tabProps);
-  runInAction(() => {
-    tabs.currentOpenedTab = "game-logs";
+for (const scrollbar of [false, true]) {
+  test(`game-state panel collapses to 80px without remounting controls or tabs (map scrollbar ${scrollbar})`, (context) => {
+    const style = document.createElement("style");
+    style.textContent = require("sass").compile(
+      require.resolve("../src/client/style/custom.scss"),
+      { logger: require("sass").Logger.silent }
+    ).css;
+    document.head.append(style);
+    context.after(() => style.remove());
+    const GameStateColumn = require("../src/client/GameStateColumn").default;
+    const GameTabs = require("../src/client/GameTabsComponent").default;
+    const PlanningComponent =
+      require("../src/client/game-state-panel/PlanningComponent").default;
+    const Ingame =
+      require("../src/common/ingame-game-state/IngameGameState").default;
+    const Game =
+      require("../src/common/ingame-game-state/game-data-structure/Game").default;
+    const Planning =
+      require("../src/common/ingame-game-state/planning-game-state/PlanningGameState").default;
+    const MapControls = require("../src/client/MapControls").default;
+    context.mock.method(PlanningComponent.prototype, "render", () =>
+      React.createElement("input", { "aria-label": "Planning choice" })
+    );
+    context.mock.method(GameTabs.prototype, "render", () =>
+      React.createElement("input", { "aria-label": "Chat draft" })
+    );
+    const root = new EntireGame("fixture", "owner", "Collapsible panel");
+    const ingame = new Ingame(root);
+    const game = new Game(ingame);
+    ingame.game = game;
+    runInAction(() => {
+      root.childGameState = ingame;
+      ingame.childGameState = new Planning(ingame);
+      game.turn = 7;
+      game.maxTurns = 10;
+      game.westerosDecks = [];
+    });
+    game.wildlingDeck = [];
+    let ownTurn = true;
+    const client = {
+      authenticatedUser: null,
+      authenticatedPlayer: null,
+      isMapScrollbarSet: scrollbar,
+      isOwnTurn: () => ownTurn
+    };
+    const swaps = [];
+    const view = render(
+      React.createElement(GameStateColumn, {
+        ingame,
+        gameClient: client,
+        mapControls: new MapControls(),
+        onColumnSwapClick: () => swaps.push("swap")
+      })
+    );
+    const panel = view.container.querySelector("#game-state-panel");
+    const planning = view.getByRole("textbox", { name: "Planning choice" });
+    const chat = view.getByRole("textbox", { name: "Chat draft" });
+    fireEvent.change(planning, { target: { value: "Keep my order" } });
+    fireEvent.change(chat, { target: { value: "Keep my draft" } });
+    const collapse = view.getByRole("button", {
+      name: "Collapse game state panel"
+    });
+    assert.equal(collapse.getAttribute("aria-expanded"), "true");
+    assert.equal(panel.style.maxHeight, "65%");
+    panel.scrollTop = 300;
+    fireEvent.click(collapse);
+    const expand = view.getByRole("button", {
+      name: "Expand game state panel"
+    });
+    assert.equal(expand, collapse);
+    assert.equal(expand.getAttribute("aria-expanded"), "false");
+    assert.equal(panel.style.height, "80px");
+    assert.equal(panel.style.maxHeight, "80px");
+    assert.equal(panel.style.overflowY, "scroll");
+    assert.equal(panel.scrollTop, 300);
+    assert.equal(getComputedStyle(panel).flexShrink, "0");
+    assert.equal(planning.closest("[inert], [aria-hidden=true]"), null);
+    assert.equal(
+      view.getByRole("textbox", { name: "Planning choice" }),
+      planning
+    );
+    assert.equal(panel.querySelector(".d-none"), null);
+    assert.ok(panel.classList.contains("border-warning"));
+    assert.ok(panel.querySelector(".spinner-grow"));
+    const round = view.getByText("7");
+    assert.equal(round.closest("[inert]"), null);
+    assert.ok(round.previousElementSibling.src.endsWith("hourglass.svg"));
+    assert.equal(round.previousElementSibling.width, 28);
+    const swap = view.getByRole("button", { name: "Swap columns" });
+    assert.equal(swap.title, "Swap columns");
+    assert.ok(
+      expand.compareDocumentPosition(swap) & Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    fireEvent.click(swap);
+    assert.deepEqual(swaps, ["swap"]);
+    assert.equal(chat, view.getByRole("textbox", { name: "Chat draft" }));
+    assert.equal(chat.value, "Keep my draft");
+    fireEvent.click(expand);
+    assert.equal(
+      planning,
+      view.getByRole("textbox", { name: "Planning choice" })
+    );
+    assert.equal(planning.value, "Keep my order");
+    fireEvent.click(
+      view.getByRole("button", { name: "Collapse game state panel" })
+    );
+    ownTurn = false;
+    act(() => {
+      runInAction(() => {
+        game.turn = 8;
+        root.leafStateId = "next-phase";
+      });
+    });
+    const nextPanel = view.container.querySelector("#game-state-panel");
+    assert.equal(nextPanel.style.height, "80px");
+    assert.ok(view.getByText("8"));
+    assert.equal(nextPanel.querySelector(".spinner-grow"), null);
+    assert.ok(view.getByRole("button", { name: "Expand game state panel" }));
+    fireEvent.click(
+      view.getByRole("button", { name: "Expand game state panel" })
+    );
+    assert.equal(nextPanel.style.height, "");
+    assert.equal(nextPanel.style.maxHeight, "65%");
+    assert.equal(nextPanel.style.overflowY, "scroll");
+    assert.equal(view.container.querySelector("[inert]"), null);
+    assert.equal(chat, view.getByRole("textbox", { name: "Chat draft" }));
+    assert.equal(chat.value, "Keep my draft");
   });
-  const view = render(
-    React.createElement(GameLogPanel, {
-      ...props,
-      key: "normal",
-      onFullScreenClick: () => {
-        tabs.logChatFullScreen = true;
-      }
-    })
-  );
-  fireEvent.click(view.getByRole("button", { name: "Game Logs" }));
-  fireEvent.click(view.getByRole("button", { name: "Full screen" }));
-  assert.equal(client.logChatFullScreen, true);
-  const fullscreenTabs = new GameTabs(tabProps);
-  assert.equal(fullscreenTabs.currentOpenedTab, "game-logs");
-  view.rerender(
-    React.createElement(GameLogPanel, {
-      ...props,
-      key: "fullscreen",
-      fullScreen: true,
-      onFullScreenClick: () => {
-        fullscreenTabs.logChatFullScreen = false;
-      }
-    })
-  );
-  assert.equal(
-    view
-      .getByRole("button", { name: "Game Logs" })
-      .getAttribute("aria-expanded"),
-    "true"
-  );
-  const exit = view.getByRole("button", { name: "Full screen", pressed: true });
-  assert.ok(view.getByRole("group", { name: "Game Logs" }).contains(exit));
-  assert.match(exit.querySelector("img").src, /contract\.svg$/);
-  fireEvent.click(exit);
-  assert.equal(client.logChatFullScreen, false);
-  assert.equal(new GameTabs(tabProps).currentOpenedTab, "game-logs");
-});
+}
 
 function addBootstrapStyles(context) {
   const style = document.createElement("style");

@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "활성화 얼굴 없는 자 영구적인 및 할 수 없음 취소됨.\n\n 당신 확실 당신 원하다 활성화 얼굴 없는 자?"
   },
   "gameStateColumn": {
+    "swapColumns": "열 바꾸기",
+    "collapsePanel": "게임 상태 패널 접기",
+    "expandPanel": "게임 상태 패널 펼치기",
     "willIncreaseInRound7dd1c1": " 증가 에서 라운드<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "현재 드래곤 전투력",
     "theWildlingDeck090e33": " 야인 덱",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "공개된 와일들링 카드만 표시",
-    "fullScreen": "전체 화면",
     "round6f8874": "라운드 {{round}}",
     "privateChat11bbff": "비공개 채팅",
     "personalNote27c48d": "개인 참고",

@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "engedélyezés Névtelen állandó és nem tud visszavont.\n\n te biztos te akar engedélyez Névtelen?"
   },
   "gameStateColumn": {
+    "swapColumns": "Oszlopok felcserélése",
+    "collapsePanel": "Játékállapot-panel összecsukása",
+    "expandPanel": "Játékállapot-panel kibontása",
     "willIncreaseInRound7dd1c1": " növelés forduló<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Jelenlegi Sárkány Erő",
     "theWildlingDeck090e33": " Vad Pakli",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Csak a felfedett Vadak-kártyák megjelenítése",
-    "fullScreen": "Teljes képernyő",
     "round6f8874": "Forduló {{round}}",
     "privateChat11bbff": "Privát Csevegés",
     "personalNote27c48d": "személyes megjegyzés",

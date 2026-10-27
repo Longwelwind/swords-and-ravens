@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Enabling Faceless is permanent and cannot be undone.\n\nAre you sure you want to enable Faceless?"
   },
   "gameStateColumn": {
+    "swapColumns": "Swap columns",
+    "collapsePanel": "Collapse game state panel",
+    "expandPanel": "Expand game state panel",
     "willIncreaseInRound7dd1c1": "Will increase in round<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Current Dragon Strength",
     "theWildlingDeck090e33": "The Wildling Deck",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Show only revealed Wildling cards",
-    "fullScreen": "Full screen",
     "round6f8874": "Round {{round}}",
     "privateChat11bbff": "Private Chat",
     "personalNote27c48d": "Personal note",

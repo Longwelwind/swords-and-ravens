@@ -1051,6 +1051,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Włączenie Faceless jest trwałe i nie można go cofnąć.\n\nCzy na pewno chcesz włączyć Faceless?"
   },
   "gameStateColumn": {
+    "swapColumns": "Zamień kolumny",
+    "collapsePanel": "Zwiń panel stanu gry",
+    "expandPanel": "Rozwiń panel stanu gry",
     "willIncreaseInRound7dd1c1": "Wzrośnie w rundzie<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Aktualna siła smoka",
     "theWildlingDeck090e33": "Talia Dzikich",
@@ -1064,7 +1067,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Pokaż tylko odkryte karty Dzikich",
-    "fullScreen": "Pełny ekran",
     "round6f8874": "Runda {{round}}",
     "privateChat11bbff": "Czat prywatny",
     "personalNote27c48d": "Notatka osobista",

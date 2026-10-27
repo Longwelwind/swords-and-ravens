@@ -4,7 +4,6 @@ import {
   Card,
   OverlayTrigger,
   Tooltip,
-  Spinner,
   Tab,
   Nav,
   Dropdown
@@ -44,8 +43,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import cardRandomImage from "../../public/images/icons/card-random.svg";
-import expandImage from "../../public/images/icons/expand.svg";
-import contractImage from "../../public/images/icons/contract.svg";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import BetterMap from "../utils/BetterMap";
@@ -54,7 +51,6 @@ interface GameTabsComponentProps {
   ingame: IngameGameState;
   gameClient: GameClient;
   mapControls: MapControls;
-  border?: string; // used if it is the own turn in full sceen mode
 }
 
 @observer
@@ -69,21 +65,8 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   private gameSettings = this.ingame.entireGame.gameSettings;
 
   @observable accessor currentOpenedTab =
-    this.gameClient.lastOpenedGameTab ??
-      this.user?.settings.lastOpenedTab ??
-      "chat";
+    this.user?.settings.lastOpenedTab ?? "chat";
   @observable accessor unseenNotes = false;
-
-  get logChatFullScreen(): boolean {
-    return this.gameClient.logChatFullScreen;
-  }
-
-  set logChatFullScreen(value: boolean) {
-    runInAction(() => {
-      this.gameClient.lastOpenedGameTab = this.currentOpenedTab;
-      this.gameClient.logChatFullScreen = value;
-    });
-  }
 
   private get publicChatRoom(): Channel {
     return this.gameClient.chatClient.channels.get(
@@ -92,17 +75,12 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   }
 
   render(): ReactNode {
-    const height = this.logChatFullScreen
-      ? "85%"
-      : this.gameClient.isMapScrollbarSet
-        ? "auto"
-        : "800px";
+    const height = this.gameClient.isMapScrollbarSet ? "auto" : "800px";
 
     const privateChatRooms = this.getPrivateChatRooms();
 
     return (
       <Card
-        border={this.props.border}
         style={{
           height: height,
           maxHeight: height,
@@ -344,20 +322,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                     </div>
                   </Nav.Item>
                 ))}
-              {(isMobile || this.logChatFullScreen) &&
-                this.currentOpenedTab != "game-logs" && (
-                  <button
-                    className="btn btn-secondary ms-auto"
-                    onClick={() => {
-                      this.logChatFullScreen = !this.logChatFullScreen;
-                    }}
-                  >
-                    <img
-                      src={this.logChatFullScreen ? contractImage : expandImage}
-                      width={24}
-                    />
-                  </button>
-                )}
             </Nav>
           </Card.Header>
           <Card.Body id="game-log-panel" className="px-1">
@@ -400,14 +364,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                     ingameGameState={this.ingame}
                     gameClient={this.gameClient}
                     currentlyViewed={this.currentOpenedTab == "game-logs"}
-                    fullScreen={this.logChatFullScreen}
-                    onFullScreenClick={
-                      isMobile || this.logChatFullScreen
-                        ? () => {
-                            this.logChatFullScreen = !this.logChatFullScreen;
-                          }
-                        : undefined
-                    }
                   />
                 ) : null}
               </Tab.Pane>
@@ -480,14 +436,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
             </Tab.Content>
           </Card.Body>
         </Tab.Container>
-        {this.logChatFullScreen && this.props.border && (
-          <Spinner
-            animation="grow"
-            variant="warning"
-            size="sm"
-            style={{ position: "absolute", bottom: "4px", left: "4px" }}
-          />
-        )}
       </Card>
     );
   }

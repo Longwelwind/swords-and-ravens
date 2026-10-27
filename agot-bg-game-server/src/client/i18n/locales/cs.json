@@ -1051,6 +1051,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Zapnutí režimu Bez tváře je trvalé a nelze jej vrátit.\n\nOpravdu chcete zapnout režim Bez tváře?"
   },
   "gameStateColumn": {
+    "swapColumns": "Prohodit sloupce",
+    "collapsePanel": "Sbalit panel stavu hry",
+    "expandPanel": "Rozbalit panel stavu hry",
     "willIncreaseInRound7dd1c1": "Zvýší se v kole<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Aktuální síla draka",
     "theWildlingDeck090e33": "Balíček divokých",
@@ -1064,7 +1067,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Zobrazit pouze odhalené karty Divokých",
-    "fullScreen": "Celá obrazovka",
     "round6f8874": "Kolo {{round}}",
     "privateChat11bbff": "Soukromý chat",
     "personalNote27c48d": "Osobní poznámka",

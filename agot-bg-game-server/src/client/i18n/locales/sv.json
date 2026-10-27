@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Det går inte att ångra att aktivera Faceless.\n\nÄr du säker på att du vill aktivera Faceless?"
   },
   "gameStateColumn": {
+    "swapColumns": "Byt kolumner",
+    "collapsePanel": "Fäll ihop spelstatuspanelen",
+    "expandPanel": "Fäll ut spelstatuspanelen",
     "willIncreaseInRound7dd1c1": "Ökar i runda<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Nuvarande drakstyrka",
     "theWildlingDeck090e33": "Vildingarnas kortlek",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Visa endast avslöjade vildingskort",
-    "fullScreen": "Helskärm",
     "round6f8874": "Omgång {{round}}",
     "privateChat11bbff": "Privat chatt",
     "personalNote27c48d": "Personlig anteckning",

@@ -1051,6 +1051,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Увімкнення режиму «Безликі» є незворотним і його не можна скасувати.\n\nВи впевнені, що хочете увімкнути «Безликі»?"
   },
   "gameStateColumn": {
+    "swapColumns": "Поміняти стовпці місцями",
+    "collapsePanel": "Згорнути панель стану гри",
+    "expandPanel": "Розгорнути панель стану гри",
     "willIncreaseInRound7dd1c1": "Збільшиться в раунді<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Поточна сила дракона",
     "theWildlingDeck090e33": "Колода дикунів",
@@ -1064,7 +1067,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Показати лише розкриті карти дикунів",
-    "fullScreen": "Повний екран",
     "round6f8874": "Раунд {{round}}",
     "privateChat11bbff": "Приватний чат",
     "personalNote27c48d": "Особиста нотатка",

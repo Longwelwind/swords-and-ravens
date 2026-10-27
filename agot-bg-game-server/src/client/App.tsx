@@ -22,10 +22,6 @@ interface AppProps {
 @observer
 export default class App extends Component<AppProps> {
   //onVisibilityChangedCallback: (() => void) | null = null;
-  get isFullScreen(): boolean {
-    return this.props.gameClient.logChatFullScreen;
-  }
-
   get user(): User | null {
     return this.props.gameClient.authenticatedUser;
   }
@@ -57,7 +53,7 @@ export default class App extends Component<AppProps> {
 
   render(): ReactNode {
     const minWidth =
-      isMobile && this.isGameRunning && !this.isFullScreen
+      isMobile && this.isGameRunning
         ? this.is8pGame
           ? "2550px"
           : "2000px"
@@ -71,7 +67,7 @@ export default class App extends Component<AppProps> {
           paddingBottom: "1rem",
           paddingRight: "3rem",
           paddingLeft: "3rem",
-          maxWidth: !this.isFullScreen ? "2800px" : "auto",
+          maxWidth: "2800px",
           minWidth: minWidth,
           overflowX: "hidden"
         }}

@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Det er permanent å aktivere Faceless, og det kan ikke angres.\n\nEr du sikker på at du vil aktivere Faceless?"
   },
   "gameStateColumn": {
+    "swapColumns": "Bytt kolonner",
+    "collapsePanel": "Skjul spillstatuspanelet",
+    "expandPanel": "Utvid spillstatuspanelet",
     "willIncreaseInRound7dd1c1": "Øker i runde<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Nåværende dragestyrke",
     "theWildlingDeck090e33": "Villingkortstokken",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Vis bare avslørte villkort",
-    "fullScreen": "Fullskjerm",
     "round6f8874": "Runde {{round}}",
     "privateChat11bbff": "Privat chat",
     "personalNote27c48d": "Personlig notat",
