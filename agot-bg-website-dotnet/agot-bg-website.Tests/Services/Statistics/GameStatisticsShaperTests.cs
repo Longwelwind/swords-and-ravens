@@ -125,6 +125,9 @@ public class GameStatisticsShaperTests
                 WinnerUserId = Guid.NewGuid(),
                 WinnerUserName = "tombstone-name",
                 WinnerUserDeleted = true,
+                OwnerUserName = "owner-tombstone",
+                OwnerUserDeleted = true,
+                ViewOfGame = """{"settings":{"pbem":true,"vassals":true,"faceless":true}}""",
             },
             new StatisticsLatestRow { PlayerCount = "6", WinnerHouse = "martell" },
         };
@@ -134,8 +137,16 @@ public class GameStatisticsShaperTests
         Assert.Equal(Catalog.GetScenarioLabel("base-game", 6), latest[0].ScenarioLabel);
         Assert.Equal("Stark", latest[0].WinnerHouseName);
         Assert.Equal("Took the Black", latest[0].WinnerUserName);
+        Assert.Equal("Stark (Took the Black)", latest[0].WinnerDisplay);
         Assert.Null(latest[0].WinnerUserId);
+        Assert.Equal("Took the Black", latest[0].OwnerDisplayName);
+        Assert.True(latest[0].IsFaceless);
+        Assert.Equal(
+            ["Play By E-Mail", "Mother of Dragons: Vassals", "Faceless"],
+            latest[0].EnabledSettingLabels
+        );
         Assert.Equal("Unknown scenario", latest[1].ScenarioLabel);
         Assert.Null(latest[1].WinnerUserName);
+        Assert.Empty(latest[1].EnabledSettingLabels);
     }
 }

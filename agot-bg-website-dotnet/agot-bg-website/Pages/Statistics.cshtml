@@ -124,7 +124,8 @@
 
         <div class="flex flex-wrap items-center gap-3">
             <button type="submit" class="btn btn-primary">Apply filters</button>
-            <a asp-page="/Statistics" class="btn btn-ghost">Reset</a>
+            @* Reset keeps the chosen scenario and only clears the other filters. *@
+            <a asp-page="/Statistics" asp-route-scenario="@filter.ScenarioValue" class="btn btn-ghost">Reset</a>
         </div>
     </div>
 </form>
@@ -266,6 +267,7 @@ else
                         <th>Winner</th>
                         <th class="text-center">Final round</th>
                         <th>Finished</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -304,6 +306,19 @@ else
                             </td>
                             <td class="text-center">@(game.Round?.ToString(CultureInfo.InvariantCulture) ?? "?")</td>
                             <td class="whitespace-nowrap"><time datetime="@game.FinishedAt.ToString("O")" data-local-datetime-minute>@game.FinishedAt.ToLocalTime().ToString("g")</time></td>
+                            <td class="whitespace-nowrap text-right">
+                                <button type="button" class="btn btn-ghost btn-sm btn-square js-game-settings-btn" title="View game settings" aria-label="View game settings"
+                                        data-game-name="@game.Name" data-setup-name="@game.SetupName" data-player-count="@game.PlayerCount"
+                                        data-owner-name="@game.OwnerDisplayName"
+                                        data-is-faceless="@game.IsFaceless"
+                                        data-created-at="@game.CreatedAt.ToString("O")"
+                                        data-last-active-at="@game.FinishedAt.ToString("O")"
+                                        data-round="@(game.Round?.ToString(CultureInfo.InvariantCulture) ?? "?")"
+                                        data-winner="@game.WinnerDisplay"
+                                        data-settings="@string.Join("|", game.EnabledSettingLabels)">
+                                    <i class="fas fa-gear"></i>
+                                </button>
+                            </td>
                         </tr>
                     }
                 </tbody>

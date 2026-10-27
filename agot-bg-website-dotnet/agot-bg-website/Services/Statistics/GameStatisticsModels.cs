@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace agot_bg_website.Services.Statistics;
 
 // Raw SQL result rows (property names match the quoted column aliases in GameStatisticsSql).
@@ -29,6 +31,10 @@ public sealed class StatisticsLatestRow
     public Guid? WinnerUserId { get; set; }
     public string? WinnerUserName { get; set; }
     public bool WinnerUserDeleted { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public string? ViewOfGame { get; set; }
+    public string? OwnerUserName { get; set; }
+    public bool OwnerUserDeleted { get; set; }
 }
 
 // Shaped results shown on the page.
@@ -70,8 +76,21 @@ public sealed record LatestGame(
     string? WinnerHouseId,
     string? WinnerHouseName,
     Guid? WinnerUserId,
-    string? WinnerUserName
-);
+    string? WinnerUserName,
+    DateTimeOffset CreatedAt,
+    string SetupName,
+    string? PlayerCount,
+    string? OwnerDisplayName,
+    bool IsFaceless,
+    IReadOnlyList<string> EnabledSettingLabels
+)
+{
+    /// <summary>Winner text for the game-settings popup, e.g. "Stark (alice)".</summary>
+    public string? WinnerDisplay =>
+        WinnerHouseName is null ? null
+        : WinnerUserName is null ? WinnerHouseName
+        : $"{WinnerHouseName} ({WinnerUserName})";
+}
 
 public static class GameStatisticsShaper
 {
@@ -159,6 +178,8 @@ public static class GameStatisticsShaper
             .. rows.Select(r =>
             {
                 var house = catalog.GetHouse(r.WinnerHouse);
+                using var viewOfGame = ParseViewOfGame(r.ViewOfGame);
+                var view = GameListing.ViewOfGameInfo.Parse(viewOfGame);
                 return new LatestGame(
                     r.Id,
                     r.Name,
@@ -171,10 +192,38 @@ public static class GameStatisticsShaper
                     r.WinnerUserDeleted ? null : r.WinnerUserId,
                     r.WinnerUserDeleted
                         ? Domain.ApplicationUser.DeletedAccountDisplayName
-                        : r.WinnerUserName
+                        : r.WinnerUserName,
+                    r.CreatedAt,
+                    GameListing.GameSettingsDisplay.GetSetupName(r.SetupId),
+                    r.PlayerCount,
+                    r.OwnerUserDeleted
+                        ? Domain.ApplicationUser.DeletedAccountDisplayName
+                        : r.OwnerUserName,
+                    view.IsFaceless,
+                    GameListing.GameSettingsDisplay.GetEnabledSettingLabels(
+                        viewOfGame,
+                        Domain.GameState.Finished
+                    )
                 );
             }),
         ];
+
+    private static JsonDocument? ParseViewOfGame(string? json)
+    {
+        if (string.IsNullOrEmpty(json))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonDocument.Parse(json);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
 
     private static string ScenarioLabel(StatisticsLatestRow row, ScenarioCatalog catalog) =>
         row.SetupId is not null && int.TryParse(row.PlayerCount, out var playerCount)
