@@ -1486,15 +1486,12 @@ export default class IngameGameState extends GameState<
             .filter((u) => u.type.id != "ship" && u.type.id != "dragon");
           if (nonDragonLandUnits.length == 1) {
             const unit = nonDragonLandUnits[0];
-            this.log(
-              {
-                type: "last-land-unit-transformed-to-dragon",
-                house: house.id,
-                transformedUnitType: unit.type.id,
-                region: unit.region.id
-              },
-              true
-            );
+            this.log({
+              type: "last-land-unit-transformed-to-dragon",
+              house: house.id,
+              transformedUnitType: unit.type.id,
+              region: unit.region.id
+            });
             this.transformUnits(unit.region, [unit], dragon);
           }
         }

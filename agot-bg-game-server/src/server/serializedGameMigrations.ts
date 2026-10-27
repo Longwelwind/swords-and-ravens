@@ -3219,6 +3219,23 @@ const serializedGameMigrations: {
       serializedGame = JSON.parse(json);
       return serializedGame;
     }
+  },
+  {
+    version: "139",
+    migrate: (serializedGame: any) => {
+      if (serializedGame.childGameState.type != "ingame") {
+        return serializedGame;
+      }
+
+      const logs = serializedGame.childGameState.gameLogManager.logs;
+      logs.forEach((log: any) => {
+        if (log.data.type == "last-land-unit-transformed-to-dragon") {
+          log.resolvedAutomatically = undefined;
+        }
+      });
+
+      return serializedGame;
+    }
   }
 ];
 
