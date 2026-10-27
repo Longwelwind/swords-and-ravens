@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Die Anonymisierung ist dauerhaft und kann nicht rückgängig gemacht werden.\n\nMöchtest du den anonymen Modus wirklich aktivieren?"
   },
   "gameStateColumn": {
+    "swapColumns": "Spalten tauschen",
+    "collapsePanel": "Spielstatus einklappen",
+    "expandPanel": "Spielstatus ausklappen",
     "willIncreaseInRound7dd1c1": "Steigt in Runde<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Aktuelle Drachenstärke",
     "theWildlingDeck090e33": "Der Wildlingskarten Stapel",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Nur aufgedeckte Wildlingskarten anzeigen",
-    "fullScreen": "Vollbild",
     "round6f8874": "Runde {{round}}",
     "privateChat11bbff": "Privater Chat",
     "personalNote27c48d": "Persönliche Notiz",

@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "L'activation de l'anonymat est définitive et ne peut pas être annulée.\n\nVoulez-vous vraiment activer l'anonymat ?"
   },
   "gameStateColumn": {
+    "swapColumns": "Permuter les colonnes",
+    "collapsePanel": "Réduire le panneau d'état de la partie",
+    "expandPanel": "Développer le panneau d'état de la partie",
     "willIncreaseInRound7dd1c1": "Augmentera au tour<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Force actuelle des dragons",
     "theWildlingDeck090e33": "Le paquet Sauvageons",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Afficher uniquement les cartes Sauvage révélées",
-    "fullScreen": "Plein écran",
     "round6f8874": "Tour {{round}}",
     "privateChat11bbff": "Chat privé",
     "personalNote27c48d": "Note personnelle",

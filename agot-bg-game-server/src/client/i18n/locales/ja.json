@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "匿名モードを有効にすると元に戻せません。\n\n匿名モードを有効にしますか？"
   },
   "gameStateColumn": {
+    "swapColumns": "列を入れ替える",
+    "collapsePanel": "ゲーム状態パネルを折りたたむ",
+    "expandPanel": "ゲーム状態パネルを展開する",
     "willIncreaseInRound7dd1c1": "増加するラウンド：<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "現在のドラゴンの強さ",
     "theWildlingDeck090e33": "野人デッキ",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "公開済みの野人カードのみ表示",
-    "fullScreen": "全画面表示",
     "round6f8874": "ラウンド {{round}}",
     "privateChat11bbff": "プライベートチャット",
     "personalNote27c48d": "個人メモ",

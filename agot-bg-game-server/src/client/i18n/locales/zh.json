@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "匿名模式一旦启用便无法关闭。\n\n确定要启用匿名模式吗？"
   },
   "gameStateColumn": {
+    "swapColumns": "交换列",
+    "collapsePanel": "收起游戏状态面板",
+    "expandPanel": "展开游戏状态面板",
     "willIncreaseInRound7dd1c1": "将在以下轮次提高<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "当前龙战力",
     "theWildlingDeck090e33": "野人牌堆",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "仅显示已揭示的野人卡牌",
-    "fullScreen": "全屏",
     "round6f8874": "第 {{round}} 轮",
     "privateChat11bbff": "私聊",
     "personalNote27c48d": "个人笔记",

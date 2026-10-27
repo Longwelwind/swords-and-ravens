@@ -29,7 +29,6 @@ import MapControls, {
 } from "./MapControls";
 import GameStateColumn from "./GameStateColumn";
 import HouseInfoColumn from "./HouseInfoColumn";
-import GameTabsComponent from "./GameTabsComponent";
 
 import House from "../common/ingame-game-state/game-data-structure/House";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
@@ -52,7 +51,6 @@ import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
 import empoweredVassalsImage from "../../public/images/icons/empowered-vassals.svg";
 
-import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import SelectedRandomDraftGameState from "../common/ingame-game-state/draft-game-state/selected-random-draft-game-state/SelectedRandomDraftGameState";
 import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
@@ -213,29 +211,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   render(): ReactNode {
     const tracks = this.calcInfluenceTrackDetails();
-    if (this.gameClient.logChatFullScreen) {
-      const isOwnTurn = this.gameClient.isOwnTurn();
-      const border = isOwnTurn
-        ? "warning"
-        : this.ingame.childGameState instanceof CancelledGameState
-          ? "danger"
-          : undefined;
-      return (
-        <Col
-          xs="12"
-          lg="8"
-          xl="6"
-          style={{ maxHeight: "95vh", height: "95vh" }}
-        >
-          <GameTabsComponent
-            gameClient={this.gameClient}
-            ingame={this.ingame}
-            mapControls={this.mapControls}
-            border={border}
-          />
-        </Col>
-      );
-    }
     const columnOrder = this.user?.settings.gameStateColumnRight
       ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
       : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };

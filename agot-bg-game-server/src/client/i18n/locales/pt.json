@@ -1032,6 +1032,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "A ativação do anonimato é permanente e não pode ser revertida.\n\nTens a certeza de que queres ativar o anonimato?"
   },
   "gameStateColumn": {
+    "swapColumns": "Trocar colunas",
+    "collapsePanel": "Recolher painel do estado do jogo",
+    "expandPanel": "Expandir painel do estado do jogo",
     "willIncreaseInRound7dd1c1": "Aumentará na ronda<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Força atual dos dragões",
     "theWildlingDeck090e33": "O baralho dos Selvagens",
@@ -1045,7 +1048,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Mostrar apenas cartas de Selvagens reveladas",
-    "fullScreen": "Ecrã inteiro",
     "round6f8874": "Ronda {{round}}",
     "privateChat11bbff": "Chat privado",
     "personalNote27c48d": "Nota pessoal",

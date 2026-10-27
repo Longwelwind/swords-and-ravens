@@ -9,27 +9,21 @@ import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import GameLogListComponent from "./GameLogListComponent";
 import AutoScroll from "./utils/AutoScroll";
 import mammothImage from "../../public/images/icons/mammoth.svg";
-import expandImage from "../../public/images/icons/expand.svg";
-import contractImage from "../../public/images/icons/contract.svg";
 
 interface GameLogPanelProps {
   ingameGameState: IngameGameState;
   gameClient: GameClient;
   currentlyViewed: boolean;
-  fullScreen?: boolean;
-  onFullScreenClick?: () => void;
 }
 
 export default observer(function GameLogPanel({
   ingameGameState,
   gameClient,
-  currentlyViewed,
-  fullScreen = false,
-  onFullScreenClick
+  currentlyViewed
 }: GameLogPanelProps): React.JSX.Element {
   const panelRef = useRef<HTMLDivElement>(null);
   const controlsId = useId();
-  const [controlsOpen, setControlsOpen] = useState(fullScreen);
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [wildlingCardsOnly, setWildlingCardsOnly] = useState(false);
   const [roundIds, setRoundIds] = useState<string[]>([]);
 
@@ -106,22 +100,6 @@ export default observer(function GameLogPanel({
           >
             <img src={mammothImage} width={24} alt="" />
           </button>
-          {onFullScreenClick && (
-            <button
-              type="button"
-              className="btn btn-sm btn-secondary ms-auto"
-              aria-label={t("gameTabs.fullScreen")}
-              title={t("gameTabs.fullScreen")}
-              aria-pressed={fullScreen}
-              onClick={onFullScreenClick}
-            >
-              <img
-                src={fullScreen ? contractImage : expandImage}
-                width={24}
-                alt=""
-              />
-            </button>
-          )}
         </div>
       )}
       <AutoScroll

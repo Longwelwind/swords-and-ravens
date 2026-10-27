@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Yüzsüzü etkinleştirmek kalıcıdır ve geri alınamaz.\n\nYüzsüzü etkinleştirmek istediğine emin misin?"
   },
   "gameStateColumn": {
+    "swapColumns": "Sütunları değiştir",
+    "collapsePanel": "Oyun durumu panelini daralt",
+    "expandPanel": "Oyun durumu panelini genişlet",
     "willIncreaseInRound7dd1c1": "Şu turda artacak<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Mevcut ejderha gücü",
     "theWildlingDeck090e33": "Vahşi destesi",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Yalnızca açılmış Yabanıl kartlarını göster",
-    "fullScreen": "Tam ekran",
     "round6f8874": "Tur {{round}}",
     "privateChat11bbff": "Özel sohbet",
     "personalNote27c48d": "Kişisel not",

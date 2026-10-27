@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Attivare la modalità Senza volto è una scelta permanente e irreversibile.\n\nVuoi davvero attivarla?"
   },
   "gameStateColumn": {
+    "swapColumns": "Scambia colonne",
+    "collapsePanel": "Comprimi il pannello dello stato della partita",
+    "expandPanel": "Espandi il pannello dello stato della partita",
     "willIncreaseInRound7dd1c1": "Aumenterà nel round<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Forza attuale dei draghi",
     "theWildlingDeck090e33": "Il mazzo dei Bruti",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Mostra solo le carte dei Bruti rivelate",
-    "fullScreen": "Schermo intero",
     "round6f8874": "Round {{round}}",
     "privateChat11bbff": "Chat privata",
     "personalNote27c48d": "Nota personale",

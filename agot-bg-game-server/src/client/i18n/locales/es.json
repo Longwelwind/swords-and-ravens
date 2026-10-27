@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Activar el modo Sin rostros es permanente y no se puede deshacer.\n\n¿Seguro que quieres activarlo?"
   },
   "gameStateColumn": {
+    "swapColumns": "Intercambiar columnas",
+    "collapsePanel": "Contraer el panel de estado de la partida",
+    "expandPanel": "Expandir el panel de estado de la partida",
     "willIncreaseInRound7dd1c1": "Aumentará en la ronda<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Fuerza actual de los dragones",
     "theWildlingDeck090e33": "El mazo de los salvajes",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Mostrar solo las cartas de Salvajes reveladas",
-    "fullScreen": "Pantalla completa",
     "round6f8874": "Ronda {{round}}",
     "privateChat11bbff": "Chat privado",
     "personalNote27c48d": "Nota personal",

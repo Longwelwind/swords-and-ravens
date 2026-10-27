@@ -1013,6 +1013,9 @@
     "enablingFacelessIsPermanentAndCannotBeUndone515372": "Faceless inschakelen is permanent en kan niet ongedaan worden gemaakt.\n\nWeet je zeker dat je Faceless wilt inschakelen?"
   },
   "gameStateColumn": {
+    "swapColumns": "Kolommen omwisselen",
+    "collapsePanel": "Spelstatuspaneel inklappen",
+    "expandPanel": "Spelstatuspaneel uitklappen",
     "willIncreaseInRound7dd1c1": "Neemt toe in ronde<lineBreak/>{{rounds}}",
     "currentDragonStrengthed8478": "Huidige drakenkracht",
     "theWildlingDeck090e33": "De Wildling-stapel",
@@ -1026,7 +1029,6 @@
   },
   "gameTabs": {
     "wildlingCardsOnly": "Alleen onthulde Wildlingkaarten tonen",
-    "fullScreen": "Volledig scherm",
     "round6f8874": "Ronde {{round}}",
     "privateChat11bbff": "Privéchat",
     "personalNote27c48d": "Persoonlijke notitie",
