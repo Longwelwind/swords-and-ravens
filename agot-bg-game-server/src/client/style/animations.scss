@@ -85,7 +85,7 @@ select {
   border-radius: 10px;
 }
 
-.float-right {
+.float-end {
   float: right;
 }
 
@@ -321,10 +321,13 @@ select {
   animation-fill-mode: both;
 }
 
-:root {
+// react-toastify 11 injects its own :root variables at runtime (after this stylesheet), so
+// override them on the container. Toasts also size to their content instead of a fixed 320px.
+.Toastify__toast-container {
   --toastify-z-index: 9998;
   --toastify-color-progress-dark: #f39c12;
   --toastify-color-progress-light: #f39c12;
+  --toastify-toast-width: auto;
 }
 
 .slide-in-elliptic-top-fwd {

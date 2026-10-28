@@ -1,11 +1,12 @@
+import { t, Trans } from "../../i18n";
+import MapContribution from "../../MapContribution";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import React from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import Region from "../../../common/ingame-game-state/game-data-structure/Region";
-import { observable } from "mobx";
-import _ from "lodash";
+import { action, observable } from "mobx";
 import PartialRecursive from "../../../utils/PartialRecursive";
 import { RegionOnMapProperties } from "../../MapControls";
 import IngameGameState from "../../../common/ingame-game-state/IngameGameState";
@@ -15,13 +16,11 @@ import ResolveMoveLoyaltyTokenGameState from "../../../common/ingame-game-state/
 export default class ResolveMoveLoyaltyTokenComponent extends Component<
   GameStateComponentProps<ResolveMoveLoyaltyTokenGameState>
 > {
-  @observable from: Region | null = null;
-  @observable to: Region | null = null;
+  @observable accessor from: Region | null = null;
+  @observable accessor to: Region | null = null;
   // Set after confirming until the server answered with "loyalty-token-moved" or a rejection
-  @observable waitingForServer = false;
+  @observable accessor waitingForServer = false;
   previewAnimationId: number | null = null;
-
-  modifyRegionsOnMapCallback: any;
 
   onLoyaltyTokenMovedCallback = (from: Region, to: Region): void =>
     this.onLoyaltyTokenMoved(from, to);
@@ -39,23 +38,47 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+        />
         <Col xs={12} className="text-center">
-          House <b>{this.gameState.house.name}</b> must move a
-          loyalty&nbsp;token to an adjacent land area.
+          <Trans
+            i18nKey="resolveMoveLoyaltyToken.houseMustMoveALoyaltyTokenToAnAdjacent74d6d6"
+            values={{ house: this.gameState.house.name }}
+            components={{
+              bold: <b />
+            }}
+          />
         </Col>
         <Col xs={12} className="mt-2">
           {this.props.gameClient.doesControlHouse(this.gameState.house) ? (
             <>
               <p className="text-center">
-                Move a loyalty&nbsp;token from{" "}
-                {this.from ? (
-                  <>
-                    <b>{this.from.name}</b> to{" "}
-                  </>
-                ) : (
-                  ""
-                )}
-                {this.to ? <b>{this.to.name}</b> : ""}
+                <Trans
+                  i18nKey="resolveMoveLoyaltyToken.moveALoyaltyTokenFrome21f73"
+                  components={{
+                    from: (
+                      <>
+                        {this.from ? (
+                          <>
+                            <Trans
+                              i18nKey="resolveMoveLoyaltyToken.to17bfa6"
+                              values={{ from: this.from.name }}
+                              components={{
+                                bold: <b />
+                              }}
+                            />
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </>
+                    ),
+                    to: <>{this.to ? <b>{this.to.name}</b> : ""}</>
+                  }}
+                />
               </p>
               <Row className="justify-content-center">
                 <Col xs="auto">
@@ -69,7 +92,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                       this.waitingForServer
                     }
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -82,14 +105,17 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
                       this.waitingForServer
                     }
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
             </>
           ) : (
             <div className="text-center">
-              Waiting for {this.gameState.house.name}...
+              <Trans
+                i18nKey="common.waitingFor"
+                values={{ houses: this.gameState.house.name }}
+              />
             </div>
           )}
         </Col>
@@ -97,7 +123,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
     );
   }
 
-  confirm(): void {
+  @action confirm(): void {
     if (this.from == null || this.to == null) {
       return;
     }
@@ -108,7 +134,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
     this.gameState.sendMovePowerTokens(this.from, this.to);
   }
 
-  private reset(): void {
+  @action private reset(): void {
     if (this.from != null && this.to != null) {
       this.ingame.undoLoyaltyTokenMoveOnClient(
         this.from,
@@ -120,13 +146,14 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
   }
 
   // Forgets the preview without undoing it, e.g. because the server confirmed exactly this move
-  private clear(): void {
+  @action private clear(): void {
     this.from = null;
     this.to = null;
     this.previewAnimationId = null;
     this.waitingForServer = false;
   }
 
+  @action
   private onLoyaltyTokenMoved(from: Region, to: Region): void {
     if (this.from == null || this.to == null) {
       return;
@@ -140,6 +167,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
     }
   }
 
+  @action
   private onLoyaltyTokenMoveRejected(): void {
     if (this.waitingForServer) {
       this.reset();
@@ -177,7 +205,7 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
     return [];
   }
 
-  onRegionClick(region: Region): void {
+  @action onRegionClick(region: Region): void {
     if (this.from == null) {
       this.from = region;
     } else if (this.from != null && this.to == null) {
@@ -198,9 +226,6 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
     this.ingame.onLoyaltyTokenMoved = this.onLoyaltyTokenMovedCallback;
     this.ingame.onLoyaltyTokenMoveRejected =
       this.onLoyaltyTokenMoveRejectedCallback;
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap())
-    );
   }
 
   componentWillUnmount(): void {
@@ -217,10 +242,5 @@ export default class ResolveMoveLoyaltyTokenComponent extends Component<
     ) {
       this.ingame.onLoyaltyTokenMoveRejected = null;
     }
-
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback
-    );
   }
 }

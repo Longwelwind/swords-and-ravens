@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import { observer } from "mobx-react";
 import React, { Component, ReactNode } from "react";
 import crossedSwordsImage from "../../public/images/icons/crossed-swords.svg";
@@ -101,7 +102,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             )}
           </div>
 
-          <div style={{ gridRow: "1", gridColumn: "2" }} className="text-right">
+          <div style={{ gridRow: "1", gridColumn: "2" }} className="text-end">
             {this.defender.isWinner && (
               <img
                 src={knightBannerImage}
@@ -256,7 +257,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             )}
           </div>
           <div style={{ gridRow: "3", gridColumn: "3" }}>
-            <b>Army</b>
+            <b>{t("combatInfo.army99b3c4")}</b>
           </div>
           <div style={{ gridRow: "3", gridColumn: "4" }}>
             {this.defender.army}
@@ -273,7 +274,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             {this.attacker.support}
           </div>
           <div style={{ gridRow: "4", gridColumn: "3" }}>
-            <b>Support</b>
+            <b>{t("combatInfo.supportbe9194")}</b>
           </div>
           <div style={{ gridRow: "4", gridColumn: "4" }}>
             {this.defender.support}
@@ -283,7 +284,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             {this.attacker.houseCardStrength}
           </div>
           <div style={{ gridRow: "5", gridColumn: "3" }}>
-            <b>House card</b>
+            <b>{t("combatInfo.houseCard359d9d")}</b>
           </div>
           <div style={{ gridRow: "5", gridColumn: "4" }}>
             {this.defender.houseCardStrength}
@@ -302,9 +303,10 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             className={showTob ? "" : "display-none"}
           >
             <b>
-              Tides
-              <br />
-              of Battle
+              <Trans
+                i18nKey="combatInfo.tidesOfBattle5287f6"
+                components={{ lineBreak: <br /> }}
+              />
             </b>
           </div>
           <div
@@ -327,9 +329,10 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             className={showVsb ? "" : "display-none"}
           >
             <b>
-              Valyrian Steel
-              <br />
-              Blade
+              <Trans
+                i18nKey="combatInfo.valyrianSteelBlade6c78a8"
+                components={{ lineBreak: <br /> }}
+              />
             </b>
           </div>
           <div
@@ -369,7 +372,7 @@ export default class CombatInfoComponent extends Component<CombatInfoComponentPr
             <b>{this.attacker.total}</b>
           </div>
           <div style={{ gridRow: "8", gridColumn: "3" }}>
-            <b>Total</b>
+            <b>{t("combatInfo.totalc9b3c3")}</b>
           </div>
           <div style={{ gridRow: "8", gridColumn: "4" }}>
             <b>{this.defender.total}</b>

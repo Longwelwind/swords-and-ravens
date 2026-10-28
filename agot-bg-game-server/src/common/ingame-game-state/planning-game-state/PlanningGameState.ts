@@ -38,10 +38,8 @@ export default class PlanningGameState extends GameState<
   // Server-side, the value of the map should never be null.
   // Client-side, the client can receive a null value if it is the order of an other player,
   // it thus represents a face-down order (this player can't see it).
-  @observable placedOrders: BetterMap<Region, Order | null> = new BetterMap<
-    Region,
-    Order | null
-  >();
+  @observable accessor placedOrders: BetterMap<Region, Order | null> =
+    new BetterMap<Region, Order | null>();
   planningRestrictions: PlanningRestriction[];
   revealedWesterosCards: WesterosCard[];
 

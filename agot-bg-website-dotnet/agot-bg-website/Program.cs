@@ -170,6 +170,8 @@ builder.Services.AddScoped<AccountLinkingService>();
 builder.Services.AddScoped<AccountDeletionService>();
 builder.Services.AddScoped<agot_bg_website.Services.GameListing.GameListQueryService>();
 builder.Services.AddScoped<agot_bg_website.Services.UserStatsService>();
+builder.Services.AddScoped<agot_bg_website.Services.Statistics.GameStatisticsService>();
+builder.Services.AddScoped<agot_bg_website.Services.Statistics.PlayerHouseStatsService>();
 
 // Recomputes cached user stats (won/finished/removed-from game counts and win rate) in the
 // background whenever a game finishes (see Api.GamesApi's PATCH handler) or an admin triggers a
@@ -336,6 +338,8 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizePage("/Games");
     options.Conventions.AuthorizePage("/MyGames");
     options.Conventions.AuthorizePage("/Users");
+    options.Conventions.AuthorizePage("/Statistics");
+    options.Conventions.AuthorizePage("/User");
 });
 
 // External logins: Google/Discord/Facebook — see MIGRATION_PLAN.md §5. Plus a MasterApi Basic

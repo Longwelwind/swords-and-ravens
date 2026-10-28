@@ -2,7 +2,7 @@ import GameState from "../../../GameState";
 import WesterosGameState from "../WesterosGameState";
 import Player from "../../Player";
 import BiddingGameState, {
-  SerializedBiddingGameState,
+  SerializedBiddingGameState
 } from "../bidding-game-state/BiddingGameState";
 import Game from "../../game-data-structure/Game";
 import House from "../../game-data-structure/House";
@@ -12,40 +12,40 @@ import EntireGame from "../../../EntireGame";
 import * as _ from "lodash";
 import WildlingCard from "../../game-data-structure/wildling-card/WildlingCard";
 import PreemptiveRaidWildlingVictoryGameState, {
-  SerializedPreemptiveRaidWildlingVictoryGameState,
+  SerializedPreemptiveRaidWildlingVictoryGameState
 } from "./preemptive-raid-wildling-victory-game-state/PreemptiveRaidWildlingVictoryGameState";
 import SimpleChoiceGameState, {
-  SerializedSimpleChoiceGameState,
+  SerializedSimpleChoiceGameState
 } from "../../simple-choice-game-state/SimpleChoiceGameState";
 import CrowKillersWildlingVictoryGameState, {
-  SerializedCrowKillersWildlingVictoryGameState,
+  SerializedCrowKillersWildlingVictoryGameState
 } from "./crow-killers-wildling-victory-game-state/CrowKillersWildlingVictoryGameState";
 import CrowKillersNightsWatchVictoryGameState, {
-  SerializedCrowKillersNightsWatchVictoryGameState,
+  SerializedCrowKillersNightsWatchVictoryGameState
 } from "./crow-killers-nights-watch-victory-game-state/CrowKillersNightsWatchVictoryGameState";
 import RattleshirtsRaidersWildlingVictoryGameState, {
-  SerializedRattleshirtsRaidersWildlingVictoryGameState,
+  SerializedRattleshirtsRaidersWildlingVictoryGameState
 } from "./rattleshirts-raiders-wildling-victory-game-state/RattleshirtsRaidersWildlingVictoryGameState";
 import MassingOnTheMilkwaterWildlingVictoryGameState, {
-  SerializedMassingOnTheMilkwaterWildlingVictoryGameState,
+  SerializedMassingOnTheMilkwaterWildlingVictoryGameState
 } from "./massing-on-the-milkwater-wildling-victory-game-state/MassingOnTheMilkwaterWildlingVictoryGameState";
 import AKingBeyondTheWallWildlingVictoryGameState, {
-  SerializedAKingBeyondTheWallWildlingVictoryGameState,
+  SerializedAKingBeyondTheWallWildlingVictoryGameState
 } from "./a-king-beyond-the-wall-wildling-victory-game-state/AKingBeyondTheWallWildlingVictoryGameState";
 import AKingBeyondTheWallNightsWatchVictoryGameState, {
-  SerializedAKingBeyondTheWallNightsWatchVictoryGameState,
+  SerializedAKingBeyondTheWallNightsWatchVictoryGameState
 } from "./a-king-beyond-the-wall-nights-watch-victory-game-state/AKingBeyondTheWallNightsWatchVictoryGameState";
 import MammothRidersWildlingVictoryGameState, {
-  SerializedMammothRidersWildlingVictoryGameState,
+  SerializedMammothRidersWildlingVictoryGameState
 } from "./mammoth-riders-wildling-victory-game-state/MammothRidersWildlingVictoryGameState";
 import MammothRidersNightsWatchVictoryGameState, {
-  SerializedMammothRidersNightsWatchVictoryGameState,
+  SerializedMammothRidersNightsWatchVictoryGameState
 } from "./mammoth-riders-nights-watch-victory-game-state/MammothRidersNightsWatchVictoryGameState";
 import TheHordeDescendsWildlingVictoryGameState, {
-  SerializedTheHordeDescendsWildlingVictoryGameState,
+  SerializedTheHordeDescendsWildlingVictoryGameState
 } from "./the-horde-descends-wildling-victory-game-state/TheHordeDescendsWildlingVictoryGameState";
 import TheHordeDescendsNightsWatchVictoryGameState, {
-  SerializedTheHordeDescendsNightsWatchVictoryGameState,
+  SerializedTheHordeDescendsNightsWatchVictoryGameState
 } from "./the-horde-descends-nights-watch-victory-game-state/TheHordeDescendsNightsWatchVictoryGameState";
 import IngameGameState from "../../IngameGameState";
 import { observable } from "mobx";
@@ -53,7 +53,7 @@ import BetterMap from "../../../../utils/BetterMap";
 import User from "../../../../server/User";
 import { isTakeControlOfEnemyPortRequired } from "../../port-helper/PortHelper";
 import TakeControlOfEnemyPortGameState, {
-  SerializedTakeControlOfEnemyPortGameState,
+  SerializedTakeControlOfEnemyPortGameState
 } from "../../take-control-of-enemy-port-game-state/TakeControlOfEnemyPortGameState";
 import ActionGameState from "../../action-game-state/ActionGameState";
 
@@ -74,15 +74,15 @@ export default class WildlingsAttackGameState extends GameState<
   | TheHordeDescendsNightsWatchVictoryGameState
   | TakeControlOfEnemyPortGameState
 > {
-  @observable participatingHouses: House[];
+  @observable accessor participatingHouses: House[];
 
   // This field is null before the bidding phase is over,
   // as the wildling card will be drawn after the bidding phase is over.
   wildlingCard: WildlingCard | null;
-  @observable wildlingStrength: number;
+  @observable accessor wildlingStrength: number;
   _highestBidder: House | null;
   _lowestBidder: House | null;
-  @observable biddingResults: [number, House[]][] | null;
+  @observable accessor biddingResults: [number, House[]][] | null;
 
   get westerosGameState(): WesterosGameState {
     return this.parentGameState;
@@ -94,14 +94,14 @@ export default class WildlingsAttackGameState extends GameState<
 
   get participatingHousesWithoutVassals(): House[] {
     return this.participatingHouses.filter(
-      (h) => !this.ingame.isVassalHouse(h),
+      (h) => !this.ingame.isVassalHouse(h)
     );
   }
 
   get excludedHouses(): House[] {
     return _.difference(
       this.game.houses.values,
-      this.participatingHouses,
+      this.participatingHouses
     ).filter((h) => !this.ingame.isVassalHouse(h));
   }
 
@@ -111,7 +111,7 @@ export default class WildlingsAttackGameState extends GameState<
     }
 
     return _.sum(
-      this.biddingResults.map(([bid, houses]) => bid * houses.length),
+      this.biddingResults.map(([bid, houses]) => bid * houses.length)
     );
   }
 
@@ -165,17 +165,17 @@ export default class WildlingsAttackGameState extends GameState<
 
   firstStart(
     wildlingStrength: number,
-    participatingHouses: House[] = [],
+    participatingHouses: House[] = []
   ): void {
     this.wildlingStrength = wildlingStrength;
 
     // Filter out Vassal houses, who never participates in wildling attacks
     this.participatingHouses = participatingHouses.filter(
-      (h) => !this.ingame.isVassalHouse(h),
+      (h) => !this.ingame.isVassalHouse(h)
     );
 
     this.setChildGameState(new BiddingGameState(this)).firstStart(
-      this.participatingHouses,
+      this.participatingHouses
     );
   }
 
@@ -190,12 +190,12 @@ export default class WildlingsAttackGameState extends GameState<
   onServerMessage(message: ServerMessage): void {
     if (message.type == "reveal-wildling-card") {
       this.wildlingCard = this.game.wildlingDeck.find(
-        (c) => c.id == message.wildlingCard,
+        (c) => c.id == message.wildlingCard
       ) as WildlingCard;
     } else if (message.type == "reveal-bids") {
       this.biddingResults = message.bids.map(([bid, houses]) => [
         bid,
-        houses.map((h) => this.game.houses.get(h)),
+        houses.map((h) => this.game.houses.get(h))
       ]);
     } else if (message.type == "wilding-ties-resolved") {
       this._highestBidder = message.highestBidder
@@ -227,8 +227,8 @@ export default class WildlingsAttackGameState extends GameState<
       type: "reveal-bids",
       bids: this.biddingResults.map(([bid, houses]) => [
         bid,
-        houses.map((h) => h.id),
-      ]),
+        houses.map((h) => h.id)
+      ])
     });
 
     this.westerosGameState.ingame.log({
@@ -236,9 +236,9 @@ export default class WildlingsAttackGameState extends GameState<
       wildlingStrength: this.wildlingStrength,
       results: this.biddingResults.map(([bid, houses]) => [
         bid,
-        houses.map((h) => h.id),
+        houses.map((h) => h.id)
       ]),
-      nightsWatchVictory: this.nightsWatchWon,
+      nightsWatchVictory: this.nightsWatchWon
     });
 
     if (this.nightsWatchWon) {
@@ -248,14 +248,14 @@ export default class WildlingsAttackGameState extends GameState<
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
           this.game.ironThroneHolder,
           "The holder of the Iron Throne must choose between the highest bidders",
-          this.highestBidders.map((h) => h.name),
+          this.highestBidders.map((h) => h.name)
         );
         return;
       }
 
       this.entireGame.broadcastToClients({
         type: "wilding-ties-resolved",
-        highestBidder: this.highestBidders[0].id,
+        highestBidder: this.highestBidders[0].id
       });
 
       this.proceedNightsWatchWon(this.highestBidders[0]);
@@ -266,14 +266,14 @@ export default class WildlingsAttackGameState extends GameState<
         this.setChildGameState(new SimpleChoiceGameState(this)).firstStart(
           this.game.ironThroneHolder,
           "The holder of the Iron Throne must choose between the lowest bidders",
-          this.lowestBidders.map((h) => h.name),
+          this.lowestBidders.map((h) => h.name)
         );
         return;
       }
 
       this.entireGame.broadcastToClients({
         type: "wilding-ties-resolved",
-        lowestBidder: this.lowestBidders[0].id,
+        lowestBidder: this.lowestBidders[0].id
       });
 
       this.proceedWildlingWon(this.lowestBidders[0]);
@@ -283,7 +283,7 @@ export default class WildlingsAttackGameState extends GameState<
   onSimpleChoiceGameStateEnd(choice: number): void {
     this.westerosGameState.ingame.log({
       type: "ties-decided",
-      house: this.game.ironThroneHolder.id,
+      house: this.game.ironThroneHolder.id
     });
 
     if (this.nightsWatchWon) {
@@ -291,12 +291,12 @@ export default class WildlingsAttackGameState extends GameState<
 
       this.entireGame.broadcastToClients({
         type: "wilding-ties-resolved",
-        highestBidder: highestBidder.id,
+        highestBidder: highestBidder.id
       });
 
       this.westerosGameState.ingame.log({
         type: "highest-bidder-chosen",
-        highestBidder: highestBidder.id,
+        highestBidder: highestBidder.id
       });
 
       this.proceedNightsWatchWon(highestBidder);
@@ -305,12 +305,12 @@ export default class WildlingsAttackGameState extends GameState<
 
       this.entireGame.broadcastToClients({
         type: "wilding-ties-resolved",
-        lowestBidder: lowestBidder.id,
+        lowestBidder: lowestBidder.id
       });
 
       this.westerosGameState.ingame.log({
         type: "lowest-bidder-chosen",
-        lowestBidder: lowestBidder.id,
+        lowestBidder: lowestBidder.id
       });
 
       this.proceedWildlingWon(this.lowestBidders[choice]);
@@ -334,12 +334,12 @@ export default class WildlingsAttackGameState extends GameState<
     // Reveal the wildling card to the players
     this.entireGame.broadcastToClients({
       type: "reveal-wildling-card",
-      wildlingCard: this.wildlingCard.id,
+      wildlingCard: this.wildlingCard.id
     });
 
     this.westerosGameState.ingame.log({
       type: "wildling-card-revealed",
-      wildlingCard: this.wildlingCard.id,
+      wildlingCard: this.wildlingCard.id
     });
 
     return this.wildlingCard;
@@ -370,7 +370,7 @@ export default class WildlingsAttackGameState extends GameState<
     }
     this.entireGame.broadcastToClients({
       type: "change-wildling-strength",
-      wildlingStrength: this.game.wildlingStrength,
+      wildlingStrength: this.game.wildlingStrength
     });
 
     const consequence =
@@ -379,10 +379,10 @@ export default class WildlingsAttackGameState extends GameState<
       return;
     } else if (consequence.takeOverPort) {
       this.setChildGameState(
-        new TakeControlOfEnemyPortGameState(this),
+        new TakeControlOfEnemyPortGameState(this)
       ).firstStart(
         consequence.takeOverPort.port,
-        consequence.takeOverPort.newController,
+        consequence.takeOverPort.newController
       );
       return;
     }
@@ -392,11 +392,11 @@ export default class WildlingsAttackGameState extends GameState<
 
   onTakeControlOfEnemyPortFinish(_previousHouse: House | null): void {
     const takeOverRequired = isTakeControlOfEnemyPortRequired(
-      this.parentGameState.ingame,
+      this.parentGameState.ingame
     );
     if (takeOverRequired) {
       this.setChildGameState(
-        new TakeControlOfEnemyPortGameState(this),
+        new TakeControlOfEnemyPortGameState(this)
       ).firstStart(takeOverRequired.port, takeOverRequired.newController);
       return;
     }
@@ -414,7 +414,7 @@ export default class WildlingsAttackGameState extends GameState<
 
   serializeToClient(
     admin: boolean,
-    player: Player | null,
+    player: Player | null
   ): SerializedWildlingsAttackGameState {
     return {
       type: "wildlings-attack",
@@ -426,37 +426,37 @@ export default class WildlingsAttackGameState extends GameState<
       biddingResults: this.biddingResults
         ? this.biddingResults.map(([bid, houses]) => [
             bid,
-            houses.map((h) => h.id),
+            houses.map((h) => h.id)
           ])
         : null,
       lowestBidder: this._lowestBidder ? this._lowestBidder.id : null,
-      highestBidder: this._highestBidder ? this._highestBidder.id : null,
+      highestBidder: this._highestBidder ? this._highestBidder.id : null
     };
   }
 
   static deserializeFromServer(
     westerosGameState: WesterosGameState,
-    data: SerializedWildlingsAttackGameState,
+    data: SerializedWildlingsAttackGameState
   ): WildlingsAttackGameState {
     const wildlingsAttackGameState = new WildlingsAttackGameState(
-      westerosGameState,
+      westerosGameState
     );
 
     wildlingsAttackGameState.wildlingStrength = data.wildlingStrength;
     wildlingsAttackGameState.participatingHouses = data.participatingHouses.map(
-      (hid) => westerosGameState.game.houses.get(hid),
+      (hid) => westerosGameState.game.houses.get(hid)
     );
     wildlingsAttackGameState.childGameState =
       wildlingsAttackGameState.deserializeChildGameState(data.childGameState);
     wildlingsAttackGameState.wildlingCard = data.wildlingCard
       ? (wildlingsAttackGameState.game.wildlingDeck.find(
-          (c) => c.id == data.wildlingCard,
+          (c) => c.id == data.wildlingCard
         ) as WildlingCard)
       : null;
     wildlingsAttackGameState.biddingResults = data.biddingResults
       ? data.biddingResults.map(([bid, hids]) => [
           bid,
-          hids.map((hid) => westerosGameState.game.houses.get(hid)),
+          hids.map((hid) => westerosGameState.game.houses.get(hid))
         ])
       : null;
     wildlingsAttackGameState._lowestBidder = data.lowestBidder
@@ -470,7 +470,7 @@ export default class WildlingsAttackGameState extends GameState<
   }
 
   deserializeChildGameState(
-    data: SerializedWildlingsAttackGameState["childGameState"],
+    data: SerializedWildlingsAttackGameState["childGameState"]
   ): WildlingsAttackGameState["childGameState"] {
     switch (data.type) {
       case "bidding":
@@ -478,64 +478,64 @@ export default class WildlingsAttackGameState extends GameState<
       case "crow-killers-wildling-victory":
         return CrowKillersWildlingVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "preemptive-raid-wildling-victory":
         return PreemptiveRaidWildlingVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "simple-choice":
         return SimpleChoiceGameState.deserializeFromServer(this, data);
       case "crow-killers-nights-watch-victory":
         return CrowKillersNightsWatchVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "rattleshirts-raiders-wildling-victory":
         return RattleshirtsRaidersWildlingVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "massing-on-the-milkwater-wildling-victory":
         return MassingOnTheMilkwaterWildlingVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "a-king-beyond-the-wall-wildling-victory":
         return AKingBeyondTheWallWildlingVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "a-king-beyond-the-wall-nights-watch-victory":
         return AKingBeyondTheWallNightsWatchVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "mammoth-riders-nights-watch-victory":
         return MammothRidersNightsWatchVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "mammoth-riders-wildling-victory":
         return MammothRidersWildlingVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "the-horde-descends-wildling-victory":
         return TheHordeDescendsWildlingVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "the-horde-descends-nights-watch-victory":
         return TheHordeDescendsNightsWatchVictoryGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
       case "take-control-of-enemy-port":
         return TakeControlOfEnemyPortGameState.deserializeFromServer(
           this,
-          data,
+          data
         );
     }
   }

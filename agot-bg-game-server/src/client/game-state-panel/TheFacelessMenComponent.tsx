@@ -1,3 +1,5 @@
+import { t, Trans, translateGameText } from "../i18n";
+import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import React from "react";
 import BetterMap from "../../utils/BetterMap";
@@ -9,7 +11,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Row from "react-bootstrap/Row";
 import { UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -19,9 +21,7 @@ import TheFacelessMenGameState from "../../common/ingame-game-state/action-game-
 export default class TheFacelessMenComponent extends Component<
   GameStateComponentProps<TheFacelessMenGameState>
 > {
-  @observable unitsToRemove: BetterMap<Region, Unit> = new BetterMap();
-
-  modifyUnitsOnMapCallback: any;
+  @observable accessor unitsToRemove: BetterMap<Region, Unit> = new BetterMap();
 
   get house(): House {
     return this.props.gameState.house;
@@ -48,53 +48,75 @@ export default class TheFacelessMenComponent extends Component<
   }
 
   render(): ReactNode {
-    return this.props.gameClient.doesControlHouse(this.house) ? (
+    return (
       <>
-        <Col xs={12} className="mt-3">
-          {this.unitsToRemove.entries.map(([region, unit]) => (
-            <Row
-              key={`the-faceless-men_${region.id}`}
-              className="justify-content-center"
-              style={{ paddingBottom: 10 }}
-            >
-              <div>
-                <b>
-                  {unit.type.name} <small>of {unit.allegiance.name}</small>
-                </b>{" "}
-                in <b>{region.name}</b>
-              </div>
-            </Row>
-          ))}
-          <Row className="justify-content-center mt-3">
-            <Col xs="auto">
-              <Button
-                type="button"
-                variant="success"
-                onClick={() => this.confirm()}
-              >
-                Confirm
-              </Button>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          units={this.modifyUnitsOnMap()}
+        />
+        {this.props.gameClient.doesControlHouse(this.house) ? (
+          <>
+            <Col xs={12} className="mt-3">
+              {this.unitsToRemove.entries.map(([region, unit]) => (
+                <Row
+                  key={`the-faceless-men_${region.id}`}
+                  className="justify-content-center"
+                  style={{ paddingBottom: 10 }}
+                >
+                  <Col xs="auto" className="p-0">
+                    <Trans
+                      i18nKey="theFacelessMen.ofInbc8f9f"
+                      values={{
+                        unitType: translateGameText(unit.type.name),
+                        unitAllegiance: unit.allegiance.name,
+                        region: region.name
+                      }}
+                      components={{
+                        bold: <b />,
+                        small: <small />,
+                        bold2: <b />
+                      }}
+                    />
+                  </Col>
+                </Row>
+              ))}
+              <Row className="justify-content-center mt-3">
+                <Col xs="auto">
+                  <Button
+                    type="button"
+                    variant="success"
+                    onClick={() => this.confirm()}
+                  >
+                    {t("common.confirm")}
+                  </Button>
+                </Col>
+                <Col xs="auto">
+                  <Button
+                    type="button"
+                    variant="danger"
+                    disabled={this.unitsToRemove.size == 0}
+                    onClick={() => this.reset()}
+                  >
+                    {t("common.reset")}
+                  </Button>
+                </Col>
+              </Row>
             </Col>
-            <Col xs="auto">
-              <Button
-                type="button"
-                variant="danger"
-                disabled={this.unitsToRemove.size == 0}
-                onClick={() => this.reset()}
-              >
-                Reset
-              </Button>
-            </Col>
-          </Row>
-        </Col>
+          </>
+        ) : (
+          <Col xs={12} className="text-center">
+            <Trans
+              i18nKey="common.waitingFor"
+              values={{ houses: this.house.name }}
+            />
+          </Col>
+        )}
       </>
-    ) : (
-      <Col xs={12} className="text-center">
-        Waiting for {this.house.name}...
-      </Col>
     );
   }
 
+  @action
   onUnitClick(unit: Unit): void {
     if (this.unitsToRemove.has(unit.region)) {
       this.unitsToRemove.delete(unit.region);
@@ -104,11 +126,12 @@ export default class TheFacelessMenComponent extends Component<
     this.unitsToRemove.set(unit.region, unit);
   }
 
+  @action
   confirm(): void {
     if (
       this.unitsToRemove.size < 2 &&
       !window.confirm(
-        "You haven't selected all the targets yet. Are you sure you want to continue?"
+        t("theFacelessMen.youHavenTSelectedAllTheTargetsYetAref3c366")
       )
     ) {
       return;
@@ -117,6 +140,7 @@ export default class TheFacelessMenComponent extends Component<
     this.reset();
   }
 
+  @action
   private reset(): void {
     this.unitsToRemove = new BetterMap();
   }
@@ -139,18 +163,5 @@ export default class TheFacelessMenComponent extends Component<
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 }

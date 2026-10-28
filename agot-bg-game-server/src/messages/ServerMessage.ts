@@ -91,6 +91,7 @@ export type ServerMessage =
   | UpdateCompletedObjectives
   | UpdateSecretObjectives
   | SyncShiftingAmbitionsGameState
+  | SyncPlayingWithFire
   | HideOrRevealUserNames
   | ClearChatRoom
   | UpdateSelectableObjectives
@@ -551,6 +552,11 @@ interface SyncShiftingAmbitionsGameState {
   step: number;
   objectiveCardPool: string[];
   turnOrder: string[];
+}
+
+interface SyncPlayingWithFire {
+  type: "sync-playing-with-fire";
+  region: string;
 }
 
 interface HideOrRevealUserNames {

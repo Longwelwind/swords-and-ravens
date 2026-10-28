@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -16,10 +17,19 @@ export default class DoranMartell1stAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Doran Martell:</b> House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may choose to
-          steal any dominance token held by House{" "}
-          <b>{this.props.gameState.enemy.name}</b>.
+          <Trans
+            i18nKey="doranMartell1stAbility.doranMartellHouseMayChooseToStealAnyDominance4d13ad"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemy: this.props.gameState.enemy.name
+            }}
+            components={{
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent]

@@ -1,3 +1,5 @@
+import { t, Trans, translateGameText } from "../i18n";
+import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import React from "react";
 import BetterMap from "../../utils/BetterMap";
@@ -9,7 +11,7 @@ import GameStateComponentProps from "./GameStateComponentProps";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import House from "../../common/ingame-game-state/game-data-structure/House";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import Row from "react-bootstrap/Row";
 import { UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -20,9 +22,8 @@ import joinReactNodes from "../utils/joinReactNodes";
 export default class ResolveSinglePayDebtComponent extends Component<
   GameStateComponentProps<ResolveSinglePayDebtGameState>
 > {
-  @observable unitsToRemove: BetterMap<Region, Unit[]> = new BetterMap();
-
-  modifyUnitsOnMapCallback: any;
+  @observable accessor unitsToRemove: BetterMap<Region, Unit[]> =
+    new BetterMap();
 
   get house(): House {
     return this.props.gameState.house;
@@ -50,16 +51,32 @@ export default class ResolveSinglePayDebtComponent extends Component<
     const notEnough = selected.length < this.props.gameState.debt;
     return (
       <Row>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          units={this.modifyUnitsOnMap()}
+        />
         <Col xs={12} className="text-center">
           <p>
-            The holder of the Valyrian Steel Blade destroys one unit for each
-            unpaid interest Power&nbsp;token.
+            {t(
+              "resolveSinglePayDebt.theHolderOfTheValyrianSteelBladeDestroysOnee4005a"
+            )}
           </p>
           <p>
-            <b>{this.resolver.name}</b> must destroy{" "}
-            <b>{this.props.gameState.debt}</b> unit
-            {this.props.gameState.debt != 1 ? "s" : ""} of House{" "}
-            <b>{this.house.name}</b>.
+            <Trans
+              i18nKey="resolveSinglePayDebt.mustDestroyOfHouse802a9b"
+              values={{
+                resolver: this.resolver.name,
+                debt: this.props.gameState.debt,
+                unit: t("common.unit", { count: this.props.gameState.debt }),
+                house: this.house.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         </Col>
         {this.props.gameClient.doesControlHouse(this.resolver) ? (
@@ -69,21 +86,35 @@ export default class ResolveSinglePayDebtComponent extends Component<
                 className="justify-content-center"
                 style={{ paddingBottom: 10 }}
               >
-                <ul>
-                  {this.unitsToRemove.entries.map(([region, units]) => (
-                    <li key={`pay-single-debt_${region.id}`}>
-                      {joinReactNodes(
-                        units.map((u, i) => (
-                          <b key={`pay-single-debt_${region.id}_${u.id}_${i}`}>
-                            {u.type.name}
-                          </b>
-                        )),
-                        ", "
-                      )}{" "}
-                      in <b>{region.name}</b>
-                    </li>
-                  ))}
-                </ul>
+                <Col xs="auto" className="p-0">
+                  <ul>
+                    {this.unitsToRemove.entries.map(([region, units]) => (
+                      <li key={`pay-single-debt_${region.id}`}>
+                        <Trans
+                          i18nKey="common.in"
+                          values={{ region: region.name }}
+                          components={{
+                            units: (
+                              <>
+                                {joinReactNodes(
+                                  units.map((u, i) => (
+                                    <b
+                                      key={`pay-single-debt_${region.id}_${u.id}_${i}`}
+                                    >
+                                      {translateGameText(u.type.name)}
+                                    </b>
+                                  )),
+                                  ", "
+                                )}
+                              </>
+                            ),
+                            bold: <b />
+                          }}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </Col>
               </Row>
               <Row className="justify-content-center">
                 <Col xs="auto">
@@ -93,7 +124,7 @@ export default class ResolveSinglePayDebtComponent extends Component<
                     disabled={notEnough}
                     onClick={() => this.confirm()}
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -103,7 +134,7 @@ export default class ResolveSinglePayDebtComponent extends Component<
                     disabled={this.unitsToRemove.size == 0}
                     onClick={() => this.reset()}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
@@ -111,13 +142,17 @@ export default class ResolveSinglePayDebtComponent extends Component<
           </>
         ) : (
           <Col xs={12} className="text-center">
-            Waiting for {this.resolver.name}...
+            <Trans
+              i18nKey="common.waitingFor"
+              values={{ houses: this.resolver.name }}
+            />
           </Col>
         )}
       </Row>
     );
   }
 
+  @action
   onUnitClick(unit: Unit): void {
     // If there's no array for this region, add one
     if (!this.unitsToRemove.has(unit.region)) {
@@ -138,11 +173,13 @@ export default class ResolveSinglePayDebtComponent extends Component<
     }
   }
 
+  @action
   confirm(): void {
     this.props.gameState.sendPayDebt(this.unitsToRemove.entries);
     this.reset();
   }
 
+  @action
   private reset(): void {
     this.unitsToRemove = new BetterMap();
   }
@@ -165,18 +202,5 @@ export default class ResolveSinglePayDebtComponent extends Component<
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback
-    );
   }
 }

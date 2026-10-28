@@ -57,19 +57,21 @@ export default class EntireGame extends GameState<
   LobbyGameState | IngameGameState | CancelledGameState
 > {
   id: string;
-  @observable users = new BetterMap<string, User>();
+  @observable accessor users = new BetterMap<string, User>();
   ownerUserId: string;
   name: string;
   publicChatRoomId: string;
   // Keys are the two users participating in the private chat.
   // A pair of user is sorted alphabetically by their id when used as a key.
-  @observable privateChatRoomsIds: BetterMap<User, BetterMap<User, string>> =
-    new BetterMap();
-  @observable leafStateId = v4();
+  @observable accessor privateChatRoomsIds: BetterMap<
+    User,
+    BetterMap<User, string>
+  > = new BetterMap();
+  @observable accessor leafStateId = v4();
   lastMessageReceivedAt: Date | null = null;
   multiAccountProtectionMap: BetterMap<string, Set<string>> = new BetterMap();
 
-  @observable gameSettings: GameSettings = new GameSettings();
+  @observable accessor gameSettings: GameSettings = new GameSettings();
 
   onSendClientMessage?: (message: ClientMessage) => void;
   onSendServerMessage?: (users: User[], message: ServerMessage) => void;
@@ -131,11 +133,10 @@ export default class EntireGame extends GameState<
       ) => void)
     | null = null;
 
-  @observable
-  now = new Date();
+  @observable accessor now = new Date();
   // serverTime - Date.now() at last pong, used to correct "now" for client/server clock skew
-  @observable clockOffsetMs = 0;
-  @observable stateVersion = 0; // Incremented when entire game is re-sent to force re-renders
+  @observable accessor clockOffsetMs = 0;
+  @observable accessor stateVersion = 0; // Incremented when entire game is re-sent to force re-renders
 
   get lobbyGameState(): LobbyGameState | null {
     return this.childGameState instanceof LobbyGameState
@@ -816,9 +817,7 @@ export default class EntireGame extends GameState<
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
   getPlayersInGame(): { userId: string; data: object }[] {
-    // eslint-disable-next-line @typescript-eslint/ban-types
     const players: { userId: string; data: object }[] = [];
     if (this.lobbyGameState) {
       this.lobbyGameState.players.forEach((user, house) => {

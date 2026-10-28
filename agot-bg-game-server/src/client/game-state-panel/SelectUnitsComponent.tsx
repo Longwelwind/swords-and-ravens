@@ -1,3 +1,5 @@
+import { t, Trans, translateGameText } from "../i18n";
+import MapContribution from "../MapContribution";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "./GameStateComponentProps";
 import SelectUnitsGameState from "../../common/ingame-game-state/select-units-game-state/SelectUnitsGameState";
@@ -9,7 +11,7 @@ import { Row } from "react-bootstrap";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import BetterMap from "../../utils/BetterMap";
-import { observable } from "mobx";
+import { action, observable } from "mobx";
 import { observer } from "mobx-react";
 import { UnitOnMapProperties } from "../MapControls";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -19,13 +21,16 @@ import joinReactNodes from "../utils/joinReactNodes";
 export default class SelectUnitsComponent extends Component<
   GameStateComponentProps<SelectUnitsGameState<any>>
 > {
-  @observable selectedUnits = new BetterMap<Region, Unit[]>();
-
-  modifyUnitOnMapCallback: any;
+  @observable accessor selectedUnits = new BetterMap<Region, Unit[]>();
 
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          units={this.modifyUnitOnMap()}
+        />
         <Col xs={12}>
           {this.props.gameClient.doesControlHouse(
             this.props.gameState.house
@@ -33,24 +38,38 @@ export default class SelectUnitsComponent extends Component<
             <>
               {this.selectedUnits.size > 0 && (
                 <Row className="mx-2 justify-content-center">
-                  <div>
-                    <div className="mb-2 text-center">Selected units:</div>
-                    <ul className="pl-0">
+                  <Col xs="auto" className="p-0">
+                    <div className="mb-2 text-center">
+                      {t("selectUnits.selectedUnits678ce1")}
+                    </div>
+                    <ul className="ps-0">
                       {this.selectedUnits.entries.map(([region, units]) => (
                         <li key={`select-units_${region.id}`}>
-                          {joinReactNodes(
-                            units.map((u, i) => (
-                              <b key={`select-units_${region.id}_${u.id}_${i}`}>
-                                {u.type.name}
-                              </b>
-                            )),
-                            ", "
-                          )}{" "}
-                          in <b>{region.name}</b>
+                          <Trans
+                            i18nKey="common.in"
+                            values={{ region: region.name }}
+                            components={{
+                              units: (
+                                <>
+                                  {joinReactNodes(
+                                    units.map((u, i) => (
+                                      <b
+                                        key={`select-units_${region.id}_${u.id}_${i}`}
+                                      >
+                                        {translateGameText(u.type.name)}
+                                      </b>
+                                    )),
+                                    ", "
+                                  )}
+                                </>
+                              ),
+                              bold: <b />
+                            }}
+                          />
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </Col>
                 </Row>
               )}
               <Row className="justify-content-center">
@@ -65,7 +84,7 @@ export default class SelectUnitsComponent extends Component<
                       )
                     }
                   >
-                    Confirm
+                    {t("common.confirm")}
                   </Button>
                 </Col>
                 <Col xs="auto">
@@ -75,20 +94,21 @@ export default class SelectUnitsComponent extends Component<
                     variant="danger"
                     disabled={this.selectedUnits.size == 0}
                   >
-                    Reset
+                    {t("common.reset")}
                   </Button>
                 </Col>
               </Row>
             </>
           ) : (
             <div className="text-center">
-              Waiting for{" "}
-              {
-                this.props.gameState.ingame.getControllerOfHouse(
-                  this.props.gameState.house
-                ).house.name
-              }
-              ...
+              <Trans
+                i18nKey="common.waitingFor"
+                values={{
+                  houses: this.props.gameState.ingame.getControllerOfHouse(
+                    this.props.gameState.house
+                  ).house.name
+                }}
+              />
             </div>
           )}
         </Col>
@@ -100,10 +120,13 @@ export default class SelectUnitsComponent extends Component<
     return _.sum(this.selectedUnits.map((r, us) => us.length));
   }
 
+  @action
   confirm(): void {
     if (this.selectedUnits.size == 0) {
       if (
-        !window.confirm("You haven't selected any unit yet. Continue anyway?")
+        !window.confirm(
+          t("selectUnits.youHavenTSelectedAnyUnitYetContinueAnyway7fb30b")
+        )
       ) {
         return;
       }
@@ -115,7 +138,7 @@ export default class SelectUnitsComponent extends Component<
     ) {
       if (
         !window.confirm(
-          "You haven't selected all possible units yet. Continue anyway?"
+          t("selectUnits.youHavenTSelectedAllPossibleUnitsYetContinuef2db81")
         )
       ) {
         return;
@@ -165,6 +188,7 @@ export default class SelectUnitsComponent extends Component<
     return [];
   }
 
+  @action
   onUnitClick(region: Region, unit: Unit): void {
     let found = false;
     this.selectedUnits.forEach((units, region) => {
@@ -186,19 +210,7 @@ export default class SelectUnitsComponent extends Component<
     }
   }
 
-  componentDidMount(): void {
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitOnMapCallback = () => this.modifyUnitOnMap())
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitOnMapCallback
-    );
-  }
-
+  @action
   private reset(): void {
     this.selectedUnits = new BetterMap<Region, Unit[]>();
   }

@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -17,17 +18,22 @@ export default class MaceTyrellAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>{houseCardName}:</b> House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> immediately
-          kills a Footman of House{" "}
-          <b>
-            {
-              this.props.gameState.combatGameState.getEnemy(
+          <Trans
+            i18nKey="maceTyrellAbility.houseImmediatelyKillsAFootmanOfHouse87e808"
+            values={{
+              houseCardName: houseCardName,
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemyHouse: this.props.gameState.combatGameState.getEnemy(
                 this.props.gameState.childGameState.house
               ).name
-            }
-          </b>
-          .
+            }}
+            components={{
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SelectUnitsGameState, SelectUnitsComponent]

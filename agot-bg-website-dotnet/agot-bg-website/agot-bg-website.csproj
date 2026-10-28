@@ -49,4 +49,13 @@
     -->
     <Content Include="GameClientTemplates\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Generated from agot-bg-game-server/data/baseGameData.json by `yarn run generate-scenario-catalog`. -->
+    <Content Remove="GameData\scenarios.json" />
+    <EmbeddedResource
+      Include="GameData\scenarios.json"
+      LogicalName="agot_bg_website.GameData.scenarios.json"
+    />
+  </ItemGroup>
 </Project>

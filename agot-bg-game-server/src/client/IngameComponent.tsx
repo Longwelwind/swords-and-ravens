@@ -1,7 +1,9 @@
+import { t, Trans } from "./i18n";
+import MapContribution from "./MapContribution";
 import * as React from "react";
 import { Component, ReactNode } from "react";
 import { observer } from "mobx-react";
-import { observable } from "mobx";
+import { action, observable, runInAction } from "mobx";
 import {
   Button,
   FormCheck,
@@ -27,7 +29,6 @@ import MapControls, {
 } from "./MapControls";
 import GameStateColumn from "./GameStateColumn";
 import HouseInfoColumn from "./HouseInfoColumn";
-import GameTabsComponent from "./GameTabsComponent";
 
 import House from "../common/ingame-game-state/game-data-structure/House";
 import Region from "../common/ingame-game-state/game-data-structure/Region";
@@ -48,9 +49,8 @@ import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import podiumWinnerImage from "../../public/images/icons/podium-winner.svg";
-import contractImage from "../../public/images/icons/contract.svg";
+import empoweredVassalsImage from "../../public/images/icons/empowered-vassals.svg";
 
-import CancelledGameState from "../common/cancelled-game-state/CancelledGameState";
 import DraftHouseCardsGameState from "../common/ingame-game-state/draft-game-state/draft-house-cards-game-state/DraftHouseCardsGameState";
 import SelectedRandomDraftGameState from "../common/ingame-game-state/draft-game-state/selected-random-draft-game-state/SelectedRandomDraftGameState";
 import ClashOfKingsGameState from "../common/ingame-game-state/westeros-game-state/clash-of-kings-game-state/ClashOfKingsGameState";
@@ -61,7 +61,7 @@ import housePowerTokensImages from "./housePowerTokensImages";
 import unitTypes from "../common/ingame-game-state/game-data-structure/unitTypes";
 import unitImages from "./unitImages";
 import { tidesOfBattleCards } from "../common/ingame-game-state/game-data-structure/static-data-structure/tidesOfBattleCards";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import WildlingCardType from "../common/ingame-game-state/game-data-structure/wildling-card/WildlingCardType";
 import WildlingCardComponent from "./game-state-panel/utils/WildlingCardComponent";
 import { CombatStats } from "../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/CombatGameState";
@@ -100,24 +100,33 @@ export interface InfluenceTrackDetails {
 export default class IngameComponent extends Component<IngameComponentProps> {
   mapControls: MapControls = new MapControls();
 
-  @observable showMapScrollbarInfo = false;
-  @observable showBrowserZoomInfo = false;
-  @observable columnSwapAnimationClassName = "";
-  @observable tracksPopoverVisible = false;
-  @observable gameStateColumnWidth: number | null = null;
+  @observable accessor showMapScrollbarInfo = false;
+  @observable accessor showBrowserZoomInfo = false;
+  @observable accessor columnSwapAnimationClassName = "";
+  @observable accessor tracksPopoverVisible = false;
+  @observable accessor gameStateColumnWidth: number | null = null;
 
   gameStateColumnRef = React.createRef<HTMLDivElement>();
   resizeDebounceTimer: number | null = null;
 
-  private ingame = this.props.gameState;
-  private gameClient = this.props.gameClient;
-  private user = this.props.gameClient.authenticatedUser;
-  private authenticatedPlayer = this.props.gameClient.authenticatedPlayer;
-  private game = this.ingame.game;
-  private gameSettings = this.ingame.entireGame.gameSettings;
-
-  modifyOrdersOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
+  private get ingame(): IngameGameState {
+    return this.props.gameState;
+  }
+  private get gameClient(): GameClient {
+    return this.props.gameClient;
+  }
+  private get user(): GameClient["authenticatedUser"] {
+    return this.props.gameClient.authenticatedUser;
+  }
+  private get authenticatedPlayer(): GameClient["authenticatedPlayer"] {
+    return this.props.gameClient.authenticatedPlayer;
+  }
+  private get game(): IngameGameState["game"] {
+    return this.ingame.game;
+  }
+  private get gameSettings(): IngameGameState["entireGame"]["gameSettings"] {
+    return this.ingame.entireGame.gameSettings;
+  }
 
   calcInfluenceTrackDetails(): InfluenceTrackDetails[] {
     const influenceTracks: (House | null)[][] = this.game.influenceTracks.map(
@@ -156,19 +165,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
     return [
       {
-        name: "Iron Throne",
+        name: t("common.ironThrone"),
         trackToShow: influenceTracks[0],
         realTrack: this.game.influenceTracks[0],
         stars: false
       },
       {
-        name: "Fiefdoms",
+        name: t("ingame.fiefdoms97dd9c"),
         trackToShow: influenceTracks[1],
         realTrack: this.game.influenceTracks[1],
         stars: false
       },
       {
-        name: "King's Court",
+        name: t("ingame.kingSCourt822992"),
         trackToShow: influenceTracks[2],
         realTrack: this.game.influenceTracks[2],
         stars: true
@@ -202,49 +211,19 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   render(): ReactNode {
     const tracks = this.calcInfluenceTrackDetails();
-    if (this.gameClient.logChatFullScreen) {
-      const isOwnTurn = this.gameClient.isOwnTurn();
-      const border = isOwnTurn
-        ? "warning"
-        : this.ingame.childGameState instanceof CancelledGameState
-          ? "danger"
-          : undefined;
-      return (
-        <Col
-          xs="12"
-          lg="8"
-          xl="6"
-          style={{ maxHeight: "95vh", height: "95vh" }}
-        >
-          <GameTabsComponent
-            gameClient={this.gameClient}
-            ingame={this.ingame}
-            mapControls={this.mapControls}
-            border={border}
-          />
-          <button
-            className="btn btn-secondary"
-            style={{
-              position: "absolute",
-              top: "20px",
-              right: "20px",
-              zIndex: 1000
-            }}
-            onClick={() => {
-              this.gameClient.logChatFullScreen = false;
-            }}
-          >
-            <img src={contractImage} width={24} />
-          </button>
-        </Col>
-      );
-    }
     const columnOrder = this.user?.settings.gameStateColumnRight
       ? { housesInfosColumn: 1, mapColumn: 2, gameStateColumn: 3 }
       : { gameStateColumn: 1, mapColumn: 2, housesInfosColumn: 3 };
 
     return (
       <>
+        <MapContribution
+          mapControls={this.mapControls}
+          gameState={this.props.gameState}
+          kind="animation"
+          orders={this.modifyOrdersOnMap()}
+          units={this.modifyUnitsOnMap()}
+        />
         <Row
           className="justify-content-center"
           style={{
@@ -252,7 +231,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           }}
         >
           <Col
-            xs={{ order: columnOrder.gameStateColumn }}
+            xs={{ span: true, order: columnOrder.gameStateColumn }}
             className={this.columnSwapAnimationClassName}
             ref={this.gameStateColumnRef as any}
             style={{
@@ -309,7 +288,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
               maxWidth: "600px"
             }}
             className={classNames(this.columnSwapAnimationClassName, {
-              "d-none d-xl-block":
+              "houses-column-responsive":
                 !isMobile && this.gameSettings.playerCount < 8,
               "d-none d-xxl-block":
                 !isMobile && this.gameSettings.playerCount >= 8
@@ -333,15 +312,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     );
   }
 
+  @action
   onColumnSwap(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
     if (this.user && this.columnSwapAnimationClassName === "") {
+      const user = this.user;
       e.currentTarget.blur();
-      this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
-      this.user.settings.gameStateColumnRight =
-        !this.user.settings.gameStateColumnRight;
-      this.tracksPopoverVisible = false;
+      runInAction(() => {
+        this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
+        user.settings.gameStateColumnRight =
+          !user.settings.gameStateColumnRight;
+        this.tracksPopoverVisible = false;
+      });
       window.setTimeout(() => {
-        this.columnSwapAnimationClassName = "";
+        runInAction(() => {
+          this.columnSwapAnimationClassName = "";
+        });
       }, 2050);
     }
   }
@@ -360,7 +345,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           rootClose
         >
           <div
-            className="clickable btn btn-sm btn-secondary"
+            className="clickable btn btn-sm btn-secondary w-auto"
             style={{
               position: "fixed",
               right: this.user?.settings.gameStateColumnRight ? "auto" : "4px",
@@ -375,7 +360,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </OverlayTrigger>
         <button
           type="button"
-          className="btn btn-sm btn-secondary"
+          className="btn btn-sm btn-secondary w-auto"
           onClick={() => (this.gameClient.muted = !this.gameClient.muted)}
           style={{
             position: "fixed",
@@ -392,7 +377,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             placement="auto"
             overlay={
               <Tooltip id="ingame-mute-tooltip">
-                {this.gameClient.muted ? "Unmute" : "Mute"}
+                {this.gameClient.muted ? t("common.unmute") : t("common.mute")}
               </Tooltip>
             }
           >
@@ -454,8 +439,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             <Col>
               <button
                 type="button"
-                className="close"
-                onClick={() => (this.tracksPopoverVisible = false)}
+                className="icon-button"
+                onClick={() => {
+                  runInAction(() => {
+                    this.tracksPopoverVisible = false;
+                  });
+                }}
                 style={{ position: "sticky", top: 0 }}
               >
                 <span>&times;</span>
@@ -475,13 +464,18 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         show={this.tracksPopoverVisible}
       >
         <div
-          className={classNames("clickable btn btn-sm btn-secondary p-1", {
-            "d-xl-none d-xxl-none":
-              !isMobile && this.gameSettings.playerCount < 8,
-            "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
-          })}
+          className={classNames(
+            "clickable btn btn-sm btn-secondary p-1 w-auto",
+            {
+              "tracks-shortcut-responsive":
+                !isMobile && this.gameSettings.playerCount < 8,
+              "d-xxl-none": !isMobile && this.gameSettings.playerCount >= 8
+            }
+          )}
           onClick={() => {
-            this.tracksPopoverVisible = !this.tracksPopoverVisible;
+            runInAction(() => {
+              this.tracksPopoverVisible = !this.tracksPopoverVisible;
+            });
           }}
           style={{
             position: "fixed",
@@ -549,37 +543,34 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           }}
         >
           <h3 className="text-center" style={{ color: "red" }}>
-            Useful hint!
-            <br />
-            <small>Please read...</small>
+            <Trans
+              i18nKey="ingame.usefulHintPleaseReadda51ec"
+              components={{ lineBreak: <br />, small: <small /> }}
+            />
           </h3>
         </Modal.Header>
         <Modal.Body>
           {this.showMapScrollbarInfo ? (
             <div className="text-center">
-              The game is optimized for HD resolutions.
-              <br />
-              You are using a lower display resolution and should try different
-              combinations of your browser&apos;s zoom level and the{" "}
-              <b>Map scrollbar</b> setting to ensure a pleasent gaming
-              experience. The setting can be found in the tab with the gear
-              icon.
-              <br />
-              <br />
-              <small>
-                <i>
-                  In your profile settings you can change the default behavior
-                  for this setting
-                  <br />
-                  for all <b>future</b> games.
-                </i>
-              </small>
+              <Trans
+                i18nKey="ingame.theGameIsOptimizedForHdResolutionsYouAreae11ff"
+                components={{
+                  lineBreak: <br />,
+                  bold: <b />,
+                  lineBreak2: <br />,
+                  lineBreak3: <br />,
+                  small: <small />,
+                  emphasis: <i />,
+                  lineBreak4: <br />,
+                  bold2: <b />
+                }}
+              />
             </div>
           ) : (
             <div className="text-center">
-              Unfortunately, your display resolution is too low to show all
-              elements in a row. Use the function of your browser to zoom out
-              and avoid scrolling all the time.
+              {t(
+                "ingame.unfortunatelyYourDisplayResolutionIsTooLowToShow3be498"
+              )}
             </div>
           )}
         </Modal.Body>
@@ -595,7 +586,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             type="switch"
             label={
               <label htmlFor="dont-show-again-setting">
-                Don&apos;t show again
+                {t("ingame.donTShowAgaind16d03")}
               </label>
             }
             onChange={(evt) => {
@@ -611,7 +602,7 @@ export default class IngameComponent extends Component<IngameComponentProps> {
             variant="primary"
             onClick={() => this.closeModal()}
           >
-            Ok
+            {t("ingame.ok843ac0")}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -619,8 +610,10 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   }
 
   closeModal(): void {
-    this.showMapScrollbarInfo = false;
-    this.showBrowserZoomInfo = false;
+    runInAction(() => {
+      this.showMapScrollbarInfo = false;
+      this.showBrowserZoomInfo = false;
+    });
   }
 
   private renderGameControlsPopover(): OverlayChildren {
@@ -642,6 +635,12 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       result: canLaunchExtendPlayerClocksVote,
       reason: canLaunchExtendPlayerClocksVoteReason
     } = this.ingame.canLaunchExtendPlayerClocksVote(this.authenticatedPlayer);
+    const {
+      result: canLaunchEnableEmpoweredVassalsVote,
+      reason: canLaunchEnableEmpoweredVassalsVoteReason
+    } = this.ingame.canLaunchEnableEmpoweredVassalsVote(
+      this.authenticatedPlayer
+    );
 
     return (
       <Popover
@@ -651,21 +650,21 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         <Col className="m-2 p-2">
           <VolumeSliderComponent
             volume={this.gameClient.notificationsVolume * 100}
-            name="Notifications"
+            name={t("common.notifications")}
             onVolumeChange={(val) =>
               this.gameClient.sfxManager.notificationVolumeChanged(val / 100)
             }
           />
           <VolumeSliderComponent
             volume={this.gameClient.musicVolume * 100}
-            name="Music"
+            name={t("common.music")}
             onVolumeChange={(val) =>
               this.gameClient.sfxManager.musicVolumeChanged(val / 100)
             }
           />
           <VolumeSliderComponent
             volume={this.gameClient.sfxVolume * 100}
-            name="Sfx"
+            name={t("common.soundEffects")}
             onVolumeChange={(val) =>
               this.gameClient.sfxManager.sfxVolumeChanged(val / 100)
             }
@@ -684,23 +683,27 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     overlay={
                       <Tooltip id="cancel-game-vote-tooltip">
                         {canLaunchCancelGameVote
-                          ? "Launch a vote to cancel the game"
+                          ? t("ingame.launchAVoteToCancelTheGame0be66e")
                           : canLaunchCancelGameVoteReason ==
                               "only-players-can-vote"
-                            ? "Only participating players can vote"
+                            ? t("common.onlyPlayersCanVote")
                             : canLaunchCancelGameVoteReason ==
                                 "already-existing"
-                              ? "A vote to cancel the game is already ongoing"
+                              ? t(
+                                  "ingame.aVoteToCancelTheGameIsAlreadyOngoing4d8a8e"
+                                )
                               : canLaunchCancelGameVoteReason ==
                                   "already-cancelled"
-                                ? "Game has already been cancelled"
+                                ? t("common.alreadyCancelled")
                                 : canLaunchCancelGameVoteReason ==
                                     "already-ended"
-                                  ? "Game has already ended"
+                                  ? t("common.alreadyEnded")
                                   : canLaunchCancelGameVoteReason ==
                                       "forbidden-in-tournament-mode"
-                                    ? "Canceling games is not allowed in tournaments"
-                                    : "Vote not possible"}
+                                    ? t(
+                                        "ingame.cancelingGamesIsNotAllowedInTournaments214559"
+                                      )
+                                    : t("common.voteNotPossible")}
                       </Tooltip>
                     }
                   >
@@ -720,28 +723,32 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                     overlay={
                       <Tooltip id="end-game-vote-tooltip">
                         {canLaunchEndGameVote
-                          ? "Launch a vote to end the game after the current round"
+                          ? t("ingame.launchAVoteToEndTheGameAfterTheff17a4")
                           : canLaunchEndGameVoteReason == "game-paused"
-                            ? "The game must be resumed first"
+                            ? t("common.resumeFirst")
                             : canLaunchEndGameVoteReason ==
                                 "only-players-can-vote"
-                              ? "Only participating players can vote"
+                              ? t("common.onlyPlayersCanVote")
                               : canLaunchEndGameVoteReason ==
                                   "already-last-turn"
-                                ? "It is already the last round"
+                                ? t("ingame.itIsAlreadyTheLastRoundac6da4")
                                 : canLaunchEndGameVoteReason ==
                                     "already-existing"
-                                  ? "A vote to end the game is already ongoing"
+                                  ? t(
+                                      "ingame.aVoteToEndTheGameIsAlreadyOngoingb559b9"
+                                    )
                                   : canLaunchEndGameVoteReason ==
                                       "already-cancelled"
-                                    ? "Game has already been cancelled"
+                                    ? t("common.alreadyCancelled")
                                     : canLaunchEndGameVoteReason ==
                                         "already-ended"
-                                      ? "Game has already ended"
+                                      ? t("common.alreadyEnded")
                                       : canLaunchEndGameVoteReason ==
                                           "forbidden-in-tournament-mode"
-                                        ? "Early end is not allowed in tournaments"
-                                        : "Vote not possible"}
+                                        ? t(
+                                            "ingame.earlyEndIsNotAllowedInTournamentsaaf210"
+                                          )
+                                        : t("common.voteNotPossible")}
                       </Tooltip>
                     }
                   >
@@ -762,20 +769,22 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                       overlay={
                         <Tooltip id="pause-game-vote-tooltip">
                           {canLaunchPauseGameVote
-                            ? "Launch a vote to pause the game"
+                            ? t("ingame.launchAVoteToPauseTheGame913c08")
                             : canLaunchPauseGameVoteReason ==
                                 "only-players-can-vote"
-                              ? "Only participating players can vote"
+                              ? t("common.onlyPlayersCanVote")
                               : canLaunchPauseGameVoteReason ==
                                   "already-existing"
-                                ? "A vote to pause the game is already ongoing"
+                                ? t(
+                                    "ingame.aVoteToPauseTheGameIsAlreadyOngoing91b326"
+                                  )
                                 : canLaunchPauseGameVoteReason ==
                                     "already-cancelled"
-                                  ? "Game has already been cancelled"
+                                  ? t("common.alreadyCancelled")
                                   : canLaunchPauseGameVoteReason ==
                                       "already-ended"
-                                    ? "Game has already ended"
-                                    : "Vote not possible"}
+                                    ? t("common.alreadyEnded")
+                                    : t("common.voteNotPossible")}
                         </Tooltip>
                       }
                     >
@@ -797,20 +806,22 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                       overlay={
                         <Tooltip id="resume-game-vote-tooltip">
                           {canLaunchResumeGameVote
-                            ? "Launch a vote to resume the game"
+                            ? t("ingame.launchAVoteToResumeTheGame5e0f5f")
                             : canLaunchResumeGameVoteReason ==
                                 "only-players-can-vote"
-                              ? "Only participating players can vote"
+                              ? t("common.onlyPlayersCanVote")
                               : canLaunchResumeGameVoteReason ==
                                   "already-existing"
-                                ? "A vote to resume the game is already ongoing"
+                                ? t(
+                                    "ingame.aVoteToResumeTheGameIsAlreadyOngoing3be763"
+                                  )
                                 : canLaunchResumeGameVoteReason ==
                                     "already-cancelled"
-                                  ? "Game has already been cancelled"
+                                  ? t("common.alreadyCancelled")
                                   : canLaunchResumeGameVoteReason ==
                                       "already-ended"
-                                    ? "Game has already ended"
-                                    : "Vote not possible"}
+                                    ? t("common.alreadyEnded")
+                                    : t("common.voteNotPossible")}
                         </Tooltip>
                       }
                     >
@@ -832,35 +843,47 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                       overlay={
                         <Tooltip id="extend-clocks-vote-tooltip">
                           {canLaunchExtendPlayerClocksVote
-                            ? "Launch a vote to extend all player clocks by 15 minutes"
+                            ? t(
+                                "ingame.launchAVoteToExtendAllPlayerClocksBy434046"
+                              )
                             : canLaunchExtendPlayerClocksVoteReason ==
                                 "game-paused"
-                              ? "The game must be resumed first"
+                              ? t("common.resumeFirst")
                               : canLaunchExtendPlayerClocksVoteReason ==
                                   "only-players-can-vote"
-                                ? "Only participating players can vote"
+                                ? t("common.onlyPlayersCanVote")
                                 : canLaunchExtendPlayerClocksVoteReason ==
                                     "already-existing"
-                                  ? "A vote to extend all clocks is already ongoing"
+                                  ? t(
+                                      "ingame.aVoteToExtendAllClocksIsAlreadyOngoing03fe15"
+                                    )
                                   : canLaunchExtendPlayerClocksVoteReason ==
                                       "already-extended"
-                                    ? "Player clocks have already been extended"
+                                    ? t(
+                                        "ingame.playerClocksHaveAlreadyBeenExtendeded648c"
+                                      )
                                     : canLaunchExtendPlayerClocksVoteReason ==
                                         "max-vote-count-reached"
-                                      ? "The maximum amount of votes was reached"
+                                      ? t(
+                                          "ingame.theMaximumAmountOfVotesWasReached84b8f2"
+                                        )
                                       : canLaunchExtendPlayerClocksVoteReason ==
                                           "already-cancelled"
-                                        ? "Game has already been cancelled"
+                                        ? t("common.alreadyCancelled")
                                         : canLaunchExtendPlayerClocksVoteReason ==
                                             "already-ended"
-                                          ? "Game has already ended"
+                                          ? t("common.alreadyEnded")
                                           : canLaunchExtendPlayerClocksVoteReason ==
                                               "forbidden-in-tournament-mode"
-                                            ? "Extending player clocks is not allowed in tournaments"
+                                            ? t(
+                                                "ingame.extendingPlayerClocksIsNotAllowedInTournaments25ec6e"
+                                              )
                                             : canLaunchExtendPlayerClocksVoteReason ==
                                                 "forbidden-by-host"
-                                              ? "Extension of player clocks was deactivated by the game host"
-                                              : "Vote not possible"}
+                                              ? t(
+                                                  "ingame.extensionOfPlayerClocksWasDeactivatedByTheGame1b9efc"
+                                                )
+                                              : t("common.voteNotPossible")}
                         </Tooltip>
                       }
                     >
@@ -869,6 +892,50 @@ export default class IngameComponent extends Component<IngameComponentProps> {
                   </button>
                 </Col>
               )}
+              {!this.gameSettings.empoweredVassals &&
+                this.ingame.getVassalHouses().length > 0 && (
+                  <Col xs="auto">
+                    <OverlayTrigger
+                      placement="auto"
+                      overlay={
+                        <Tooltip id="enable-empowered-vassals-vote-tooltip">
+                          {canLaunchEnableEmpoweredVassalsVote
+                            ? t("ingame.launchEnableEmpoweredVassalsVote")
+                            : canLaunchEnableEmpoweredVassalsVoteReason ==
+                                "game-paused"
+                              ? t("common.resumeFirst")
+                              : canLaunchEnableEmpoweredVassalsVoteReason ==
+                                  "already-ended"
+                                ? t("common.alreadyEnded")
+                                : canLaunchEnableEmpoweredVassalsVoteReason ==
+                                    "already-cancelled"
+                                  ? t("common.alreadyCancelled")
+                                  : t("common.voteNotPossible")}
+                        </Tooltip>
+                      }
+                    >
+                      <span>
+                        <button
+                          type="button"
+                          className="btn btn-outline-light btn-sm"
+                          aria-label={t("gameSettings.empoweredVassals")}
+                          disabled={!canLaunchEnableEmpoweredVassalsVote}
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                t("ingame.confirmEnableEmpoweredVassalsVote")
+                              )
+                            ) {
+                              this.ingame.launchEnableEmpoweredVassalsVote();
+                            }
+                          }}
+                        >
+                          <img src={empoweredVassalsImage} width={32} alt="" />
+                        </button>
+                      </span>
+                    </OverlayTrigger>
+                  </Col>
+                )}
             </Row>
           )}
         </Col>
@@ -908,7 +975,15 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       <div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <h5>
-            Battle results for <b>{houseCombatDatas[1].region.name}</b>
+            <Trans
+              i18nKey="ingame.battleResultsFor11fa2e"
+              values={{
+                houseCombatDatasRegion: houseCombatDatas[1].region.name
+              }}
+              components={{
+                bold: <b />
+              }}
+            />
           </h5>
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
@@ -916,7 +991,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         </div>
         {winner && (
           <p className="text-center mt-2">
-            Winner: <b style={{ color: winner.color }}>{winner.name}</b>
+            <Trans
+              i18nKey="common.winner"
+              values={{ winner: winner.name }}
+              components={{
+                bold: <b style={{ color: winner.color }} />
+              }}
+            />
           </p>
         )}
       </div>
@@ -940,7 +1021,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     return (
       <div>
         <h5 className="text-center mb-2">
-          {highestBidder ? "Night's watch victory" : "Wildling victory"}
+          {highestBidder
+            ? t("ingame.nightSWatchVictorya3bde0")
+            : t("ingame.wildlingVictoryc8da84")}
         </h5>
         <div className="d-flex justify-content-center">
           <WildlingCardComponent cardType={wildlingCard} />
@@ -955,14 +1038,24 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         )}
         {highestBidder && (
           <p className="text-center mt-2">
-            Highest Bidder:{" "}
-            <b style={{ color: highestBidder.color }}>{highestBidder.name}</b>
+            <Trans
+              i18nKey="common.highestBidder"
+              values={{ highestBidder: highestBidder.name }}
+              components={{
+                bold: <b style={{ color: highestBidder.color }} />
+              }}
+            />
           </p>
         )}
         {lowestBidder && (
           <p className="text-center mt-2">
-            Lowest Bidder:{" "}
-            <b style={{ color: lowestBidder.color }}>{lowestBidder.name}</b>
+            <Trans
+              i18nKey="common.lowestBidder"
+              values={{ lowestBidder: lowestBidder.name }}
+              components={{
+                bold: <b style={{ color: lowestBidder.color }} />
+              }}
+            />
           </p>
         )}
       </div>
@@ -970,13 +1063,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   }
 
   componentDidMount(): void {
-    this.mapControls.modifyOrdersOnMap.push(
-      (this.modifyOrdersOnMapCallback = () => this.modifyOrdersOnMap())
-    );
-    this.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap())
-    );
-
     // Measure and lock the column width after initial render
     setTimeout(() => this.measureAndLockColumnWidth(), 100);
 
@@ -994,9 +1080,13 @@ export default class IngameComponent extends Component<IngameComponentProps> {
       this.gameClient.isMapScrollbarSet &&
       !dontShowAgain
     ) {
-      this.showMapScrollbarInfo = true;
+      runInAction(() => {
+        this.showMapScrollbarInfo = true;
+      });
     } else if (this.hasVerticalScrollbar() && !dontShowAgain) {
-      this.showBrowserZoomInfo = true;
+      runInAction(() => {
+        this.showBrowserZoomInfo = true;
+      });
     }
 
     this.ingame.entireGame.onCombatFastTracked = (stats) => {
@@ -1056,25 +1146,54 @@ export default class IngameComponent extends Component<IngameComponentProps> {
         const house = this.game.houses.get(log.house);
         toast(
           <div>
-            <h5 className="text-center mb-2">Customs Officer purchased</h5>
+            <h5 className="text-center mb-2">
+              {t("ingame.customsOfficerPurchased66bdce")}
+            </h5>
             <div className="d-flex justify-content-center">
               <LoanCardComponent loanCard={customsOfficer} />
             </div>
             <div className="d-flex justify-content-center">
               {loanPurchased && region ? (
                 <p className="text-center mt-3">
-                  House <b>{house.name}</b> resolved an <b>Iron Bank</b> order
-                  in <b>{region.name}</b>,<br />
-                  paying <b>{loanPurchased.paid}</b> Power tokens for the{" "}
-                  <b>Customs Officer</b>.<br />
-                  They gained <b>{log.gained}</b> Power&nbsp;token
-                  {log.gained != 1 ? "s" : ""}.
+                  <Trans
+                    i18nKey="ingame.houseResolvedAnIronBankOrderInPayingPower3d5a0f"
+                    values={{
+                      house: house.name,
+                      region: region.name,
+                      loanPurchasedPaid: loanPurchased.paid,
+                      logGained: log.gained,
+                      powerTokenLabel: t("common.PowertokenLabel", {
+                        count: log.gained
+                      })
+                    }}
+                    components={{
+                      bold: <b />,
+                      bold2: <b />,
+                      bold3: <b />,
+                      lineBreak: <br />,
+                      bold4: <b />,
+                      bold5: <b />,
+                      lineBreak2: <br />,
+                      bold6: <b />
+                    }}
+                  />
                 </p>
               ) : (
                 <p className="text-center mt-3">
-                  House <b>{house.name}</b> gained <b>{log.gained}</b>{" "}
-                  Power&nbsp;token
-                  {log.gained != 1 ? "s" : ""}.
+                  <Trans
+                    i18nKey="common.houseGained"
+                    values={{
+                      house: house.name,
+                      gain: log.gained,
+                      powerTokenLabel: t("common.PowertokenLabel", {
+                        count: log.gained
+                      })
+                    }}
+                    components={{
+                      bold: <b />,
+                      bold2: <b />
+                    }}
+                  />
                 </p>
               )}
             </div>
@@ -1090,8 +1209,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <Card>
             <Card.Body className="d-flex align-items-center">
               <img src={stopwatchImage} width={64} />
-              <h4 className="d-inline ml-3" style={{ color: "white" }}>
-                Game has been paused!
+              <h4 className="d-inline ms-3" style={{ color: "white" }}>
+                {t("ingame.gameHasBeenPaused8bed51")}
               </h4>
             </Card.Body>
           </Card>
@@ -1110,8 +1229,8 @@ export default class IngameComponent extends Component<IngameComponentProps> {
           <Card>
             <Card.Body className="d-flex align-items-center">
               <img src={stopwatchImage} width={64} />
-              <h4 className="d-inline ml-3" style={{ color: "white" }}>
-                Game has resumed!
+              <h4 className="d-inline ms-3" style={{ color: "white" }}>
+                {t("ingame.gameHasResumed367404")}
               </h4>
             </Card.Body>
           </Card>
@@ -1134,8 +1253,6 @@ export default class IngameComponent extends Component<IngameComponentProps> {
 
   componentWillUnmount(): void {
     this.ingame.entireGame.onNewPrivateChatRoomCreated = null;
-    _.pull(this.mapControls.modifyOrdersOnMap, this.modifyOrdersOnMapCallback);
-    _.pull(this.mapControls.modifyUnitsOnMap, this.modifyUnitsOnMapCallback);
 
     this.ingame.entireGame.onWildingsAttackFastTracked = null;
     this.ingame.entireGame.onCombatFastTracked = null;
@@ -1152,7 +1269,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
   measureAndLockColumnWidth = (): void => {
     if (this.gameStateColumnRef.current) {
       const width = this.gameStateColumnRef.current.offsetWidth;
-      this.gameStateColumnWidth = width;
+      runInAction(() => {
+        this.gameStateColumnWidth = width;
+      });
     }
   };
 
@@ -1163,7 +1282,9 @@ export default class IngameComponent extends Component<IngameComponentProps> {
     }
 
     // Reset width to allow natural sizing, then remeasure after debounce
-    this.gameStateColumnWidth = null;
+    runInAction(() => {
+      this.gameStateColumnWidth = null;
+    });
 
     this.resizeDebounceTimer = window.setTimeout(() => {
       this.measureAndLockColumnWidth();

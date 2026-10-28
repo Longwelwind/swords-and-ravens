@@ -1,5 +1,7 @@
+import { t, Trans } from "../i18n";
+import MapContribution, { wrapMapElement } from "../MapContribution";
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Component, ReactElement, ReactNode } from "react";
+import { Component, ReactNode } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
 import GameStateComponentProps from "./GameStateComponentProps";
@@ -9,7 +11,7 @@ import { Button, Col, OverlayTrigger, Popover } from "react-bootstrap";
 import DraftMapGameState from "../../common/ingame-game-state/draft-game-state/draft-map-game-state/DraftMapGameState";
 import { faInfo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 import Region from "../../common/ingame-game-state/game-data-structure/Region";
 import Unit from "../../common/ingame-game-state/game-data-structure/Unit";
 import PartialRecursive from "../../utils/PartialRecursive";
@@ -19,7 +21,6 @@ import unitTypes from "../../common/ingame-game-state/game-data-structure/unitTy
 import UnitType from "../../common/ingame-game-state/game-data-structure/UnitType";
 
 import { preventOverflow } from "@popperjs/core";
-import _ from "lodash";
 import UnitIconComponent from "../UnitIconComponent";
 import housePowerTokensImages from "../housePowerTokensImages";
 import getGarrisonToken from "../garrisonTokens";
@@ -28,9 +29,6 @@ import getGarrisonToken from "../garrisonTokens";
 export default class DraftMapComponent extends Component<
   GameStateComponentProps<DraftMapGameState>
 > {
-  modifyRegionsOnMapCallback: any;
-  modifyUnitsOnMapCallback: any;
-
   get player(): Player | null {
     return this.props.gameClient.authenticatedPlayer;
   }
@@ -39,7 +37,7 @@ export default class DraftMapComponent extends Component<
     return (
       this.player != null &&
       this.props.gameState.parentGameState.participatingHouses.includes(
-        this.player.house,
+        this.player.house
       )
     );
   }
@@ -47,28 +45,32 @@ export default class DraftMapComponent extends Component<
   render(): ReactNode {
     return (
       <>
+        <MapContribution
+          mapControls={this.props.mapControls}
+          gameState={this.props.gameState}
+          regions={this.modifyRegionsOnMap()}
+          units={this.modifyUnitsOnMap()}
+        />
         <Row className="justify-content-center">
           <Col xs={12} className="text-center">
-            All players can add and remove pieces according to their unit and
-            supply limits.
+            {t("draftMap.allPlayersCanAddAndRemovePiecesAccordingTo1625aa")}
           </Col>
         </Row>
         {this.isParticipatingInDraft && this.player != null && (
           <Row className="justify-content-center">
             <Col xs="12" className="text-center text-normal">
-              Click on a piece to remove it, or click on a highlighted region to
-              add pieces.
+              {t("draftMap.clickOnAPieceToRemoveItOrClick7ec9ab")}
             </Col>
             <Col xs="auto">
               <Button
                 type="button"
                 disabled={this.props.gameState.readyHouses.includes(
-                  this.player.house,
+                  this.player.house
                 )}
                 onClick={() => this.props.gameState.setReady()}
                 variant="success"
               >
-                Ready
+                {t("common.ready")}
               </Button>
             </Col>
             <Col xs="auto">
@@ -80,19 +82,22 @@ export default class DraftMapComponent extends Component<
                 onClick={() => this.props.gameState.setUnready()}
                 variant="danger"
               >
-                Unready
+                {t("common.unready")}
               </Button>
             </Col>
           </Row>
         )}
         <Row className="mt-3 justify-content-center">
           <Col xs={12} className="text-center">
-            Waiting for{" "}
-            {this.props.gameState
-              .getNotReadyPlayers()
-              .map((p) => p.house.name)
-              .join(", ")}
-            ...
+            <Trans
+              i18nKey="common.waitingFor"
+              values={{
+                houses: this.props.gameState
+                  .getNotReadyPlayers()
+                  .map((p) => p.house.name)
+                  .join(", ")
+              }}
+            />
           </Col>
         </Row>
       </>
@@ -101,7 +106,7 @@ export default class DraftMapComponent extends Component<
 
   private modifyRegionsOnMap(): [
     Region,
-    PartialRecursive<RegionOnMapProperties>,
+    PartialRecursive<RegionOnMapProperties>
   ][] {
     if (this.isParticipatingInDraft && this.player != null) {
       return this.props.gameState
@@ -110,17 +115,17 @@ export default class DraftMapComponent extends Component<
           modifiedRegion,
           {
             highlight: { active: true },
-            wrap: (child: ReactElement) => (
+            wrap: wrapMapElement(
               <OverlayTrigger
                 placement="auto"
                 trigger="click"
                 rootClose
                 overlay={this.renderMusteringPopover(modifiedRegion)}
               >
-                {child}
+                <span />
               </OverlayTrigger>
-            ),
-          },
+            )
+          }
         ]);
     }
 
@@ -144,7 +149,7 @@ export default class DraftMapComponent extends Component<
     return unitTypes.values.filter(
       (ut) =>
         ut.walksOn == region.type.kind &&
-        gameState.getAvailableUnitsOfType(house, ut) > 0,
+        gameState.getAvailableUnitsOfType(house, ut) > 0
     );
   }
 
@@ -182,8 +187,8 @@ export default class DraftMapComponent extends Component<
                     this.props.gameState.isLegalUnitAdd(
                       this.player!.house,
                       ut,
-                      region,
-                    ),
+                      region
+                    )
                   )
                   .map((ut) => (
                     <Col xs="auto" key={region.id + "_add_" + ut.id}>
@@ -203,7 +208,7 @@ export default class DraftMapComponent extends Component<
             {this.player &&
               this.props.gameState.isLegalPowerTokenAdd(
                 this.player.house,
-                region,
+                region
               ) && (
                 <Col xs="auto">
                   <Button
@@ -222,7 +227,7 @@ export default class DraftMapComponent extends Component<
         {this.player &&
           this.props.gameState.canRemovePowerToken(
             this.player.house,
-            region,
+            region
           ) && (
             <Row className="justify-content-center">
               <Col xs="auto">
@@ -230,7 +235,7 @@ export default class DraftMapComponent extends Component<
                   type="button"
                   onClick={() => this.props.gameState.removePowerToken(region)}
                 >
-                  Remove Power token
+                  {t("draftMap.removePowerTokenf3a7c8")}
                 </Button>
               </Col>
             </Row>
@@ -242,7 +247,7 @@ export default class DraftMapComponent extends Component<
                 !this.props.gameState.isLegalGarrisonAdd(
                   this.player!.house,
                   garrison,
-                  region,
+                  region
                 )
               ) {
                 return null;
@@ -276,7 +281,7 @@ export default class DraftMapComponent extends Component<
                   type="button"
                   onClick={() => this.props.gameState.removeGarrison(region)}
                 >
-                  Remove Garrison
+                  {t("draftMap.removeGarrison9caf41")}
                 </Button>
               </Col>
             </Row>
@@ -290,7 +295,7 @@ export default class DraftMapComponent extends Component<
       return this.props.gameState.world
         .getUnitsOfHouse(this.player.house)
         .filter((u) =>
-          this.props.gameState.canRemoveUnit(this.player!.house, u),
+          this.props.gameState.canRemoveUnit(this.player!.house, u)
         )
         .map((u) => [
           u,
@@ -298,31 +303,11 @@ export default class DraftMapComponent extends Component<
             highlight: { active: true },
             onClick: () => {
               this.props.gameState.removeUnit(u);
-            },
-          },
+            }
+          }
         ]);
     }
 
     return [];
-  }
-
-  componentDidMount(): void {
-    this.props.mapControls.modifyRegionsOnMap.push(
-      (this.modifyRegionsOnMapCallback = () => this.modifyRegionsOnMap()),
-    );
-    this.props.mapControls.modifyUnitsOnMap.push(
-      (this.modifyUnitsOnMapCallback = () => this.modifyUnitsOnMap()),
-    );
-  }
-
-  componentWillUnmount(): void {
-    _.pull(
-      this.props.mapControls.modifyRegionsOnMap,
-      this.modifyRegionsOnMapCallback,
-    );
-    _.pull(
-      this.props.mapControls.modifyUnitsOnMap,
-      this.modifyUnitsOnMapCallback,
-    );
   }
 }

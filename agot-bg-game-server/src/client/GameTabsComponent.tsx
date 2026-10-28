@@ -1,18 +1,17 @@
+import { t } from "./i18n";
 import React, { Component, ReactNode } from "react";
 import {
   Card,
   OverlayTrigger,
   Tooltip,
-  Spinner,
   Tab,
   Nav,
   Dropdown
 } from "react-bootstrap";
-// @ts-expect-error Somehow this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import AutoScroll from "./utils/AutoScroll";
 
 import classNames from "classnames";
-import { observable } from "mobx";
+import { observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
 import { isMobile } from "react-device-detect";
 import * as _ from "lodash";
@@ -24,7 +23,7 @@ import GameClient from "./GameClient";
 import MapControls from "./MapControls";
 import ChatComponent from "./chat-client/ChatComponent";
 import VotesListComponent from "./VotesListComponent";
-import GameLogListComponent from "./GameLogListComponent";
+import GameLogPanel from "./GameLogPanel";
 import GameSettingsComponent from "./GameSettingsComponent";
 import UserSettingsComponent from "./UserSettingsComponent";
 import ObjectivesInfoComponent from "./ObjectivesInfoComponent";
@@ -44,7 +43,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import cardRandomImage from "../../public/images/icons/card-random.svg";
-import expandImage from "../../public/images/icons/expand.svg";
 import ConditionalWrap from "./utils/ConditionalWrap";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
 import BetterMap from "../utils/BetterMap";
@@ -53,7 +51,6 @@ interface GameTabsComponentProps {
   ingame: IngameGameState;
   gameClient: GameClient;
   mapControls: MapControls;
-  border?: string; // used if it is the own turn in full sceen mode
 }
 
 @observer
@@ -67,19 +64,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   private ingame = this.props.ingame;
   private gameSettings = this.ingame.entireGame.gameSettings;
 
-  @observable currentOpenedTab = this.user?.settings.lastOpenedTab ?? "chat";
-  @observable unseenNotes = false;
-
-  @observable gameRoundElems: ReactNode | null = null;
-  private previousOpenedTab = this.currentOpenedTab;
-
-  get logChatFullScreen(): boolean {
-    return this.gameClient.logChatFullScreen;
-  }
-
-  set logChatFullScreen(value: boolean) {
-    this.gameClient.logChatFullScreen = value;
-  }
+  @observable accessor currentOpenedTab =
+    this.user?.settings.lastOpenedTab ?? "chat";
+  @observable accessor unseenNotes = false;
 
   private get publicChatRoom(): Channel {
     return this.gameClient.chatClient.channels.get(
@@ -88,17 +75,12 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   }
 
   render(): ReactNode {
-    const height = this.logChatFullScreen
-      ? "85%"
-      : this.gameClient.isMapScrollbarSet
-        ? "auto"
-        : "800px";
+    const height = this.gameClient.isMapScrollbarSet ? "auto" : "800px";
 
     const privateChatRooms = this.getPrivateChatRooms();
 
     return (
       <Card
-        border={this.props.border}
         style={{
           height: height,
           maxHeight: height,
@@ -106,13 +88,15 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
         }}
         className={classNames(
           { "flex-fill-remaining": this.gameClient.isMapScrollbarSet },
-          "text-large"
+          "text-large game-tabs"
         )}
       >
         <Tab.Container
           activeKey={this.currentOpenedTab}
           onSelect={(k) => {
-            this.currentOpenedTab = k ?? "chat";
+            runInAction(() => {
+              this.currentOpenedTab = k ?? "chat";
+            });
           }}
         >
           <Card.Header>
@@ -120,7 +104,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               <Nav.Item>
                 <Nav.Link eventKey="game-logs">
                   <OverlayTrigger
-                    overlay={<Tooltip id="logs-tooltip">Game Logs</Tooltip>}
+                    overlay={
+                      <Tooltip id="logs-tooltip">
+                        {t("common.gameLogs")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -141,7 +129,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                 >
                   <Nav.Link eventKey="chat">
                     <OverlayTrigger
-                      overlay={<Tooltip id="chat-tooltip">Game Chat</Tooltip>}
+                      overlay={
+                        <Tooltip id="chat-tooltip">
+                          {t("gameTabs.gameChat76ddef")}
+                        </Tooltip>
+                      }
                       placement="top"
                     >
                       <span>
@@ -163,7 +155,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   >
                     <Nav.Link eventKey="votes">
                       <OverlayTrigger
-                        overlay={<Tooltip id="votes-tooltip">Votes</Tooltip>}
+                        overlay={
+                          <Tooltip id="votes-tooltip">
+                            {t("gameTabs.votescd8e97")}
+                          </Tooltip>
+                        }
                         placement="top"
                       >
                         <span>
@@ -182,7 +178,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   <Nav.Link eventKey="objectives">
                     <OverlayTrigger
                       overlay={
-                        <Tooltip id="objectives-tooltip">Objectives</Tooltip>
+                        <Tooltip id="objectives-tooltip">
+                          {t("common.objectives")}
+                        </Tooltip>
                       }
                       placement="top"
                     >
@@ -200,7 +198,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="iron-bank-tooltip">
-                            The Iron Bank
+                            {t("gameTabs.theIronBank59437a")}
                           </Tooltip>
                         }
                         placement="top"
@@ -222,7 +220,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                   <Nav.Link eventKey="note">
                     <OverlayTrigger
                       overlay={
-                        <Tooltip id="note-tooltip">Personal note</Tooltip>
+                        <Tooltip id="note-tooltip">
+                          {t("gameTabs.personalNote27c48d")}
+                        </Tooltip>
                       }
                       placement="top"
                     >
@@ -239,7 +239,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               <Nav.Item>
                 <Nav.Link eventKey="settings">
                   <OverlayTrigger
-                    overlay={<Tooltip id="settings-tooltip">Settings</Tooltip>}
+                    overlay={
+                      <Tooltip id="settings-tooltip">
+                        {t("common.settings")}
+                      </Tooltip>
+                    }
                     placement="top"
                   >
                     <span>
@@ -267,7 +271,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                         <OverlayTrigger
                           overlay={
                             <Tooltip id="private-chat-tooltip">
-                              Private Chat
+                              {t("gameTabs.privateChat11bbff")}
                             </Tooltip>
                           }
                           placement="top"
@@ -318,24 +322,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                     </div>
                   </Nav.Item>
                 ))}
-              {this.currentOpenedTab == "game-logs" && (
-                <Dropdown className="ml-auto mt-1">
-                  <Dropdown.Toggle variant="secondary" size="sm">
-                    Jump to
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>{this.gameRoundElems}</Dropdown.Menu>
-                </Dropdown>
-              )}
-              {isMobile && !this.logChatFullScreen && (
-                <button
-                  className="btn btn-secondary ml-auto"
-                  onClick={() => {
-                    this.logChatFullScreen = true;
-                  }}
-                >
-                  <img src={expandImage} width={24} />
-                </button>
-              )}
             </Nav>
           </Card.Header>
           <Card.Body id="game-log-panel" className="px-1">
@@ -361,7 +347,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
               </Tab.Pane>
               {this.ingame.votes.size > 0 && (
                 <Tab.Pane eventKey="votes" className="h-100">
-                  <ScrollToBottom
+                  <AutoScroll
                     className="h-100"
                     scrollViewClassName="overflow-x-hidden"
                   >
@@ -369,24 +355,16 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
                       gameClient={this.gameClient}
                       ingame={this.ingame}
                     />
-                  </ScrollToBottom>
+                  </AutoScroll>
                 </Tab.Pane>
               )}
               <Tab.Pane eventKey="game-logs" className="h-100">
                 {this.currentOpenedTab == "game-logs" || !isMobile ? (
-                  <div className="d-flex flex-column h-100">
-                    <ScrollToBottom
-                      className="flex-fill-remaining"
-                      scrollViewClassName="overflow-x-hidden"
-                      initialScrollBehavior="auto"
-                    >
-                      <GameLogListComponent
-                        ingameGameState={this.ingame}
-                        gameClient={this.gameClient}
-                        currentlyViewed={this.currentOpenedTab == "game-logs"}
-                      />
-                    </ScrollToBottom>
-                  </div>
+                  <GameLogPanel
+                    ingameGameState={this.ingame}
+                    gameClient={this.gameClient}
+                    currentlyViewed={this.currentOpenedTab == "game-logs"}
+                  />
                 ) : null}
               </Tab.Pane>
               <Tab.Pane eventKey="settings" className="h-100">
@@ -458,14 +436,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
             </Tab.Content>
           </Card.Body>
         </Tab.Container>
-        {this.logChatFullScreen && this.props.border && (
-          <Spinner
-            animation="grow"
-            variant="warning"
-            size="sm"
-            style={{ position: "absolute", bottom: "4px", left: "4px" }}
-          />
-        )}
       </Card>
     );
   }
@@ -484,7 +454,7 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
           <OverlayTrigger
             overlay={
               <Tooltip id="user-is-spectator-tooltip">
-                This user does not participate in the game
+                {t("common.thisUserDoesNotParticipateInTheGame")}
               </Tooltip>
             }
             placement="auto"
@@ -525,7 +495,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
         (this.user as User).syncSettings();
       }
 
-      this.currentOpenedTab = privateRoomId;
+      runInAction(() => {
+        this.currentOpenedTab = privateRoomId;
+      });
       this.gameClient.chatClient.markAsViewed(
         this.gameClient.chatClient.channels.get(privateRoomId)
       );
@@ -577,36 +549,6 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     return null;
   }
 
-  renderGameLogRoundsDropDownItems(): ReactNode {
-    const gameRoundElements = document.querySelectorAll(
-      '*[id^="gamelog-round-"]'
-    );
-
-    const result: JSX.Element[] = [];
-
-    gameRoundElements.forEach((gameRoundElem) => {
-      const round = gameRoundElem.id.replace("gamelog-round-", "");
-
-      result.push(
-        <Dropdown.Item
-          className="text-center"
-          key={`dropdownitem-for-${gameRoundElem.id}`}
-          onClick={() => {
-            const elemToScroll = document.getElementById(gameRoundElem.id);
-            elemToScroll?.scrollIntoView({
-              behavior: "smooth",
-              block: "center"
-            });
-          }}
-        >
-          Round {round}
-        </Dropdown.Item>
-      );
-    });
-
-    return result;
-  }
-
   onVisibilityChanged(): void {
     if (document.visibilityState == "visible" || !this.user) {
       return;
@@ -620,7 +562,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
   }
 
   onNewPrivateChatRoomCreated(roomId: string): void {
-    this.currentOpenedTab = roomId;
+    runInAction(() => {
+      this.currentOpenedTab = roomId;
+    });
   }
 
   componentDidMount(): void {
@@ -631,11 +575,11 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     this.ingame.entireGame.onNewPrivateChatRoomCreated = (roomId: string) =>
       this.onNewPrivateChatRoomCreated(roomId);
 
-    if ((this.user as User)?.note.length ?? 0 > 0) {
-      this.unseenNotes = true;
-    }
-
-    this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
+    runInAction(() => {
+      if ((this.user as User)?.note.length ?? 0 > 0) {
+        this.unseenNotes = true;
+      }
+    });
   }
 
   componentDidUpdate(
@@ -644,20 +588,9 @@ export default class GameTabsComponent extends Component<GameTabsComponentProps>
     _snapshot?: any
   ): void {
     if (this.currentOpenedTab == "note") {
-      this.unseenNotes = false;
-    }
-
-    // Only update game round elements when switching TO the game-logs tab
-    if (
-      this.currentOpenedTab == "game-logs" &&
-      this.previousOpenedTab != "game-logs"
-    ) {
-      this.gameRoundElems = this.renderGameLogRoundsDropDownItems();
-    }
-
-    // Track tab changes
-    if (this.currentOpenedTab != this.previousOpenedTab) {
-      this.previousOpenedTab = this.currentOpenedTab;
+      runInAction(() => {
+        this.unseenNotes = false;
+      });
     }
   }
 

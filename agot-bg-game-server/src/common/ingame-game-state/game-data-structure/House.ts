@@ -20,16 +20,16 @@ export default class House {
   color: string;
   unitLimits: BetterMap<UnitType, number>;
   maxPowerTokens: number;
-  @observable houseCards: BetterMap<string, HouseCard>;
-  @observable laterHouseCards: BetterMap<string, HouseCard> | null;
-  @observable powerTokens: number;
-  @observable supplyLevel: number;
-  @observable knowsNextWildlingCard: boolean;
-  @observable hasBeenReplacedByVassal: boolean;
+  @observable accessor houseCards: BetterMap<string, HouseCard>;
+  @observable accessor laterHouseCards: BetterMap<string, HouseCard> | null;
+  @observable accessor powerTokens: number;
+  @observable accessor supplyLevel: number;
+  @observable accessor knowsNextWildlingCard: boolean;
+  @observable accessor hasBeenReplacedByVassal: boolean;
   specialObjective: SpecialObjectiveCard | null;
-  @observable secretObjectives: ObjectiveCard[];
-  @observable completedObjectives: ObjectiveCard[];
-  @observable victoryPoints: number;
+  @observable accessor secretObjectives: ObjectiveCard[];
+  @observable accessor completedObjectives: ObjectiveCard[];
+  @observable accessor victoryPoints: number;
 
   constructor(
     id: string,

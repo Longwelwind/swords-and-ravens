@@ -1,3 +1,4 @@
+import { t, Trans } from "../i18n";
 import { Component, ReactNode } from "react";
 import * as React from "react";
 import { observer } from "mobx-react";
@@ -23,7 +24,7 @@ import joinReactNodes from "../utils/joinReactNodes";
 export default class DraftHouseCardsComponent extends Component<
   GameStateComponentProps<DraftHouseCardsGameState>
 > {
-  @observable nameFilter = "";
+  @observable accessor nameFilter = "";
   get house(): House {
     return this.props.gameState.childGameState.house;
   }
@@ -62,22 +63,33 @@ export default class DraftHouseCardsComponent extends Component<
           <Row className="mt-1 mb-3 justify-content-center">
             {this.draftStep == DraftStep.DECIDE ? (
               <div className="text-center">
-                House{" "}
-                <b style={{ color: this.house.color }}>{this.house.name}</b>{" "}
-                must decide whether to select a House card or an Influence track
-                position.
+                <Trans
+                  i18nKey="draftHouseCards.houseMustDecideWhetherToSelectAHouseCard0540ce"
+                  values={{ house: this.house.name }}
+                  components={{
+                    bold: <b style={{ color: this.house.color }} />
+                  }}
+                />
               </div>
             ) : this.draftStep == DraftStep.HOUSE_CARD ? (
               <div className="text-center">
-                House{" "}
-                <b style={{ color: this.house.color }}>{this.house.name}</b>{" "}
-                must select a House card.
+                <Trans
+                  i18nKey="draftHouseCards.houseMustSelectAHouseCard58199e"
+                  values={{ house: this.house.name }}
+                  components={{
+                    bold: <b style={{ color: this.house.color }} />
+                  }}
+                />
               </div>
             ) : this.draftStep == DraftStep.INFLUENCE_TRACK ? (
               <div className="text-center">
-                House{" "}
-                <b style={{ color: this.house.color }}>{this.house.name}</b>{" "}
-                must choose an Influence track.
+                <Trans
+                  i18nKey="draftHouseCards.houseMustChooseAnInfluenceTrackefe933"
+                  values={{ house: this.house.name }}
+                  components={{
+                    bold: <b style={{ color: this.house.color }} />
+                  }}
+                />
               </div>
             ) : (
               <></>
@@ -85,27 +97,37 @@ export default class DraftHouseCardsComponent extends Component<
           </Row>
           <Row>
             <small>
-              <b>Note</b>: All House cards work in a generic way!
-              <br />
-              That means House card abilities (e.g. Salladhor) referring to
-              specific houses are always available for any house you use.
-              <br />
-              Character references are equivalent to the same-strength character
-              in your hand (e.g. Reek and any 3-strength card).
-              <br />
-              References to capitals always refer to your house&apos;s home
-              territory (e.g. Littlefinger).
+              <Trans
+                i18nKey="common.noteAllHouseCardsWorkInAGenericWay"
+                components={{
+                  bold: <b />,
+                  lineBreak: <br />,
+                  lineBreak2: <br />,
+                  lineBreak3: <br />
+                }}
+              />
             </small>
             <p className="mt-2">
-              These are the next houses:{" "}
-              {joinReactNodes(
-                this.props.gameState.getNextHouses().map((h, i) => (
-                  <b key={`next-house_${h.id}_${i}`} style={{ color: h.color }}>
-                    {h.name}
-                  </b>
-                )),
-                ", "
-              )}
+              <Trans
+                i18nKey="draftHouseCards.theseAreTheNextHouses551e40"
+                components={{
+                  houses: (
+                    <>
+                      {joinReactNodes(
+                        this.props.gameState.getNextHouses().map((h, i) => (
+                          <b
+                            key={`next-house_${h.id}_${i}`}
+                            style={{ color: h.color }}
+                          >
+                            {h.name}
+                          </b>
+                        )),
+                        ", "
+                      )}
+                    </>
+                  )
+                }}
+              />
             </p>
           </Row>
           {this.doesControlHouse && (
@@ -119,14 +141,15 @@ export default class DraftHouseCardsComponent extends Component<
           {showCardsPreview && (
             <Row className="mt-3 justify-content-center">
               <Col xs="12" className="text-center">
-                These are the House cards from which you may choose one on your
-                next turn:
+                {t(
+                  "draftHouseCards.theseAreTheHouseCardsFromWhichYouMay0a3344"
+                )}
               </Col>
               <Col xs="12">
                 <Row className="justify-content-center mb-2">
                   <input
                     className="form-control"
-                    placeholder="Filter by house card name or strength"
+                    placeholder={t("common.filterByHouseCardNameOrStrength")}
                     type="text"
                     value={this.nameFilter}
                     onChange={(e) => (this.nameFilter = e.target.value)}
@@ -159,13 +182,13 @@ export default class DraftHouseCardsComponent extends Component<
           {!this.player && (
             <Row className="mt-3 justify-content-center">
               <Col xs="12" className="text-center">
-                These are all remaining House cards:
+                {t("common.theseAreAllRemainingHouseCards")}
               </Col>
               <Col xs="12">
                 <Row className="justify-content-center mb-2">
                   <input
                     className="form-control"
-                    placeholder="Filter by house card name or strength"
+                    placeholder={t("common.filterByHouseCardNameOrStrength")}
                     type="text"
                     value={this.nameFilter}
                     onChange={(e) => (this.nameFilter = e.target.value)}

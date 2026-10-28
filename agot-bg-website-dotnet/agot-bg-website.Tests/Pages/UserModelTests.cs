@@ -6,12 +6,14 @@ using agot_bg_website.Infrastructure.Auth;
 using agot_bg_website.Infrastructure.Stats;
 using agot_bg_website.Pages;
 using agot_bg_website.Services;
+using agot_bg_website.Services.Statistics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -56,7 +58,13 @@ public class UserModelTests : IDisposable
 
     private UserModel CreatePageModel(ClaimsPrincipal? viewer = null)
     {
-        var model = new UserModel(_db, _userManager, _authorizationService, _userStatsQueue)
+        var model = new UserModel(
+            _db,
+            _userManager,
+            _authorizationService,
+            _userStatsQueue,
+            new PlayerHouseStatsService(_db, new MemoryCache(new MemoryCacheOptions()))
+        )
         {
             PageContext = new PageContext
             {

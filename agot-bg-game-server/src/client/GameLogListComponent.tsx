@@ -1,3 +1,4 @@
+import { t, Trans, translateGameText, getLanguage } from "./i18n";
 import { Component, ReactNode } from "react";
 import React from "react";
 import Row from "react-bootstrap/Row";
@@ -55,14 +56,12 @@ import allKnownHouseCards from "./utils/houseCardHelper";
 import classNames from "classnames";
 import GameReplayManager from "./game-replay/GameReplayManager";
 
-const fogOfWarRegion = "a region";
-const fogOfWarUnit = "unit";
-
 interface GameLogListComponentProps {
   ingameGameState: IngameGameState;
   gameClient: GameClient;
   currentlyViewed: boolean;
   scrollToLog?: number;
+  wildlingCardsOnly?: boolean;
 }
 
 @observer
@@ -73,8 +72,6 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       .filter((hc) => hc.ability != null)
       .map((hc) => [hc.ability?.id ?? "ability-never-null-here", hc])
   );
-
-  currentRound = 0;
 
   get ingame(): IngameGameState {
     return this.props.ingameGameState;
@@ -112,7 +109,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
       ? ticksToTime(lastSeenLogTicks)
       : null;
 
-    this.currentRound = 0;
+    let currentRound = 0;
+    const visibleLogs = this.logManager.logs
+      .map((log, index) => {
+        if (log.data.type == "turn-begin") {
+          currentRound = log.data.turn;
+        }
+        return { log, index, round: currentRound };
+      })
+      .filter(
+        ({ log }) =>
+          !this.props.wildlingCardsOnly ||
+          log.data.type == "wildling-card-revealed"
+      );
+
+    if (this.props.wildlingCardsOnly && visibleLogs.length == 0) {
+      return (
+        <p className="text-center">
+          {t("gameLogList.noWildlingCardsRevealed")}
+        </p>
+      );
+    }
 
     const highlightLog = (i: number): boolean => {
       return this.replayManager.isReplayMode
@@ -120,15 +137,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         : this.replayManager.isModifyingGameLogUI(this.logManager.logs[i].data);
     };
 
-    return this.logManager.logs.map((l, i) => (
+    return visibleLogs.map(({ log: l, index: i, round }, visibleIndex) => (
       <div key={`log_${i}`}>
-        {lastSeenLogTime == null && i == 0 && (
+        {this.props.wildlingCardsOnly &&
+          (visibleIndex == 0 || visibleLogs[visibleIndex - 1].round != round) &&
+          this.renderGameLogData({ type: "turn-begin", turn: round }, round)}
+        {lastSeenLogTime == null && visibleIndex == 0 && (
           <Row className="justify-content-center align-items-center">
             <Col xs={true}>
               <hr className="red" />
             </Col>
             <Col xs="auto" style={{ color: "red" }}>
-              <h6>New log entries</h6>
+              <h6>{t("gameLogList.newLogEntriesb7cd7c")}</h6>
             </Col>
             <Col xs={true}>
               <hr className="red" />
@@ -136,18 +156,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           </Row>
         )}
         <Row>
-          <Col xs="auto" className="text-muted px-0 ml-2">
+          <Col xs="auto" className="text-muted px-0 ms-2">
             <OverlayTrigger
               placement="auto"
               overlay={
                 <Tooltip id={"log-date-" + l.time.getUTCMilliseconds()}>
-                  {l.time.toLocaleString()}
+                  {l.time.toLocaleString(getLanguage())}
                 </Tooltip>
               }
               popperConfig={{ modifiers: [preventOverflow] }}
             >
               <small>
-                {l.time.toLocaleTimeString([], {
+                {l.time.toLocaleTimeString(getLanguage(), {
                   hour: "2-digit",
                   minute: "2-digit",
                   hour12: false
@@ -160,7 +180,9 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               <OverlayTrigger
                 overlay={
                   <Tooltip id="logs-tooltip">
-                    This action has been resolved automatically.
+                    {t(
+                      "gameLogList.thisActionHasBeenResolvedAutomatically3ead33"
+                    )}
                   </Tooltip>
                 }
                 placement="auto"
@@ -175,7 +197,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               </OverlayTrigger>
             </Col>
           )}
-          <Col className="mr-2">
+          <Col className="me-2">
             <div
               id={`game-log-content-${i}`}
               className={classNames("game-log-content", {
@@ -190,20 +212,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 }
               }}
             >
-              {this.renderGameLogData(l.data, this.currentRound)}
+              {this.renderGameLogData(l.data, round)}
             </div>
           </Col>
         </Row>
         {lastSeenLogTime &&
-          i + 1 < this.logManager.logs.length &&
-          this.logManager.logs[i].time <= lastSeenLogTime &&
-          this.logManager.logs[i + 1].time > lastSeenLogTime && (
+          visibleIndex + 1 < visibleLogs.length &&
+          l.time <= lastSeenLogTime &&
+          visibleLogs[visibleIndex + 1].log.time > lastSeenLogTime && (
             <Row className="justify-content-center align-items-center">
               <Col xs={true}>
                 <hr className="red" />
               </Col>
               <Col xs="auto" style={{ color: "red" }}>
-                <h6>New log entries</h6>
+                <h6>{t("gameLogList.newLogEntriesb7cd7c")}</h6>
               </Col>
               <Col xs={true}>
                 <hr className="red" />
@@ -229,45 +251,70 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         switch (data.action) {
           case PlayerActionType.ORDERS_PLACED:
-            text = "placed their orders";
+            text = t("gameLogList.placedTheirOrders56f84c");
             break;
           case PlayerActionType.BID_MADE:
-            text = "made their bid";
+            text = t("gameLogList.madeTheirBid82f16f");
             break;
           case PlayerActionType.HOUSE_CARD_CHOSEN:
-            text = "chose their House card";
+            text = t("gameLogList.choseTheirHouseCard7cc16f");
             break;
           default:
-            text = "Invalid PlayerActionType received";
+            text = t("gameLogList.invalidPlayeractiontypeReceived980e13");
             break;
         }
         return (
           <p>
-            House <b>{house.name}</b> {text}
-            {forHouses ? (
-              <>
-                {" "}
-                for{" "}
-                {forHouses.length == 1 ? (
+            <Trans
+              i18nKey="gameLogList.house1fa976"
+              values={{ house: house.name, action: text }}
+              components={{
+                bold: <b />,
+                vassals: (
                   <>
-                    Vassal house{" "}
-                    <b key={`for_vassal_house_${forHouses[0].id}`}>
-                      {forHouses[0].name}
-                    </b>
+                    {forHouses ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.for196ccd"
+                          components={{
+                            houses: (
+                              <>
+                                {forHouses.length == 1 ? (
+                                  <>
+                                    <Trans
+                                      i18nKey="gameLogList.vassalHouse9a9755"
+                                      values={{ house: forHouses[0].name }}
+                                      components={{
+                                        bold: (
+                                          <b
+                                            key={`for_vassal_house_${forHouses[0].id}`}
+                                          />
+                                        )
+                                      }}
+                                    />
+                                  </>
+                                ) : (
+                                  joinReactNodes(
+                                    forHouses.map((h) => (
+                                      <b key={`for_vassal_house_${h.id}`}>
+                                        {h.name}
+                                      </b>
+                                    )),
+                                    ", "
+                                  )
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <></>
+                    )}
                   </>
-                ) : (
-                  joinReactNodes(
-                    forHouses.map((h) => (
-                      <b key={`for_vassal_house_${h.id}`}>{h.name}</b>
-                    )),
-                    ", "
-                  )
-                )}
-              </>
-            ) : (
-              <></>
-            )}
-            .
+                )
+              }}
+            />
           </p>
         );
       }
@@ -279,18 +326,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <div id="gamelog-round-0" className="text-center mb-4">
-              <h4>The war of the {assignments.length} kings has begun!</h4>
+              <h4>
+                <Trans
+                  i18nKey="gameLogList.theWarOfTheKingsHasBegun9a446a"
+                  values={{ kingCount: assignments.length }}
+                />
+              </h4>
             </div>
             {assignments.map(([house, user]) => (
               <p key={`${house.id}_${user.id}`}>
-                {this.renderHouseName(house)} is controlled by{" "}
-                <b>{getUserLinkOrLabel(user)}</b>.
+                <Trans
+                  i18nKey="gameLogList.isControlledBy9cf9a1"
+                  components={{
+                    house: <>{this.renderHouseName(house)}</>,
+                    bold: <b />,
+                    user: <>{getUserLinkOrLabel(user)}</>
+                  }}
+                />
               </p>
             ))}
           </>
         );
       case "turn-begin":
-        this.currentRound = data.turn;
         return (
           <Row className="justify-content-center">
             <Col xs={true}>
@@ -298,7 +355,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             </Col>
             <Col xs="auto">
               <h3 id={`gamelog-round-${data.turn}`}>
-                Round <b>{data.turn}</b>
+                <Trans
+                  i18nKey="gameLogList.roundce52f1"
+                  values={{ turn: data.turn }}
+                  components={{ bold: <b /> }}
+                />
               </h3>
             </Col>
             <Col xs={true}>
@@ -315,14 +376,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         if (supported) {
           return (
             <p>
-              House <b>{supporter.name}</b> supported House{" "}
-              <b>{supported.name}</b>.
+              <Trans
+                i18nKey="gameLogList.houseSupportedHouseaa02c0"
+                values={{
+                  supporter: supporter.name,
+                  supported: supported.name
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         } else {
           return (
             <p>
-              House <b>{supporter.name}</b> supported no-one.
+              <Trans
+                i18nKey="gameLogList.houseSupportedNoOnee03b29"
+                values={{ supporter: supporter.name }}
+                components={{ bold: <b /> }}
+              />
             </p>
           );
         }
@@ -332,15 +406,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const from = data.from ? this.game.houses.get(data.from) : null;
         return (
           <p>
-            House <b>{house.name}</b> chose to refuse{" "}
-            {from == null ? "all" : ""} the support they received
-            {from ? (
-              <>
-                {" "}
-                from House <b>{from.name}</b>
-              </>
-            ) : null}
-            .
+            <Trans
+              i18nKey="gameLogList.houseChoseToRefuseTheSupportTheyReceived753a8e"
+              values={{
+                house: house.name,
+                allSupport: from == null ? t("gameLogList.all5ef5ef") : ""
+              }}
+              components={{
+                bold: <b />,
+                from: (
+                  <>
+                    {from ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.fromHouseb80cdb"
+                          values={{ from: from.name }}
+                          components={{
+                            bold: <b />
+                          }}
+                        />
+                      </>
+                    ) : null}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -371,29 +461,55 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               <img src={crossedSwordsImage} width="32px" />
             </Col>
             <Col>
-              House <b>{attacker.name}</b> attacked{" "}
-              {attacked ? (
-                <>
-                  House <b>{attacked.name}</b>
-                </>
-              ) : (
-                <>
-                  a <b>Neutral Force</b>
-                </>
-              )}{" "}
-              from <b>{attackingRegion.name}</b> to <b>{attackedRegion.name}</b>{" "}
-              with{" "}
-              <>
-                {joinReactNodes(
-                  army.map((ut, i) => (
-                    <b key={`attack_${ut.id}_${i}`}>
-                      {this.fogOfWar ? fogOfWarUnit : ut.name}
-                    </b>
-                  )),
-                  ", "
-                )}
-              </>
-              .
+              <Trans
+                i18nKey="gameLogList.houseAttackedFromToWith7c4199"
+                values={{
+                  attacker: attacker.name,
+                  attackingRegion: attackingRegion.name,
+                  attackedRegion: attackedRegion.name
+                }}
+                components={{
+                  bold: <b />,
+                  attacked: (
+                    <>
+                      {attacked ? (
+                        <>
+                          <Trans
+                            i18nKey="gameLogList.house7d99a9"
+                            values={{ attacked: attacked.name }}
+                            components={{
+                              bold: <b />
+                            }}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <Trans
+                            i18nKey="gameLogList.aNeutralForce77580a"
+                            components={{ bold: <b /> }}
+                          />
+                        </>
+                      )}
+                    </>
+                  ),
+                  bold2: <b />,
+                  bold3: <b />,
+                  joinReactNodes: (
+                    <>
+                      {joinReactNodes(
+                        army.map((ut, i) => (
+                          <b key={`attack_${ut.id}_${i}`}>
+                            {this.fogOfWar
+                              ? t("common.hiddenUnit")
+                              : translateGameText(ut.name)}
+                          </b>
+                        )),
+                        ", "
+                      )}
+                    </>
+                  )
+                }}
+              />
             </Col>
           </Row>
         );
@@ -406,7 +522,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             <Row className="align-items-center">
               <Col>
                 <p>
-                  House <b>{house.name}</b> resolved a <b>March</b> order.
+                  <Trans
+                    i18nKey="gameLogList.houseResolvedAMarchOrderfa9694"
+                    values={{ house: house.name }}
+                    components={{
+                      bold: <b />,
+                      bold2: <b />
+                    }}
+                  />
                 </p>
               </Col>
             </Row>
@@ -433,21 +556,42 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               {moves.length > 0 ? (
                 <>
                   <p>
-                    House <b>{house.name}</b> marched from{" "}
-                    <b>{startingRegion.name}</b>:
+                    <Trans
+                      i18nKey="gameLogList.houseMarchedFrom5c5118"
+                      values={{
+                        house: house.name,
+                        startingRegion: startingRegion.name
+                      }}
+                      components={{
+                        bold: <b />,
+                        bold2: <b />
+                      }}
+                    />
                   </p>
                   <ul>
                     {moves.map(([region, unitTypes]) => (
                       <li key={`march-resolved_${region.id}`}>
-                        {joinReactNodes(
-                          unitTypes.map((ut, i) => (
-                            <b key={`march_${region.id}_${ut.id}_${i}`}>
-                              {this.fogOfWar ? fogOfWarUnit : ut.name}
-                            </b>
-                          )),
-                          ", "
-                        )}{" "}
-                        to <b>{region.name}</b>
+                        <Trans
+                          i18nKey="gameLogList.to3609b4"
+                          values={{ region: region.name }}
+                          components={{
+                            units: (
+                              <>
+                                {joinReactNodes(
+                                  unitTypes.map((ut, i) => (
+                                    <b key={`march_${region.id}_${ut.id}_${i}`}>
+                                      {this.fogOfWar
+                                        ? t("common.hiddenUnit")
+                                        : translateGameText(ut.name)}
+                                    </b>
+                                  )),
+                                  ", "
+                                )}
+                              </>
+                            ),
+                            bold: <b />
+                          }}
+                        />
                       </li>
                     ))}
                   </ul>
@@ -455,8 +599,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               ) : (
                 <>
                   <p>
-                    House <b>{house.name}</b> removed their March Order in{" "}
-                    <b>{startingRegion.name}</b>.
+                    <Trans
+                      i18nKey="gameLogList.houseRemovedTheirMarchOrderIn2f880b"
+                      values={{
+                        house: house.name,
+                        startingRegion: startingRegion.name
+                      }}
+                      components={{
+                        bold: <b />,
+                        bold2: <b />
+                      }}
+                    />
                   </p>
                 </>
               )}
@@ -470,9 +623,26 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> left{" "}
-            {data.leftPowerToken ? <>behind a</> : <b>no</b>} Power&nbsp;token
-            in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseLeftPowerTokenIn5ca329"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                tokenPlacement: (
+                  <>
+                    {data.leftPowerToken ? (
+                      <>{t("gameLogList.behindA03f8e8")}</>
+                    ) : (
+                      <b>{t("gameLogList.no939029")}</b>
+                    )}
+                  </>
+                ),
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -502,7 +672,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <>
-            <p>Westeros cards were drawn:</p>
+            <p>{t("gameLogList.westerosCardsWereDrawn3f179c")}</p>
             <Row className="justify-content-around">
               {drawnWesterosCardTypes.map((wct, i) => (
                 <Col xs="auto" key={`${wct.id}_${i}`}>
@@ -520,7 +690,10 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             </Row>
             {data.addedWildlingStrength > 0 && (
               <p style={{ marginTop: "1.0em" }}>
-                Wildling Threat increased by {data.addedWildlingStrength}
+                <Trans
+                  i18nKey="gameLogList.wildlingThreatIncreasedBy7c5dd1"
+                  values={{ addedWildlingStrength: data.addedWildlingStrength }}
+                />
               </p>
             )}
           </>
@@ -559,11 +732,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               <CombatInfoComponent housesCombatData={houseCombatDatas} />
             </div>
             <p className="text-center mt-4">
-              House{" "}
-              <b style={{ color: winner.color, fontSize: "1.25rem" }}>
-                {winner.name}
-              </b>{" "}
-              won the battle!
+              <Trans
+                i18nKey="gameLogList.houseWonTheBattle8bc1a0"
+                values={{ winner: winner.name }}
+                components={{
+                  bold: (
+                    <b style={{ color: winner.color, fontSize: "1.25rem" }} />
+                  )
+                }}
+              />
             </p>
           </>
         );
@@ -575,7 +752,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              Wildling card revealed: <b>{wildlingCard.type.name}</b>
+              <Trans
+                i18nKey="gameLogList.wildlingCardRevealed20a9c2"
+                values={{ wildlingCardType: wildlingCard.type.name }}
+                components={{
+                  bold: <b />
+                }}
+              />
             </p>
             <Row className="justify-content-center">
               <Col xs="auto">
@@ -600,8 +783,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              Wildling bidding results for Wildling Threat{" "}
-              <b>{data.wildlingStrength}</b>:
+              <Trans
+                i18nKey="gameLogList.wildlingBiddingResultsForWildlingThreat1aac47"
+                values={{ wildlingStrength: data.wildlingStrength }}
+                components={{
+                  bold: <b />
+                }}
+              />
             </p>
             <div className="mt-1">
               <HouseNumberResultsComponent
@@ -611,11 +799,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
             </div>
             {data.nightsWatchVictory ? (
               <p className="text-center">
-                The <b>Night&apos;s Watch</b> won!
+                <Trans
+                  i18nKey="gameLogList.theNightSWatchWon84c407"
+                  components={{ bold: <b /> }}
+                />
               </p>
             ) : (
               <p className="text-center">
-                The <b>Wildlings</b> won!
+                <Trans
+                  i18nKey="gameLogList.theWildlingsWonfc07f6"
+                  components={{ bold: <b /> }}
+                />
               </p>
             )}
           </>
@@ -626,7 +820,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{lowestBidder.name}</b> was chosen as the lowest bidder.
+            <Trans
+              i18nKey="gameLogList.houseWasChosenAsTheLowestBidder31c374"
+              values={{ lowestBidder: lowestBidder.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -635,7 +833,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{highestBidder.name}</b> was chosen as the highest bidder.
+            <Trans
+              i18nKey="gameLogList.houseWasChosenAsTheHighestBidder2e725c"
+              values={{ highestBidder: highestBidder.name }}
+              components={{
+                bold: <b />
+              }}
+            />
           </p>
         );
 
@@ -660,7 +864,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <>
             {musterings.length == 0 && (
               <p>
-                House <b>{house.name}</b> mustered nothing.
+                <Trans
+                  i18nKey="gameLogList.houseMusteredNothingaa8622"
+                  values={{ house: house.name }}
+                  components={{ bold: <b /> }}
+                />
               </p>
             )}
             {musterings.length > 0 && (
@@ -668,13 +876,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                 {musterings.map(([originatingRegion, recruitments]) => (
                   <div key={`$mustering_${originatingRegion.id}`}>
                     <p>
-                      House <b>{house.name}</b> mustered in{" "}
-                      <b>
-                        {this.fogOfWar
-                          ? fogOfWarRegion
-                          : originatingRegion.name}
-                      </b>
-                      .
+                      <Trans
+                        i18nKey="gameLogList.houseMusteredIn6fa3a2"
+                        values={{
+                          house: house.name,
+                          originatingRegion: this.fogOfWar
+                            ? t("common.hiddenRegion")
+                            : originatingRegion.name
+                        }}
+                        components={{
+                          bold: <b />,
+                          bold2: <b />
+                        }}
+                      />
                     </p>
                     {!this.fogOfWar && (
                       <ul>
@@ -682,33 +896,67 @@ export default class GameLogListComponent extends Component<GameLogListComponent
                           <li key={"recruitment-" + region.id + "-" + i}>
                             {from ? (
                               <>
-                                A <b>{to.name}</b> from a <b>{from.name}</b>
-                                {originatingRegion != region && (
-                                  <>
-                                    {" "}
-                                    to{" "}
-                                    <b>
-                                      {this.fogOfWar
-                                        ? fogOfWarRegion
-                                        : region.name}
-                                    </b>
-                                  </>
-                                )}
+                                <Trans
+                                  i18nKey="gameLogList.aFromAef18b6"
+                                  values={{
+                                    newUnitType: translateGameText(to.name),
+                                    oldUnitType: translateGameText(from.name)
+                                  }}
+                                  components={{
+                                    bold: <b />,
+                                    bold2: <b />,
+                                    region: (
+                                      <>
+                                        {originatingRegion != region && (
+                                          <>
+                                            <Trans
+                                              i18nKey="gameLogList.toc066b9"
+                                              values={{
+                                                region: this.fogOfWar
+                                                  ? t("common.hiddenRegion")
+                                                  : region.name
+                                              }}
+                                              components={{
+                                                bold: <b />
+                                              }}
+                                            />
+                                          </>
+                                        )}
+                                      </>
+                                    )
+                                  }}
+                                />
                               </>
                             ) : (
                               <>
-                                A <b>{to.name}</b>
-                                {originatingRegion != region && (
-                                  <>
-                                    {" "}
-                                    to{" "}
-                                    <b>
-                                      {this.fogOfWar
-                                        ? fogOfWarRegion
-                                        : region.name}
-                                    </b>
-                                  </>
-                                )}
+                                <Trans
+                                  i18nKey="gameLogList.ab82d39"
+                                  values={{
+                                    unitType: translateGameText(to.name)
+                                  }}
+                                  components={{
+                                    bold: <b />,
+                                    region: (
+                                      <>
+                                        {originatingRegion != region && (
+                                          <>
+                                            <Trans
+                                              i18nKey="gameLogList.toc066b9"
+                                              values={{
+                                                region: this.fogOfWar
+                                                  ? t("common.hiddenRegion")
+                                                  : region.name
+                                              }}
+                                              components={{
+                                                bold: <b />
+                                              }}
+                                            />
+                                          </>
+                                        )}
+                                      </>
+                                    )
+                                  }}
+                                />
                               </>
                             )}
                           </li>
@@ -726,9 +974,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const winner = this.game.houses.get(data.winner);
         return (
           <h4 className="text-center">
-            Game has ended.
-            <br />
-            {this.renderHouseName(winner)} has won this Game of Thrones!
+            <Trans
+              i18nKey="gameLogList.gameHasEndedHasWonThisGameOfThrones1c42d4"
+              components={{
+                lineBreak: <br />,
+                winner: <>{this.renderHouseName(winner)}</>
+              }}
+            />
           </h4>
         );
       }
@@ -737,9 +989,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>, holder of the Messenger Raven token,
-            chose to look at the top card of the Wildling deck and to move it at
-            the bottom of the deck.
+            <Trans
+              i18nKey="gameLogList.houseHolderOfTheMessengerRavenTokenChoseTof0b73b"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -748,9 +1002,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>, holder of the Messenger Raven token,
-            chose to look at the top card of the Wildling deck and to leave it
-            at the top of the deck.
+            <Trans
+              i18nKey="gameLogList.houseHolderOfTheMessengerRavenTokenChoseTo3350b4"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -762,11 +1018,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>, holder of the Messenger Raven token,
-            chose to replace a{" "}
-            <b>{this.fogOfWar ? "" : originalOrder.type.name}</b> order with a{" "}
-            <b>{this.fogOfWar ? "" : newOrder.type.name}</b> order in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : orderRegion.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseHolderOfTheMessengerRavenTokenChoseTo6963a7"
+              values={{
+                house: house.name,
+                originalOrder: this.fogOfWar
+                  ? ""
+                  : translateGameText(originalOrder.type.name),
+                newOrder: this.fogOfWar
+                  ? ""
+                  : translateGameText(newOrder.type.name),
+                orderRegion: this.fogOfWar
+                  ? t("common.hiddenRegion")
+                  : orderRegion.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -775,7 +1047,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> did not use the Messenger Raven token.
+            <Trans
+              i18nKey="gameLogList.houseDidNotUseTheMessengerRavenTokene4f855"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -794,7 +1070,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         if (this.fogOfWar) {
           return (
             <p>
-              <b>House {raider.name}</b> resolved a <b>Raid</b> order.
+              <Trans
+                i18nKey="gameLogList.houseResolvedARaidOrdereadfeb"
+                values={{ raider: raider.name }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         }
@@ -804,22 +1087,42 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           return (
             <>
               <p>
-                House <b>{raider.name}</b> raided House <b>{raidee.name}</b>
-                &apos;s <b>{orderRaided.type.name} Order</b> in{" "}
-                <b>{raidedRegion.name}</b> from <b>{raiderRegion.name}</b>.
+                <Trans
+                  i18nKey="gameLogList.houseRaidedHouseSOrderInFromf7952e"
+                  values={{
+                    raider: raider.name,
+                    raidee: raidee.name,
+                    orderRaidedType: translateGameText(orderRaided.type.name),
+                    raidedRegion: raidedRegion.name,
+                    raiderRegion: raiderRegion.name
+                  }}
+                  components={{
+                    bold: <b />,
+                    bold2: <b />,
+                    bold3: <b />,
+                    bold4: <b />,
+                    bold5: <b />
+                  }}
+                />
               </p>
               {data.raiderGainedPowerToken && (
                 <p>
-                  House <b>{raider.name}</b> gained{" "}
-                  {data.raiderGainedPowerToken ? "a" : "no"} Power&nbsp;token
-                  from this raid.
+                  <Trans
+                    i18nKey="gameLogList.raidPowerGained"
+                    count={data.raiderGainedPowerToken ? 1 : 0}
+                    values={{ raider: raider.name }}
+                    components={{ bold: <b /> }}
+                  />
                 </p>
               )}
               {data.raidedHouseLostPowerToken != null && (
                 <p>
-                  House <b>{raidee.name}</b> lost{" "}
-                  {data.raidedHouseLostPowerToken ? "a" : "no"} Power&nbsp;token
-                  from this raid.
+                  <Trans
+                    i18nKey="gameLogList.raidPowerLost"
+                    count={data.raidedHouseLostPowerToken ? 1 : 0}
+                    values={{ raidee: raidee.name }}
+                    components={{ bold: <b /> }}
+                  />
                 </p>
               )}
             </>
@@ -827,8 +1130,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         } else {
           return (
             <p>
-              <b>House {raider.name}</b> raided nothing from{" "}
-              <b>{raiderRegion.name}</b>.
+              <Trans
+                i18nKey="gameLogList.houseRaidedNothingFromd0b397"
+                values={{
+                  raider: raider.name,
+                  raiderRegion: raiderRegion.name
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         }
@@ -838,14 +1150,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>, holder of the Iron Throne token, chose to
-            {data.choice == 0 ? (
-              <> trigger a Mustering.</>
-            ) : data.choice == 1 ? (
-              <> trigger a Supply.</>
-            ) : (
-              <> trigger nothing.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.houseHolderOfTheIronThroneTokenChoseTo537053"
+              values={{
+                house: house.name,
+                choice:
+                  data.choice == 0
+                    ? t("gameLogList.triggerAMusteringeda291")
+                    : data.choice == 1
+                      ? t("gameLogList.triggerASupply6c6ad3")
+                      : t("gameLogList.triggerNothing938c4b")
+              }}
+              components={{
+                bold: <b />
+              }}
+            />
           </p>
         );
       }
@@ -854,12 +1173,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>, holder of the Iron Throne token, chose to
-            {data.choice == 0 ? (
-              <> reduce the Wildling track to the &quot;0&quot; position.</>
-            ) : (
-              <> trigger a Mustering.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.houseHolderOfTheIronThroneTokenChoseTo537053"
+              values={{
+                house: house.name,
+                choice:
+                  data.choice == 0
+                    ? t(
+                        "gameLogList.reduceTheWildlingTrackToThe0Position1690f3"
+                      )
+                    : t("gameLogList.triggerAMusteringeda291")
+              }}
+              components={{
+                bold: <b />
+              }}
+            />
           </p>
         );
       }
@@ -868,15 +1196,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>, holder of the Messenger Raven token,
-            chose to
-            {data.choice == 0 ? (
-              <> trigger a Clash of Kings.</>
-            ) : data.choice == 1 ? (
-              <> trigger a Game of Thrones.</>
-            ) : (
-              <> trigger nothing.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.houseHolderOfTheMessengerRavenTokenChoseTo2fabef"
+              values={{
+                house: house.name,
+                choice:
+                  data.choice == 0
+                    ? t("gameLogList.triggerAClashOfKingse1cab5")
+                    : data.choice == 1
+                      ? t("gameLogList.triggerAGameOfThrones4f1f2c")
+                      : t("gameLogList.triggerNothing938c4b")
+              }}
+              components={{
+                bold: <b />
+              }}
+            />
           </p>
         );
       }
@@ -885,23 +1219,34 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>, holder of the Valyrian Steel Blade token,
-            chose to
-            {data.choice == 0 ? (
-              <>
-                {" "}
-                forbid <b>March +1</b> Orders from being played during this
-                Planning Phase.
-              </>
-            ) : data.choice == 1 ? (
-              <>
-                {" "}
-                forbid <b>Defense</b> Orders from being played during this
-                Planning Phase.
-              </>
-            ) : (
-              <> forbid nothing.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.houseHolderOfTheValyrianSteelBladeTokenChose75df2b"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                choice: (
+                  <>
+                    {data.choice == 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.forbidMarch1OrdersFromBeingPlayedDuringThis352c9f"
+                          components={{ bold: <b /> }}
+                        />
+                      </>
+                    ) : data.choice == 1 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.forbidDefenseOrdersFromBeingPlayedDuringThisPlanning7306b5"
+                          components={{ bold: <b /> }}
+                        />
+                      </>
+                    ) : (
+                      <>{t("gameLogList.forbidNothing5d57e1")}</>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -910,9 +1255,17 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Winter is Coming</b>: The Westeros deck {data.deckIndex + 1} was
-            shuffled and the new Westeros card drawn is{" "}
-            <b>{drawnCardType.name}</b>.
+            <Trans
+              i18nKey="gameLogList.winterIsComingTheWesterosDeckWasShuffledAnd75a5ea"
+              values={{
+                deckNumber: data.deckIndex + 1,
+                drawnCardType: drawnCardType.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
 
@@ -921,7 +1274,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <Row className="justify-content-center">
             <Col xs="auto">
               <h4>
-                <b>Westeros Phase</b>
+                <b>{t("gameLogList.westerosPhase9004d5")}</b>
               </h4>
             </Col>
           </Row>
@@ -932,14 +1285,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <Row className="justify-content-center">
             <Col xs="auto">
               <h5>
-                <b>Claim Vassals</b>
+                <b>{t("gameLogList.claimVassals58bd2f")}</b>
               </h5>
             </Col>
           </Row>
         );
 
       case "planning-phase-began":
-        const content = <b>{data.forVassals && "Vassal "}Planning Phase</b>;
+        const content = (
+          <b>
+            <Trans
+              i18nKey="gameLogList.planningPhase9e4dd3"
+              components={{ vassalLabel: <>{data.forVassals && "Vassal "}</> }}
+            />
+          </b>
+        );
         return (
           <Row className="justify-content-center">
             <Col xs="auto">
@@ -953,7 +1313,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <Row className="justify-content-center">
             <Col xs="auto">
               <h5>
-                <b>Draft House cards</b>
+                <b>{t("common.draftHouseCards")}</b>
               </h5>
             </Col>
           </Row>
@@ -964,7 +1324,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
           <p>
-            House <b>{house.name}</b> picked <b>{houseCard.name}</b>.
+            <Trans
+              i18nKey="gameLogList.housePickedbda163"
+              values={{ house: house.name, houseCard: houseCard.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -973,7 +1340,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            House <b>{house.name}</b> has chosen their House cards.
+            <Trans
+              i18nKey="gameLogList.houseHasChosenTheirHouseCardsc142da"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -983,7 +1354,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <Row className="justify-content-center">
             <Col xs="auto">
               <h4>
-                <b>Action Phase</b>
+                <b>{t("gameLogList.actionPhasedccc8a")}</b>
               </h4>
             </Col>
           </Row>
@@ -994,7 +1365,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <Row className="justify-content-center">
             <Col xs="auto">
               <h5>
-                <b>Resolve Raid Orders</b>
+                <b>{t("gameLogList.resolveRaidOrders200b6b")}</b>
               </h5>
             </Col>
           </Row>
@@ -1005,7 +1376,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <Row className="justify-content-center">
             <Col xs="auto">
               <h5>
-                <b>Resolve March Orders</b>
+                <b>{t("gameLogList.resolveMarchOrders052d0f")}</b>
               </h5>
             </Col>
           </Row>
@@ -1016,7 +1387,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <Row className="justify-content-center">
             <Col xs="auto">
               <h5>
-                <b>Resolve Consolidate Power Orders</b>
+                <b>{t("gameLogList.resolveConsolidatePowerOrders94e9fd")}</b>
               </h5>
             </Col>
           </Row>
@@ -1027,11 +1398,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> used the <b>Valyrian Steel Blade</b> to{" "}
-            {data.forNewTidesOfBattleCard
-              ? "draw a new Tides of Battle card"
-              : "increase their combat strength by 1"}
-            .
+            <Trans
+              i18nKey="gameLogList.houseUsedTheValyrianSteelBladeToe9e0dd"
+              values={{
+                house: house.name,
+                effect: data.forNewTidesOfBattleCard
+                  ? t("common.drawANewTidesOfBattleCard")
+                  : t("common.increaseTheirCombatStrengthBy1")
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1046,7 +1425,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <ul>
             {houseCards.map(([h, hc]) => (
               <li key={`housecard-chosen_${h.id}_${hc.id}`}>
-                House <b>{h.name}</b> chose <b>{hc.name}</b>
+                <Trans
+                  i18nKey="gameLogList.houseChose571829"
+                  values={{ house: h.name, houseCard: hc.name }}
+                  components={{
+                    bold: <b />,
+                    bold2: <b />
+                  }}
+                />
               </li>
             ))}
           </ul>
@@ -1060,10 +1446,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              Final order of{" "}
-              <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
+              <Trans
+                i18nKey="gameLogList.finalOrderOfTrack5a3759"
+                values={{
+                  influenceTrack: translateGameText(
+                    this.game.getNameInfluenceTrack(data.trackerI)
+                  )
+                }}
+                components={{
+                  bold: <b />
+                }}
+              />
             </p>
-            <Row className="mb-2 mt-1 ml-2">
+            <Row className="mb-2 mt-1 ms-2">
               {finalOrder.map((h) => (
                 <Col xs="auto" key={`cok_final_${data.trackerI}_${h.id}`}>
                   <SimpleInfluenceIconComponent house={h} />
@@ -1089,17 +1484,37 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <>
             {distributor != null ? (
               <p>
-                House <b>{distributor.name}</b> adapted the biddings for{" "}
-                <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
+                <Trans
+                  i18nKey="gameLogList.houseAdaptedTheBiddingsForTrack623768"
+                  values={{
+                    distributor: distributor.name,
+                    influenceTrack: translateGameText(
+                      this.game.getNameInfluenceTrack(data.trackerI)
+                    )
+                  }}
+                  components={{
+                    bold: <b />,
+                    bold2: <b />
+                  }}
+                />
               </p>
             ) : (
               <p>
-                Houses bid for{" "}
-                <b>{this.game.getNameInfluenceTrack(data.trackerI)}</b> track:
+                <Trans
+                  i18nKey="gameLogList.housesBidForTrackbe03db"
+                  values={{
+                    influenceTrack: translateGameText(
+                      this.game.getNameInfluenceTrack(data.trackerI)
+                    )
+                  }}
+                  components={{
+                    bold: <b />
+                  }}
+                />
               </p>
             )}
 
-            <Row className="mb-1 mt-2 ml-2">
+            <Row className="mb-1 mt-2 ms-2">
               <HouseNumberResultsComponent
                 results={bids}
                 keyPrefix={`cok_${data.trackerI}`}
@@ -1115,8 +1530,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               <img src={mammothImage} width="24px" />
             </Col>
             <Col>
-              <b>Wildling Threat</b> reached <b>{data.wildlingStrength}</b>,
-              triggering a <b>Wildling Attack</b>!
+              <Trans
+                i18nKey="gameLogList.wildlingThreatReachedTriggeringAWildlingAttackf6d00d"
+                values={{ wildlingStrength: data.wildlingStrength }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />
+                }}
+              />
             </Col>
           </Row>
         );
@@ -1129,18 +1551,38 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         if (this.fogOfWar) {
           return (
             <p>
-              House <b>{house.name}</b> resolved a <b>Consolidate Power</b>{" "}
-              order.
+              <Trans
+                i18nKey="gameLogList.houseResolvedAConsolidatePowerOrder2ee66a"
+                values={{ house: house.name }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         }
 
         return (
           <p>
-            House <b>{house.name}</b> resolved a{" "}
-            <b>{data.starred && "Special "}Consolidate Power</b> order in{" "}
-            <b>{region.name}</b> to gain <b>{countPowerToken}</b>{" "}
-            Power&nbsp;token{countPowerToken != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.houseResolvedAConsolidatePowerOrderInToGain6f364c"
+              values={{
+                house: house.name,
+                region: region.name,
+                countPowerToken: countPowerToken,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: countPowerToken
+                }),
+                specialLabel: data.starred ? t("gameLogList.special6268c6") : ""
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1157,20 +1599,42 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              House <b>{house.name}</b> reconciled their armies by destroying:
+              <Trans
+                i18nKey="gameLogList.houseReconciledTheirArmiesByDestroyingba8e39"
+                values={{ house: house.name }}
+                components={{ bold: <b /> }}
+              />
             </p>
             <ul>
               {armies.map(([region, unitTypes]) => (
                 <li key={`armies-reconciled_${region.id}`}>
-                  {joinReactNodes(
-                    unitTypes.map((ut, i) => (
-                      <b key={`armies-reconciled_${region.id}_${ut.id}_${i}`}>
-                        {this.fogOfWar ? fogOfWarUnit : ut.name}
-                      </b>
-                    )),
-                    ", "
-                  )}{" "}
-                  in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
+                  <Trans
+                    i18nKey="common.in"
+                    values={{
+                      region: this.fogOfWar
+                        ? t("common.hiddenRegion")
+                        : region.name
+                    }}
+                    components={{
+                      units: (
+                        <>
+                          {joinReactNodes(
+                            unitTypes.map((ut, i) => (
+                              <b
+                                key={`armies-reconciled_${region.id}_${ut.id}_${i}`}
+                              >
+                                {this.fogOfWar
+                                  ? t("common.hiddenUnit")
+                                  : translateGameText(ut.name)}
+                              </b>
+                            )),
+                            ", "
+                          )}
+                        </>
+                      ),
+                      bold: <b />
+                    }}
+                  />
                 </li>
               ))}
             </ul>
@@ -1183,8 +1647,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> did not use <b>{houseCard.name}&apos;s</b>{" "}
-            ability.
+            <Trans
+              i18nKey="gameLogList.houseDidNotUseSAbility02ccbb"
+              values={{ house: house.name, houseCard: houseCard.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1194,8 +1664,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
           <p>
-            <b>Patchface</b>: House <b>{house.name}</b> decided to discard{" "}
-            <b>{houseCard.name}</b> from House <b>{affectedHouse.name}</b>.
+            <Trans
+              i18nKey="gameLogList.patchfaceHouseDecidedToDiscardFromHouse91e36f"
+              values={{
+                house: house.name,
+                houseCard: houseCard.name,
+                affectedHouse: affectedHouse.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1204,31 +1686,51 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
           <p>
-            <b>Melisandre</b>: House <b>{house.name}</b> discarded{" "}
-            <b>{houseCard.combatStrength}</b> Power token
-            {houseCard.combatStrength != 1 ? "s" : ""} to return{" "}
-            <b>{houseCard.name}</b> to hand.
+            <Trans
+              i18nKey="gameLogList.melisandreHouseDiscardedToReturnToHanda3d42d"
+              values={{
+                house: house.name,
+                houseCardCombatStrength: houseCard.combatStrength,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: houseCard.combatStrength
+                }),
+                houseCard: houseCard.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
       case "jon-snow-used": {
         const house = this.game.houses.get(data.house);
-        let wilddlingStatus = "increase";
+        let wilddlingStatus = t("common.increase");
         if (data.wildlingsStrength < 0) {
-          wilddlingStatus = "decrease";
+          wilddlingStatus = t("common.decrease");
         }
         return (
           <p>
-            <b>Jon Snow</b>: House <b>{house.name}</b> decided to{" "}
-            <b>{wilddlingStatus}</b> the Wildling track by one space.
+            <Trans
+              i18nKey="gameLogList.jonSnowHouseDecidedToTheWildlingTrackBy0a275e"
+              values={{ house: house.name, wilddlingStatus: wilddlingStatus }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
       case "doran-used": {
         const house = this.game.houses.get(data.house);
         const affectedHouse = this.game.houses.get(data.affectedHouse);
-        const influenceTrack = this.game.getNameInfluenceTrack(
-          data.influenceTrack
+        const influenceTrack = translateGameText(
+          this.game.getNameInfluenceTrack(data.influenceTrack)
         );
         const skippedHouse = data.skippedHouse
           ? this.game.houses.get(data.skippedHouse)
@@ -1236,29 +1738,54 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         const skippedAddition = skippedHouse ? (
           <>
-            , causing House <b>{skippedHouse.name}</b>&apos;s turn to be skipped
-            until the next pass of the <b>Iron Throne</b> track
+            <Trans
+              i18nKey="gameLogList.causingHouseSTurnToBeSkippedUntilThea4b1dd"
+              values={{ skippedHouse: skippedHouse.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </>
         ) : null;
 
         return (
           <p>
-            <b>Doran Martell</b>: House <b>{house.name}</b> decided to move
-            House <b>{affectedHouse.name}</b> to the bottom of the{" "}
-            <b>{influenceTrack}</b> track{skippedAddition}.
+            <Trans
+              i18nKey="gameLogList.doranMartellHouseDecidedToMoveHouseToThe273941"
+              values={{
+                house: house.name,
+                affectedHouse: affectedHouse.name,
+                influenceTrack: influenceTrack
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                skippedAddition: <>{skippedAddition}</>
+              }}
+            />
           </p>
         );
       }
       case "ser-gerris-drinkwater-used": {
         const house = this.game.houses.get(data.house);
-        const influenceTrack = this.game.getNameInfluenceTrack(
-          data.influenceTrack
+        const influenceTrack = translateGameText(
+          this.game.getNameInfluenceTrack(data.influenceTrack)
         );
 
         return (
           <p>
-            <b>Ser Gerris Drinkwater</b>: House <b>{house.name}</b> decided to
-            increase his position on <b>{influenceTrack}</b> track.
+            <Trans
+              i18nKey="gameLogList.serGerrisDrinkwaterHouseDecidedToIncreaseHisPosition6e7906"
+              values={{ house: house.name, influenceTrack: influenceTrack }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1267,8 +1794,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Reek</b>: House <b>{house.name}</b> decided to return <b>Reek</b>{" "}
-            to hand.
+            <Trans
+              i18nKey="gameLogList.reekHouseDecidedToReturnReekToHandd4090e"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1278,8 +1812,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Reek</b>: <b>{houseCard.name}</b> of House <b>{house.name}</b>{" "}
-            was returned to hand.
+            <Trans
+              i18nKey="gameLogList.reekOfHouseWasReturnedToHandddfe5a"
+              values={{ houseCard: houseCard.name, house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1288,8 +1829,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Lysa Arryn</b>: House <b>{house.name}</b> decided to return{" "}
-            <b>Lysa Arryn</b> to hand.
+            <Trans
+              i18nKey="gameLogList.lysaArrynHouseDecidedToReturnLysaArrynTo476541"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1299,12 +1847,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Qyburn</b>: House <b>{house.name}</b> decided to use the combat
-            strength <b>{houseCard.combatStrength}</b> from{" "}
-            <b>{houseCard.name}</b>.
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <HouseCardComponent houseCard={houseCard} size="small" />
-            </div>
+            <Trans
+              i18nKey="gameLogList.qyburnHouseDecidedToUseTheCombatStrengthFrom1cd16e"
+              values={{
+                house: house.name,
+                houseCardCombatStrength: houseCard.combatStrength,
+                houseCard: houseCard.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                details: (
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <HouseCardComponent houseCard={houseCard} size="small" />
+                  </div>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -1314,8 +1875,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Aeron Damphair</b>: House <b>{house.name}</b> decided to increase
-            the combat strength of this card by <b>{tokens}</b>.
+            <Trans
+              i18nKey="gameLogList.aeronDamphairHouseDecidedToIncreaseTheCombatStrengthcc92cc"
+              values={{ house: house.name, tokens: tokens }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1324,8 +1892,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Rodrik the Reader</b>: House <b>{house.name}</b> decided to
-            choose a card from Westeros Deck <b>{data.westerosDeckI + 1}</b>.
+            <Trans
+              i18nKey="gameLogList.rodrikTheReaderHouseDecidedToChooseACardca4e9e"
+              values={{ house: house.name, deckNumber: data.westerosDeckI + 1 }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1336,9 +1911,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Tyrion Lannister</b>: House <b>{house.name}</b>{" "}
-            {!chooseToReplace && "didn't "}force{chooseToReplace && "d"} House{" "}
-            <b>{affectedHouse.name}</b> to choose a new House card.
+            <Trans
+              i18nKey={
+                chooseToReplace
+                  ? "gameLogList.tyrionForcedReplacement"
+                  : "gameLogList.tyrionKeptCard"
+              }
+              values={{ house: house.name, affectedHouse: affectedHouse.name }}
+              components={{
+                cardName: <b />,
+                actingHouse: <b />,
+                targetHouse: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1350,11 +1935,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return newHouseCard ? (
           <p>
-            House <b>{affectedHouse.name}</b> chose <b>{newHouseCard.name}.</b>
+            <Trans
+              i18nKey="gameLogList.houseChosefe099b"
+              values={{
+                affectedHouse: affectedHouse.name,
+                newHouseCard: newHouseCard.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         ) : (
           <p>
-            House <b>{affectedHouse.name}</b> had no other available House card.
+            <Trans
+              i18nKey="gameLogList.houseHadNoOtherAvailableHouseCardc56b10"
+              values={{ affectedHouse: affectedHouse.name }}
+              components={{
+                bold: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1363,8 +1964,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Arianne Martell</b>: House <b>{enemyHouse.name}</b> cannot move
-            their army into the embattled area.
+            <Trans
+              i18nKey="gameLogList.arianneMartellHouseCannotMoveTheirArmyIntoThe9ce25f"
+              values={{ enemyHouse: enemyHouse.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1374,8 +1981,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Arianne Martell</b>: House <b>{house.name}</b> forced House{" "}
-            <b>{enemyHouse.name}</b> to retreat.
+            <Trans
+              i18nKey="gameLogList.arianneMartellHouseForcedHouseToRetreat1940ae"
+              values={{ house: house.name, enemyHouse: enemyHouse.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1387,20 +2001,35 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return returnedHouseCards.length > 0 ? (
           <p>
-            <b>Roose Bolton</b>: House <b>{house.name}</b> took back all
-            discarded House cards (
-            {joinReactNodes(
-              returnedHouseCards.map((hc) => (
-                <b key={`roose_${hc.id}`}>{hc.name}</b>
-              )),
-              ", "
-            )}
-            ).
+            <Trans
+              i18nKey="gameLogList.rooseBoltonHouseTookBackAllDiscardedHouseCards23162a"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                houseCards: (
+                  <>
+                    {joinReactNodes(
+                      returnedHouseCards.map((hc) => (
+                        <b key={`roose_${hc.id}`}>{hc.name}</b>
+                      )),
+                      ", "
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         ) : (
           <p>
-            <b>Roose Bolton</b>: House <b>{house.name}</b> had no discarded
-            House cards.
+            <Trans
+              i18nKey="gameLogList.rooseBoltonHouseHadNoDiscardedHouseCards43100d"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1410,8 +2039,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Loras Tyrell</b>: The <b>{order.type.name}</b> Order was moved to{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : embattledRegion.name}</b>.
+            <Trans
+              i18nKey="gameLogList.lorasTyrellTheOrderWasMovedTofd0bf0"
+              values={{
+                orderType: translateGameText(order.type.name),
+                embattledRegion: this.fogOfWar
+                  ? t("common.hiddenRegion")
+                  : embattledRegion.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
 
@@ -1421,9 +2062,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Queen of Thorns</b>: There were no orders of House{" "}
-            <b>{affectedHouse.name}</b> that could have been removed by House{" "}
-            <b>{house.name}</b>.
+            <Trans
+              i18nKey="gameLogList.queenOfThornsThereWereNoOrdersOfHouse4e18fa"
+              values={{ affectedHouse: affectedHouse.name, house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1435,10 +2082,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Queen of Thorns</b>: House <b>{house.name}</b> removed a{" "}
-            <b>{removedOrder.type.name}</b> Order of House{" "}
-            <b>{affectedHouse.name}</b> in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.queenOfThornsHouseRemovedAOrderOfHouse6be416"
+              values={{
+                house: house.name,
+                removedOrderType: translateGameText(removedOrder.type.name),
+                affectedHouse: affectedHouse.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1448,9 +2107,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Tywin Lannister</b>: House <b>{house.name}</b> gained{" "}
-            <b>{powerTokensGained}</b> Power&nbsp;token
-            {powerTokensGained != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.tywinLannisterHouseGained0f5915"
+              values={{
+                house: house.name,
+                powerTokensGained: powerTokensGained,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: powerTokensGained
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1460,9 +2131,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Qarl the Maid</b>: House <b>{house.name}</b> gained{" "}
-            <b>{powerTokensGained}</b> Power&nbsp;token
-            {powerTokensGained != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.qarlTheMaidHouseGained4de6d3"
+              values={{
+                house: house.name,
+                powerTokensGained: powerTokensGained,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: powerTokensGained
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1471,8 +2154,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Renly Baratheon</b>: House <b>{house.name}</b> had no available
-            Knight to upgrade to.
+            <Trans
+              i18nKey="gameLogList.renlyBaratheonHouseHadNoAvailableKnightToUpgrade5783e9"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1481,8 +2170,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Renly Baratheon</b>: House <b>{house.name}</b> had no available
-            Footman to upgrade.
+            <Trans
+              i18nKey="gameLogList.renlyBaratheonHouseHadNoAvailableFootmanToUpgradea3d2e4"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1492,17 +2187,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Renly Baratheon</b>: House <b>{house.name}</b> upgraded a Footman
-            to a Knight in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-            .
+            <Trans
+              i18nKey="gameLogList.renlyBaratheonHouseUpgradedAFootmanToAKnight56890b"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
       case "mace-tyrell-casualties-prevented": {
         return (
           <p>
-            <b>Mace Tyrell</b>: Casualties were prevented by{" "}
-            <b>The Blackfish</b>.
+            <Trans
+              i18nKey="gameLogList.maceTyrellCasualtiesWerePreventedByTheBlackfish09f5e5"
+              components={{ bold: <b />, bold2: <b /> }}
+            />
           </p>
         );
       }
@@ -1512,8 +2218,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           : "Mace Tyrell";
         return (
           <p>
-            <b>{houseCardName}</b>: No enemy Footman was available to be
-            destroyed.
+            <Trans
+              i18nKey="gameLogList.noEnemyFootmanWasAvailableToBeDestroyed1dc586"
+              values={{ houseCardName: houseCardName }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
 
@@ -1526,8 +2235,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>{houseCardName}</b>: House <b>{house.name}</b> destroyed an enemy
-            Footman in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseDestroyedAnEnemyFootmanIn3f96f8"
+              values={{
+                houseCardName: houseCardName,
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1537,15 +2257,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Ser Ilyn Payne</b>: House <b>{house.name}</b> destroyed an enemy
-            Footman in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.serIlynPayneHouseDestroyedAnEnemyFootmanIn08e07c"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
       case "cersei-lannister-no-order-available":
         return (
           <p>
-            <b>Cersei Lannister</b>: There were no Order tokens to be removed.
+            <Trans
+              i18nKey="gameLogList.cerseiLannisterThereWereNoOrderTokensToBed7061d"
+              components={{ bold: <b /> }}
+            />
           </p>
         );
 
@@ -1557,9 +2290,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Cersei Lannister</b>: House <b>{house.name}</b> removed a{" "}
-            <b>{removedOrder.type.name}</b> Order of <b>{affectedHouse.name}</b>{" "}
-            in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.cerseiLannisterHouseRemovedAOrderOfIne605fc"
+              values={{
+                house: house.name,
+                removedOrderType: translateGameText(removedOrder.type.name),
+                affectedHouse: affectedHouse.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1570,8 +2316,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>{houseCard.name}</b>: House <b>{house.name}</b> chose the retreat
-            location of the retreating army of <b>{affectedHouse.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseChoseTheRetreatLocationOfTheRetreatingArmy21bf7e"
+              values={{
+                houseCard: houseCard.name,
+                house: house.name,
+                affectedHouse: affectedHouse.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1581,9 +2338,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const regionTo = this.game.world.regions.get(data.regionTo);
         return (
           <p>
-            House <b>{house.name}</b> retreats from{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : regionFrom.name}</b> to{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : regionTo.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseRetreatsFromToa1d19f"
+              values={{
+                house: house.name,
+                regionFrom: this.fogOfWar
+                  ? t("common.hiddenRegion")
+                  : regionFrom.name,
+                regionTo: this.fogOfWar
+                  ? t("common.hiddenRegion")
+                  : regionTo.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1593,9 +2364,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> was not able to retreat{" "}
-            {data.isAttacker ? "to" : "from"}{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseWasNotAbleToRetreatc1de6a"
+              values={{
+                house: house.name,
+                direction: data.isAttacker
+                  ? t("gameLogList.to663ea1")
+                  : t("gameLogList.from75857a"),
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1604,19 +2386,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const units = data.units.map((ut) => unitTypes.get(ut).name);
         return (
           <p>
-            House <b>{house.name}</b> suffered casualties from the retreat and
-            chose these units to be destroyed:{" "}
-            <>
-              {joinReactNodes(
-                units.map((unitType, i) => (
-                  <b key={`retreat-casualties-suffered_${unitType}_${i}`}>
-                    {this.fogOfWar ? fogOfWarUnit : unitType}
-                  </b>
-                )),
-                ", "
-              )}
-            </>
-            .
+            <Trans
+              i18nKey="gameLogList.houseSufferedCasualtiesFromTheRetreatAndChoseThesebab2bd"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                joinReactNodes: (
+                  <>
+                    {joinReactNodes(
+                      units.map((unitType, i) => (
+                        <b key={`retreat-casualties-suffered_${unitType}_${i}`}>
+                          {this.fogOfWar ? t("common.hiddenUnit") : unitType}
+                        </b>
+                      )),
+                      ", "
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -1629,14 +2417,37 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         }
         return data.shipCount > 0 ? (
           <p>
-            House <b>{newController.name}</b> converted {data.shipCount} ship
-            {data.shipCount == 1 ? "" : "s"} from House{" "}
-            <b>{oldController.name}</b> in <b>{port.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseConvertedFromHouseIn21f41b"
+              values={{
+                newController: newController.name,
+                shipCount: data.shipCount,
+                ship: t("common.ship", { count: data.shipCount }),
+                oldController: oldController.name,
+                port: port.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         ) : (
           <p>
-            House <b>{newController.name}</b> destroyed all{" "}
-            <b>{oldController.name}</b> ships in <b>{port.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseDestroyedAllShipsIn0487d2"
+              values={{
+                newController: newController.name,
+                oldController: oldController.name,
+                port: port.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1646,16 +2457,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const castle = this.game.world.regions.get(data.castle);
         return !this.fogOfWar ? (
           <p>
-            House <b>{house.name}</b> lost {data.shipCount} Ship
-            {data.shipCount > 1 ? "s" : ""} in <b>{port.name}</b> because{" "}
-            <b>{castle.name}</b> is empty now.
+            <Trans
+              i18nKey="gameLogList.houseLostInBecauseIsEmptyNowa251d6"
+              values={{
+                house: house.name,
+                shipCount: data.shipCount,
+                shipLabel: t("common.ShipLabel", { count: data.shipCount }),
+                port: port.name,
+                castle: castle.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         ) : null;
       }
       case "silence-at-the-wall-executed":
         return (
           <p>
-            <b>Silence at the Wall</b>: Nothing happened.
+            <Trans
+              i18nKey="gameLogList.silenceAtTheWallNothingHappened24542a"
+              components={{ bold: <b /> }}
+            />
           </p>
         );
 
@@ -1665,15 +2491,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         if (data.choice == 0) {
           return (
             <p>
-              <b>Preemptive Raid</b>: House <b>{house.name}</b> chose to destroy
-              2 of their units.
+              <Trans
+                i18nKey="gameLogList.preemptiveRaidHouseChoseToDestroy2OfTheir160e51"
+                values={{ house: house.name }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         } else {
           return (
             <p>
-              <b>Preemptive Raid</b>: House <b>{house.name}</b> chose to reduce
-              2 positions on their highest Influence track.
+              <Trans
+                i18nKey="gameLogList.preemptiveRaidHouseChoseToReduce2PositionsOn6ca3c6"
+                values={{ house: house.name }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         }
@@ -1683,20 +2521,39 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           ? this.game.houses.get(data.chooser)
           : null;
         const house = this.game.houses.get(data.house);
-        const trackName = this.game.getNameInfluenceTrack(data.trackI);
+        const trackName = translateGameText(
+          this.game.getNameInfluenceTrack(data.trackI)
+        );
 
         if (chooser == null) {
           return (
             <p>
-              House <b>{house.name}</b> was reduced 2 positions on the{" "}
-              <b>{trackName}</b> track.
+              <Trans
+                i18nKey="gameLogList.houseWasReduced2PositionsOnTheTrack22057b"
+                values={{ house: house.name, trackName: trackName }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         } else {
           return (
             <p>
-              <b>House {chooser.name}</b> chose to reduce House{" "}
-              <b>{house.name}</b> 2 positions on the <b>{trackName}</b> track.
+              <Trans
+                i18nKey="gameLogList.houseChoseToReduceHouse2PositionsOnThec2c21d"
+                values={{
+                  chooser: chooser.name,
+                  house: house.name,
+                  trackName: trackName
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />
+                }}
+              />
             </p>
           );
         }
@@ -1713,32 +2570,68 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>
-            {units.length > 0 ? (
-              <>
-                {" "}
-                chose to destroy{" "}
-                {joinReactNodes(
-                  units.map(([region, unitTypes]) => (
-                    <span key={`preemptive_${region.id}`}>
-                      {joinReactNodes(
-                        unitTypes.map((ut, i) => (
-                          <b key={`preemptive_${ut.id}_${i}`}>
-                            {this.fogOfWar ? fogOfWarUnit : ut.name}
-                          </b>
-                        )),
-                        ", "
-                      )}{" "}
-                      in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                    </span>
-                  )),
-                  " and "
-                )}
-                .
-              </>
-            ) : (
-              <> had no units to destroy.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.house7da3b4"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                casualties: (
+                  <>
+                    {units.length > 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.choseToDestroyceb5fc"
+                          components={{
+                            units: (
+                              <>
+                                {joinReactNodes(
+                                  units.map(([region, unitTypes]) => (
+                                    <span key={`preemptive_${region.id}`}>
+                                      <Trans
+                                        i18nKey="common.in"
+                                        values={{
+                                          region: this.fogOfWar
+                                            ? t("common.hiddenRegion")
+                                            : region.name
+                                        }}
+                                        components={{
+                                          units: (
+                                            <>
+                                              {joinReactNodes(
+                                                unitTypes.map((ut, i) => (
+                                                  <b
+                                                    key={`preemptive_${ut.id}_${i}`}
+                                                  >
+                                                    {this.fogOfWar
+                                                      ? t("common.hiddenUnit")
+                                                      : translateGameText(
+                                                          ut.name
+                                                        )}
+                                                  </b>
+                                                )),
+                                                ", "
+                                              )}
+                                            </>
+                                          ),
+                                          bold: <b />
+                                        }}
+                                      />
+                                    </span>
+                                  )),
+                                  t("gameLogList.ande3ee91")
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>{t("gameLogList.hadNoUnitsToDestroy8607b5")}</>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -1747,9 +2640,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Preemptive Raid</b>: A new Wildlings Attack with strength{" "}
-            <b>{data.wildlingStrength}</b> was triggered where House{" "}
-            <b>{house.name}</b> will not be participating.
+            <Trans
+              i18nKey="gameLogList.preemptiveRaidANewWildlingsAttackWithStrengthWas2b384f"
+              values={{
+                wildlingStrength: data.wildlingStrength,
+                house: house.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1761,23 +2663,47 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Massing on the Milkwater</b>: House <b>{house.name}</b>{" "}
-            {houseCardsReturned.length > 0 ? (
-              <>
-                took back{" "}
-                {joinReactNodes(
-                  houseCardsReturned.map((hc) => (
-                    <b key={`massing-on-the-milkwater-cards-back_${hc.id}`}>
-                      {hc.name}
-                    </b>
-                  )),
-                  ", "
-                )}
-                .
-              </>
-            ) : (
-              <>had no House cards on their discard pile.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.massingOnTheMilkwaterHousee84208"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                returnedCards: (
+                  <>
+                    {houseCardsReturned.length > 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.tookBackf59df9"
+                          components={{
+                            houseCards: (
+                              <>
+                                {joinReactNodes(
+                                  houseCardsReturned.map((hc) => (
+                                    <b
+                                      key={`massing-on-the-milkwater-cards-back_${hc.id}`}
+                                    >
+                                      {hc.name}
+                                    </b>
+                                  )),
+                                  ", "
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        {t(
+                          "gameLogList.hadNoHouseCardsOnTheirDiscardPile607e7f"
+                        )}
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -1786,9 +2712,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Massing on the Milkwater</b>: House <b>{lowestBidder.name}</b>{" "}
-            discards all House cards with the highest combat strength, all other
-            houses must discard one House card.
+            <Trans
+              i18nKey="gameLogList.massingOnTheMilkwaterHouseDiscardsAllHouseCards04a021"
+              values={{ lowestBidder: lowestBidder.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1800,31 +2731,55 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return houseCardsUsed.length > 0 ? (
           <p>
-            House <b>{house.name}</b> discarded{" "}
-            {joinReactNodes(
-              houseCardsUsed.map((hc) => (
-                <b key={`massing-on-the-milkwater-cards-removed_${hc.id}`}>
-                  {hc.name}
-                </b>
-              )),
-              ", "
-            )}
-            .
+            <Trans
+              i18nKey="gameLogList.houseDiscardeda5e7fc"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                houseCards: (
+                  <>
+                    {joinReactNodes(
+                      houseCardsUsed.map((hc) => (
+                        <b
+                          key={`massing-on-the-milkwater-cards-removed_${hc.id}`}
+                        >
+                          {hc.name}
+                        </b>
+                      )),
+                      ", "
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         ) : (
           <p>
-            House <b>{house.name}</b> did not discard a House card.
+            <Trans
+              i18nKey="gameLogList.houseDidNotDiscardAHouseCard0da336"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
       case "a-king-beyond-the-wall-highest-top-track": {
         const house = this.game.houses.get(data.house);
-        const trackName = this.game.getNameInfluenceTrack(data.trackI);
+        const trackName = translateGameText(
+          this.game.getNameInfluenceTrack(data.trackI)
+        );
 
         return (
           <p>
-            <b>A King Beyond the Wall</b>: House <b>{house.name}</b> chose to
-            move at the top of the <b>{trackName}</b> track.
+            <Trans
+              i18nKey="gameLogList.aKingBeyondTheWallHouseChoseToMovea74b6a"
+              values={{ house: house.name, trackName: trackName }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1833,19 +2788,34 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>A King Beyond the Wall</b>: House <b>{lowestBidder.name}</b> was
-            moved to the bottom of all influence tracks.
+            <Trans
+              i18nKey="gameLogList.aKingBeyondTheWallHouseWasMovedTob7d8c5"
+              values={{ lowestBidder: lowestBidder.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
 
       case "a-king-beyond-the-wall-house-reduce-track": {
         const house = this.game.houses.get(data.house);
-        const trackName = this.game.getNameInfluenceTrack(data.trackI);
+        const trackName = translateGameText(
+          this.game.getNameInfluenceTrack(data.trackI)
+        );
 
         return (
           <p>
-            <b>A King Beyond the Wall</b>: House <b>{house.name}</b> chose to
-            move at the bottom of the <b>{trackName}</b> influence track.
+            <Trans
+              i18nKey="gameLogList.aKingBeyondTheWallHouseChoseToMovee4ac5c"
+              values={{ house: house.name, trackName: trackName }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1858,32 +2828,69 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Mammoth Riders</b>: House <b>{house.name}</b>
-            {units.length > 0 ? (
-              <>
-                {" "}
-                chose to destroy{" "}
-                {joinReactNodes(
-                  units.map(([region, unitTypes]) => (
-                    <span key={`mammoth-riders_${region.id}`}>
-                      {joinReactNodes(
-                        unitTypes.map((ut, i) => (
-                          <b key={`mammoth-riders_${ut.id}_${i}`}>
-                            {this.fogOfWar ? fogOfWarUnit : ut.name}
-                          </b>
-                        )),
-                        ", "
-                      )}{" "}
-                      in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                    </span>
-                  )),
-                  ", "
-                )}
-                .
-              </>
-            ) : (
-              <> had no units to destroy.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.mammothRidersHouse38b193"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                casualties: (
+                  <>
+                    {units.length > 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.choseToDestroyceb5fc"
+                          components={{
+                            units: (
+                              <>
+                                {joinReactNodes(
+                                  units.map(([region, unitTypes]) => (
+                                    <span key={`mammoth-riders_${region.id}`}>
+                                      <Trans
+                                        i18nKey="common.in"
+                                        values={{
+                                          region: this.fogOfWar
+                                            ? t("common.hiddenRegion")
+                                            : region.name
+                                        }}
+                                        components={{
+                                          units: (
+                                            <>
+                                              {joinReactNodes(
+                                                unitTypes.map((ut, i) => (
+                                                  <b
+                                                    key={`mammoth-riders_${ut.id}_${i}`}
+                                                  >
+                                                    {this.fogOfWar
+                                                      ? t("common.hiddenUnit")
+                                                      : translateGameText(
+                                                          ut.name
+                                                        )}
+                                                  </b>
+                                                )),
+                                                ", "
+                                              )}
+                                            </>
+                                          ),
+                                          bold: <b />
+                                        }}
+                                      />
+                                    </span>
+                                  )),
+                                  ", "
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>{t("gameLogList.hadNoUnitsToDestroy8607b5")}</>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -1893,8 +2900,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Mammoth Riders</b>: House <b>{house.name}</b> chose to regain{" "}
-            <b>{houseCard.name}</b>.
+            <Trans
+              i18nKey="gameLogList.mammothRidersHouseChoseToRegain71ffec"
+              values={{ house: house.name, houseCard: houseCard.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1903,8 +2917,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>The Horde Descends</b>: House <b>{house.name}</b> may muster
-            forces in any one Castle or Stronghold they control.
+            <Trans
+              i18nKey="gameLogList.theHordeDescendsHouseMayMusterForcesInAny87f42b"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -1917,32 +2937,71 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>The Horde Descends</b>: House <b>{house.name}</b>
-            {units.length > 0 ? (
-              <>
-                {" "}
-                chose to destroy{" "}
-                {joinReactNodes(
-                  units.map(([region, unitTypes]) => (
-                    <span key={`the-horde-descends_${region.id}`}>
-                      {joinReactNodes(
-                        unitTypes.map((ut, i) => (
-                          <b key={`the-horde-descends_${ut.id}_${i}`}>
-                            {this.fogOfWar ? fogOfWarUnit : ut.name}
-                          </b>
-                        )),
-                        ", "
-                      )}{" "}
-                      in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                    </span>
-                  )),
-                  ", "
-                )}
-                .
-              </>
-            ) : (
-              <> had no units to destroy.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.theHordeDescendsHouse909690"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                casualties: (
+                  <>
+                    {units.length > 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.choseToDestroyceb5fc"
+                          components={{
+                            units: (
+                              <>
+                                {joinReactNodes(
+                                  units.map(([region, unitTypes]) => (
+                                    <span
+                                      key={`the-horde-descends_${region.id}`}
+                                    >
+                                      <Trans
+                                        i18nKey="common.in"
+                                        values={{
+                                          region: this.fogOfWar
+                                            ? t("common.hiddenRegion")
+                                            : region.name
+                                        }}
+                                        components={{
+                                          units: (
+                                            <>
+                                              {joinReactNodes(
+                                                unitTypes.map((ut, i) => (
+                                                  <b
+                                                    key={`the-horde-descends_${ut.id}_${i}`}
+                                                  >
+                                                    {this.fogOfWar
+                                                      ? t("common.hiddenUnit")
+                                                      : translateGameText(
+                                                          ut.name
+                                                        )}
+                                                  </b>
+                                                )),
+                                                ", "
+                                              )}
+                                            </>
+                                          ),
+                                          bold: <b />
+                                        }}
+                                      />
+                                    </span>
+                                  )),
+                                  ", "
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>{t("gameLogList.hadNoUnitsToDestroy8607b5")}</>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -1957,23 +3016,52 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <p>
             {units.length > 0 ? (
               <>
-                <b>Crow Killers</b>: House <b>{house.name}</b> replaced{" "}
-                {joinReactNodes(
-                  units.map(([region, unitTypes], i) => (
-                    <span key={`crow-killers-replace_${i}`}>
-                      <b>{unitTypes.length}</b> Knight
-                      {unitTypes.length != 1 ? "s" : ""} in{" "}
-                      <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                    </span>
-                  )),
-                  ", "
-                )}{" "}
-                with Footmen.
+                <Trans
+                  i18nKey="gameLogList.crowKillersHouseReplacedWithFootmene0239a"
+                  values={{ house: house.name }}
+                  components={{
+                    bold: <b />,
+                    bold2: <b />,
+                    units: (
+                      <>
+                        {joinReactNodes(
+                          units.map(([region, unitTypes], i) => (
+                            <span key={`crow-killers-replace_${i}`}>
+                              <Trans
+                                i18nKey="gameLogList.in08e815"
+                                values={{
+                                  unitTypesCount: unitTypes.length,
+                                  knightLabel: t("common.KnightLabel", {
+                                    count: unitTypes.length
+                                  }),
+                                  region: this.fogOfWar
+                                    ? t("common.hiddenRegion")
+                                    : region.name
+                                }}
+                                components={{
+                                  bold: <b />,
+                                  bold2: <b />
+                                }}
+                              />
+                            </span>
+                          )),
+                          ", "
+                        )}
+                      </>
+                    )
+                  }}
+                />
               </>
             ) : (
               <>
-                <b>Crow Killers</b>: House <b>{house.name}</b> had no Knights to
-                replace with Footmen.
+                <Trans
+                  i18nKey="gameLogList.crowKillersHouseHadNoKnightsToReplaceWithc7e161"
+                  values={{ house: house.name }}
+                  components={{
+                    bold: <b />,
+                    bold2: <b />
+                  }}
+                />
               </>
             )}
           </p>
@@ -1988,18 +3076,41 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Crow Killers</b>: House <b>{house.name}</b> had to destroy{" "}
-            {joinReactNodes(
-              units.map(([region, unitTypes], i) => (
-                <span key={`crow-killers-kill_${i}`}>
-                  <b>{unitTypes.length}</b> Knight
-                  {unitTypes.length != 1 ? "s" : ""} in{" "}
-                  <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                </span>
-              )),
-              ", "
-            )}
-            .
+            <Trans
+              i18nKey="gameLogList.crowKillersHouseHadToDestroy30fd1c"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                units: (
+                  <>
+                    {joinReactNodes(
+                      units.map(([region, unitTypes], i) => (
+                        <span key={`crow-killers-kill_${i}`}>
+                          <Trans
+                            i18nKey="gameLogList.in08e815"
+                            values={{
+                              unitTypesCount: unitTypes.length,
+                              knightLabel: t("common.KnightLabel", {
+                                count: unitTypes.length
+                              }),
+                              region: this.fogOfWar
+                                ? t("common.hiddenRegion")
+                                : region.name
+                            }}
+                            components={{
+                              bold: <b />,
+                              bold2: <b />
+                            }}
+                          />
+                        </span>
+                      )),
+                      ", "
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2013,23 +3124,52 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return units.length > 0 ? (
           <p>
-            <b>Crow Killers</b>: House <b>{house.name}</b> replaced{" "}
-            {joinReactNodes(
-              units.map(([region, unitTypes], i) => (
-                <span key={`crow-killers-upgrade_${i}`}>
-                  <b>{unitTypes.length}</b> Footm
-                  {unitTypes.length == 1 ? "a" : "e"}n in{" "}
-                  <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                </span>
-              )),
-              ", "
-            )}{" "}
-            with Knights.
+            <Trans
+              i18nKey="gameLogList.crowKillersHouseReplacedWithKnights546e5c"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                units: (
+                  <>
+                    {joinReactNodes(
+                      units.map(([region, unitTypes], i) => (
+                        <span key={`crow-killers-upgrade_${i}`}>
+                          <Trans
+                            i18nKey="gameLogList.footmenInRegion"
+                            values={{
+                              unitTypesCount: unitTypes.length,
+                              footmen: t("common.footmen", {
+                                count: unitTypes.length
+                              }),
+                              region: this.fogOfWar
+                                ? t("common.hiddenRegion")
+                                : region.name
+                            }}
+                            components={{
+                              bold: <b />,
+                              bold2: <b />
+                            }}
+                          />
+                        </span>
+                      )),
+                      ", "
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         ) : (
           <p>
-            <b>Crow Killers</b>: House <b>{house.name}</b> was not able to
-            replace any Footman with Knights.
+            <Trans
+              i18nKey="gameLogList.crowKillersHouseWasNotAbleToReplaceAny4d6046"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2038,9 +3178,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Skinchanger Scout</b>: House <b>{house.name}</b> gets back{" "}
-            <b>{data.powerToken}</b> Power&nbsp;token
-            {data.powerToken != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.skinchangerScoutHouseGetsBack1a8b48"
+              values={{
+                house: house.name,
+                powerToken: data.powerToken,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerToken
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2054,15 +3206,32 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              <b>Skinchanger Scout</b>: House <b>{house.name}</b> lost all of
-              their Power&nbsp;tokens, all other houses lost 2
-              Power&nbsp;tokens.
+              <Trans
+                i18nKey="gameLogList.skinchangerScoutHouseLostAllOfTheirPowerTokens179555"
+                values={{ house: house.name }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
             <ul>
               {powerTokensLost.map(([house, amount]) => (
                 <li key={`skinchanger-scout_${house.id}_${amount}`}>
-                  House <b>{house.name}</b> lost <b>{amount}</b>{" "}
-                  Power&nbsp;token{amount != 1 ? "s" : ""}.
+                  <Trans
+                    i18nKey="gameLogList.houseLost1db272"
+                    values={{
+                      house: house.name,
+                      powerTokens: amount,
+                      powerTokenLabel: t("common.PowertokenLabel", {
+                        count: amount
+                      })
+                    }}
+                    components={{
+                      bold: <b />,
+                      bold2: <b />
+                    }}
+                  />
                 </li>
               ))}
             </ul>
@@ -2074,15 +3243,29 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Rattleshirt&apos;s Raiders</b>: House <b>{house.name}</b> gained
-            one level of supply
-            {!this.fogOfWar && (
-              <>
-                {" "}
-                and is now at <b>{data.newSupply}</b>
-              </>
-            )}
-            .
+            <Trans
+              i18nKey="gameLogList.rattleshirtSRaidersHouseGainedOneLevelOfSupply13e8f2"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                supplyChange: (
+                  <>
+                    {!this.fogOfWar && (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.andIsNowAt7e33eb"
+                          values={{ newSupply: data.newSupply }}
+                          components={{
+                            bold: <b />
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
 
@@ -2095,17 +3278,36 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <>
-            <b>Rattleshirt&apos;s Raiders</b>: House <b>{lowestBidder.name}</b>{" "}
-            lost 2 levels of supply, all other houses lost 1 levels of supply.
-            {!this.fogOfWar && (
-              <ul>
-                {newSupply.map(([house, supply]) => (
-                  <li key={`rattleshirts-raiders_${house.id}_${supply}`}>
-                    House <b>{house.name}</b> is now at <b>{supply}</b>.
-                  </li>
-                ))}
-              </ul>
-            )}
+            <Trans
+              i18nKey="gameLogList.rattleshirtSRaidersHouseLost2LevelsOfSupply165ee5"
+              values={{ lowestBidder: lowestBidder.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                newSupply: (
+                  <>
+                    {!this.fogOfWar && (
+                      <ul>
+                        {newSupply.map(([house, supply]) => (
+                          <li
+                            key={`rattleshirts-raiders_${house.id}_${supply}`}
+                          >
+                            <Trans
+                              i18nKey="gameLogList.houseIsNowAt43fd2c"
+                              values={{ house: house.name, supply: supply }}
+                              components={{
+                                bold: <b />,
+                                bold2: <b />
+                              }}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )
+              }}
+            />
           </>
         );
       }
@@ -2118,8 +3320,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <ul>
             {gains.map(([house, gain]) => (
               <li key={`got_${house.id}_${gain}`}>
-                House <b>{house.name}</b> gained <b>{gain}</b> Power&nbsp;token
-                {gain != 1 ? "s" : ""}.
+                <Trans
+                  i18nKey="gameLogList.houseGained807d9e"
+                  values={{
+                    house: house.name,
+                    gain: gain,
+                    powerTokenLabel: t("common.PowertokenLabel", {
+                      count: gain
+                    })
+                  }}
+                  components={{
+                    bold: <b />,
+                    bold2: <b />
+                  }}
+                />
               </li>
             ))}
           </ul>
@@ -2136,38 +3350,54 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <p>
             {killedBecauseWounded.length > 0 && (
               <>
-                House <b>{house.name}</b> suffered battle casualties because
-                these units were wounded:{" "}
-                <>
-                  {joinReactNodes(
-                    killedBecauseWounded.map((unitType, i) => (
-                      <b key={`wounded_${unitType}_${i}`}>
-                        {this.fogOfWar ? fogOfWarUnit : unitType}
-                      </b>
-                    )),
-                    ", "
-                  )}
-                </>
-                .
+                <Trans
+                  i18nKey="gameLogList.houseSufferedBattleCasualtiesBecauseTheseUnitsWereWounded47a38d"
+                  values={{ house: house.name }}
+                  components={{
+                    bold: <b />,
+                    joinReactNodes: (
+                      <>
+                        {joinReactNodes(
+                          killedBecauseWounded.map((unitType, i) => (
+                            <b key={`wounded_${unitType}_${i}`}>
+                              {this.fogOfWar
+                                ? t("common.hiddenUnit")
+                                : unitType}
+                            </b>
+                          )),
+                          ", "
+                        )}
+                      </>
+                    )
+                  }}
+                />
               </>
             )}
             {killedBecauseWounded.length > 0 &&
               killedBecauseCantRetreat.length > 0 && <br />}
             {killedBecauseCantRetreat.length > 0 && (
               <>
-                House <b>{house.name}</b> suffered battle casualties because
-                these units can&apos;t retreat:{" "}
-                <>
-                  {joinReactNodes(
-                    killedBecauseCantRetreat.map((unitType, i) => (
-                      <b key={`cant-retreat_${unitType}_${i}`}>
-                        {this.fogOfWar ? fogOfWarUnit : unitType}
-                      </b>
-                    )),
-                    ", "
-                  )}
-                </>
-                .
+                <Trans
+                  i18nKey="gameLogList.houseSufferedBattleCasualtiesBecauseTheseUnitsCanT01eec9"
+                  values={{ house: house.name }}
+                  components={{
+                    bold: <b />,
+                    joinReactNodes: (
+                      <>
+                        {joinReactNodes(
+                          killedBecauseCantRetreat.map((unitType, i) => (
+                            <b key={`cant-retreat_${unitType}_${i}`}>
+                              {this.fogOfWar
+                                ? t("common.hiddenUnit")
+                                : unitType}
+                            </b>
+                          )),
+                          ", "
+                        )}
+                      </>
+                    )
+                  }}
+                />
               </>
             )}
           </p>
@@ -2178,19 +3408,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const killed = data.killed.map((utid) => unitTypes.get(utid).name);
         return killed.length > 0 ? (
           <>
-            House <b>{house.name}</b> suffered battle casualties and chose these
-            units to be destroyed:{" "}
-            <>
-              {joinReactNodes(
-                killed.map((unitType, i) => (
-                  <b key={`casualties_${unitType}_${i}`}>
-                    {this.fogOfWar ? fogOfWarUnit : unitType}
-                  </b>
-                )),
-                ", "
-              )}
-            </>
-            .
+            <Trans
+              i18nKey="gameLogList.houseSufferedBattleCasualtiesAndChoseTheseUnitsTocadc32"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                joinReactNodes: (
+                  <>
+                    {joinReactNodes(
+                      killed.map((unitType, i) => (
+                        <b key={`casualties_${unitType}_${i}`}>
+                          {this.fogOfWar ? t("common.hiddenUnit") : unitType}
+                        </b>
+                      )),
+                      ", "
+                    )}
+                  </>
+                )
+              }}
+            />
           </>
         ) : (
           <></>
@@ -2203,7 +3439,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <>
-            <p>Supply levels have been adjusted:</p>
+            <p>{t("gameLogList.supplyLevelsHaveBeenAdjusted34f851")}</p>
             <div className="mt-1">
               <HouseNumberResultsComponent
                 results={supplies}
@@ -2224,23 +3460,49 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const newUserLabel = newUser ? getUserLinkOrLabel(newUser) : null;
         const reason =
           data.reason == ReplacementReason.CLOCK_TIMEOUT
-            ? " due to clock timeout"
+            ? t("gameLogList.dueToClockTimeout400aca")
             : data.reason == ReplacementReason.VOTE
-              ? " due to vote"
+              ? t("gameLogList.dueToVote0578f7")
               : "";
 
         return (
           <>
-            <b>{getUserLinkOrLabel(oldUser)}</b> ({this.renderHouseName(house)})
-            was replaced by {newUserLabel ? <b>{newUserLabel}</b> : " a vassal"}
-            {reason}.<br />
-            {newCommanderHouse && (
-              <>
-                Until the next vassal claim phase, {this.renderHouseName(house)}{" "}
-                has been randomly assigned to{" "}
-                {this.renderHouseName(newCommanderHouse)}.
-              </>
-            )}
+            <Trans
+              i18nKey="gameLogList.wasReplacedBy59fdbc"
+              values={{ reason: reason }}
+              components={{
+                bold: <b />,
+                oldUser: <>{getUserLinkOrLabel(oldUser)}</>,
+                house: <>{this.renderHouseName(house)}</>,
+                replacement: (
+                  <>
+                    {newUserLabel ? (
+                      <b>{newUserLabel}</b>
+                    ) : (
+                      t("gameLogList.aVassal4df4bb")
+                    )}
+                  </>
+                ),
+                lineBreak: <br />,
+                commanderAssignment: (
+                  <>
+                    {newCommanderHouse && (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.untilTheNextVassalClaimPhaseHasBeenRandomly726c26"
+                          components={{
+                            house: <>{this.renderHouseName(house)}</>,
+                            newCommanderHouse: (
+                              <>{this.renderHouseName(newCommanderHouse)}</>
+                            )
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            />
           </>
         );
       }
@@ -2250,8 +3512,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <>
-            Vassal house <b>{house.name}</b> was replaced by{" "}
-            <b>{getUserLinkOrLabel(user)}</b>.
+            <Trans
+              i18nKey="gameLogList.vassalHouseWasReplacedBy5114c9"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                user: <>{getUserLinkOrLabel(user)}</>
+              }}
+            />
           </>
         );
       }
@@ -2263,20 +3532,34 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           <p>
             {vassals.length > 0 ? (
               <>
-                House <b>{house.name}</b> claimed{" "}
-                {joinReactNodes(
-                  vassals.map((v) => (
-                    <b key={`vassals-claimed_${v.id}`}>{v.name}</b>
-                  )),
-                  ", "
-                )}{" "}
-                as vassal{vassals.length > 1 && "s"}.
+                <Trans
+                  i18nKey="gameLogList.houseClaimedAsf53a3c"
+                  values={{
+                    house: house.name,
+                    vassal: t("common.vassal", { count: vassals.length })
+                  }}
+                  components={{
+                    bold: <b />,
+                    vassals: (
+                      <>
+                        {joinReactNodes(
+                          vassals.map((v) => (
+                            <b key={`vassals-claimed_${v.id}`}>{v.name}</b>
+                          )),
+                          ", "
+                        )}
+                      </>
+                    )
+                  }}
+                />
               </>
             ) : (
               <>
-                House <b>{house.name}</b> has declined to command a vassal and
-                has handed their set of vassal order tokens to the next player
-                on the Iron Throne track.
+                <Trans
+                  i18nKey="gameLogList.houseHasDeclinedToCommandAVassalAndHas92f4f9"
+                  values={{ house: house.name }}
+                  components={{ bold: <b /> }}
+                />
               </>
             )}
           </p>
@@ -2286,8 +3569,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            Commanding House <b>{house.name}</b> gained a Power&nbsp;token for
-            this battle.
+            <Trans
+              i18nKey="gameLogList.commandingHouseGainedAPowerTokenForThisBattlea82893"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -2296,8 +3582,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const casualty = unitTypes.get(data.casualty).name;
         return (
           <p>
-            <b>Beric Dondarrion</b>: House <b>{house.name}</b> chose a{" "}
-            <b>{casualty}</b> to be destroyed.
+            <Trans
+              i18nKey="gameLogList.bericDondarrionHouseChoseAToBeDestroyedd352cd"
+              values={{ house: house.name, casualty: casualty }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2305,8 +3598,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Varys</b>: House <b>{house.name}</b> is now on top of the
-            Fiefdoms track.
+            <Trans
+              i18nKey="gameLogList.varysHouseIsNowOnTopOfTheFiefdomsed837a"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2318,9 +3617,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>{usedByHouseCard.name}</b>: House <b>{house.name}</b> randomly
-            chose <b>{newHouseCard.name}</b> as{" "}
-            <b>{affectedHouse.name}&apos;s</b> new House card.
+            <Trans
+              i18nKey="gameLogList.houseRandomlyChoseAsSNewHouseCard084ea8"
+              values={{
+                usedByHouseCard: usedByHouseCard.name,
+                house: house.name,
+                newHouseCard: newHouseCard.name,
+                affectedHouse: affectedHouse.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2329,8 +3640,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const region = this.game.world.regions.get(data.region);
         return (
           <p>
-            <b>Jon Conningtion</b>: House <b>{house.name}</b> chose to recruit a
-            Knight in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.jonConningtionHouseChoseToRecruitAKnightInc30e86"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2338,8 +3659,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Bronn</b>: House <b>{house.name}</b> chose to discard 2
-            Power&nbsp;tokens to reduce Bron&apos;s combat strength to 0.
+            <Trans
+              i18nKey="gameLogList.bronnHouseChoseToDiscard2PowerTokensTofa5a24"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2347,9 +3674,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Littlefinger</b>: House <b>{house.name}</b> gained{" "}
-            <b>{data.powerTokens}</b> Power&nbsp;token
-            {data.powerTokens != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.littlefingerHouseGainede21782"
+              values={{
+                house: house.name,
+                powerTokens: data.powerTokens,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerTokens
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2358,10 +3697,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const affectedHouse = this.game.houses.get(data.affectedHouse);
         return (
           <p>
-            <b>Alayne Stone</b>: House <b>{house.name}</b> forced House{" "}
-            <b>{affectedHouse.name}</b> to discard all their{" "}
-            <b>{data.lostPowerTokens}</b> available Power&nbsp;token
-            {data.lostPowerTokens != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.alayneStoneHouseForcedHouseToDiscardAllTheir8b8c1c"
+              values={{
+                house: house.name,
+                affectedHouse: affectedHouse.name,
+                lostPowerTokens: data.lostPowerTokens,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.lostPowerTokens
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2369,9 +3721,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Lysa Arryn</b>: House <b>{house.name}</b> gained{" "}
-            <b>{data.powerTokens}</b> Power&nbsp;token
-            {data.powerTokens != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.lysaArrynHouseGainedcf9450"
+              values={{
+                house: house.name,
+                powerTokens: data.powerTokens,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerTokens
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2383,13 +3747,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              <b>Anya Waynwood</b>:
+              <b>{"Anya Waynwood"}</b>:
             </p>
             <ul>
               {gains.map(([house, gain]) => (
                 <li key={`anya-waynwood_${house.id}_${gain}`}>
-                  House <b>{house.name}</b> gained <b>{gain}</b>{" "}
-                  Power&nbsp;token{gain != 1 ? "s" : ""}.
+                  <Trans
+                    i18nKey="common.houseGained"
+                    values={{
+                      house: house.name,
+                      gain: gain,
+                      powerTokenLabel: t("common.PowertokenLabel", {
+                        count: gain
+                      })
+                    }}
+                    components={{
+                      bold: <b />,
+                      bold2: <b />
+                    }}
+                  />
                 </li>
               ))}
             </ul>
@@ -2405,15 +3781,34 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Robert Arryn</b>: House <b>{house.name}</b> decided to remove{" "}
-            <b>Robert Arryn</b>{" "}
-            {removedHouseCard && (
-              <>
-                and <b>{removedHouseCard.name}</b> of{" "}
-                <b>{affectedHouse.name}</b>{" "}
-              </>
-            )}
-            from the game.
+            <Trans
+              i18nKey="gameLogList.robertArrynHouseDecidedToRemoveRobertArrynFroma9e329"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                removedHouseCard: (
+                  <>
+                    {removedHouseCard && (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.andOfeaaeb2"
+                          values={{
+                            removedHouseCard: removedHouseCard.name,
+                            affectedHouse: affectedHouse.name
+                          }}
+                          components={{
+                            bold: <b />,
+                            bold2: <b />
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2423,8 +3818,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>{houseCard.name}</b> of House <b>{house.name}</b> was removed
-            from the game.
+            <Trans
+              i18nKey="gameLogList.ofHouseWasRemovedFromTheGame4c6263"
+              values={{ houseCard: houseCard.name, house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2434,9 +3835,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Viserys Targaryen</b>: House <b>{house.name}</b> decided to add
-            the strength <b>{houseCard.combatStrength}</b> from{" "}
-            <b>{houseCard.name}</b>.
+            <Trans
+              i18nKey="gameLogList.viserysTargaryenHouseDecidedToAddTheStrengthFromb7e503"
+              values={{
+                house: house.name,
+                houseCardCombatStrength: houseCard.combatStrength,
+                houseCard: houseCard.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2446,9 +3858,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Illyrio Mopatis</b>: House <b>{house.name}</b> gained{" "}
-            <b>{powerTokensGained}</b> Power&nbsp;token
-            {powerTokensGained != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.illyrioMopatisHouseGainedcd40b2"
+              values={{
+                house: house.name,
+                powerTokensGained: powerTokensGained,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: powerTokensGained
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2458,10 +3882,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Daenerys Targaryen</b>: House <b>{house.name}</b> forced House{" "}
-            <b>{affectedHouse.name}</b> to discard{" "}
-            <b>{data.powerTokensDiscarded}</b> Power&nbsp;token
-            {data.powerTokensDiscarded != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.daenerysTargaryenHouseForcedHouseToDiscard2cc485"
+              values={{
+                house: house.name,
+                affectedHouse: affectedHouse.name,
+                powerTokensDiscarded: data.powerTokensDiscarded,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerTokensDiscarded
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2470,8 +3907,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
           <p>
-            <b>Missandei</b>: House <b>{house.name}</b> decided to return{" "}
-            <b>{houseCard.name}</b> to hand.
+            <Trans
+              i18nKey="gameLogList.missandeiHouseDecidedToReturnToHand30c5b5"
+              values={{ house: house.name, houseCard: houseCard.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2485,20 +3929,46 @@ export default class GameLogListComponent extends Component<GameLogListComponent
               <img src={presentImage} width="32px" />
             </Col>
             <Col>
-              House <b>{house.name}</b> gifted <b>{data.powerTokens}</b>{" "}
-              Power&nbsp;token{data.powerTokens != 1 ? "s" : ""} to House{" "}
-              <b>{affectedHouse.name}</b>.
+              <Trans
+                i18nKey="gameLogList.houseGiftedToHouse164679"
+                values={{
+                  house: house.name,
+                  powerTokens: data.powerTokens,
+                  powerTokenLabel: t("common.PowertokenLabel", {
+                    count: data.powerTokens
+                  }),
+                  affectedHouse: affectedHouse.name
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />
+                }}
+              />
             </Col>
           </Row>
         );
       }
       case "influence-track-position-chosen": {
         const house = this.game.houses.get(data.house);
-        const track = this.game.getNameInfluenceTrack(data.trackerI);
+        const track = translateGameText(
+          this.game.getNameInfluenceTrack(data.trackerI)
+        );
         return (
           <p>
-            House <b>{house.name}</b> has chosen position <b>{data.position}</b>{" "}
-            on <b>{track} Track</b>.
+            <Trans
+              i18nKey="gameLogList.houseHasChosenPositionOnTracka3f071"
+              values={{
+                house: house.name,
+                position: data.position,
+                track: track
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2506,7 +3976,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            House <b>{house.name}</b> has decided ties.
+            <Trans
+              i18nKey="gameLogList.houseHasDecidedTies2391ce"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -2514,16 +3988,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         const verb =
           data.discardedPowerTokens == 0
-            ? "place no loyalty\xa0token"
+            ? t("common.placeNoLoyaltyToken")
             : data.discardedPowerTokens == 1
-              ? `place ${data.loyaltyTokenCount > 1 ? "loyalty\xa0tokens" : "a loyalty\xa0token"}`
+              ? t("common.placeLoyaltyToken", { count: data.loyaltyTokenCount })
               : null;
         return (
           <p>
-            House <b>{house.name}</b> decided to discard{" "}
-            <b>{data.discardedPowerTokens}</b> Power&nbsp;token
-            {data.discardedPowerTokens != 1 && "s"}
-            {verb && ` and ${verb}`}.
+            <Trans
+              i18nKey="gameLogList.houseDecidedToDiscarda65997"
+              values={{
+                house: house.name,
+                discardedPowerTokens: data.discardedPowerTokens,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.discardedPowerTokens
+                }),
+                additionalAction:
+                  verb && t("gameLogList.and49ff7b", { verb: verb })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2531,8 +4017,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const region = this.world.regions.get(data.region);
         return (
           <p>
-            A loyalty&nbsp;token has been placed in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.aLoyaltyTokenHasBeenPlacedIn55a185"
+              values={{
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2540,9 +4033,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const region = this.world.regions.get(data.region);
         return (
           <p>
-            House <b>{this.game.targaryen?.name ?? "Targaryen"}</b> gained{" "}
-            {data.count} Loyalty&nbsp;token{data.count != 1 ? "s" : ""} in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseGainedIna2c74a"
+              values={{
+                targaryen: this.game.targaryen?.name ?? "Targaryen",
+                tokenCount: data.count,
+                loyaltyTokenLabel: t("common.LoyaltytokenLabel", {
+                  count: data.count
+                }),
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2552,33 +4057,66 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         if (data.ignored) {
           return (
             <p>
-              <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to do
-              nothing.
+              <Trans
+                i18nKey="gameLogList.fireMadeFleshHouseDecidedToDoNothing9f7fd9"
+                values={{ house: house.name }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         } else if (data.dragonKilledInRegion) {
           const region = this.world.regions.get(data.dragonKilledInRegion);
           return (
             <p>
-              <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to
-              destroy a dragon in{" "}
-              <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+              <Trans
+                i18nKey="gameLogList.fireMadeFleshHouseDecidedToDestroyADragonf09320"
+                values={{
+                  house: house.name,
+                  region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />
+                }}
+              />
             </p>
           );
         } else if (data.removedDragonStrengthToken) {
           return (
             <p>
-              <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to
-              remove the dragon strength token from round{" "}
-              {data.removedDragonStrengthToken}.
+              <Trans
+                i18nKey="gameLogList.fireMadeFleshHouseDecidedToRemoveTheDragon7e6d26"
+                values={{
+                  house: house.name,
+                  removedDragonStrengthToken: data.removedDragonStrengthToken
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         } else if (data.regainedDragonRegion) {
           const region = this.world.regions.get(data.regainedDragonRegion);
           return (
             <p>
-              <b>Fire Made Flesh</b>: House <b>{house.name}</b> decided to place
-              a dragon in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+              <Trans
+                i18nKey="gameLogList.fireMadeFleshHouseDecidedToPlaceADragonef2593"
+                values={{
+                  house: house.name,
+                  region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />
+                }}
+              />
             </p>
           );
         } else {
@@ -2592,9 +4130,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Playing with Fire</b>: House <b>{house.name}</b> chose to place a{" "}
-            <b>{this.fogOfWar ? fogOfWarUnit : unitType.name}</b> in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.playingWithFireHouseChoseToPlaceAIn9ac2d9"
+              values={{
+                house: house.name,
+                unitType: this.fogOfWar
+                  ? t("common.hiddenUnit")
+                  : translateGameText(unitType.name),
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2604,8 +4155,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>The Long Plan</b>: House <b>{house.name}</b> chose House{" "}
-            <b>{affectedHouse.name}</b> to place 2 loyalty&nbsp;tokens.
+            <Trans
+              i18nKey="gameLogList.theLongPlanHouseChoseHouseToPlace281faf1"
+              values={{ house: house.name, affectedHouse: affectedHouse.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2615,8 +4173,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         if (data.powerTokensDiscardedToCancelMovement == 0) {
           return (
             <p>
-              House <b>{house.name}</b> chose not to cancel the previous
-              movement.
+              <Trans
+                i18nKey="gameLogList.houseChoseNotToCancelThePreviousMovement0b771b"
+                values={{ house: house.name }}
+                components={{ bold: <b /> }}
+              />
             </p>
           );
         } else if (
@@ -2625,11 +4186,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         ) {
           return (
             <p>
-              House <b>{house.name}</b> discarded{" "}
-              <b>{data.powerTokensDiscardedToCancelMovement}</b>{" "}
-              Power&nbsp;token
-              {data.powerTokensDiscardedToCancelMovement != 1 ? "s" : ""} to
-              cancel the previous movement.
+              <Trans
+                i18nKey="gameLogList.houseDiscardedToCancelThePreviousMovementab47e0"
+                values={{
+                  house: house.name,
+                  powerTokens: data.powerTokensDiscardedToCancelMovement,
+                  powerTokenLabel: t("common.PowertokenLabel", {
+                    count: data.powerTokensDiscardedToCancelMovement
+                  })
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />
+                }}
+              />
             </p>
           );
         } else if (data.regionFrom && data.regionTo) {
@@ -2638,9 +4208,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
           return (
             <p>
-              House <b>{house.name}</b> moved a loyalty&nbsp;token from{" "}
-              <b>{this.fogOfWar ? fogOfWarRegion : regionFrom.name}</b> to{" "}
-              <b>{this.fogOfWar ? fogOfWarRegion : regionTo.name}</b>.
+              <Trans
+                i18nKey="gameLogList.houseMovedALoyaltyTokenFromToa7bfb7"
+                values={{
+                  house: house.name,
+                  regionFrom: this.fogOfWar
+                    ? t("common.hiddenRegion")
+                    : regionFrom.name,
+                  regionTo: this.fogOfWar
+                    ? t("common.hiddenRegion")
+                    : regionTo.name
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />
+                }}
+              />
             </p>
           );
         } else {
@@ -2655,10 +4239,25 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              House <b>{house.name}</b> resolved an <b>Iron&nbsp;Bank</b> order
-              in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b> and paid{" "}
-              <b>{data.paid}</b> Power&nbsp;token
-              {data.paid != 1 ? "s" : ""} for
+              <Trans
+                i18nKey="gameLogList.houseResolvedAnIronBankOrderInAndPaideec19e"
+                values={{
+                  house: house.name,
+                  region: this.fogOfWar
+                    ? t("common.hiddenRegion")
+                    : region.name,
+                  paid: data.paid,
+                  powerTokenLabel: t("common.PowertokenLabel", {
+                    count: data.paid
+                  })
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />,
+                  bold4: <b />
+                }}
+              />
             </p>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <LoanCardComponent loanCard={loan} />
@@ -2673,13 +4272,33 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return house ? (
           <p>
-            House <b>{house.name}</b> removed their <b>{orderType.name}</b>{" "}
-            order in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseRemovedTheirOrderIn5e8d7e"
+              values={{
+                house: house.name,
+                orderType: translateGameText(orderType.name),
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         ) : (
           <p>
-            A <b>{orderType.name}</b> order has been removed from{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.aOrderHasBeenRemovedFrom18490d"
+              values={{
+                orderType: translateGameText(orderType.name),
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2688,16 +4307,35 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const debt = data.cost + data.paid;
         return (
           <p>
-            House <b>{house.name}</b> paid an interest of{" "}
-            <b>{Math.abs(data.paid)}</b> Power token
-            {Math.abs(data.paid) != 1 ? "s" : ""} to the Iron&nbsp;Bank.
-            {debt > 0 ? (
-              <>
-                &nbsp;<b>{debt}</b> interest debt could not be paid.
-              </>
-            ) : (
-              ""
-            )}
+            <Trans
+              i18nKey="gameLogList.housePaidAnInterestOfToTheIronBank182461"
+              values={{
+                house: house.name,
+                abs: Math.abs(data.paid),
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: Math.abs(data.paid)
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                unpaidDebt: (
+                  <>
+                    {debt > 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.interestDebtCouldNotBePaidec5ed0"
+                          values={{ debt: debt }}
+                          components={{ bold: <b /> }}
+                        />
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2711,31 +4349,61 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Debts to the Iron&nbsp;Bank</b>:{" "}
+            <b>{t("gameLogList.debtsToTheIronBank6b9aef")}</b>:{" "}
             {units.length > 0 ? (
               <>
-                House <b>{resolver.name}</b> chose to destroy{" "}
-                {joinReactNodes(
-                  units.map(([region, unitTypes]) => (
-                    <span key={`pay-debt_${region.id}_${house.id}`}>
-                      {joinReactNodes(
-                        unitTypes.map((ut, i) => (
-                          <b key={`pay-debt_${ut.id}_${i}`}>
-                            {this.fogOfWar ? fogOfWarUnit : ut.name}
-                          </b>
-                        )),
-                        ", "
-                      )}{" "}
-                      in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                    </span>
-                  )),
-                  ", "
-                )}{" "}
-                of House <b>{house.name}</b>.
+                <Trans
+                  i18nKey="gameLogList.houseChoseToDestroyOfHouse6b6511"
+                  values={{ resolver: resolver.name, house: house.name }}
+                  components={{
+                    bold: <b />,
+                    units: (
+                      <>
+                        {joinReactNodes(
+                          units.map(([region, unitTypes]) => (
+                            <span key={`pay-debt_${region.id}_${house.id}`}>
+                              <Trans
+                                i18nKey="common.in"
+                                values={{
+                                  region: this.fogOfWar
+                                    ? t("common.hiddenRegion")
+                                    : region.name
+                                }}
+                                components={{
+                                  units: (
+                                    <>
+                                      {joinReactNodes(
+                                        unitTypes.map((ut, i) => (
+                                          <b key={`pay-debt_${ut.id}_${i}`}>
+                                            {this.fogOfWar
+                                              ? t("common.hiddenUnit")
+                                              : translateGameText(ut.name)}
+                                          </b>
+                                        )),
+                                        ", "
+                                      )}
+                                    </>
+                                  ),
+                                  bold: <b />
+                                }}
+                              />
+                            </span>
+                          )),
+                          ", "
+                        )}
+                      </>
+                    ),
+                    bold2: <b />
+                  }}
+                />
               </>
             ) : (
               <>
-                House <b>{house.name} </b> had no units to destroy.
+                <Trans
+                  i18nKey="gameLogList.houseHadNoUnitsToDestroy013560"
+                  values={{ house: house.name }}
+                  components={{ bold: <b /> }}
+                />
               </>
             )}
           </p>
@@ -2745,8 +4413,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Customs Officer</b>: House <b>{house.name}</b> gained{" "}
-            <b>{data.gained}</b> Power&nbsp;token{data.gained != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.customsOfficerHouseGained8355bf"
+              values={{
+                house: house.name,
+                gained: data.gained,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.gained
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2762,32 +4443,73 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const loan = loanCardTypes.get(data.loanType);
         return (
           <p>
-            <b>{loan.name}</b>: House <b>{house.name}</b>
-            {placedSellswords.length > 0 ? (
-              <>
-                {" "}
-                chose to place{" "}
-                {joinReactNodes(
-                  placedSellswords.map(([region, unitTypes]) => (
-                    <span key={`place-sellsword_${region.id}`}>
-                      {joinReactNodes(
-                        unitTypes.map((ut, i) => (
-                          <b key={`place-sellsword_${region.id}_${ut.id}_${i}`}>
-                            {this.fogOfWar ? fogOfWarUnit : ut.name}
-                          </b>
-                        )),
-                        ", "
-                      )}{" "}
-                      in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>
-                    </span>
-                  )),
-                  " and "
-                )}
-                .
-              </>
-            ) : (
-              <> placed no sellswords.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.house310c67"
+              values={{ loan: loan.name, house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                placement: (
+                  <>
+                    {placedSellswords.length > 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.choseToPlaceedcee6"
+                          components={{
+                            units: (
+                              <>
+                                {joinReactNodes(
+                                  placedSellswords.map(
+                                    ([region, unitTypes]) => (
+                                      <span
+                                        key={`place-sellsword_${region.id}`}
+                                      >
+                                        <Trans
+                                          i18nKey="common.in"
+                                          values={{
+                                            region: this.fogOfWar
+                                              ? t("common.hiddenRegion")
+                                              : region.name
+                                          }}
+                                          components={{
+                                            units: (
+                                              <>
+                                                {joinReactNodes(
+                                                  unitTypes.map((ut, i) => (
+                                                    <b
+                                                      key={`place-sellsword_${region.id}_${ut.id}_${i}`}
+                                                    >
+                                                      {this.fogOfWar
+                                                        ? t("common.hiddenUnit")
+                                                        : translateGameText(
+                                                            ut.name
+                                                          )}
+                                                    </b>
+                                                  )),
+                                                  ", "
+                                                )}
+                                              </>
+                                            ),
+                                            bold: <b />
+                                          }}
+                                        />
+                                      </span>
+                                    )
+                                  ),
+                                  t("gameLogList.ande3ee91")
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>{t("gameLogList.placedNoSellswordsa37a7f")}</>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2802,30 +4524,61 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         }));
         return (
           <p>
-            <b>The Faceless Men</b>: House <b>{house.name}</b> chose{" "}
-            {destroyedUnits.length > 0 ? (
-              <>
-                to destroy{" "}
-                {joinReactNodes(
-                  destroyedUnits.map((unitInfo) => (
-                    <span
-                      key={`the-faceless-men_${unitInfo.region.id}_${unitInfo.unitType.id}`}
-                    >
-                      a{" "}
-                      <b>
-                        {this.fogOfWar ? fogOfWarUnit : unitInfo.unitType.name}
-                      </b>{" "}
-                      of <b>{unitInfo.house?.name ?? "Unknown"}</b> in{" "}
-                      <b>{unitInfo.region.name}</b>
-                    </span>
-                  )),
-                  " and "
-                )}
-                .
-              </>
-            ) : (
-              <>not to destroy any units.</>
-            )}
+            <Trans
+              i18nKey="gameLogList.theFacelessMenHouseChose1a3134"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                casualties: (
+                  <>
+                    {destroyedUnits.length > 0 ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.toDestroy13c937"
+                          components={{
+                            units: (
+                              <>
+                                {joinReactNodes(
+                                  destroyedUnits.map((unitInfo) => (
+                                    <span
+                                      key={`the-faceless-men_${unitInfo.region.id}_${unitInfo.unitType.id}`}
+                                    >
+                                      <Trans
+                                        i18nKey="gameLogList.aOfIn8ddfd5"
+                                        values={{
+                                          unitType: this.fogOfWar
+                                            ? t("common.hiddenUnit")
+                                            : translateGameText(
+                                                unitInfo.unitType.name
+                                              ),
+                                          house:
+                                            unitInfo.house?.name ??
+                                            t("common.unknown"),
+                                          unitInfoRegion: unitInfo.region.name
+                                        }}
+                                        components={{
+                                          bold: <b />,
+                                          bold2: <b />,
+                                          bold3: <b />
+                                        }}
+                                      />
+                                    </span>
+                                  )),
+                                  t("gameLogList.ande3ee91")
+                                )}
+                              </>
+                            )
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>{t("gameLogList.notToDestroyAnyUnits9a4c81")}</>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2834,9 +4587,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const region = this.world.regions.get(data.region);
         return (
           <p>
-            <b>Pyromancer</b>: House <b>{house.name}</b> chose to degrade{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b> and place a{" "}
-            <b>{data.upgradeType}</b> there.
+            <Trans
+              i18nKey="gameLogList.pyromancerHouseChoseToDegradeAndPlaceAThere378dfe"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name,
+                upgradeType: data.upgradeType
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2845,11 +4609,24 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const region = this.world.regions.get(data.region);
         return (
           <p>
-            <b>Expert Artificer</b>: House <b>{house.name}</b> chose to place a{" "}
-            <b>Crown</b> in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b> and gained{" "}
-            <b>{data.gainedPowerTokens}</b> Power token
-            {data.gainedPowerTokens != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.expertArtificerHouseChoseToPlaceACrownInbe2a14"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name,
+                gainedPowerTokens: data.gainedPowerTokens,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.gainedPowerTokens
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2858,17 +4635,27 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const regions = data.regions.map((rid) => this.world.regions.get(rid));
         return (
           <p>
-            <b>Loyal Maester</b>: House <b>{house.name}</b> chose to place a{" "}
-            <b>Barrel</b> in{" "}
-            {joinReactNodes(
-              regions.map((r) => (
-                <b key={`loyal_maester_${r.id}`}>
-                  {this.fogOfWar ? fogOfWarRegion : r.name}
-                </b>
-              )),
-              " and in "
-            )}
-            .
+            <Trans
+              i18nKey="gameLogList.loyalMaesterHouseChoseToPlaceABarrelIn41a769"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                regions: (
+                  <>
+                    {joinReactNodes(
+                      regions.map((r) => (
+                        <b key={`loyal_maester_${r.id}`}>
+                          {this.fogOfWar ? t("common.hiddenRegion") : r.name}
+                        </b>
+                      )),
+                      t("gameLogList.andInf2d950")
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2877,17 +4664,26 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const regions = data.regions.map((rid) => this.world.regions.get(rid));
         return (
           <p>
-            <b>Master-at-Arms</b>: House <b>{house.name}</b> chose to upgrade
-            the castles in{" "}
-            {joinReactNodes(
-              regions.map((r) => (
-                <b key={`master-at-arms_${r.id}`}>
-                  {this.fogOfWar ? fogOfWarRegion : r.name}
-                </b>
-              )),
-              " and in "
-            )}
-            .
+            <Trans
+              i18nKey="gameLogList.masterAtArmsHouseChoseToUpgradeTheCastlesdc6ab9"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                regions: (
+                  <>
+                    {joinReactNodes(
+                      regions.map((r) => (
+                        <b key={`master-at-arms_${r.id}`}>
+                          {this.fogOfWar ? t("common.hiddenRegion") : r.name}
+                        </b>
+                      )),
+                      t("gameLogList.andInf2d950")
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2896,10 +4692,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const region = this.world.regions.get(data.region);
         return (
           <p>
-            <b>Savvy Steward</b>: House <b>{house.name}</b> chose to place a{" "}
-            <b>Barrel</b> in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>. Their new
-            supply level is <b>{data.newSupply}</b>.
+            <Trans
+              i18nKey="gameLogList.savvyStewardHouseChoseToPlaceABarrelIn130a30"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name,
+                newSupply: data.newSupply
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2908,13 +4715,30 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Spymaster</b>: House <b>{house.name}</b> chose Westeros deck{" "}
-            <b>{data.westerosDeckI + 1}</b> and put{" "}
-            <b>{data.westerosCardsCountForTopOfDeck}</b> card
-            {data.westerosCardsCountForTopOfDeck != 1 ? "s" : ""} on top of the
-            deck and <b>{data.westerosCardsCountForBottomOfDeck}</b> card
-            {data.westerosCardsCountForBottomOfDeck != 1 ? "s" : ""} to the
-            bottom of the deck.
+            <Trans
+              i18nKey="gameLogList.spymasterHouseChoseWesterosDeckAndPutOnTop9133c9"
+              values={{
+                house: house.name,
+                deckNumber: data.westerosDeckI + 1,
+                westerosCardsCountForTopOfDeck:
+                  data.westerosCardsCountForTopOfDeck,
+                card: t("common.card", {
+                  count: data.westerosCardsCountForTopOfDeck
+                }),
+                westerosCardsCountForBottomOfDeck:
+                  data.westerosCardsCountForBottomOfDeck,
+                card2: t("common.card", {
+                  count: data.westerosCardsCountForBottomOfDeck
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2923,7 +4747,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> has chosen their 3 objectives.
+            <Trans
+              i18nKey="gameLogList.houseHasChosenTheir3Objectivesd246e6"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -2932,7 +4760,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> drew a new Objective card.
+            <Trans
+              i18nKey="gameLogList.houseDrewANewObjectiveCard3e68aa"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -2941,16 +4773,34 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b>{" "}
-            {data.scored ? (
-              <>
-                scored their Special Objective and now has a total of{" "}
-                <b>{data.newTotal}</b> victory points
-              </>
-            ) : (
-              <>did not score their Special Objective</>
-            )}
-            .
+            <Trans
+              i18nKey="gameLogList.housec2c96c"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                objectiveResult: (
+                  <>
+                    {data.scored ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.scoredTheirSpecialObjectiveAndNowHasATotal936d92"
+                          values={{ newTotal: data.newTotal }}
+                          components={{
+                            bold: <b />
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        {t(
+                          "gameLogList.didNotScoreTheirSpecialObjective9c0836"
+                        )}
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -2964,10 +4814,24 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return objective != null ? (
           <>
             <p>
-              House <b>{house.name}</b> scored <b>{objective.name}</b>, awarded{" "}
-              <b>{data.victoryPoints}</b>&nbsp;victory&nbsp;point
-              {data.victoryPoints != 1 ? "s" : ""} and now has a total of{" "}
-              <b>{data.newTotal}</b>&nbsp;victory&nbsp;points.
+              <Trans
+                i18nKey="gameLogList.houseScoredAwardedAndNowHasATotalOf3fda08"
+                values={{
+                  house: house.name,
+                  objective: objective.name,
+                  victoryPoints: data.victoryPoints,
+                  victorypoint: t("common.victorypoint", {
+                    count: data.victoryPoints
+                  }),
+                  newTotal: data.newTotal
+                }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />,
+                  bold4: <b />
+                }}
+              />
             </p>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <ObjectiveCardComponent objectiveCard={objective} size="small" />
@@ -2975,7 +4839,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           </>
         ) : (
           <>
-            House <b>{house.name}</b> did not score an Objective card.
+            <Trans
+              i18nKey="gameLogList.houseDidNotScoreAnObjectiveCard35f40e"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </>
         );
       }
@@ -2983,9 +4851,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Ironborn Raid</b>: House <b>{house.name}</b> was reduced one
-            position on the Victory track and now has a total of{" "}
-            <b>{data.newTotal}</b> victory points.
+            <Trans
+              i18nKey="gameLogList.ironbornRaidHouseWasReducedOnePositionOnThe498fd2"
+              values={{ house: house.name, newTotal: data.newTotal }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -2993,8 +4867,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Shifting Ambitions</b>: House <b>{house.name}</b> put one
-            Objective card to the pool.
+            <Trans
+              i18nKey="gameLogList.shiftingAmbitionsHousePutOneObjectiveCardToThe875ea2"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3005,8 +4885,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return (
           <>
             <p>
-              <b>Shifting Ambitions</b>: House <b>{house.name}</b> choose{" "}
-              <b>{objective.name}</b> from the Objective card pool.
+              <Trans
+                i18nKey="gameLogList.shiftingAmbitionsHouseChooseFromTheObjectiveCardPool325467"
+                values={{ house: house.name, objective: objective.name }}
+                components={{
+                  bold: <b />,
+                  bold2: <b />,
+                  bold3: <b />
+                }}
+              />
             </p>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <ObjectiveCardComponent objectiveCard={objective} size="small" />
@@ -3019,9 +4906,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>New Information</b>: House <b>{house.name}</b> chose one
-            Objective card in their hand and shuffled it back into the objective
-            deck.
+            <Trans
+              i18nKey="gameLogList.newInformationHouseChoseOneObjectiveCardInTheirb164b6"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3037,7 +4929,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         return objectivesOfHouses.map(([house, objectives]) => (
           <Col xs={12} key={`objectives-of-house_${house.id}`}>
             <Col xs={12} className="text-center">
-              Remaining Objectives of House <b>{house.name}</b>.
+              <Trans
+                i18nKey="gameLogList.remainingObjectivesOfHouse2e37a9"
+                values={{ house: house.name }}
+                components={{ bold: <b /> }}
+              />
             </Col>
             <Col xs="12">
               <Row className="justify-content-center">
@@ -3056,9 +4952,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            A <b>garrison token</b> with strength <b>{data.strength}</b> was{" "}
-            <b>removed</b> from{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.aGarrisonTokenWithStrengthWasRemovedFrom360d59"
+              values={{
+                strength: data.strength,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3067,9 +4973,19 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            A <b>garrison token</b> with strength <b>{data.strength}</b> was{" "}
-            <b>returned</b> to{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.aGarrisonTokenWithStrengthWasReturnedTof4e7d5"
+              values={{
+                strength: data.strength,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3078,8 +4994,11 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> was not able to draw a new Objective card
-            because the deck is empty.
+            <Trans
+              i18nKey="gameLogList.houseWasNotAbleToDrawANewObjective6fae67"
+              values={{ house: house.name }}
+              components={{ bold: <b /> }}
+            />
           </p>
         );
       }
@@ -3087,7 +5006,7 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         if (data.onlySnapshot) return null;
         return (
           <p id={`gamelog-orders-revealed-round-${currentRound}`}>
-            Orders were revealed.
+            {t("gameLogList.ordersWereRevealedd851f4")}
           </p>
         );
       }
@@ -3102,23 +5021,43 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{house.name}</b> took back their discarded House cards (
-            {joinReactNodes(
-              returnedHouseCards.map((hc) => (
-                <b key={`house-cards-returned_${hc.id}`}>{hc.name}</b>
-              )),
-              ", "
-            )}
-            ).
-            {houseCardDiscarded ? (
-              <>
-                <br />
-                <b>{houseCardDiscarded.name}</b> was played as the last card and
-                remains discarded.
-              </>
-            ) : (
-              <></>
-            )}
+            <Trans
+              i18nKey="gameLogList.houseTookBackTheirDiscardedHouseCards270e75"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                houseCards: (
+                  <>
+                    {joinReactNodes(
+                      returnedHouseCards.map((hc) => (
+                        <b key={`house-cards-returned_${hc.id}`}>{hc.name}</b>
+                      )),
+                      ", "
+                    )}
+                  </>
+                ),
+                houseCardDiscarded: (
+                  <>
+                    {houseCardDiscarded ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.wasPlayedAsTheLastCardAndRemainsDiscardedcc9c65"
+                          values={{
+                            houseCardDiscarded: houseCardDiscarded.name
+                          }}
+                          components={{
+                            lineBreak: <br />,
+                            bold: <b />
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -3128,9 +5067,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Balon Greyjoy</b>: House <b>{house.name}</b> gained{" "}
-            <b>{powerTokensGained}</b> Power&nbsp;token
-            {powerTokensGained != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.balonGreyjoyHouseGained60619d"
+              values={{
+                house: house.name,
+                powerTokensGained: powerTokensGained,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: powerTokensGained
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3141,9 +5092,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Mace Tyrell</b>: House <b>{house.name}</b> decided to place a{" "}
-            <b>{order.type.name}</b> order in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.maceTyrellHouseDecidedToPlaceAOrderIn93df50"
+              values={{
+                house: house.name,
+                orderType: translateGameText(order.type.name),
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3152,8 +5114,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
           <p>
-            <b>Bran Stark</b>: House <b>{house.name}</b> decided to return{" "}
-            <b>{houseCard.name}</b> to hand.
+            <Trans
+              i18nKey="gameLogList.branStarkHouseDecidedToReturnToHandc63983"
+              values={{ house: house.name, houseCard: houseCard.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3163,10 +5132,23 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Cersei Lannister</b>: House <b>{house.name}</b> forced House{" "}
-            <b>{affectedHouse.name}</b> to discard{" "}
-            <b>{data.powerTokensDiscarded}</b> Power&nbsp;token
-            {data.powerTokensDiscarded != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.cerseiLannisterHouseForcedHouseToDiscard44e4ce"
+              values={{
+                house: house.name,
+                affectedHouse: affectedHouse.name,
+                powerTokensDiscarded: data.powerTokensDiscarded,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerTokensDiscarded
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3176,9 +5158,16 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Doran Martell</b>: House <b>{house.name}</b> moved House{" "}
-            <b>{affectedHouse.name}</b> to the bottom of the <b>Fiefdoms</b>{" "}
-            track.
+            <Trans
+              i18nKey="gameLogList.doranMartellHouseMovedHouseToTheBottomOfe8d26f"
+              values={{ house: house.name, affectedHouse: affectedHouse.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3186,9 +5175,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Melisandre of Asshai</b>: House <b>{house.name}</b> gained{" "}
-            <b>{data.powerTokens}</b> Power&nbsp;token
-            {data.powerTokens != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.melisandreOfAsshaiHouseGainedaab782"
+              values={{
+                house: house.name,
+                powerTokens: data.powerTokens,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerTokens
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3197,11 +5198,28 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const affectedHouse = this.game.houses.get(data.affectedHouse);
         return (
           <p>
-            <b>Salladhar Saan</b>: House <b>{house.name}</b> gained{" "}
-            <b>{data.powerTokensGained}</b> Power&nbsp;token
-            {data.powerTokensGained != 1 ? "s" : ""}. House{" "}
-            <b>{affectedHouse.name}</b> lost <b>{data.powerTokensLost}</b>{" "}
-            Power&nbsp;token{data.powerTokensLost != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.salladharSaanHouseGainedHouseLost1f8855"
+              values={{
+                house: house.name,
+                powerTokensGained: data.powerTokensGained,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerTokensGained
+                }),
+                affectedHouse: affectedHouse.name,
+                powerTokensLost: data.powerTokensLost,
+                lostTokenLabel: t("common.PowertokenLabel", {
+                  count: data.powerTokensLost
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3209,8 +5227,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const house = this.game.houses.get(data.house);
         return (
           <p>
-            <b>Ser Davos Seaworth</b>: House <b>{house.name}</b> has spent{" "}
-            <b>2</b> Power&nbsp;tokens and gained 1 Fortification Icon.
+            <Trans
+              i18nKey="gameLogList.serDavosSeaworthHouseHasSpent2PowerTokens3e2569"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3220,8 +5245,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>{houseCard.name}</b> prevented casualties of House{" "}
-            <b>{house.name}</b>.
+            <Trans
+              i18nKey="gameLogList.preventedCasualtiesOfHouse71958a"
+              values={{ houseCard: houseCard.name, house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3232,10 +5263,24 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Ser Ilyn Payne</b>: House <b>{house.name}</b> forced House{" "}
-            <b>{affectedHouse.name}</b> to lose a casualty. House{" "}
-            <b>{affectedHouse.name}</b> chose a{" "}
-            <b>{this.fogOfWar ? fogOfWarUnit : unitType.name}</b>.
+            <Trans
+              i18nKey="gameLogList.serIlynPayneHouseForcedHouseToLoseA1f792c"
+              values={{
+                house: house.name,
+                affectedHouse: affectedHouse.name,
+                affectedHouse2: affectedHouse.name,
+                unitType: this.fogOfWar
+                  ? t("common.hiddenUnit")
+                  : translateGameText(unitType.name)
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3244,19 +5289,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const newHolder = this.game.houses.get(data.newHolder);
         const dominanceToken =
           data.dominanceToken == "iron-throne"
-            ? "Iron Throne"
+            ? t("common.ironThrone")
             : data.dominanceToken == "valyrian-steel-blade"
-              ? "Valyrian Steel Blade"
+              ? t("gameLogList.valyrianSteelBladef2fa0f")
               : data.dominanceToken == "raven"
-                ? "Raven"
-                : "Unknown";
+                ? t("gameLogList.raven9cccdb")
+                : t("common.unknown");
 
         const houseCardName = this.allHouseCards.get(data.houseCardId).name;
 
         return (
           <p>
-            <b>{houseCardName}</b>: House <b>{newHolder.name}</b> has stolen the{" "}
-            {dominanceToken} dominance token from House <b>{oldHolder.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseHasStolenTheDominanceTokenFromHouse1d720f"
+              values={{
+                houseCardName: houseCardName,
+                newHolder: newHolder.name,
+                dominanceToken: dominanceToken,
+                oldHolder: oldHolder.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3266,18 +5323,30 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Aeron Damphair</b>: House <b>{house.name}</b> chose to discard{" "}
-            <b>2</b> Power tokens to use <b>{newHouseCard.name}</b> as their new
-            House card
-            {data.reducedCombatStrength ? (
-              <>
-                {" "}
-                at the cost of <b>-1</b> combat strength
-              </>
-            ) : (
-              ""
-            )}
-            .
+            <Trans
+              i18nKey="gameLogList.aeronDamphairHouseChoseToDiscard2PowerTokensa6014a"
+              values={{ house: house.name, newHouseCard: newHouseCard.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                combatPenalty: (
+                  <>
+                    {data.reducedCombatStrength ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.atTheCostOf1CombatStrength065d72"
+                          components={{ bold: <b /> }}
+                        />
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -3287,20 +5356,38 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            A <b>Power token</b> of House <b>{house.name}</b> was removed from{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.aPowerTokenOfHouseWasRemovedFromfacd8d"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
       case "game-paused": {
-        return <p>The game was paused by vote.</p>;
+        return <p>{t("gameLogList.theGameWasPausedByVote5b0f00")}</p>;
       }
+      case "empowered-vassals-enabled":
+        return <p>{t("gameLogList.empoweredVassalsEnabled")}</p>;
       case "game-resumed": {
         return (
           <p>
-            The game was{" "}
-            {data.autoResumed ? "automatically resumed" : "resumed by vote"}.
-            Pause time: {secondsToString(data.pauseTimeInSeconds, true)}
+            <Trans
+              i18nKey="gameLogList.theGameWasPauseTime7a639e"
+              values={{
+                resumeMethod: data.autoResumed
+                  ? t("gameLogList.automaticallyResumed7b44b1")
+                  : t("gameLogList.resumedByVote693194"),
+                pauseDuration: secondsToString(data.pauseTimeInSeconds, true)
+              }}
+            />
           </p>
         );
       }
@@ -3311,18 +5398,42 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            House <b>{supporter.name}</b>{" "}
-            {data.refused ? (
-              <>
-                refused to grant support to House <b>{house.name}</b>
-              </>
-            ) : (
-              <>
-                would support House <b>{house.name}</b>
-              </>
-            )}{" "}
-            to attack the Neutral Force in{" "}
-            <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.houseToAttackTheNeutralForceIn4368eb"
+              values={{
+                supporter: supporter.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                supportDecision: (
+                  <>
+                    {data.refused ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.refusedToGrantSupportToHouse9bbf39"
+                          values={{ house: house.name }}
+                          components={{
+                            bold: <b />
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.wouldSupportHouse1d12f4"
+                          values={{ house: house.name }}
+                          components={{
+                            bold: <b />
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                ),
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3337,9 +5448,20 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <>
-            <b>{getUserLinkOrLabel(initiator)}</b> (House{" "}
-            <b>{initiatorHouse.name}</b>) swapped houses with{" "}
-            {<b>{newUserLabel}</b>} (House <b>{swappingHouse.name}</b>).
+            <Trans
+              i18nKey="gameLogList.houseSwappedHousesWithHouse62115d"
+              values={{
+                initiatorHouse: initiatorHouse.name,
+                swappingHouse: swappingHouse.name
+              }}
+              components={{
+                bold: <b />,
+                initiator: <>{getUserLinkOrLabel(initiator)}</>,
+                bold2: <b />,
+                newUser: <>{<b>{newUserLabel}</b>}</>,
+                bold3: <b />
+              }}
+            />
           </>
         );
       }
@@ -3349,15 +5471,31 @@ export default class GameLogListComponent extends Component<GameLogListComponent
           : null;
         return (
           <>
-            The execution of{" "}
-            {westerosCardType ? (
-              <>
-                the Westeros card <b>{westerosCardType.name}</b> :{" "}
-              </>
-            ) : (
-              <>Westeros deck 4 </>
-            )}
-            was skipped because House <b>Targaryen</b> is <b>{data.reason}</b>.
+            <Trans
+              i18nKey="gameLogList.theExecutionOfWasSkippedBecauseHouseTargaryenIsc08889"
+              values={{ reason: data.reason }}
+              components={{
+                westerosCardType: (
+                  <>
+                    {westerosCardType ? (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.theWesterosCard971bba"
+                          values={{ westerosCardType: westerosCardType.name }}
+                          components={{
+                            bold: <b />
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <>{t("gameLogList.westerosDeck4417a01")}</>
+                    )}
+                  </>
+                ),
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </>
         );
       }
@@ -3366,8 +5504,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            There was no further loyalty token available that could have been
-            placed in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.thereWasNoFurtherLoyaltyTokenAvailableThatCouldf90e93"
+              values={{
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3378,19 +5523,42 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <>
-            <b>Dragon revenge</b>: The last{" "}
-            <b>{this.fogOfWar ? fogOfWarUnit : unitType.name}</b> of House{" "}
-            <b>{house.name}</b> has been transformed into a <b>Dragon</b> in{" "}
-            <b>{region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.dragonRevengeTheLastOfHouseHasBeenTransformed2ec9ee"
+              values={{
+                unitType: this.fogOfWar
+                  ? t("common.hiddenUnit")
+                  : translateGameText(unitType.name),
+                house: house.name,
+                region: region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </>
         );
       }
       case "live-pbem-switch": {
         return (
           <p>
-            <h5 className="text-center">Game type has been changed</h5>
+            <h5 className="text-center">
+              {t("gameLogList.gameTypeHasBeenChanged5fa74c")}
+            </h5>
             <div className="text-center">
-              It is now <b>{data.isNowPbem ? "PBEM" : "Live"}</b>.
+              <Trans
+                i18nKey="gameLogList.itIsNow54f8d3"
+                values={{
+                  gameType: data.isNowPbem ? "PBEM" : t("common.live")
+                }}
+                components={{
+                  bold: <b />
+                }}
+              />
             </div>
           </p>
         );
@@ -3402,9 +5570,21 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Jamie Lannister</b>: House <b>{house.name}</b> gained{" "}
-            <b>{powerTokensGained}</b> Power&nbsp;token
-            {powerTokensGained != 1 ? "s" : ""}.
+            <Trans
+              i18nKey="gameLogList.jamieLannisterHouseGained6e7084"
+              values={{
+                house: house.name,
+                powerTokensGained: powerTokensGained,
+                powerTokenLabel: t("common.PowertokenLabel", {
+                  count: powerTokensGained
+                })
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3413,8 +5593,15 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
           <p>
-            <b>Maester Luwin</b>: House <b>{house.name}</b> decided to return{" "}
-            <b>{houseCard.name}</b> to hand.
+            <Trans
+              i18nKey="gameLogList.maesterLuwinHouseDecidedToReturnToHand24b07b"
+              values={{ house: house.name, houseCard: houseCard.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3424,16 +5611,30 @@ export default class GameLogListComponent extends Component<GameLogListComponent
         const houseCard = this.allHouseCards.get(data.houseCard);
         return (
           <p>
-            <b>Melisandre of Asshai</b>: House <b>{house.name}</b> spent 1
-            Power&nbsp;token to discard <b>{houseCard.name}</b> from House{" "}
-            <b>{affectedHouse.name}</b>.
+            <Trans
+              i18nKey="gameLogList.melisandreOfAsshaiHouseSpent1PowerTokenTo262cdb"
+              values={{
+                house: house.name,
+                houseCard: houseCard.name,
+                affectedHouse: affectedHouse.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />
+              }}
+            />
           </p>
         );
       }
       case "asha-greyjoy-1st-no-order-available":
         return (
           <p>
-            <b>Asha Greyjoy</b>: There were no Order tokens to be removed.
+            <Trans
+              i18nKey="gameLogList.ashaGreyjoyThereWereNoOrderTokensToBeb22171"
+              components={{ bold: <b /> }}
+            />
           </p>
         );
 
@@ -3445,9 +5646,22 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Asha Greyjoy</b>: House <b>{house.name}</b> removed a{" "}
-            <b>{removedOrder.type.name}</b> Order of <b>{affectedHouse.name}</b>{" "}
-            in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.ashaGreyjoyHouseRemovedAOrderOfInbabea0"
+              values={{
+                house: house.name,
+                removedOrderType: translateGameText(removedOrder.type.name),
+                affectedHouse: affectedHouse.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                bold4: <b />,
+                bold5: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3456,8 +5670,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Ellaria Sand</b>: House <b>{house.name}</b> had no available
-            Knight to upgrade to.
+            <Trans
+              i18nKey="gameLogList.ellariaSandHouseHadNoAvailableKnightToUpgrade6d5a93"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3466,8 +5686,14 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Ellaria Sand</b>: House <b>{house.name}</b> had no available
-            Footman to upgrade.
+            <Trans
+              i18nKey="gameLogList.ellariaSandHouseHadNoAvailableFootmanToUpgradebc8e6a"
+              values={{ house: house.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3477,8 +5703,18 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Ellaria Sand</b>: House <b>{house.name}</b> upgraded a Footman to
-            a Knight in <b>{this.fogOfWar ? fogOfWarRegion : region.name}</b>.
+            <Trans
+              i18nKey="gameLogList.ellariaSandHouseUpgradedAFootmanToAKnight285a12"
+              values={{
+                house: house.name,
+                region: this.fogOfWar ? t("common.hiddenRegion") : region.name
+              }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />
+              }}
+            />
           </p>
         );
       }
@@ -3489,15 +5725,35 @@ export default class GameLogListComponent extends Component<GameLogListComponent
 
         return (
           <p>
-            <b>Arianne Martell</b>: House <b>{house.name}</b> forced House{" "}
-            <b>{affectedHouse.name}</b> to destroy a unit.
-            <br />
-            {!this.fogOfWar && (
-              <>
-                House <b>{affectedHouse.name}</b> chose to destroy a{" "}
-                <b>{unitType.name}</b>
-              </>
-            )}
+            <Trans
+              i18nKey="gameLogList.arianneMartellHouseForcedHouseToDestroyAUnitc949f3"
+              values={{ house: house.name, affectedHouse: affectedHouse.name }}
+              components={{
+                bold: <b />,
+                bold2: <b />,
+                bold3: <b />,
+                lineBreak: <br />,
+                casualty: (
+                  <>
+                    {!this.fogOfWar && (
+                      <>
+                        <Trans
+                          i18nKey="gameLogList.houseChoseToDestroyAa590ac"
+                          values={{
+                            affectedHouse: affectedHouse.name,
+                            unitType: translateGameText(unitType.name)
+                          }}
+                          components={{
+                            bold: <b />,
+                            bold2: <b />
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
+                )
+              }}
+            />
           </p>
         );
       }
@@ -3507,7 +5763,13 @@ export default class GameLogListComponent extends Component<GameLogListComponent
   renderHouseName(house: House): ReactNode {
     return (
       <>
-        House <b style={{ color: house.color }}>{house.name}</b>
+        <Trans
+          i18nKey="gameLogList.house7d99a9"
+          values={{ attacked: house.name }}
+          components={{
+            bold: <b style={{ color: house.color }} />
+          }}
+        />
       </>
     );
   }

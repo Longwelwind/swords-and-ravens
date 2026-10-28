@@ -8,7 +8,7 @@ import IngameGameState from "../common/ingame-game-state/IngameGameState";
 import { MAP_HEIGHT } from "./MapComponent";
 import GameClient from "./GameClient";
 import User from "../server/User";
-import { observable } from "mobx";
+import { observable, runInAction } from "mobx";
 import { GameSettings } from "../common/GameSettings";
 import houseCardsBackImages from "./houseCardsBackImages";
 import houseInfluenceImages from "./houseInfluenceImages";
@@ -33,8 +33,8 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
   private gameSettings: GameSettings = this.ingame.entireGame.gameSettings;
   private user: User | null = this.gameClient.authenticatedUser;
 
-  @observable currentOpenedTab = "game-logs";
-  @observable columnSwapAnimationClassName = "";
+  @observable accessor currentOpenedTab = "game-logs";
+  @observable accessor columnSwapAnimationClassName = "";
 
   constructor(props: ReplayComponentProps) {
     super(props);
@@ -62,30 +62,34 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
       <Row
         className="justify-content-center"
         style={{
-          maxHeight: this.gameClient.isMapScrollbarSet ? "95vh" : "none",
+          maxHeight: this.gameClient.isMapScrollbarSet ? "95vh" : "none"
         }}
       >
         <Col
-          xs={{ order: columnOrders.gameStateColumn }}
+          xs={{ span: true, order: columnOrders.gameStateColumn }}
           className={this.columnSwapAnimationClassName}
           style={{
             maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
             minWidth: col1MinWidth,
-            maxWidth: "800px",
+            maxWidth: "800px"
           }}
         >
           <ReplayGameStateColumn
             gameClient={this.gameClient}
             ingame={this.ingame}
             currentOpenedTab={this.currentOpenedTab}
-            onTabChange={(tab) => (this.currentOpenedTab = tab)}
+            onTabChange={(tab) => {
+              runInAction(() => {
+                this.currentOpenedTab = tab;
+              });
+            }}
             onColumnSwapClick={() => this.onColumnSwap()}
           />
         </Col>
         <Col
           xs={{ span: "auto", order: columnOrders.mapColumn }}
           style={{
-            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
+            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none"
           }}
         >
           <div
@@ -94,7 +98,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
               height: this.gameClient.isMapScrollbarSet ? "100%" : "auto",
               overflowY: "auto",
               overflowX: "hidden",
-              maxHeight: MAP_HEIGHT,
+              maxHeight: MAP_HEIGHT
             }}
           >
             <WorldSnapshotComponent ingameGameState={this.ingame} />
@@ -104,7 +108,7 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
           xs={{ span: "auto", order: columnOrders.housesInfosColumn }}
           className={this.columnSwapAnimationClassName}
           style={{
-            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none",
+            maxHeight: this.gameClient.isMapScrollbarSet ? "100%" : "none"
           }}
         >
           <ReplayHouseInfoColumn
@@ -119,9 +123,15 @@ export default class ReplayComponent extends Component<ReplayComponentProps> {
 
   private onColumnSwap(): void {
     if (!this.user || this.columnSwapAnimationClassName !== "") return;
-    this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
-    this.user.settings.gameStateColumnRight =
-      !this.user.settings.gameStateColumnRight;
-    window.setTimeout(() => (this.columnSwapAnimationClassName = ""), 2050);
+    const user = this.user;
+    runInAction(() => {
+      this.columnSwapAnimationClassName = "animate__animated animate__fadeIn";
+      user.settings.gameStateColumnRight = !user.settings.gameStateColumnRight;
+    });
+    window.setTimeout(() => {
+      runInAction(() => {
+        this.columnSwapAnimationClassName = "";
+      });
+    }, 2050);
   }
 }

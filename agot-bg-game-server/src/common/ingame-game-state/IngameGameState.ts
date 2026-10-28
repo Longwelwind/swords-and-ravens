@@ -38,6 +38,7 @@ import VoteType, {
   CancelGame,
   EndGame,
   ExtendPlayerClocks,
+  EnableEmpoweredVassals,
   PauseGame,
   ReplacePlayer,
   ReplacePlayerByVassal,
@@ -50,7 +51,7 @@ import { v4 } from "uuid";
 import CancelledGameState, {
   SerializedCancelledGameState
 } from "../cancelled-game-state/CancelledGameState";
-import { computed, observable, runInAction } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 import _ from "lodash";
 import DraftGameState, {
   SerializedDraftGameState
@@ -142,18 +143,19 @@ export default class IngameGameState extends GameState<
   oldPlayerIds: string[] = [];
   replacerIds: string[] = [];
   timeoutPlayerIds: string[] = [];
-  @observable housesTimedOut: House[] = [];
+  @observable accessor housesTimedOut: House[] = [];
   game: Game;
   gameLogManager: GameLogManager = new GameLogManager(this);
   replayManager: GameReplayManager;
-  @observable ordersOnBoard: BetterMap<Region, Order> = new BetterMap();
-  @observable unitVisibilityRangeModifier = 0;
+  @observable accessor ordersOnBoard: BetterMap<Region, Order> =
+    new BetterMap();
+  @observable accessor unitVisibilityRangeModifier = 0;
 
   votes: BetterMap<string, Vote> = new BetterMap();
-  @observable paused: Date | null = null;
-  @observable willBeAutoResumedAt: Date | null = null;
+  @observable accessor paused: Date | null = null;
+  @observable accessor willBeAutoResumedAt: Date | null = null;
 
-  @observable bannedUsers: Set<string> = new Set();
+  @observable accessor bannedUsers: Set<string> = new Set();
 
   childGameStateBeforeCancellation: IngameChildGameState | null = null;
   childGameStateBeforeVassalsModification: IngameChildGameState | null = null;
@@ -163,13 +165,14 @@ export default class IngameGameState extends GameState<
   autoResumeTimeout: NodeJS.Timeout | null = null;
 
   // Client-side only
-  @observable stateVersion = 0;
-  @observable unitsToBeAnimated: BetterMap<Unit, UnitOnMapProperties> =
+  @observable accessor stateVersion = 0;
+  @observable accessor unitsToBeAnimated: BetterMap<Unit, UnitOnMapProperties> =
     new BetterMap();
-  @observable unitMoveAnimations: UnitMoveAnimationEntry[] = [];
-  @observable orderAnimations: OrderAnimationEntry[] = [];
-  @observable orderMoveAnimations: OrderMoveAnimationEntry[] = [];
-  @observable loyaltyTokenMoveAnimations: LoyaltyTokenMoveAnimationEntry[] = [];
+  @observable accessor unitMoveAnimations: UnitMoveAnimationEntry[] = [];
+  @observable accessor orderAnimations: OrderAnimationEntry[] = [];
+  @observable accessor orderMoveAnimations: OrderMoveAnimationEntry[] = [];
+  @observable
+  accessor loyaltyTokenMoveAnimations: LoyaltyTokenMoveAnimationEntry[] = [];
   private nextUnitMoveAnimationId = 1;
   private nextOrderAnimationId = 1;
   private nextOrderMoveAnimationId = 1;
@@ -177,8 +180,8 @@ export default class IngameGameState extends GameState<
 
   onVoteStarted: (() => void) | null = null;
   onPreemptiveRaidNewAttack:
-    | ((biddings: [number, House[]][], highestBidder: House) => void)
-    | null = null;
+    ((biddings: [number, House[]][], highestBidder: House) => void) | null =
+    null;
   onLogReceived: ((log: GameLogData) => void) | null = null;
   onGamePaused: (() => void) | null = null;
   onGameResumed: (() => void) | null = null;
@@ -201,7 +204,7 @@ export default class IngameGameState extends GameState<
    * the event is missed for some reason). The primary, precise cleanup happens via
    * `removeOrderAnimation` being called from the rendered order icon's onAnimationEnd handler.
    */
-  addOrderAnimation(
+  @action addOrderAnimation(
     region: Region,
     properties: OrderOnMapProperties,
     fallbackTimeoutMs: number
@@ -216,7 +219,7 @@ export default class IngameGameState extends GameState<
 
   // Safe to call multiple times or with an id that was already removed (e.g. once from
   // onAnimationEnd and once from the fallback timeout) - it simply does nothing in that case.
-  removeOrderAnimation(id: number): void {
+  @action removeOrderAnimation(id: number): void {
     const index = this.orderAnimations.findIndex((a) => a.id == id);
     if (index >= 0) {
       this.orderAnimations.splice(index, 1);
@@ -227,7 +230,7 @@ export default class IngameGameState extends GameState<
    * Finishes a running order move animation by really placing its order in the target region.
    * Safe to call multiple times (e.g. from the animation timeout and from a flush).
    */
-  finishOrderMoveAnimation(id: number): void {
+  @action finishOrderMoveAnimation(id: number): void {
     const animation = this.orderMoveAnimations.find((a) => a.id == id);
     if (!animation) {
       return;
@@ -244,7 +247,7 @@ export default class IngameGameState extends GameState<
    * `region`). Must be called before any other message modifies the orders on board, so a
    * pending animation can't place a stale order once it ends.
    */
-  flushOrderMoveAnimations(region?: Region): void {
+  @action flushOrderMoveAnimations(region?: Region): void {
     this.orderMoveAnimations
       .filter((a) => !region || a.to == region)
       .forEach((a) => this.finishOrderMoveAnimation(a.id));
@@ -299,7 +302,7 @@ export default class IngameGameState extends GameState<
     });
   }
 
-  removeLoyaltyTokenMoveAnimation(id: number): void {
+  @action removeLoyaltyTokenMoveAnimation(id: number): void {
     this.loyaltyTokenMoveAnimations = this.loyaltyTokenMoveAnimations.filter(
       (a) => a.id != id
     );
@@ -847,6 +850,10 @@ export default class IngameGameState extends GameState<
     } else if (message.type == "launch-extend-player-clocks-vote") {
       if (this.canLaunchExtendPlayerClocksVote(player).result) {
         this.createVote(player.user, new ExtendPlayerClocks());
+      }
+    } else if (message.type == "launch-enable-empowered-vassals-vote") {
+      if (this.canLaunchEnableEmpoweredVassalsVote(player).result) {
+        this.createVote(player.user, new EnableEmpoweredVassals());
       }
     } else if (message.type == "launch-replace-player-by-vassal-vote") {
       const playerToReplace = this.players.get(
@@ -1479,15 +1486,12 @@ export default class IngameGameState extends GameState<
             .filter((u) => u.type.id != "ship" && u.type.id != "dragon");
           if (nonDragonLandUnits.length == 1) {
             const unit = nonDragonLandUnits[0];
-            this.log(
-              {
-                type: "last-land-unit-transformed-to-dragon",
-                house: house.id,
-                transformedUnitType: unit.type.id,
-                region: unit.region.id
-              },
-              true
-            );
+            this.log({
+              type: "last-land-unit-transformed-to-dragon",
+              house: house.id,
+              transformedUnitType: unit.type.id,
+              region: unit.region.id
+            });
             this.transformUnits(unit.region, [unit], dragon);
           }
         }
@@ -1577,7 +1581,10 @@ export default class IngameGameState extends GameState<
           })
         );
         window.setTimeout(
-          () => units.forEach((u) => this.unitsToBeAnimated.delete(u)),
+          () =>
+            runInAction(() =>
+              units.forEach((u) => this.unitsToBeAnimated.delete(u))
+            ),
           4000
         );
       }
@@ -1598,10 +1605,12 @@ export default class IngameGameState extends GameState<
         );
         window.setTimeout(
           () =>
-            units.forEach((unit) => {
-              region.units.delete(unit.id);
-              this.unitsToBeAnimated.delete(unit);
-            }),
+            runInAction(() =>
+              units.forEach((unit) => {
+                region.units.delete(unit.id);
+                this.unitsToBeAnimated.delete(unit);
+              })
+            ),
           4000
         );
       } else {
@@ -1646,10 +1655,12 @@ export default class IngameGameState extends GameState<
           });
 
           window.setTimeout(() => {
-            this.unitMoveAnimations = this.unitMoveAnimations.filter(
-              (animation) => !animationIds.includes(animation.id)
-            );
-            moveAction();
+            runInAction(() => {
+              this.unitMoveAnimations = this.unitMoveAnimations.filter(
+                (animation) => !animationIds.includes(animation.id)
+              );
+              moveAction();
+            });
           }, durationMs);
         } else {
           moveAction();
@@ -2250,6 +2261,46 @@ export default class IngameGameState extends GameState<
         type: "launch-extend-player-clocks-vote"
       });
     }
+  }
+
+  launchEnableEmpoweredVassalsVote(): void {
+    this.entireGame.sendMessageToServer({
+      type: "launch-enable-empowered-vassals-vote"
+    });
+  }
+
+  canLaunchEnableEmpoweredVassalsVote(player: Player | null): {
+    result: boolean;
+    reason: string;
+  } {
+    if (player == null || !this.players.values.includes(player)) {
+      return { result: false, reason: "only-players-can-vote" };
+    }
+    if (this.isCancelled) {
+      return { result: false, reason: "already-cancelled" };
+    }
+    if (this.isEnded) {
+      return { result: false, reason: "already-ended" };
+    }
+    if (this.paused) {
+      return { result: false, reason: "game-paused" };
+    }
+    if (this.entireGame.gameSettings.empoweredVassals) {
+      return { result: false, reason: "already-enabled" };
+    }
+    if (this.getVassalHouses().length == 0) {
+      return { result: false, reason: "no-vassals" };
+    }
+    if (
+      this.votes.values.some(
+        (v) =>
+          v.state == VoteState.ONGOING &&
+          v.type instanceof EnableEmpoweredVassals
+      )
+    ) {
+      return { result: false, reason: "already-existing" };
+    }
+    return { result: true, reason: "" };
   }
 
   canLaunchCancelGameVote(player: Player | null): {

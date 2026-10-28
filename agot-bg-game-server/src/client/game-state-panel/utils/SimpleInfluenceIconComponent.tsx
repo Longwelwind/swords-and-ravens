@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { Component, default as React, ReactNode } from "react";
 import Tooltip from "react-bootstrap/Tooltip";
 import houseInfluenceImages from "../../houseInfluenceImages";
@@ -31,7 +32,9 @@ export default class SimpleInfluenceIconComponent extends Component<SimpleInflue
       <OverlayTrigger
         overlay={
           <Tooltip id="influence-icon">
-            <b>{this.house?.name ?? "Unknown house"}</b>
+            <b>
+              {this.house?.name ?? t("simpleInfluenceIcon.unknownHouse9961c1")}
+            </b>
           </Tooltip>
         }
         placement="bottom"

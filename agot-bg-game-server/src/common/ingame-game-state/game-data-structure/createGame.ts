@@ -767,6 +767,22 @@ export default function createGame(
           }
         });
     });
+
+    if (
+      playerHouses.includes("greyjoy") &&
+      game.houses.get("greyjoy").houseCards.has("balon-greyjoy")
+    ) {
+      // replace Balon by Rodrik DwD
+      const greyjoy = game.houses.get("greyjoy");
+      const adwdHouseCards = getHouseCardSet(baseGameData.adwdHouseCards);
+      const rodrikTheReaderCard = adwdHouseCards.find(
+        (hc) => hc.id == "rodrik-the-reader"
+      );
+      if (rodrikTheReaderCard) {
+        greyjoy.houseCards.delete("balon-greyjoy");
+        greyjoy.houseCards.set(rodrikTheReaderCard.id, rodrikTheReaderCard);
+      }
+    }
   } else if (
     gameSettings.customBalancing &&
     gameSettings.setupId == "base-game" &&

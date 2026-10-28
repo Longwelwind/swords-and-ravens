@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import LobbyGameState, {
@@ -30,11 +31,10 @@ import settingsKnobsImage from "../../public/images/icons/settings-knobs.svg";
 import speakerImage from "../../public/images/icons/speaker.svg";
 import speakerOffImage from "../../public/images/icons/speaker-off.svg";
 import getUserLinkOrLabel from "./utils/getIngameUserLinkOrLabel";
-// @ts-expect-error Somehow ts complains that this module cannot be found while it is
-import ScrollToBottom from "react-scroll-to-bottom";
+import AutoScroll from "./utils/AutoScroll";
 import _ from "lodash";
 import VolumeSliderComponent from "./utils/VolumeSliderComponent";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 interface LobbyComponentProps {
   gameClient: GameClient;
@@ -45,7 +45,7 @@ interface LobbyComponentProps {
 export default class LobbyComponent extends Component<LobbyComponentProps> {
   private lobbyHousesListRef = React.createRef<HTMLDivElement>();
 
-  @observable password = this.props.gameClient.isRealOwner()
+  @observable accessor password = this.props.gameClient.isRealOwner()
     ? this.lobby.password
     : "";
 
@@ -69,7 +69,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     return this.lobby.readyUsers != null;
   }
 
-  @observable chatHeight = 430;
+  @observable accessor chatHeight = 430;
 
   render(): ReactNode {
     const { success: canStartGame, reason: canStartGameReason } =
@@ -109,7 +109,11 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         </Col>
                       )}
                       <Col xs="auto" style={{ width: "100px" }}>
-                        <b>{this.randomHouses ? "Seat " + (i + 1) : h.name}</b>
+                        <b>
+                          {this.randomHouses
+                            ? t("lobby.seat9f2b77", { seatNumber: i + 1 })
+                            : h.name}
+                        </b>
                       </Col>
                       <Col
                         className={classNames({
@@ -161,13 +165,13 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             </Col>
             {connectedSpectators.length > 0 && (
               <Col className="no-space-around">
-                <Card className="ml-2">
+                <Card className="ms-2">
                   <Card.Body
                     style={{ height: this.chatHeight, padding: "1rem" }}
                   >
                     <div className="d-flex flex-column h-100">
-                      <span>Spectators:</span>
-                      <ScrollToBottom
+                      <span>{t("common.spectators")}</span>
+                      <AutoScroll
                         className="mb-2 flex-fill-remaining"
                         scrollViewClassName="overflow-x-hidden"
                       >
@@ -176,7 +180,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                             <b>{getUserLinkOrLabel(u)}</b>
                           </div>
                         ))}
-                      </ScrollToBottom>
+                      </AutoScroll>
                     </div>
                   </Card.Body>
                 </Card>
@@ -186,7 +190,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         </Col>
         <Col xs={12}>
           <Row className="justify-content-center no-space-around">
-            <Card>
+            <Card className="w-auto">
               <Card.Body className="py-2">
                 {!this.props.gameClient.isRealOwner() &&
                   this.lobby.password != "" &&
@@ -205,7 +209,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                   <Col>
                     <Button
                       type="button"
-                      block
+                      className="w-100"
                       onClick={() => this.lobby.start()}
                       disabled={!canStartGame || this.readyCheckOngoing}
                     >
@@ -216,14 +220,20 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                             overlay={
                               <Tooltip id="start-game">
                                 {this.readyCheckOngoing
-                                  ? "Ready check is ongoing"
+                                  ? t("lobby.readyCheckIsOngoingeccafe")
                                   : canStartGameReason == "not-enough-players"
-                                    ? "More players must join to be able to start the game."
+                                    ? t(
+                                        "lobby.morePlayersMustJoinToBeAbleToStart458adb"
+                                      )
                                     : canStartGameReason ==
                                         "targaryen-must-be-a-player-controlled-house"
-                                      ? "House Targaryen must be chosen by a player"
+                                      ? t(
+                                          "lobby.houseTargaryenMustBeChosenByAPlayer957ff1"
+                                        )
                                       : canStartGameReason == "not-owner"
-                                        ? "Only the owner of the game can start it"
+                                        ? t(
+                                            "lobby.onlyTheOwnerOfTheGameCanStartIt5c87b7"
+                                          )
                                         : null}
                               </Tooltip>
                             }
@@ -233,9 +243,11 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                         )}
                       >
                         {this.lobby.settings.pbem ? (
-                          <span>Start</span>
+                          <span>{t("lobby.starte4bb9f")}</span>
                         ) : (
-                          <span>Launch Ready Check to start the game</span>
+                          <span>
+                            {t("lobby.launchReadyCheckToStartTheGame2c0e86")}
+                          </span>
                         )}
                       </ConditionalWrap>
                     </Button>
@@ -254,9 +266,11 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                             overlay={
                               <Tooltip id="start-game">
                                 {this.readyCheckOngoing
-                                  ? "Ready check is ongoing"
+                                  ? t("lobby.readyCheckIsOngoingeccafe")
                                   : canCancelGameReason == "not-owner"
-                                    ? "Only the owner of the game can cancel it"
+                                    ? t(
+                                        "lobby.onlyTheOwnerOfTheGameCanCancelIt1e3ea8"
+                                      )
                                     : null}
                               </Tooltip>
                             }
@@ -265,7 +279,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                           </OverlayTrigger>
                         )}
                       >
-                        <>Cancel</>
+                        <>{t("lobby.cancel19766e")}</>
                       </ConditionalWrap>
                     </Button>
                   </Col>
@@ -281,7 +295,9 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="lobby-mute-tooltip">
-                            {this.props.gameClient.muted ? "Unmute" : "Mute"}
+                            {this.props.gameClient.muted
+                              ? t("common.unmute")
+                              : t("common.mute")}
                           </Tooltip>
                         }
                       >
@@ -326,7 +342,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         <Col className="m-2 p-2">
           <VolumeSliderComponent
             volume={this.props.gameClient.notificationsVolume * 100}
-            name="Notifications"
+            name={t("common.notifications")}
             onVolumeChange={(val) =>
               this.props.gameClient.sfxManager.notificationVolumeChanged(
                 val / 100
@@ -335,14 +351,14 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
           />
           <VolumeSliderComponent
             volume={this.props.gameClient.musicVolume * 100}
-            name="Music"
+            name={t("common.music")}
             onVolumeChange={(val) =>
               this.props.gameClient.sfxManager.musicVolumeChanged(val / 100)
             }
           />
           <VolumeSliderComponent
             volume={this.props.gameClient.sfxVolume * 100}
-            name="Sfx"
+            name={t("common.soundEffects")}
             onVolumeChange={(val) =>
               this.props.gameClient.sfxManager.sfxVolumeChanged(val / 100)
             }
@@ -365,19 +381,18 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
           tooltip={
             <Tooltip id="game-password-tooltip">
               {isOwner ? (
-                <>
-                  You can set a password here to prevent strangers from joining
-                  your game.
-                </>
+                <>{t("lobby.youCanSetAPasswordHereToPreventStrangers358b96")}</>
               ) : this.lobby.password != "" ? (
-                <>Enter the password here to unlock and join the game.</>
+                <>{t("lobby.enterThePasswordHereToUnlockAndJoinThef9cb12")}</>
               ) : (
                 <></>
               )}
             </Tooltip>
           }
           placeHolder={
-            isOwner ? "Set password" : "Enter the password to unlock the game"
+            isOwner
+              ? t("lobby.setPassword4e4116")
+              : t("lobby.enterThePasswordToUnlockTheGame31e38f")
           }
           width={300}
         />
@@ -401,14 +416,14 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
         return (
           <Col xs="auto">
             <Button type="button" size="sm" className="invisible">
-              INVISIBLE DUMMY
+              {t("lobby.invisibleDummy6080df")}
             </Button>
           </Col>
         );
       }
       return this.lobby.readyUsers.includes(this.lobby.players.get(h)) ? (
         <Col xs="auto">
-          <Badge variant="success">
+          <Badge bg="success">
             <FontAwesomeIcon icon={faCheck} size="sm" />
           </Badge>
         </Col>
@@ -420,10 +435,10 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             variant="outline-success"
             onClick={() => this.ready()}
           >
-            Ready
+            {t("common.ready")}
           </Button>
           <Spinner
-            className="ml-3"
+            className="ms-3"
             size="sm"
             animation="border"
             variant="info"
@@ -454,7 +469,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
     return !this.lobby.players.has(h) ? (
       <Col xs="auto" className={invisible ? "invisible" : ""}>
         <Button type="button" size="sm" onClick={() => this.choose(h)}>
-          Choose
+          {t("lobby.choosec7f937")}
         </Button>
       </Col>
     ) : this.lobby.players.get(h) == this.authenticatedUser ? (
@@ -465,7 +480,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
           variant="danger"
           onClick={() => this.leave()}
         >
-          Leave
+          {t("lobby.leavefc6e4a")}
         </Button>
       </Col>
     ) : (
@@ -477,7 +492,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
             variant="danger"
             onClick={() => this.kick(h)}
           >
-            Kick
+            {t("lobby.kick37ca3c")}
           </Button>
         </Col>
       )
@@ -497,7 +512,7 @@ export default class LobbyComponent extends Component<LobbyComponentProps> {
   }
 
   cancel(): void {
-    if (confirm("Are you sure you want to cancel the game?")) {
+    if (confirm(t("lobby.areYouSureYouWantToCancelTheGamec7f270"))) {
       this.lobby.cancel();
     }
   }

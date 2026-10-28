@@ -16,16 +16,16 @@ interface ParentGameState extends GameState<any, any> {
   onSelectHouseCardFinish(
     house: House,
     houseCard: HouseCard,
-    resolvedAutomatically: boolean,
+    resolvedAutomatically: boolean
   ): void;
 }
 
 export default class SelectHouseCardGameState<
-  P extends ParentGameState,
+  P extends ParentGameState
 > extends GameState<P> {
   house: House;
   houseCards: HouseCard[];
-  @observable selectedHouseCard: HouseCard | null = null;
+  @observable accessor selectedHouseCard: HouseCard | null = null;
 
   firstStart(house: House, houseCards: HouseCard[]): void {
     this.house = house;
@@ -33,7 +33,7 @@ export default class SelectHouseCardGameState<
 
     if (houseCards.length == 0) {
       throw new Error(
-        "SelectHouseCardGameState called with houseCards.length == 0!",
+        "SelectHouseCardGameState called with houseCards.length == 0!"
       );
     }
 
@@ -46,14 +46,14 @@ export default class SelectHouseCardGameState<
   select(houseCard: HouseCard): void {
     this.parentGameState.entireGame.sendMessageToServer({
       type: "select-house-card",
-      houseCard: houseCard.id,
+      houseCard: houseCard.id
     });
   }
 
   onPlayerMessage(player: Player, message: ClientMessage): void {
     if (message.type == "select-house-card") {
       const houseCard = this.parentGameState.game.getHouseCardById(
-        message.houseCard,
+        message.houseCard
       );
 
       if (
@@ -69,7 +69,7 @@ export default class SelectHouseCardGameState<
       this.parentGameState.onSelectHouseCardFinish(
         this.house,
         houseCard,
-        false,
+        false
       );
     }
   }
@@ -82,24 +82,24 @@ export default class SelectHouseCardGameState<
 
   serializeToClient(
     _admin: boolean,
-    _player: Player | null,
+    _player: Player | null
   ): SerializedSelectHouseCardGameState {
     return {
       type: "select-house-card",
       house: this.house.id,
-      houseCards: this.houseCards.map((hc) => hc.id),
+      houseCards: this.houseCards.map((hc) => hc.id)
     };
   }
 
   static deserializeFromServer<P extends ParentGameState>(
     parent: P,
-    data: SerializedSelectHouseCardGameState,
+    data: SerializedSelectHouseCardGameState
   ): SelectHouseCardGameState<P> {
     const selectHouseCardGameState = new SelectHouseCardGameState(parent);
 
     selectHouseCardGameState.house = parent.game.houses.get(data.house);
     selectHouseCardGameState.houseCards = data.houseCards.map((hcid) =>
-      parent.game.getHouseCardById(hcid),
+      parent.game.getHouseCardById(hcid)
     );
 
     return selectHouseCardGameState;

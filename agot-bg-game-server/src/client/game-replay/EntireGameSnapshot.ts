@@ -8,8 +8,8 @@ import IngameGameState from "../../common/ingame-game-state/IngameGameState";
 import _ from "lodash";
 
 export default class EntireGameSnapshot implements IEntireGameSnapshot {
-  @observable worldSnapshot: RegionSnapshot[];
-  @observable gameSnapshot?: GameSnapshot;
+  @observable accessor worldSnapshot: RegionSnapshot[];
+  @observable accessor gameSnapshot: GameSnapshot | undefined = undefined;
 
   private ingame: IngameGameState;
   private _regionMap = new BetterMap<string, RegionSnapshot>();

@@ -1,0 +1,261 @@
+{
+  "houses": [
+    {
+      "id": "baratheon",
+      "name": "Baratheon",
+      "color": "#e6d228"
+    },
+    {
+      "id": "lannister",
+      "name": "Lannister",
+      "color": "#dc3545"
+    },
+    {
+      "id": "stark",
+      "name": "Stark",
+      "color": "#f8f9fa"
+    },
+    {
+      "id": "greyjoy",
+      "name": "Greyjoy",
+      "color": "#6c757d"
+    },
+    {
+      "id": "tyrell",
+      "name": "Tyrell",
+      "color": "#28a745"
+    },
+    {
+      "id": "martell",
+      "name": "Martell",
+      "color": "orange"
+    },
+    {
+      "id": "arryn",
+      "name": "Arryn",
+      "color": "#32aadc"
+    },
+    {
+      "id": "targaryen",
+      "name": "Targaryen",
+      "color": "#9013FE"
+    }
+  ],
+  "setups": [
+    {
+      "id": "base-game",
+      "name": "2nd Edition Base Game (3-6p)",
+      "playerSetups": [
+        {
+          "playerCount": 3,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark"
+          ]
+        },
+        {
+          "playerCount": 4,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy"
+          ]
+        },
+        {
+          "playerCount": 5,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell"
+          ]
+        },
+        {
+          "playerCount": 6,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell",
+            "martell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mother-of-dragons",
+      "name": "Mother of Dragons (7p/8p)",
+      "playerSetups": [
+        {
+          "playerCount": 7,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell",
+            "martell",
+            "arryn"
+          ]
+        },
+        {
+          "playerCount": 8,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell",
+            "martell",
+            "arryn",
+            "targaryen"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-dance-with-dragons",
+      "name": "A Dance with Dragons (6p)",
+      "playerSetups": [
+        {
+          "playerCount": 6,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell",
+            "martell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-feast-for-crows",
+      "name": "A Feast for Crows (4p)",
+      "playerSetups": [
+        {
+          "playerCount": 4,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "arryn"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-dance-with-mother-of-dragons",
+      "name": "A Dance with Mother of Dragons (8p)",
+      "playerSetups": [
+        {
+          "playerCount": 8,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell",
+            "martell",
+            "arryn",
+            "targaryen"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "struggle-in-the-north",
+      "name": "Struggle in the North (4p/5p)",
+      "playerSetups": [
+        {
+          "playerCount": 4,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy"
+          ]
+        },
+        {
+          "playerCount": 5,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rumble-in-the-south",
+      "name": "Rumble in the South (4p)",
+      "playerSetups": [
+        {
+          "playerCount": 4,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "tyrell",
+            "martell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "race-to-kings-landing",
+      "name": "Race to King's Landing (5p)",
+      "playerSetups": [
+        {
+          "playerCount": 5,
+          "houses": [
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell",
+            "martell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "no-kraken-for-dinner",
+      "name": "No Kraken for Dinner (5p)",
+      "playerSetups": [
+        {
+          "playerCount": 5,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "tyrell",
+            "martell"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "learn-the-game",
+      "name": "Teach the Game (2p)",
+      "playerSetups": [
+        {
+          "playerCount": 2,
+          "houses": [
+            "baratheon",
+            "lannister",
+            "stark",
+            "greyjoy",
+            "tyrell",
+            "martell"
+          ]
+        }
+      ]
+    }
+  ]
+}

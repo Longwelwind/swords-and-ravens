@@ -1,6 +1,7 @@
 @page "{id:guid}"
 @model UserModel
 @using agot_bg_website.Domain
+@using agot_bg_website.Services.Statistics
 @{
     ViewData["Title"] = Model.ViewedUser.DisplayName;
     ViewData["WideContainer"] = true;
@@ -81,6 +82,75 @@
     </div>
 
     <div class="lg:col-span-9 flex flex-col gap-4">
+        @if (Model.HouseSelections.Count > 0)
+        {
+            <section class="card bg-base-200 shadow-md border border-base-300 p-4 sm:p-6" aria-labelledby="house-stats-heading">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 id="house-stats-heading" class="text-lg font-semibold">Houses</h2>
+                    <select id="house-stats-select" class="select" aria-label="Scenario" style="max-width: 100%;">
+                        @foreach (var selection in Model.HouseSelections)
+                        {
+                            <option value="@selection.Key">@selection.Label</option>
+                        }
+                    </select>
+                </div>
+                <p class="text-sm opacity-70 mt-1 mb-1">Win rate &middot; qualifying finished games &middot; the best house needs @PlayerHouseStatsView.MinGamesForBest+ games</p>
+                <p class="text-xs opacity-70 mb-4">Only games with a recorded result count here. Tutorial games and losses as a pure replacer are excluded, so this total can be lower than Finished games in your profile.</p>
+                @foreach (var selection in Model.HouseSelections)
+                {
+                    <div class="js-house-panel" data-scenario="@selection.Key" hidden="@(selection.Key.Length > 0)">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.75rem;">
+                            @foreach (var house in selection.Cards)
+                            {
+                                var played = house.State == HouseCardState.Played;
+                                var winRatePercent = house.WinRate is { } rate ? rate * 100 : 0;
+                                var summary = house.State switch
+                                {
+                                    HouseCardState.Played => $"{house.Wins} won of {house.Games}, win rate {house.WinRateDisplay}",
+                                    HouseCardState.NotPlayed => "not played",
+                                    _ => "not in this scenario",
+                                };
+                                <div class="rounded-box border border-base-300 bg-base-100 p-3 text-center"
+                                     role="group" aria-label="@house.Name: @summary@(house.IsBest ? ", best house" : "")"
+                                     style="@(played ? "" : "opacity: 0.5;")@(house.IsBest ? "border-color: #d4af37; box-shadow: 0 0 0 1px #d4af37;" : "")">
+                                    <div style="position: relative; width: 5.5rem; height: 5.5rem; margin: 0 auto;">
+                                        <svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true" focusable="false" style="transform: rotate(-90deg);">
+                                            <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="7" />
+                                            @if (played && winRatePercent > 0)
+                                            {
+                                                <circle cx="50" cy="50" r="44" fill="none" stroke="@house.Color" stroke-width="7" stroke-linecap="round"
+                                                        pathLength="100" stroke-dasharray="@winRatePercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) 100" />
+                                            }
+                                        </svg>
+                                        <img src="~/house_icons/@(house.Id).png" alt="" aria-hidden="true"
+                                             style="position: absolute; inset: 0; margin: auto; height: 2.75rem; width: auto; max-width: 3.25rem; @(played ? "" : "filter: grayscale(1);")" />
+                                    </div>
+                                    <div class="font-semibold mt-1" style="@(house.IsBest ? "color: #d4af37;" : "")">
+                                        @house.Name@(house.IsBest ? " ★" : "")
+                                    </div>
+                                    @if (played)
+                                    {
+                                        <div class="text-xs opacity-70">@house.Wins won of @house.Games</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-xs opacity-70">@(house.State == HouseCardState.NotPlayed ? "not played" : "not in this scenario")</div>
+                                    }
+                                    <div class="text-lg font-bold" style="@(house.IsBest ? "color: #d4af37;" : "")">@house.WinRateDisplay</div>
+                                </div>
+                            }
+                        </div>
+                        @if (selection.RemovedGames > 0)
+                        {
+                            <p class="text-xs opacity-70 mt-3">
+                                Not included: replaced or left early in @selection.RemovedGames @(selection.RemovedGames == 1 ? "game" : "games") (house not recorded).
+                            </p>
+                        }
+                    </div>
+                }
+            </section>
+        }
+
         <details class="collapse collapse-arrow bg-base-200 shadow-md border border-base-300" data-collapse-key="user-games"@(Model.Request.IsCollapseSectionOpen("user-games", true) ? " open" : "")>
             <summary class="collapse-title text-lg font-semibold">
                 Games <span class="badge badge-lg align-middle ml-1">@Model.GamesOfUser.Count</span>
@@ -291,7 +361,14 @@
                                         <td class="text-center">
                                             @if (game.State == GameState.Cancelled)
                                             {
-                                                <span class="badge badge-neutral" title="This game was later cancelled - it never counted towards your stats.">Cancelled</span>
+                                                @if (game.Reason == PlayerReplacementReason.ClockTimeout || game.IsReplacer)
+                                                {
+                                                    <span class="badge badge-neutral" title="This game was later cancelled - it never counted towards your stats.">Cancelled</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-neutral" title="This game was later cancelled - leaving it early still counts as a loss.">Cancelled</span>
+                                                }
                                             }
                                         </td>
                                         <td class="whitespace-normal break-words">
@@ -339,3 +416,21 @@
         }
     </div>
 </div>
+
+@if (Model.HouseSelections.Count > 0)
+{
+    <script nonce="@HttpContext.GetCspNonce()">
+        (function () {
+            var select = document.getElementById('house-stats-select');
+            if (!select) { return; }
+            var panels = document.querySelectorAll('.js-house-panel');
+            function show() {
+                panels.forEach(function (panel) {
+                    panel.hidden = panel.getAttribute('data-scenario') !== select.value;
+                });
+            }
+            select.addEventListener('change', show);
+            show();
+        })();
+    </script>
+}

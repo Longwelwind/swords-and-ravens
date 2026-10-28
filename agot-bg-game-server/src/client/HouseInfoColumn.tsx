@@ -1,3 +1,4 @@
+import { t, Trans } from "./i18n";
 import React, { Component, ReactNode } from "react";
 import {
   Col,
@@ -17,7 +18,7 @@ import GameClient from "./GameClient";
 import MapControls from "./MapControls";
 import User from "../server/User";
 import { InfluenceTrackDetails } from "./IngameComponent";
-import { OverlayChildren } from "react-bootstrap/esm/Overlay";
+import { OverlayChildren } from "react-bootstrap/Overlay";
 
 import ColumnSwapButton from "./game-state-panel/utils/ColumnSwapButton";
 
@@ -101,14 +102,10 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                       id="cancel-game-vote-tooltip"
                       className="tooltip-w-100"
                     >
-                      The houses info list is always reordered by score and thus
-                      acts as the victory track.
-                      <br />
-                      If you hover the mouse pointer over the victory point
-                      counter, a tooltip appears
-                      <br />
-                      that shows you the total number of land areas, which is
-                      important for breaking ties.
+                      <Trans
+                        i18nKey="houseInfoColumn.theHousesInfoListIsAlwaysReorderedByScoreadbbe7"
+                        components={{ lineBreak: <br />, lineBreak2: <br /> }}
+                      />
                     </Tooltip>
                   }
                   placement="top"
@@ -125,11 +122,11 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                   mapControls={this.props.mapControls}
                 />
               ))}
-              <ListGroupItem className="font-italic">
+              <ListGroupItem className="fst-italic">
                 {connectedSpectators.length > 0 ? (
                   <>
                     <Row className="justify-content-center">
-                      <Col xs="auto">Spectators:</Col>
+                      <Col xs="auto">{t("common.spectators")}</Col>
                     </Row>
                     <Row
                       className="justify-content-center"
@@ -150,14 +147,18 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                   </>
                 ) : (
                   <Row className="justify-content-center">
-                    <Col xs="auto">No spectators</Col>
+                    <Col xs="auto">
+                      {t("houseInfoColumn.noSpectatorsabba41")}
+                    </Col>
                   </Row>
                 )}
               </ListGroupItem>
               {bannedUsers.length > 0 && (
-                <ListGroupItem className="font-italic">
+                <ListGroupItem className="fst-italic">
                   <Row className="justify-content-center">
-                    <Col xs="auto">Banned users:</Col>
+                    <Col xs="auto">
+                      {t("houseInfoColumn.bannedUsersfe6569")}
+                    </Col>
                   </Row>
                   <Row
                     className="justify-content-center"
@@ -169,7 +170,7 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                         {this.gameClient.canActAsOwner() && (
                           <button
                             type="button"
-                            className="close ml-1"
+                            className="icon-button ms-1"
                             style={{ float: "none" }}
                             onClick={() => this.unbanUser(u)}
                           >
@@ -204,40 +205,43 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
                 <Tooltip id={`tooltip-tracker-${i}`}>
                   {i == 0 ? (
                     <>
-                      <b>Iron Throne Track</b>
-                      <br />
-                      All ties (except military ones) are decided by the holder
-                      of the Iron Throne.
-                      <br />
-                      Turn order is decided by this tracker.
+                      <Trans
+                        i18nKey="houseInfoColumn.ironThroneTrackAllTiesExceptMilitaryOnesAre6b30b5"
+                        components={{
+                          bold: <b />,
+                          lineBreak: <br />,
+                          lineBreak2: <br />
+                        }}
+                      />
                     </>
                   ) : i == 1 ? (
                     <>
-                      <b>Fiefdoms Track</b>
-                      <br />
-                      Once per round, the holder of Valyrian Steel Blade can use
-                      the blade to increase by one the combat strength of his
-                      army in a combat.
-                      <br />
-                      In case of a tie in a combat, the winner is the house
-                      which is the highest in this tracker.
-                      <br />
-                      <br />
-                      {this.game.valyrianSteelBladeUsed ? (
-                        <>The Valyrian Steel Blade has been used this round.</>
-                      ) : (
-                        <>The Valyrian Steel Blade is available.</>
-                      )}
+                      <Trans
+                        i18nKey="houseInfoColumn.fiefdomsTrackOncePerRoundTheHolderOfValyrianbce67a"
+                        values={{
+                          bladeStatus: this.game.valyrianSteelBladeUsed
+                            ? t(
+                                "houseInfoColumn.theValyrianSteelBladeHasBeenUsedThisRoundb9af41"
+                              )
+                            : t(
+                                "houseInfoColumn.theValyrianSteelBladeIsAvailablef2bb4f"
+                              )
+                        }}
+                        components={{
+                          bold: <b />,
+                          lineBreak: <br />,
+                          lineBreak2: <br />,
+                          lineBreak3: <br />,
+                          lineBreak4: <br />
+                        }}
+                      />
                     </>
                   ) : (
                     <>
-                      <b>Kings&apos;s Court Track</b>
-                      <br />
-                      At the end of the Planning Phase, the holder of the Raven
-                      may choose to either change one of his placed order, or to
-                      look at the top card of the Wildling deck and decide
-                      whether to leave it at the top or to place it at the
-                      bottom of the deck.
+                      <Trans
+                        i18nKey="houseInfoColumn.kingsSCourtTrackAtTheEndOfThed57382"
+                        components={{ bold: <b />, lineBreak: <br /> }}
+                      />
                     </>
                   )}
                 </Tooltip>
@@ -300,7 +304,11 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
   private unbanUser(user: User): void {
     if (this.gameClient.canActAsOwner()) {
       if (
-        !window.confirm("Are you sure you want to unban '" + user.name + "'?")
+        !window.confirm(
+          t("houseInfoColumn.areYouSureYouWantToUnband3897e", {
+            user: user.name
+          })
+        )
       ) {
         return;
       }
@@ -342,7 +350,9 @@ export default class HouseInfoColumn extends Component<HouseInfoColumnProps> {
               placement="auto"
               overlay={
                 <Tooltip id="house-info-mute-tooltip">
-                  {this.gameClient.muted ? "Unmute" : "Mute"}
+                  {this.gameClient.muted
+                    ? t("common.unmute")
+                    : t("common.mute")}
                 </Tooltip>
               }
             >

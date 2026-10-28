@@ -1,3 +1,4 @@
+import { Trans } from "../../i18n";
 import { observer } from "mobx-react";
 import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
@@ -18,17 +19,21 @@ export default class MelisandreOfAsshai1stAbilityComponent extends Component<
     return (
       <>
         <Col xs={12} className="text-center">
-          <b>Melisandre of Asshai</b>: House{" "}
-          <b>{this.props.gameState.childGameState.house.name}</b> may choose to
-          expend one Power token to discard one House card of House{" "}
-          <b>
-            {
-              this.props.gameState.combat.getEnemy(
+          <Trans
+            i18nKey="melisandreOfAsshai1stAbility.melisandreOfAsshaiHouseMayChooseToExpendOne636cfa"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name,
+              enemyHouse: this.props.gameState.combat.getEnemy(
                 this.props.gameState.childGameState.house
               ).name
-            }
-          </b>
-          .
+            }}
+            components={{
+              bold: <b />,
+              bold2: <b />,
+              bold3: <b />
+            }}
+          />
         </Col>
         {renderChildGameState(this.props, [
           [SimpleChoiceGameState, SimpleChoiceComponent],

@@ -1,31 +1,41 @@
-import {observer} from "mobx-react";
-import {Component, ReactNode} from "react";
+import { Trans } from "../../i18n";
+import { observer } from "mobx-react";
+import { Component, ReactNode } from "react";
 import GameStateComponentProps from "../GameStateComponentProps";
 import renderChildGameState from "../../utils/renderChildGameState";
 import React from "react";
 import Col from "react-bootstrap/Col";
-import RodrikTheReaderAbilityGameState
-    from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
-import SelectWesterosCardGameState
-    from "../../../common/ingame-game-state/select-westeros-card-game-state/SelectWesterosCardGameState";
+import RodrikTheReaderAbilityGameState from "../../../common/ingame-game-state/action-game-state/resolve-march-order-game-state/combat-game-state/post-combat-game-state/after-winner-determination-game-state/rodrik-the-reader-ability-game-state/RodrikTheReaderAbilityGameState";
+import SelectWesterosCardGameState from "../../../common/ingame-game-state/select-westeros-card-game-state/SelectWesterosCardGameState";
 import SelectWesterosCardComponent from "../SelectWesterosCardComponent";
 import SimpleChoiceGameState from "../../../common/ingame-game-state/simple-choice-game-state/SimpleChoiceGameState";
 import SimpleChoiceComponent from "../SimpleChoiceComponent";
 
 @observer
-export default class RodrikTheReaderAbilityComponent extends Component<GameStateComponentProps<RodrikTheReaderAbilityGameState>> {
-    render(): ReactNode {
-        return (
-            <>
-                <Col xs={12} className="text-center">
-                    <b>Rodrik The Reader</b>: House <b>{this.props.gameState.childGameState.house.name}</b> may search any Westeros deck for a card
-                    of his choice and place the chosen card facedown on top of the deck.
-                </Col>
-                {renderChildGameState(this.props, [
-                    [SimpleChoiceGameState, SimpleChoiceComponent],
-                    [SelectWesterosCardGameState, SelectWesterosCardComponent]
-                ])}
-            </>
-        );
-    }
+export default class RodrikTheReaderAbilityComponent extends Component<
+  GameStateComponentProps<RodrikTheReaderAbilityGameState>
+> {
+  render(): ReactNode {
+    return (
+      <>
+        <Col xs={12} className="text-center">
+          <Trans
+            i18nKey="rodrikTheReaderAbility.rodrikTheReaderHouseMaySearchAnyWesterosDeckd28985"
+            values={{
+              childGameStateHouse:
+                this.props.gameState.childGameState.house.name
+            }}
+            components={{
+              bold: <b />,
+              bold2: <b />
+            }}
+          />
+        </Col>
+        {renderChildGameState(this.props, [
+          [SimpleChoiceGameState, SimpleChoiceComponent],
+          [SelectWesterosCardGameState, SelectWesterosCardComponent]
+        ])}
+      </>
+    );
+  }
 }
