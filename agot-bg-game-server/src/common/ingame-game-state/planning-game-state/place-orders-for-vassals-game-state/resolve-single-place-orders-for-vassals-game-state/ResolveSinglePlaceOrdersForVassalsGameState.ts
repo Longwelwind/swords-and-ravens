@@ -98,6 +98,10 @@ export default class ResolveSinglePlaceOrdersForVassalsGameState extends GameSta
         const availableOrders = this.placeOrdersGameState
           .getAvailableOrders(house)
           .filter((o) => o != order);
+        const replacedOrder = this.placedOrders.tryGet(region, null);
+        if (replacedOrder && !availableOrders.includes(replacedOrder)) {
+          availableOrders.push(replacedOrder);
+        }
         if (
           availableOrders.some(
             (o) =>

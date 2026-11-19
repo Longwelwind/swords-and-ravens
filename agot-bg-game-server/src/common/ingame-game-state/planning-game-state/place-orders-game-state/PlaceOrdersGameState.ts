@@ -159,6 +159,10 @@ export default class PlaceOrdersGameState extends GameState<PlanningGameState> {
         const availableOrders = this.getAvailableOrders(house).filter(
           (o) => o != order
         );
+        const replacedOrder = this.placedOrders.tryGet(region, null);
+        if (replacedOrder && !availableOrders.includes(replacedOrder)) {
+          availableOrders.push(replacedOrder);
+        }
         if (
           availableOrders.some(
             (o) =>
