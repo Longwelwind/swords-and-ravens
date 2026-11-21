@@ -608,14 +608,16 @@ export default class IngameGameState extends GameState<
       this.game.ironBank.drawNewLoanCard();
     }
 
-    if (this.game.turn != 0 && this.game.turn % 10 == 0) {
-      // Refresh Westeros deck 3 after every 10th round
+    if (this.game.westerosDecks[2].every((wc) => wc.discarded)) {
+      // Refresh Westeros deck 3 once all of its cards have been discarded
       const deck3 = this.game.westerosDecks[2];
       deck3.forEach((wc) => (wc.discarded = false));
       this.game.westerosDecks[2] = shuffle(deck3);
 
       this.broadcastWesterosDecks();
+    }
 
+    if (this.game.turn != 0 && this.game.turn % 10 == 0) {
       // Reshuffle the wildling deck
       this.game.wildlingDeck = shuffle(this.game.wildlingDeck);
       this.game.houses.forEach((h) => (h.knowsNextWildlingCard = false));
